@@ -4,6 +4,7 @@ import {getTheta, DEGREES} from '@/shared';
 
 import Readout from './readout';
 import LimitDisplay from './limitDisplay';
+import Target from './target';
 
 import getElements from './elements';
 
@@ -32,6 +33,7 @@ const dock = (node) => new Promise((resolve) => {
 export default class {
 	static limitDisplay = new LimitDisplay();
 	static readout = new Readout();
+	static target = new Target();
 	
 	elements = getElements();
 	
@@ -52,7 +54,7 @@ export default class {
 		this.constructor.readout.setRotation(this.rotation);
 		
 		resizer.parentElement.insertBefore(this.constructor.readout.element, resizer);
-		imageWrapper.appendChild(this.constructor.limitDisplay.element);
+		imageWrapper.append(this.constructor.limitDisplay.element, this.constructor.target.element);
 		
 		dock(wrapper).then(() => {
 			const observer = new ResizeObserver(() => {
@@ -115,9 +117,6 @@ export default class {
 			
 			this.applyPosition();
 			this.applyZoom();
-			
-			// setTargetX(newPosition.x);
-			// setTargetY(newPosition.y);
 		});
 		
 		viewport.addEventListener('pointerdown', (event) => {
@@ -166,8 +165,7 @@ export default class {
 					}, {capture: true, once: true});
 				}
 				
-				// setTargetX(null);
-				// setTargetY(null);
+				this.constructor.target.show(false);
 				
 				if (!isClick) {
 					return;
@@ -214,8 +212,12 @@ export default class {
 		this.setDimensions(this.viewportDimensions, this.elements.viewport);
 		
 		if (doApply) {
+			const target = {...this.position};
+			
 			this.constrainPosition(WEIGHTS.DIMENSIONS);
 			this.applyPosition();
+			
+			this.constructor.target.set(target, this);
 		}
 	}
 	
@@ -245,10 +247,14 @@ export default class {
 				this.position.x += change.x / this.imageDimensions.width;
 				this.position.y += change.y / this.imageDimensions.height;
 				
+				const target = {...this.position};
+				
 				// setTargetX(target.x);
 				// setTargetY(target.y);
 				
 				this.constrainPosition(WEIGHTS.POSITION);
+				
+				this.constructor.target.set(target, this);
 				
 				this.applyPosition();
 			}
@@ -278,8 +284,12 @@ export default class {
 			
 			this.rotation = startRotation + (priorMouseTheta - mouseTheta);
 			
+			const target = {...this.position};
+			
 			this.constrainRotation();
 			this.constrainPosition(WEIGHTS.ROTATION);
+			
+			this.constructor.target.set(target, this);
 			
 			this.applyRotation();
 			this.applyPosition();
