@@ -1,0 +1,15 @@
+{
+	"devDependencies": {
+		"@eslint/eslintrc": "^3.1.0",
+		"@stylistic/eslint-plugin": "^2.6.4",
+		"copy-webpack-plugin": "^13.0.0",
+		"eslint": "^9.9.0",
+		"eslint-plugin-indent-empty-lines": "^1.0.2",
+		"webpack": "^5.54.0",
+		"webpack-cli": "^4.8.0",
+		"webpack-dev-server": "^4.3.0"
+	},
+	"scripts": {
+		"serve": "webpack s --config-name DEBUG"
+	}
+}
