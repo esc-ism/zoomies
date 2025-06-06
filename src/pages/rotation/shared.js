@@ -29,11 +29,7 @@ export const getProgressed = ({x: fromX, y: fromY, z: lowZ}, {x: toX, y: toY}, t
 export const getLineY = ({m, c}, x) => m * x + c;
 
 // x = (y - c) / m
-export const getLineX = ({m, c, ...point}, y) => {
-	const x = (y - c) / m;
-	
-	return isNaN(x) ? point.x : x;
-};
+export const getLineX = ({m, c, x}, y) => !Number.isFinite(m) || m === 0 ? x : (y - c) / m;
 
 export const getM = (from, to) => (to.y - from.y) / (to.x - from.x);
 export const getLine = (m, {x, y}) => ({c: y - m * x, m, x, y});

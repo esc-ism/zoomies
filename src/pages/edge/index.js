@@ -14,6 +14,8 @@ export default (wrapper) => {
 		demo.zoom = 2;
 		demo.rotation = DEGREES[90];
 		
+		demo.setLimits();
+		
 		demo.applyPosition();
 		demo.applyZoom();
 		demo.applyRotation();
@@ -39,8 +41,10 @@ export default (wrapper) => {
 					content: 'larger',
 					onclick: () => {
 						demo.zoom = 0.8;
+						demo.rotation = DEGREES[90];
 						
 						demo.applyZoom();
+						demo.applyRotation();
 					},
 				},
 				' than the image.',
@@ -102,7 +106,7 @@ export default (wrapper) => {
 						await new Promise((resolve) => window.setTimeout(resolve, 0));
 						
 						const observer = new ResizeObserver(() => {
-							snapPan();
+							demo.updateViewportDimensions();
 						});
 						
 						observer.observe(demo.element);
@@ -135,6 +139,8 @@ export default (wrapper) => {
 						demo.position.y = 0;
 						demo.zoom = 1;
 						demo.rotation = 0.2;
+						
+						demo.setLimits();
 						
 						demo.applyPosition();
 						demo.applyZoom();
