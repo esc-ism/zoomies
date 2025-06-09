@@ -11,13 +11,14 @@ import Progress from './progress';
 
 import getElements from './elements';
 
-import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL} from './consts';
+import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL, TWEEN_DEFAULT} from './consts';
 
 export const WEIGHTS = {
 	RATIO: -1,
 	ROTATION: 0,
 	ZOOM: 1,
 	POSITION: 2,
+	X: 2, Y: 2,
 };
 
 const cancelRightClick = () => {
@@ -56,6 +57,12 @@ export default class {
 	position = {x: 0, y: 0};
 	rotation = DEGREES[90];
 	zoom = 1;
+	
+	_ratioImage = 1;
+	ratioImageInverse = 1;
+	
+	_ratioViewport = 1;
+	ratioViewportInverse = 1;
 	
 	constructor() {
 		const {wrapper, viewport, image, resizer, imageWrapper} = this.elements;
@@ -102,9 +109,7 @@ export default class {
 			event.preventDefault();
 			
 			const moveCallback = (event) => {
-				viewport.style.aspectRatio = `${(event.clientX - offsetX) / this.viewportDimensions.height}`;
-				
-				this.updateViewportDimensions();
+				this.viewportRatio = (event.clientX - offsetX) / this.viewportDimensions.height;
 			};
 			
 			resizer.setPointerCapture(event.pointerId);
@@ -114,9 +119,7 @@ export default class {
 				if (buttons === 2) {
 					cancelRightClick();
 					
-					viewport.style.aspectRatio = '1';
-					
-					this.updateViewportDimensions();
+					this.viewportRatio = 1;
 				}
 				
 				resizer.removeEventListener('pointermove', moveCallback);
@@ -128,6 +131,18 @@ export default class {
 			event.preventDefault();
 			
 			if (event.deltaY === 0) {
+				return;
+			}
+			
+			if (event.ctrlKey) {
+				const increment = event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] / -1000;
+				
+				if (increment > 0) {
+					this.ratioImage *= 1 + increment;
+				} else {
+					this.ratioImage /= 1 - increment;
+				}
+				
 				return;
 			}
 			
@@ -209,6 +224,32 @@ export default class {
 		});
 	}
 	
+	set ratioImage(ratio) {
+		this._ratioImage = ratio;
+		this.ratioImageInverse = 1 / this.ratioImage;
+		
+		this.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
+		
+		this.updateImageDimensions();
+	}
+	
+	get ratioImage() {
+		return this._ratioImage;
+	}
+	
+	set ratioViewport(ratio) {
+		this._ratioViewport = ratio;
+		this.ratioViewportInverse = 1 / ratio;
+		
+		this.elements.viewport.style.aspectRatio = `${ratio}`;
+		
+		this.updateViewportDimensions();
+	}
+	
+	get ratioViewport() {
+		return this._ratioViewport;
+	}
+	
 	setDimensions(data, {offsetWidth, offsetHeight}) {
 		data.width = offsetWidth;
 		data.height = offsetHeight;
@@ -217,13 +258,16 @@ export default class {
 		data.halfHeight = data.height / 2;
 	}
 	
+	updatePreZoom() {
+		this.elements.imageWrapper.style.height = `${Math.min(1, this.ratioViewport / this.ratioImage) * 100}%`;
+	}
+	
 	updateImageDimensions(doApply = true) {
+		this.updatePreZoom();
+		
 		this.setDimensions(this.imageDimensions, this.elements.image);
 		
 		this.constructor.limitDisplay.setDimensions(this.elements.image);
-		
-		this.ratioWidth = Math.min(1, this.imageDimensions.width / this.imageDimensions.height);
-		this.ratioHeight = Math.min(1, this.imageDimensions.height / this.imageDimensions.width);
 		
 		if (doApply) {
 			this.constrainPosition(WEIGHTS.RATIO);
@@ -232,6 +276,8 @@ export default class {
 	}
 	
 	updateViewportDimensions(doApply = true) {
+		this.updatePreZoom();
+		
 		this.setDimensions(this.viewportDimensions, this.elements.viewport);
 		
 		if (doApply) {
@@ -341,59 +387,70 @@ export default class {
 		this.constructor.readout.setRotation(this.rotation);
 	}
 	
-	setWidth(ratio, tween) {
-		if (tween) {
-			const value = {value: this.viewportDimensions.width / this.viewportDimensions.height};
-			const travel = Math.abs(value.value - ratio) * this.viewportDimensions.height / window.screen.availWidth;
-			
-			if (travel > 0.05) {
-				this.constructor.progress.reset();
-				
-				const demo = this;
-				
-				this.tween?.kill();
-				
-				return this.tween = gsap
-					.to(value, {value: ratio, ease: 'bounce.out', duration: Math.min(2, travel * 10), ...typeof tween === 'object' ? tween : {}})
-					.eventCallback('onUpdate', function () {
-						demo.elements.viewport.style.aspectRatio = `${value.value}`;
-						
-						demo.updateViewportDimensions();
-						
-						demo.constructor.progress.set(this.progress());
-					})
-					.eventCallback('onComplete', () => {
-						this.constructor.progress.complete();
-					});
-			}
-		}
-		
-		this.elements.viewport.style.aspectRatio = `${ratio}`;
-		
-		this.updateViewportDimensions();
+	getNearestCorner() {
+		return {
+			x: this.position.x < 0 ? -0.5 : 0.5,
+			y: this.position.y < 0 ? -0.5 : 0.5,
+		};
 	}
 	
-	doTween(position, ...targets) {
-		this.tween?.kill();
+	setTween(...targets) {
+		this.tween?.progress(0).kill();
 		
-		this.tween = gsap.timeline({paused: true});
+		this.tween = gsap.timeline({paused: true, data: {}});
 		const values = {};
 		
-		let weight = WEIGHTS.POSITION;
-		
-		for (const [type, value, {delay = 0, ...ease}] of targets) {
-			values[type] = this[type];
-			
-			this.tween.to(values, {[type]: value, ...ease}, delay);
-			
-			weight = Math.min(weight, WEIGHTS[type.toUpperCase()]);
-		}
+		let weight = Infinity;
 		
 		const actions = [];
 		
+		let hasTween = false;
+		
+		const setTween = (type, value, {delay = 0, ...vars} = {}, current = this[type]) => {
+			if (current === value && !(type in values)) {
+				return;
+			}
+			
+			values[type] = current;
+			
+			this.tween.to(values, {...TWEEN_DEFAULT, [type]: value, ...vars}, delay);
+			
+			weight = Math.min(weight, WEIGHTS[type.toUpperCase()]);
+			
+			hasTween = true;
+		};
+		
+		for (const [type, value, vars] of targets) {
+			if (type === 'position') {
+				if (typeof value === 'object') {
+					setTween('x', value.x, vars, this.position.x);
+					setTween('y', value.y, {...vars, delay: '<'}, this.position.y);
+				} else {
+					setTween('x', value, vars, this.position.x);
+					setTween('y', value, {...vars, delay: '<'}, this.position.y);
+				}
+			} else if (type === 'x' || type === 'y') {
+				setTween(type, value, vars, this.position[type]);
+			} else if (type === 'ratio') {
+				setTween(type, value, vars, this.ratioImage);
+			} else if (type === 'rotation') {
+				if (value > this.rotation) {
+					setTween(type, value - this.rotation <= DEGREES[180] ? value : value - DEGREES[360], vars);
+				} else {
+					setTween(type, this.rotation - value <= DEGREES[180] ? value : value + DEGREES[360], vars);
+				}
+			} else {
+				setTween(type, value, vars);
+			}
+		}
+		
+		if (!hasTween) {
+			return;
+		}
+		
 		if ('ratio' in values) {
 			actions.push(() => {
-				this.setWidth(values.ratio);
+				this.ratioImage = values.ratio;
 			});
 		}
 		
@@ -414,20 +471,15 @@ export default class {
 			});
 		}
 		
-		if (position) {
-			if (typeof position === 'object') {
-				actions.push(() => {
-					this.position.x = position.x;
-					this.position.y = position.y;
-				});
-			}
-			
-			const targetX = this.position.x < 0 ? -0.5 : 0.5;
-			const targetY = this.position.y < 0 ? -0.5 : 0.5;
-			
+		if ('x' in values) {
 			actions.push(() => {
-				this.position.x = targetX;
-				this.position.y = targetY;
+				this.position.x = values.x;
+			});
+		}
+		
+		if ('y' in values) {
+			actions.push(() => {
+				this.position.y = values.y;
 			});
 		}
 		
@@ -442,10 +494,12 @@ export default class {
 				this.constrainPosition(weight);
 				this.applyPosition();
 				
-				this.constructor.progress.set(this.tween.progress());
+				this.constructor.progress.set(this.tween.totalProgress());
 			})
-			.eventCallback('onComplete', () => {
-				this.constructor.progress.complete();
+			.eventCallback('onReverseComplete', () => {
+				this.tween.kill();
+				
+				delete this.tween;
 			})
 			.play();
 	}

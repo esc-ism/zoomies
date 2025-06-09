@@ -87,11 +87,15 @@ export default class extends Demo {
 		this.position.y = Math.max(-this.pointY, Math.min(this.pointY, this.position.y));
 	}
 	
-	constrainZoom() {
-		this.zoom = Math.max(
-			this.viewportDimensions.width / this.imageDimensions.width / 2 / (0.5 - Math.abs(this.position.x)),
-			this.viewportDimensions.height / this.imageDimensions.height / 2 / (0.5 - Math.abs(this.position.y)),
+	getConstrainedZoom({x, y} = this.position) {
+		return Math.max(
+			this.viewportDimensions.width / this.imageDimensions.width / 2 / (0.5 - Math.abs(x)),
+			this.viewportDimensions.height / this.imageDimensions.height / 2 / (0.5 - Math.abs(y)),
 		);
+	}
+	
+	constrainZoom() {
+		this.zoom = this.getConstrainedZoom();
 		
 		this.setLimits();
 	}

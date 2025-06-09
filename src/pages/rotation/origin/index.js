@@ -54,7 +54,7 @@ export default (wrapper) => {
 						
 						const duration = 6;
 						
-						demo.doTween(
+						demo.setTween(
 							true,
 							['rotation', rotation, {duration, ease: 'none'}],
 							['zoom', demo.zoom * 2, {duration: duration / 2, ease: 'power3.inOut', yoyo: true, repeat: 1}],
@@ -88,7 +88,7 @@ export default (wrapper) => {
 					onclick: () => {
 						setBadState();
 						
-						demo.doTween(true, ['rotation', -4, {duration: 1, ease: 'power1.inOut'}]);
+						demo.setTween(true, ['rotation', -4, {duration: 1, ease: 'power1.inOut'}]);
 					},
 				},
 				' or ',
@@ -98,7 +98,7 @@ export default (wrapper) => {
 					onclick: () => {
 						setBadState();
 						
-						demo.doTween(true, ['zoom', 0.6, {duration: 1, ease: 'power1.inOut'}]);
+						demo.setTween(true, ['zoom', 0.6, {duration: 1, ease: 'power1.inOut'}]);
 					},
 				},
 				' far out.',

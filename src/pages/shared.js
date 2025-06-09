@@ -1,4 +1,6 @@
-import {CLASS_WRAPPER} from './consts';
+import {CLASS_BUTTON, CLASS_WRAPPER} from './consts';
+
+let buttonCount = 0;
 
 const getBroken = (lines) => {
 	const broken = [];
@@ -48,6 +50,48 @@ export const getCode = (...content) => ({
 		content: getBroken(content),
 	}),
 });
+
+export const getButton = (text, demo, ...tweens) => {
+	const id = buttonCount++;
+	
+	return {
+		tag: 'span',
+		content: text,
+		classList: [CLASS_BUTTON],
+		onpointerover: () => {
+			if (demo.tween?.data.id === id) {
+				demo.tween.play();
+				
+				return;
+			}
+			
+			demo.setTween(...tweens.map((tween) => typeof tween === 'function' ? tween() : tween));
+			
+			demo.tween.data.id = id;
+		},
+		onpointerout: () => {
+			if (!demo.tween) {
+				return;
+			}
+			
+			if (demo.tween.totalDuration() > 0) {
+				demo.tween.reverse();
+			} else {
+				demo.tween.revert();
+				
+				demo.tween.vars.onUpdate();
+				demo.tween.vars.onReverseComplete();
+			}
+		},
+		onclick: () => {
+			demo.constructor.progress.complete();
+			
+			demo.tween.progress(1).kill();
+			
+			delete demo.tween;
+		},
+	};
+};
 
 export const getText = (...children) => {
 	const wrapper = document.createElement('div');

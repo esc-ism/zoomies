@@ -29,7 +29,8 @@ export default class {
 		this.crosshair.style.display = this.line.style.display = 'none';
 	}
 	
-	set(target, {position, ratioWidth, ratioHeight, zoom, rotation}) {
+	// todo test if ratios work when not 1:1
+	set(target, {position, ratioImage, ratioHeight, zoom, rotation}) {
 		if ((!target.x || target.x === position.x) && (!target.y || target.y === position.y)) {
 			this.hide();
 			
@@ -44,12 +45,12 @@ export default class {
 		this.crosshair.style.scale = `${1 / zoom}`;
 		this.crosshair.style.rotate = `${rotation - DEGREES[90]}rad`;
 		
-		this.line.style.height = `${Math.sqrt((target.x ? Math.pow((target.x - position.x) * ratioWidth, 2) : 0)
+		this.line.style.height = `${Math.sqrt((target.x ? Math.pow((target.x - position.x) * ratioImage, 2) : 0)
 			+ (target.y ? Math.pow((target.y - position.y) * ratioHeight, 2) : 0)) * 100}%`;
 		this.line.style.rotate = `${DEGREES[270] - getTheta(
-			position.x * ratioWidth,
+			position.x * ratioImage,
 			position.y * ratioHeight,
-			(target.x ?? position.x) * ratioWidth,
+			(target.x ?? position.x) * ratioImage,
 			(target.y ?? position.y) * ratioHeight,
 		)}rad`;
 		this.line.style.left = `${(0.5 + position.x) * 100}%`;

@@ -1,6 +1,6 @@
 import {addRule} from '@css';
 
-import {CLASS_WRAPPER} from './consts';
+import {CLASS_WRAPPER, CLASS_BUTTON, CLASS_INSTRUCTION} from './consts';
 
 addRule(`.${CLASS_WRAPPER} code`, {
 	padding: '1em',
@@ -14,13 +14,11 @@ addRule(`.${CLASS_WRAPPER} code`, {
 	'white-space': 'pre',
 });
 
-addRule(`.${CLASS_WRAPPER} button`, {
-	background: 'unset',
-	border: '1px solid var(--color)',
-	color: 'inherit',
-	'box-shadow': 'inset 0 0 4px var(--color), 0 0 4px var(--color)',
-	'border-radius': '10px',
-	font: 'inherit',
-	padding: '0 5px 3px',
+addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}`, {
+	color: '#ffa200',
 	cursor: 'pointer',
 });
+
+addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}:hover`, {filter: 'drop-shadow(0 0 6px currentcolor)'});
+
+addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {'font-weight': 'bold'});

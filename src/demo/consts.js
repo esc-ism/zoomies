@@ -13,3 +13,8 @@ export const CLASS_CROSSHAIR = getId('crosshair');
 export const ALLOWANCE_CLICK = 3;
 
 export const MULTIPLIERS_SCROLL = [1, 40, 800];
+
+export const TWEEN_DEFAULT = {
+	duration: 1,
+	ease: 'power1.inOut',
+};

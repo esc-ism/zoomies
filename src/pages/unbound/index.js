@@ -1,4 +1,4 @@
-import {getText, getCode} from '../shared';
+import {getText, getCode, getButton} from '../shared';
 
 import Demo from './demo';
 
@@ -38,20 +38,23 @@ export default (wrapper) => {
 			),
 			{
 				content: [
-					'A sensible user of this system may self-impose a pan-limiting algorithm to keep their bearings.',
+					'A sensible user of this system may ',
+					getButton(
+						'self-impose', demo,
+						['zoom', 1],
+						['position', 0.2],
+						['position', {x: 0.3, y: -0.2}, {delay: '>'}],
+						['position', {x: -0.2, y: -0.3}, {delay: '>'}],
+						['position', {x: -0.4, y: 0.2}, {delay: '>'}],
+					),
+					' a pan-limiting algorithm to keep their bearings.',
 					'But what if their ',
-					{
-						tag: 'button',
-						content: 'finger slips',
-						onclick: () => {
-							demo.position.x = 2;
-							demo.position.y = 2;
-							demo.zoom = 1;
-							
-							demo.applyPosition();
-							demo.applyZoom();
-						},
-					},
+					getButton(
+						'finger slips',
+						demo,
+						['position', 2],
+						['zoom', 1],
+					),
 					'?',
 				],
 			},
