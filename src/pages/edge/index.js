@@ -7,9 +7,13 @@ import Demo from './demo';
 export default (wrapper) => {
 	const demo = new Demo();
 	
+	const getSnapPosition = () => ({
+		x: (0.5 - demo.viewportDimensions.width / demo.imageDimensions.width / 4),
+		y: (0.5 - demo.viewportDimensions.height / demo.imageDimensions.height / 4),
+	});
+	
 	const snapPan = () => {
-		demo.position.x = (0.5 - demo.viewportDimensions.width / demo.imageDimensions.width / 4);
-		demo.position.y = (0.5 - demo.viewportDimensions.height / demo.imageDimensions.height / 4);
+		Object.assign(demo.position, getSnapPosition());
 		
 		demo.zoom = 2;
 		demo.rotation = DEGREES[90];
@@ -40,11 +44,13 @@ export default (wrapper) => {
 					tag: 'button',
 					content: 'larger',
 					onclick: () => {
-						demo.zoom = 0.8;
-						demo.rotation = DEGREES[90];
+						const duration = 1;
 						
-						demo.applyZoom();
-						demo.applyRotation();
+						demo.doTween(
+							false,
+							['rotation', DEGREES[90], {duration, ease: 'power4.out'}],
+							['zoom', 0.8, {duration: duration, ease: 'power4.out'}],
+						);
 					},
 				},
 				' than the image.',
@@ -55,9 +61,7 @@ export default (wrapper) => {
 					tag: 'button',
 					content: 'doubles',
 					onclick: () => {
-						demo.zoom *= 2;
-						
-						demo.applyZoom();
+						demo.doTween(false, ['zoom', demo.zoom * 2, {duration: 1, ease: 'power1.inOut', yoyo: true, repeat: 1, repeatDelay: 0.5}]);
 					},
 				},
 				'.',
@@ -91,60 +95,50 @@ export default (wrapper) => {
 				{
 					tag: 'button',
 					content: 'snap panning',
-					onclick: snapPan,
+					onpointerover: () => {
+						demo.constructor.target.set(getSnapPosition(), demo);
+					},
+					onpointerout: () => {
+						demo.constructor.target.hide();
+					},
+					onclick: () => {
+						snapPan();
+						
+						demo.constructor.target.hide();
+					},
 				},
-				'!',
+				'.',
 				'Position will even be ',
 				{
 					tag: 'button',
 					content: 'corrected',
-					onclick: async () => {
+					onclick: () => {
 						demo.setWidth(0.8);
 						
 						snapPan();
 						
-						await new Promise((resolve) => window.setTimeout(resolve, 0));
-						
-						const observer = new ResizeObserver(() => {
-							demo.updateViewportDimensions();
-						});
-						
-						observer.observe(demo.element);
-						
-						demo.element.style.transition = 'width 1s ease-in-out';
-						demo.setWidth(1.5);
-						
-						const stop = () => {
-							demo.element.style.removeProperty('transition');
-							
-							observer.disconnect();
-							
-							demo.element.removeEventListener('transitionend', stop);
-							demo.element.removeEventListener('transitioncancel', stop);
-						};
-						
-						demo.element.addEventListener('transitionend', stop);
-						demo.element.addEventListener('transitioncancel', stop);
+						demo.setWidth(1.5, {duration: 1, ease: 'power1.inOut'});
 					},
 				},
-				' if we increase viewport size.',
+				' if we increase viewport size!',
 			],
 			[
 				'However, since we\'re not considering rotation, our system ',
 				{
 					tag: 'button',
-					content: 'falls apart',
+					content: 'fails',
 					onclick: () => {
 						demo.position.x = 0;
 						demo.position.y = 0;
 						demo.zoom = 1;
-						demo.rotation = 0.2;
+						demo.rotation = DEGREES[90] - 0.2;
 						
-						demo.setLimits();
-						
-						demo.applyPosition();
-						demo.applyZoom();
 						demo.applyRotation();
+						
+						demo.doTween(
+							true,
+							['zoom', 2, {duration: 2, ease: 'power3.inOut', yoyo: true, repeat: 1}],
+						);
 					},
 				},
 				' when it\'s introduced.',

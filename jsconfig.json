@@ -2,7 +2,7 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
-      "css": ["./src/css.js"]
+      "@css": ["./src/css.js"]
     }
   },
   "exclude": ["node_modules", "dist"]

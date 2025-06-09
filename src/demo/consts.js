@@ -1,4 +1,4 @@
-import {getIdGetter} from 'css';
+import {getIdGetter} from '@css';
 
 const getId = getIdGetter('demo');
 

@@ -51,13 +51,19 @@ export default class extends Demo {
 		);
 	}
 	
+	updateImageDimensions() {
+		super.updateImageDimensions(false);
+		
+		this.cornerDistance = Math.sqrt(Math.pow(this.imageDimensions.halfWidth, 2) + Math.pow(this.imageDimensions.halfHeight, 2));
+	}
+	
 	getZoomPoints() {
-		const {width, height} = this.imageDimensions;
+		const {halfWidth, halfHeight} = this.imageDimensions;
 		
 		return getRotatedCorners(
 			this.rotation,
-			Math.sqrt(width * width / 4 + height * height / 4),
-			getTheta(0, 0, width, height),
+			this.cornerDistance,
+			getTheta(0, 0, halfWidth, halfHeight),
 		).map(({x, y}) => ({x: 0, y: 0, z: 0.5 / Math.max(x / this.viewportDimensions.width, y / this.viewportDimensions.height)}));
 	}
 	

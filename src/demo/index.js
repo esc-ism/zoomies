@@ -1,3 +1,5 @@
+import {gsap} from 'gsap';
+
 import './css';
 
 import {getTheta, DEGREES} from '@/shared';
@@ -5,16 +7,24 @@ import {getTheta, DEGREES} from '@/shared';
 import Readout from './readout';
 import LimitDisplay from './limitDisplay';
 import Target from './target';
+import Progress from './progress';
 
 import getElements from './elements';
 
 import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL} from './consts';
 
 export const WEIGHTS = {
-	DIMENSIONS: 0,
+	RATIO: -1,
 	ROTATION: 0,
 	ZOOM: 1,
 	POSITION: 2,
+};
+
+const cancelRightClick = () => {
+	window.addEventListener('contextmenu', (event) => {
+		event.stopPropagation();
+		event.preventDefault();
+	}, {capture: true, once: true});
 };
 
 const dock = (node) => new Promise((resolve) => {
@@ -34,6 +44,7 @@ export default class {
 	static limitDisplay = new LimitDisplay();
 	static readout = new Readout();
 	static target = new Target();
+	static progress = new Progress();
 	
 	elements = getElements();
 	
@@ -53,6 +64,7 @@ export default class {
 		this.constructor.readout.setZoom(this.zoom);
 		this.constructor.readout.setRotation(this.rotation);
 		
+		viewport.appendChild(this.constructor.progress.element);
 		resizer.parentElement.insertBefore(this.constructor.readout.element, resizer);
 		imageWrapper.append(this.constructor.limitDisplay.element, this.constructor.target.element);
 		
@@ -67,24 +79,30 @@ export default class {
 				this.updateImageDimensions(false);
 				this.updateViewportDimensions();
 				
-				this.constrainPosition(WEIGHTS.DIMENSIONS);
+				if (this.setLimits) {
+					this.constructor.limitDisplay.show();
+					
+					this.setLimits();
+				} else {
+					this.constructor.limitDisplay.show(false);
+				}
 			});
 			
 			observer.observe(wrapper.parentElement);
 		});
 		
 		resizer.addEventListener('pointerdown', (event) => {
-			if (event.button !== 0) {
+			const {buttons, offsetX} = event;
+			
+			if (buttons !== 1 && buttons !== 2) {
 				return;
 			}
 			
 			event.stopPropagation();
 			event.preventDefault();
 			
-			const {offsetX} = event;
-			
 			const moveCallback = (event) => {
-				wrapper.style.width = `${(event.clientX - offsetX) / wrapper.parentElement.clientWidth * 100}%`;
+				viewport.style.aspectRatio = `${(event.clientX - offsetX) / this.viewportDimensions.height}`;
 				
 				this.updateViewportDimensions();
 			};
@@ -93,8 +111,16 @@ export default class {
 			
 			resizer.addEventListener('pointermove', moveCallback);
 			resizer.addEventListener('pointerup', () => {
+				if (buttons === 2) {
+					cancelRightClick();
+					
+					viewport.style.aspectRatio = '1';
+					
+					this.updateViewportDimensions();
+				}
+				
 				resizer.removeEventListener('pointermove', moveCallback);
-			});
+			}, {once: true});
 		});
 		
 		viewport.addEventListener('wheel', (event) => {
@@ -159,13 +185,10 @@ export default class {
 				this.elements.viewport.removeEventListener('pointermove', listener);
 				
 				if (buttons === 2) {
-					window.addEventListener('contextmenu', (event) => {
-						event.stopPropagation();
-						event.preventDefault();
-					}, {capture: true, once: true});
+					cancelRightClick();
 				}
 				
-				this.constructor.target.show(false);
+				this.constructor.target.hide();
 				
 				if (!isClick) {
 					return;
@@ -203,7 +226,7 @@ export default class {
 		this.ratioHeight = Math.min(1, this.imageDimensions.height / this.imageDimensions.width);
 		
 		if (doApply) {
-			this.constrainPosition(WEIGHTS.DIMENSIONS);
+			this.constrainPosition(WEIGHTS.RATIO);
 			this.applyPosition();
 		}
 	}
@@ -212,12 +235,8 @@ export default class {
 		this.setDimensions(this.viewportDimensions, this.elements.viewport);
 		
 		if (doApply) {
-			const target = {...this.position};
-			
-			this.constrainPosition(WEIGHTS.DIMENSIONS);
+			this.constrainPosition(WEIGHTS.RATIO);
 			this.applyPosition();
-			
-			this.constructor.target.set(target, this);
 		}
 	}
 	
@@ -248,9 +267,6 @@ export default class {
 				this.position.y += change.y / this.imageDimensions.height;
 				
 				const target = {...this.position};
-				
-				// setTargetX(target.x);
-				// setTargetY(target.y);
 				
 				this.constrainPosition(WEIGHTS.POSITION);
 				
@@ -325,11 +341,112 @@ export default class {
 		this.constructor.readout.setRotation(this.rotation);
 	}
 	
-	setWidth(ratio) {
-		const targetWidth = this.imageDimensions.width * ratio;
+	setWidth(ratio, tween) {
+		if (tween) {
+			const value = {value: this.viewportDimensions.width / this.viewportDimensions.height};
+			const travel = Math.abs(value.value - ratio) * this.viewportDimensions.height / window.screen.availWidth;
+			
+			if (travel > 0.05) {
+				this.constructor.progress.reset();
+				
+				const demo = this;
+				
+				this.tween?.kill();
+				
+				return this.tween = gsap
+					.to(value, {value: ratio, ease: 'bounce.out', duration: Math.min(2, travel * 10), ...typeof tween === 'object' ? tween : {}})
+					.eventCallback('onUpdate', function () {
+						demo.elements.viewport.style.aspectRatio = `${value.value}`;
+						
+						demo.updateViewportDimensions();
+						
+						demo.constructor.progress.set(this.progress());
+					})
+					.eventCallback('onComplete', () => {
+						this.constructor.progress.complete();
+					});
+			}
+		}
 		
-		this.element.style.width = `${targetWidth / this.element.parentElement.clientWidth * 100}%`;
+		this.elements.viewport.style.aspectRatio = `${ratio}`;
 		
 		this.updateViewportDimensions();
+	}
+	
+	doTween(position, ...targets) {
+		this.tween?.kill();
+		
+		this.tween = gsap.timeline({paused: true});
+		const values = {};
+		
+		let weight = WEIGHTS.POSITION;
+		
+		for (const [type, value, {delay = 0, ...ease}] of targets) {
+			values[type] = this[type];
+			
+			this.tween.to(values, {[type]: value, ...ease}, delay);
+			
+			weight = Math.min(weight, WEIGHTS[type.toUpperCase()]);
+		}
+		
+		const actions = [];
+		
+		if ('ratio' in values) {
+			actions.push(() => {
+				this.setWidth(values.ratio);
+			});
+		}
+		
+		if ('rotation' in values) {
+			actions.push(() => {
+				this.rotation = values.rotation;
+				
+				this.constrainRotation();
+				this.applyRotation();
+			});
+		}
+		
+		if ('zoom' in values) {
+			actions.push(() => {
+				this.zoom = values.zoom;
+				
+				this.applyZoom();
+			});
+		}
+		
+		if (position) {
+			if (typeof position === 'object') {
+				actions.push(() => {
+					this.position.x = position.x;
+					this.position.y = position.y;
+				});
+			}
+			
+			const targetX = this.position.x < 0 ? -0.5 : 0.5;
+			const targetY = this.position.y < 0 ? -0.5 : 0.5;
+			
+			actions.push(() => {
+				this.position.x = targetX;
+				this.position.y = targetY;
+			});
+		}
+		
+		this.constructor.progress.reset();
+		
+		return this.tween
+			.eventCallback('onUpdate', () => {
+				for (const action of actions) {
+					action();
+				}
+				
+				this.constrainPosition(weight);
+				this.applyPosition();
+				
+				this.constructor.progress.set(this.tween.progress());
+			})
+			.eventCallback('onComplete', () => {
+				this.constructor.progress.complete();
+			})
+			.play();
 	}
 }

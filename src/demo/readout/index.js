@@ -1,6 +1,6 @@
 import './css';
 
-import {IDS, POSTFIXES, PRETTIFIERS, ID} from './consts';
+import {IDS, POSTFIXES, FORMATTERS, ID} from './consts';
 
 export default class {
 	element = document.createElement('table');
@@ -42,7 +42,7 @@ export default class {
 	}
 	
 	#set(label, value) {
-		this.#valueElements[label].innerText = `${PRETTIFIERS[label](value)}${POSTFIXES[label] ?? ''}`;
+		this.#valueElements[label].innerText = `${FORMATTERS[label](value)}${POSTFIXES[label] ?? ''}`;
 	}
 	
 	setPosition({x, y}) {

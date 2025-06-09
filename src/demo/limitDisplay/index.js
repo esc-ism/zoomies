@@ -92,6 +92,14 @@ export default class {
 		this.element.style.pointerEvents = 'none';
 	}
 	
+	show(doShow = true) {
+		if (doShow) {
+			this.element.style.removeProperty('display');
+		} else {
+			this.element.style.display = 'none';
+		}
+	}
+	
 	setDimensions({offsetWidth, offsetHeight}) {
 		this.element.width = offsetWidth;
 		this.element.height = offsetHeight;

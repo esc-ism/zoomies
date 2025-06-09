@@ -40,21 +40,26 @@ template.style.paddingRight = '20px';
 template.style.overflow = 'hidden';
 
 generate('viewport', paths.wrapper, {
-	width: '100%',
-	height: '100%',
 	backgroundColor: 'black',
+	padding: '1px',
+	boxSizing: 'border-box',
 	position: 'relative',
 	overflow: 'hidden',
 	display: 'flex',
 	flexFlow: 'column wrap',
 	placeContent: 'center center',
 	cursor: 'grab',
+	
+	width: 'auto',
+	height: '100%',
+	aspectRatio: '1',
 });
 
 generate('imageWrapper', paths.viewport, {
 	height: '100%',
 	width: 'auto',
 	aspectRatio: '1',
+	position: 'relative',
 }).classList.add(CLASS_WRAPPER_IMAGE);
 
 (() => {

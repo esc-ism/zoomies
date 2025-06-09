@@ -78,7 +78,7 @@ export default class extends Demo {
 		);
 	}
 	
-	constrainPosition(weight) {
+	constrainPosition(weight = 2) {
 		if (weight <= 1) {
 			this.setLimits();
 		}

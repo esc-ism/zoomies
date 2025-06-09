@@ -11,5 +11,8 @@
 	},
 	"scripts": {
 		"serve": "webpack s --config-name DEBUG"
+	},
+	"dependencies": {
+		"gsap": "^3.13.0"
 	}
 }

@@ -1,4 +1,4 @@
-import {addRule} from 'css';
+import {addRule} from '@css';
 
 import {CLASS_WRAPPER, CLASS_WRAPPER_IMAGE, CLASS_IMAGE, CLASS_CROSSHAIR} from './consts';
 

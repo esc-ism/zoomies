@@ -1,4 +1,4 @@
-import {addRule} from 'css';
+import {addRule} from '@css';
 
 import {ID} from './consts';
 

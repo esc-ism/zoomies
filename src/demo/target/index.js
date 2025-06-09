@@ -21,25 +21,23 @@ export default class {
 		this.line.style.translate = '-50% 0';
 		this.line.style.width = '2px';
 		this.line.style.backgroundImage = 'repeating-linear-gradient(transparent, white 0, white 5px, transparent 0, transparent 10px)';
+		
+		this.hide();
 	}
 	
-	show(doShow = true) {
-		if (doShow) {
-			this.crosshair.style.removeProperty('display');
-			this.line.style.removeProperty('display');
-		} else {
-			this.crosshair.style.display = this.line.style.display = 'none';
-		}
+	hide() {
+		this.crosshair.style.display = this.line.style.display = 'none';
 	}
 	
 	set(target, {position, ratioWidth, ratioHeight, zoom, rotation}) {
 		if ((!target.x || target.x === position.x) && (!target.y || target.y === position.y)) {
-			this.show(false);
+			this.hide();
 			
 			return;
 		}
 		
-		this.show();
+		this.crosshair.style.removeProperty('display');
+		this.line.style.removeProperty('display');
 		
 		this.crosshair.style.left = `${(0.5 + (target.x ?? position.x)) * 100}%`;
 		this.crosshair.style.top = `${(0.5 - (target.y ?? position.y)) * 100}%`;
