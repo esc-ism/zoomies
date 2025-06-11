@@ -64,14 +64,21 @@ generate('imageWrapper', paths.viewport, {
 
 (() => {
 	const image = generate('image', paths.imageWrapper, {
-		backgroundColor: 'white',
-		border: '4px solid var(--color)',
+		padding: '2px',
 		boxSizing: 'border-box',
 		height: '100%',
 		width: '100%',
+		display: 'flex',
 	});
 	
-	image.append(...[
+	const childContainer = document.createElement('div');
+	
+	childContainer.style.flexGrow = '1';
+	childContainer.style.backgroundColor = 'white';
+	childContainer.style.position = 'relative';
+	childContainer.style.pointerEvents = 'none';
+	
+	childContainer.append(...[
 		{
 			backgroundImage: 'radial-gradient(at left top, rgb(0 220 0), transparent), radial-gradient(at right top, rgb(0 0 255), transparent), radial-gradient(at left bottom, rgb(255 0 0), transparent), radial-gradient(at right bottom, rgb(179 255 0 / 50%), transparent)',
 			backgroundBlendMode: 'color-dodge',
@@ -81,8 +88,16 @@ generate('imageWrapper', paths.viewport, {
 			backgroundSize: '18px 18px',
 			backgroundRepeat: 'round',
 		},
+		{
+			boxShadow: 'white 0 0 6px 1px',
+			zIndex: '1',
+			position: 'relative',
+		},
 	].map((styles) => {
 		const element = document.createElement('div');
+		
+		element.style.position = 'absolute';
+		element.style.width = element.style.height = '100%';
 		
 		for (const [property, value] of Object.entries(styles)) {
 			element.style[property] = value;
@@ -90,6 +105,8 @@ generate('imageWrapper', paths.viewport, {
 		
 		return element;
 	}));
+	
+	image.appendChild(childContainer);
 	
 	image.classList.add(CLASS_IMAGE);
 })();

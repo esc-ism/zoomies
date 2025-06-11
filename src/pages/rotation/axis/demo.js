@@ -109,6 +109,19 @@ const getSnappedZoom = (() => {
 	};
 })();
 
+export const getImageFit = (rotation, viewport, image) => {
+	const [corner0, corner1] = getRotatedCorners(
+		rotation,
+		Math.sqrt(image.width * image.width / 4 + image.height * image.height / 4),
+		getTheta(0, 0, image.width, image.height),
+	);
+	
+	const x = Math.max(corner0.x, corner1.x) / viewport.width;
+	const y = Math.max(corner0.y, corner1.y) / viewport.height;
+	
+	return [0.5 / x, 0.5 / y];
+};
+
 const getZoomPoints = (() => {
 	const getPoints = (rotation, image, viewport, fitZoom, doFlip) => {
 		const getGenericRotated = (x, y, angle) => {
@@ -185,19 +198,6 @@ const getZoomPoints = (() => {
 		const angle = (rotation + DEGREES[360]) % DEGREES[90];
 		
 		return isEvenQuadrant ? angle : DEGREES[90] - angle;
-	};
-	
-	const getImageFit = (rotation, viewport, image) => {
-		const [corner0, corner1] = getRotatedCorners(
-			rotation,
-			Math.sqrt(image.width * image.width / 4 + image.height * image.height / 4),
-			getTheta(0, 0, image.width, image.height),
-		);
-		
-		const x = Math.max(corner0.x, corner1.x) / viewport.width;
-		const y = Math.max(corner0.y, corner1.y) / viewport.height;
-		
-		return [0.5 / x, 0.5 / y];
 	};
 	
 	return (rotation, viewport, image) => {

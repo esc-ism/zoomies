@@ -1,4 +1,4 @@
-import {CLASS_BUTTON, CLASS_WRAPPER} from './consts';
+import {CLASS_BUTTON, CLASS_WRAPPER, TWEENS_RESET} from './consts';
 
 let buttonCount = 0;
 
@@ -51,8 +51,10 @@ export const getCode = (...content) => ({
 	}),
 });
 
-export const getButton = (text, demo, ...tweens) => {
+export const getButton = (text, demo, tweens, {doReset = false, getParam = () => undefined} = {}) => {
 	const id = buttonCount++;
+	
+	const resetTweens = doReset ? TWEENS_RESET : [];
 	
 	return {
 		tag: 'span',
@@ -65,9 +67,11 @@ export const getButton = (text, demo, ...tweens) => {
 				return;
 			}
 			
-			demo.setTween(...tweens.map((tween) => typeof tween === 'function' ? tween() : tween));
+			const param = getParam();
 			
-			demo.tween.data.id = id;
+			if (demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween))) {
+				demo.tween.data.id = id;
+			}
 		},
 		onpointerout: () => {
 			if (!demo.tween) {
@@ -84,11 +88,15 @@ export const getButton = (text, demo, ...tweens) => {
 			}
 		},
 		onclick: () => {
+			if (!demo.tween) {
+				return;
+			}
+			
 			demo.constructor.progress.complete();
 			
-			demo.tween.progress(1).kill();
+			demo.tween.progress(1);
 			
-			delete demo.tween;
+			demo.deleteTween();
 		},
 	};
 };
@@ -102,6 +110,7 @@ export const getText = (...children) => {
 	wrapper.style.overflow = 'auto';
 	wrapper.style.scrollbarColor = 'var(--color) transparent';
 	wrapper.style.flexGrow = '1';
+	wrapper.style.lineHeight = '1.3';
 	
 	wrapper.classList.add(CLASS_WRAPPER);
 	

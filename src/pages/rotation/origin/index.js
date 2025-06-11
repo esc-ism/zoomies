@@ -1,27 +1,21 @@
-import gsap from 'gsap';
-
 import {DEGREES} from '@/shared';
-import {WEIGHTS} from '@/demo';
-import {getText, getCode} from '../../shared';
+import {getText, getCode, getButton} from '../../shared';
 
 import Demo from './demo';
 
+export const badTweens = {};
+
+for (const [type, value, ease] of [
+	['ratio', 0.6],
+	['position', 0.5],
+	['rotation', -4.467],
+	['zoom', 2],
+]) {
+	badTweens[type] = [type, value, ease];
+}
+
 export default (wrapper) => {
 	const demo = new Demo();
-	
-	const badWidth = 0.6;
-	
-	const setBadState = () => {
-		demo.position.x = 0.5;
-		demo.position.y = 0.5;
-		demo.rotation = -4.467;
-		demo.zoom = Math.max(1, demo.zoom);
-		
-		demo.setWidth(badWidth);
-		
-		demo.applyZoom();
-		demo.applyRotation();
-	};
 	
 	wrapper.append(
 		demo.element,
@@ -42,66 +36,36 @@ export default (wrapper) => {
 			],
 			[
 				'You\'ll find that this system works ',
-				{
-					tag: 'button',
-					content: 'perfectly',
-					onclick: () => {
-						demo.setWidth(1);
-						
-						const {rotation} = demo;
-						
-						demo.rotation += DEGREES[360];
-						
-						const duration = 6;
-						
-						demo.setTween(
-							true,
-							['rotation', rotation, {duration, ease: 'none'}],
-							['zoom', demo.zoom * 2, {duration: duration / 2, ease: 'power3.inOut', yoyo: true, repeat: 1}],
-						);
-					},
-				},
+				getButton('perfectly', demo, [
+					() => ['ratio', demo.ratioViewport],
+					() => ['rotation', demo.rotation - DEGREES[180] + 0.001, {duration: 4, delay: '>'}],
+					() => ['zoom', demo.zoom * 2, {duration: 2, ease: 'power3.inOut', yoyo: true, repeat: 1, delay: '<'}],
+					['position', {x: -0.5, y: 0.5}],
+				]),
 				' if the viewport and image share an aspect ratio.',
 				'The system\'s flaw is only revealed when the ratios are ',
-				{
-					tag: 'button',
-					content: 'decoupled',
-					onclick: () => {
-						demo.setWidth(badWidth, true);
-					},
-				},
+				getButton('decoupled', demo, [badTweens.ratio]),
 				'.',
 			],
 			[
 				'Consider ',
-				{
-					tag: 'button',
-					content: 'this',
-					onclick: setBadState,
-				},
+				getButton('this', demo, Object.values(badTweens)),
 				' demo state.',
 				'Imagine that you want to see the entirety of the image\'s top-right corner.',
-				'You\'ll find that it\'s impossible to achieve this without ',
-				{
-					tag: 'button',
-					content: 'rotating',
-					onclick: () => {
-						setBadState();
-						
-						demo.setTween(true, ['rotation', -4, {duration: 1, ease: 'power1.inOut'}]);
-					},
-				},
+				'You\'ll find that it\'s ',
+				getButton('impossible', demo, [
+					...Object.values(badTweens),
+					['position', {x: 0.5, y: 0.1}, {delay: '>'}],
+				]),
+				' to achieve this without ',
+				getButton('rotating', demo, [...Object.values(badTweens), ['rotation', Math.round(badTweens.rotation[1] / DEGREES[90]) * DEGREES[90], {delay: '>'}]]),
 				' or ',
-				{
-					tag: 'button',
-					content: 'zooming',
-					onclick: () => {
-						setBadState();
-						
-						demo.setTween(true, ['zoom', 0.6, {duration: 1, ease: 'power1.inOut'}]);
-					},
-				},
-				' far out.',
+				getButton('zooming', demo, [...Object.values(badTweens), ['zoom', 1, {delay: '>'}]]),
+				' out past the point that pan limits become one-dimensional.',
+			],
+			[
+				'This laissez-faire approach to pan limit point expansion doesn\'t work.',
+				'An improved system will require more deliberate placement of image corners on viewport edges.',
 			],
 		),
 	);

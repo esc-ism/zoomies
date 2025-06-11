@@ -256,8 +256,8 @@ export const getConstrainerFromPoints = (() => {
 				swap(points, 'topRight', 'bottomRight');
 				
 				swap(tangents, 'top', 'bottom');
-				swap(tangents.left, 'top', 'left');
-				swap(tangents.right, 'top', 'left');
+				swap(tangents.left, 'top', 'bottom');
+				swap(tangents.right, 'top', 'bottom');
 			}
 		}
 		

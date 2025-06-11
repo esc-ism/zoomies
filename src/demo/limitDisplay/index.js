@@ -83,32 +83,59 @@ const drawTangents = (() => {
 })();
 
 export default class {
-	element = document.createElement('canvas');
-	ctx = this.element.getContext('2d');
+	element = document.createElement('div');
+	background = document.createElement('div');
+	// todo remove canvas
+	//  replace with div lines like target
+	//  width = 1px
+	//  filter = drop-shadow(0 0 6px white)
+	canvas = document.createElement('canvas');
+	ctx = this.canvas.getContext('2d');
 	
 	constructor() {
-		this.element.style.height = '100%';
-		this.element.style.width = '100%';
+		this.element.style.height = this.element.style.width
+		= this.background.style.height = this.background.style.width
+		= '100%';
+		
+		this.background.style.position = this.canvas.style.position = 'absolute';
+		
 		this.element.style.pointerEvents = 'none';
+		
+		this.background.style.backgroundColor = '#000000a0';
+		
+		this.element.append(this.background, this.canvas);
+	}
+	
+	#setPoints(points) {
+		if (points.length === 0) {
+			this.background.style.removeProperty('clip-path');
+			
+			return;
+		}
+		
+		const path = points.map(({x, y}) => `${x * 100 + 50}% ${50 - y * 100}%`);
+		
+		this.background.style.clipPath = `polygon(0 0, 0 100%, 100% 100%, 100% 0, 0 0, ${[...path, path[0]].join(',')})`;
 	}
 	
 	show(doShow = true) {
 		if (doShow) {
-			this.element.style.removeProperty('display');
+			this.canvas.style.removeProperty('display');
+			this.background.style.removeProperty('display');
 		} else {
-			this.element.style.display = 'none';
+			this.canvas.style.display = this.background.style.display = 'none';
 		}
 	}
 	
 	setDimensions({offsetWidth, offsetHeight}) {
-		this.element.width = offsetWidth;
-		this.element.height = offsetHeight;
+		this.canvas.width = offsetWidth;
+		this.canvas.height = offsetHeight;
 	}
 	
 	setLimits(points, tangents) {
-		this.ctx.clearRect(0, 0, this.element.width, this.element.height);
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		
-		drawPoints(this.ctx, points);
+		this.#setPoints(points);
 		
 		drawTangents(this.ctx, tangents);
 	}

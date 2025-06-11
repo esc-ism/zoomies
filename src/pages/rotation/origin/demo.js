@@ -3,6 +3,7 @@ import Demo from '../demo';
 import {getTheta} from '@/shared';
 
 import {getRotatedCorners, getConstrainerFromPoints, isAbove, getProgressedLine, getIntersectProgress} from '../shared';
+import {WEIGHTS} from '@/demo';
 
 const getBound = (zoom, point, isTopLeft) => {
 	if (zoom <= point.z) {
@@ -55,6 +56,9 @@ export default class extends Demo {
 		super.updateImageDimensions(false);
 		
 		this.cornerDistance = Math.sqrt(Math.pow(this.imageDimensions.halfWidth, 2) + Math.pow(this.imageDimensions.halfHeight, 2));
+		
+		this.constrainPosition(WEIGHTS.RATIO);
+		this.applyPosition();
 	}
 	
 	getZoomPoints() {

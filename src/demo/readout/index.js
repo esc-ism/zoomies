@@ -10,16 +10,13 @@ export default class {
 		this.element.id = ID;
 		
 		this.element.style.position = 'absolute';
-		this.element.style.bottom = '0';
+		this.element.style.top = this.element.style.left = '0';
 		this.element.style.userSelect = 'none';
 		this.element.style.pointerEvents = 'none';
 		this.element.style.whiteSpace = 'nowrap';
-		this.element.style.textShadow = 'black 0 0 1px';
-		this.element.style.backgroundColor = '#00000073';
+		this.element.style.backgroundColor = '#000000a0';
 		this.element.style.borderCollapse = 'collapse';
-		this.element.style.borderColor = 'white';
-		this.element.style.borderStyle = 'solid';
-		this.element.style.borderWidth = '2px 2px 0 0';
+		this.element.style.boxShadow = 'black 0 0 6px 1px';
 		this.element.style.fontFamily = 'courier-new, monospace';
 		this.element.style.fontSize = '0.9em';
 		
@@ -45,16 +42,20 @@ export default class {
 		this.#valueElements[label].innerText = `${FORMATTERS[label](value)}${POSTFIXES[label] ?? ''}`;
 	}
 	
-	setPosition({x, y}) {
+	setPosition({position: {x, y}}) {
 		this.#set(IDS.X, x);
 		this.#set(IDS.Y, y);
 	}
 	
-	setZoom(value) {
-		this.#set(IDS.ZOOM, value);
+	setZoom({zoom}) {
+		this.#set(IDS.ZOOM, zoom);
 	}
 	
-	setRotation(value) {
-		this.#set(IDS.ANGLE, value);
+	setRotation({rotation}) {
+		this.#set(IDS.ANGLE, rotation);
+	}
+	
+	setRatio({ratioViewport, ratioImage}) {
+		this.#set(IDS.RATIO, ratioViewport / ratioImage);
 	}
 }

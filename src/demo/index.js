@@ -67,9 +67,10 @@ export default class {
 	constructor() {
 		const {wrapper, viewport, image, resizer, imageWrapper} = this.elements;
 		
-		this.constructor.readout.setPosition(this.position);
-		this.constructor.readout.setZoom(this.zoom);
-		this.constructor.readout.setRotation(this.rotation);
+		this.constructor.readout.setPosition(this);
+		this.constructor.readout.setZoom(this);
+		this.constructor.readout.setRotation(this);
+		this.constructor.readout.setRatio(this);
 		
 		viewport.appendChild(this.constructor.progress.element);
 		resizer.parentElement.insertBefore(this.constructor.readout.element, resizer);
@@ -83,7 +84,6 @@ export default class {
 					return;
 				}
 				
-				this.updateImageDimensions(false);
 				this.updateViewportDimensions();
 				
 				if (this.setLimits) {
@@ -109,7 +109,7 @@ export default class {
 			event.preventDefault();
 			
 			const moveCallback = (event) => {
-				this.viewportRatio = (event.clientX - offsetX) / this.viewportDimensions.height;
+				this.ratioViewport = (event.clientX - offsetX) / this.viewportDimensions.height;
 			};
 			
 			resizer.setPointerCapture(event.pointerId);
@@ -119,7 +119,7 @@ export default class {
 				if (buttons === 2) {
 					cancelRightClick();
 					
-					this.viewportRatio = 1;
+					this.ratioViewport = 1;
 				}
 				
 				resizer.removeEventListener('pointermove', moveCallback);
@@ -230,6 +230,8 @@ export default class {
 		
 		this.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
 		
+		this.constructor.readout.setRatio(this);
+		
 		this.updateImageDimensions();
 	}
 	
@@ -242,6 +244,8 @@ export default class {
 		this.ratioViewportInverse = 1 / ratio;
 		
 		this.elements.viewport.style.aspectRatio = `${ratio}`;
+		
+		this.constructor.readout.setRatio(this);
 		
 		this.updateViewportDimensions();
 	}
@@ -258,16 +262,12 @@ export default class {
 		data.halfHeight = data.height / 2;
 	}
 	
-	updatePreZoom() {
-		this.elements.imageWrapper.style.height = `${Math.min(1, this.ratioViewport / this.ratioImage) * 100}%`;
-	}
-	
 	updateImageDimensions(doApply = true) {
-		this.updatePreZoom();
+		this.elements.imageWrapper.style.height = `${Math.min(1, this.ratioViewport / this.ratioImage) * 100}%`;
 		
-		this.setDimensions(this.imageDimensions, this.elements.image);
+		this.setDimensions(this.imageDimensions, this.elements.imageWrapper);
 		
-		this.constructor.limitDisplay.setDimensions(this.elements.image);
+		this.constructor.limitDisplay.setDimensions(this.elements.imageWrapper);
 		
 		if (doApply) {
 			this.constrainPosition(WEIGHTS.RATIO);
@@ -275,28 +275,25 @@ export default class {
 		}
 	}
 	
-	updateViewportDimensions(doApply = true) {
-		this.updatePreZoom();
+	updateViewportDimensions() {
+		this.updateImageDimensions(false);
 		
 		this.setDimensions(this.viewportDimensions, this.elements.viewport);
 		
-		if (doApply) {
-			this.constrainPosition(WEIGHTS.RATIO);
-			this.applyPosition();
-		}
+		this.constrainPosition(WEIGHTS.RATIO);
+		this.applyPosition();
 	}
 	
 	reset() {
-		this.position.x = 0;
-		this.position.y = 0;
 		this.zoom = 1;
 		this.rotation = DEGREES[90];
 		
-		this.applyPosition();
 		this.applyZoom();
 		this.applyRotation();
 		
-		this.constrainPosition(WEIGHTS.ROTATION);
+		this.position.x = 0;
+		this.position.y = 0;
+		this.ratioImage = 1;
 	}
 	
 	getPanListener() {
@@ -372,19 +369,19 @@ export default class {
 		this.elements.imageWrapper.style.translate = `${-this.position.x * 100}% ${this.position.y * 100}%`;
 		this.elements.imageWrapper.style.transformOrigin = `${(0.5 + this.position.x) * 100}% ${(0.5 - this.position.y) * 100}%`;
 		
-		this.constructor.readout.setPosition(this.position);
+		this.constructor.readout.setPosition(this);
 	}
 	
 	applyZoom() {
 		this.elements.imageWrapper.style.scale = `${this.zoom}`;
 		
-		this.constructor.readout.setZoom(this.zoom);
+		this.constructor.readout.setZoom(this);
 	}
 	
 	applyRotation() {
 		this.elements.imageWrapper.style.rotate = `${DEGREES[90] - this.rotation}rad`;
 		
-		this.constructor.readout.setRotation(this.rotation);
+		this.constructor.readout.setRotation(this);
 	}
 	
 	getNearestCorner() {
@@ -392,6 +389,14 @@ export default class {
 			x: this.position.x < 0 ? -0.5 : 0.5,
 			y: this.position.y < 0 ? -0.5 : 0.5,
 		};
+	}
+	
+	deleteTween() {
+		this.constructor.target.hide();
+		
+		this.tween.kill();
+		
+		delete this.tween;
 	}
 	
 	setTween(...targets) {
@@ -407,7 +412,7 @@ export default class {
 		let hasTween = false;
 		
 		const setTween = (type, value, {delay = 0, ...vars} = {}, current = this[type]) => {
-			if (current === value && !(type in values)) {
+			if (!(type in values) && Math.abs(current - value) < 0.01) {
 				return;
 			}
 			
@@ -432,7 +437,7 @@ export default class {
 			} else if (type === 'x' || type === 'y') {
 				setTween(type, value, vars, this.position[type]);
 			} else if (type === 'ratio') {
-				setTween(type, value, vars, this.ratioImage);
+				setTween(type, value, vars, this.ratioViewport / this.ratioImage);
 			} else if (type === 'rotation') {
 				if (value > this.rotation) {
 					setTween(type, value - this.rotation <= DEGREES[180] ? value : value - DEGREES[360], vars);
@@ -445,12 +450,14 @@ export default class {
 		}
 		
 		if (!hasTween) {
+			this.deleteTween();
+			
 			return;
 		}
 		
 		if ('ratio' in values) {
 			actions.push(() => {
-				this.ratioImage = values.ratio;
+				this.ratioImage = this.ratioViewport / values.ratio;
 			});
 		}
 		
@@ -494,13 +501,11 @@ export default class {
 				this.constrainPosition(weight);
 				this.applyPosition();
 				
+				this.constructor.target.set({x: values.x ?? this.position.x, y: values.y ?? this.position.y}, this);
+				
 				this.constructor.progress.set(this.tween.totalProgress());
 			})
-			.eventCallback('onReverseComplete', () => {
-				this.tween.kill();
-				
-				delete this.tween;
-			})
+			.eventCallback('onReverseComplete', () => this.deleteTween())
 			.play();
 	}
 }

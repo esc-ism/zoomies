@@ -7,6 +7,7 @@ export const IDS = {
 	Y: 'y',
 	ZOOM: 'zoom',
 	ANGLE: 'angle',
+	RATIO: 'ratio',
 };
 
 const MULTIPLIER_DEGREES = 180 / Math.PI;
@@ -30,6 +31,7 @@ export const FORMATTERS = {
 	[IDS.Y]: (value) => getRoundedString(value),
 	[IDS.ZOOM]: (value) => getRoundedString(value),
 	[IDS.ANGLE]: (value) => Math.round((DEGREES[90] - value) * MULTIPLIER_DEGREES),
+	[IDS.RATIO]: (value) => getRoundedString(value),
 };
 
 export const POSTFIXES = {

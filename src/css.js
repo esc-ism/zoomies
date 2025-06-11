@@ -23,8 +23,7 @@ addRule(':root', {
 	'--color': '#e6e6e6',
 	'--background': '#242424',
 	
-	'font-family': 'system-ui, Avenir, Helvetica, Arial, sans-serif',
-	'line-height': '1.5',
+	'font-family': 'courier-new, monospace',
 	'font-weight': '400',
 	'background-color': 'var(--background)',
 	color: 'var(--color)',
