@@ -1,9 +1,10 @@
-import Demo from '../demo';
+import Demo from '@/demo';
 
 import {getTheta} from '@/shared';
-
 import {getRotatedCorners, getConstrainerFromPoints, isAbove, getProgressedLine, getIntersectProgress} from '../shared';
+
 import {WEIGHTS} from '@/demo';
+import {CORNERS} from '@/pages/consts';
 
 const getBound = (zoom, point, isTopLeft) => {
 	if (zoom <= point.z) {
@@ -44,6 +45,14 @@ const getSnappedZoom = (_point0, point1, {x, y}) => {
 };
 
 export default class extends Demo {
+	setRails(bounds) {
+		this.rails.hide(bounds.length);
+		
+		for (const [i, bound] of bounds.entries()) {
+			this.rails[i].set(this, bound, CORNERS[`${bound.y > 0 ? 'TOP' : 'BOTTOM'}_${bound.x > 0 ? 'RIGHT' : 'LEFT'}`]);
+		}
+	}
+	
 	getPositionConstrainer() {
 		return getConstrainerFromPoints(
 			this.imageDimensions,
@@ -52,13 +61,15 @@ export default class extends Demo {
 		);
 	}
 	
-	updateImageDimensions() {
+	updateImageDimensions(doApply = true) {
 		super.updateImageDimensions(false);
 		
 		this.cornerDistance = Math.sqrt(Math.pow(this.imageDimensions.halfWidth, 2) + Math.pow(this.imageDimensions.halfHeight, 2));
 		
-		this.constrainPosition(WEIGHTS.RATIO);
-		this.applyPosition();
+		if (doApply) {
+			this.constrainPosition(WEIGHTS.RATIO);
+			this.applyPosition();
+		}
 	}
 	
 	getZoomPoints() {

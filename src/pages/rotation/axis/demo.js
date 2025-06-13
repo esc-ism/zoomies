@@ -1,10 +1,11 @@
-import Demo from '../demo';
+import Demo from '@/demo';
 
 import {getTheta, DEGREES} from '@/shared';
-
 import {getRotatedCorners, getConstrainerFromPoints, getProgressed, getProgressedLine, getIntersectProgress, getProgress} from '../shared';
 
-const getBound = (zoom, first, second, isTopLeft) => {
+import {CORNERS} from '@/pages/consts';
+
+export const getBound = (zoom, first, second, isTopLeft) => {
 	if (zoom > second.z) {
 		const progress = zoom / second.z;
 		
@@ -180,7 +181,7 @@ const getZoomPoints = (() => {
 		const point0 = getIntersection(viewport, image, yIntersect, corner, right);
 		const point1 = getIntersection(viewport, image, yIntersect, corner, top);
 		
-		const [point, vpEnd] = point0.z > point1.z ? [point0, {...right}] : [point1, {...top}];
+		const [point, vpEnd, notVpEnd] = point0.z > point1.z ? [point0, {...right}, point1] : [point1, {...top}, point0];
 		
 		// todo do you need to reference the specific axis?
 		//  can you just say if either axis' sign isn't equal?
@@ -190,7 +191,7 @@ const getZoomPoints = (() => {
 			vpEnd.y = -vpEnd.y;
 		}
 		
-		return {...point, vpEnd};
+		return {...point, vpEnd, notVpEnd};
 	};
 	
 	// the angle from 0,0 to the center of the image edge angled towards the viewport's upper-right corner
@@ -245,23 +246,66 @@ const getZoomPoints = (() => {
 		
 		const [originSide, originBase] = fitZoom.map((z) => ({x: 0, y: 0, z}));
 		
-		return isEvenQuadrant ?
-				[...[originSide, sideIntersection], ...[originBase, baseIntersection]] :
-				[...[originBase, baseIntersection], ...[originSide, sideIntersection]];
+		return [
+			isEvenQuadrant ?
+					[...[originSide, sideIntersection], ...[originBase, baseIntersection]] :
+					[...[originBase, baseIntersection], ...[originSide, sideIntersection]],
+			points,
+		];
 	};
 })();
 
+const getPath = (corner, midpoint, bound) => {
+	if (!bound) {
+		return [[], [{x: 0, y: 0}, midpoint, corner]];
+	}
+	
+	if (bound.c === 0) {
+		return [[{x: 0, y: 0}, bound], [bound, midpoint, corner]];
+	}
+	
+	return [[{x: 0, y: 0}, midpoint, bound], [bound, corner]];
+};
+
 export default class extends Demo {
-	getPositionConstrainer() {
-		return getConstrainerFromPoints(
-			this.imageDimensions,
-			getBound(this.zoom, this.zoomPoints[0], this.zoomPoints[1], true),
-			getBound(this.zoom, this.zoomPoints[2], this.zoomPoints[3], false),
+	constructor() {
+		super();
+		
+		this.rails.set(
+			[{x: 0, y: 0}, CORNERS.TOP_LEFT],
+			[{x: 0, y: 0}, CORNERS.TOP_RIGHT],
+			[{x: 0, y: 0}, CORNERS.BOTTOM_LEFT],
+			[{x: 0, y: 0}, CORNERS.BOTTOM_RIGHT],
 		);
 	}
 	
+	getLines() {
+		const [rejected0, accepted0] = getPath(CORNERS.TOP_LEFT, this.zoomPoints[1], this.bound0);
+		const [rejected1, accepted1] = getPath(CORNERS.TOP_RIGHT, this.zoomPoints[3], this.bound1);
+		
+		return [
+			[accepted0, accepted1],
+			[rejected0, rejected1],
+			[
+				...this.axes,
+				[this.zoomPoints[1].notVpEnd, CORNERS.TOP_LEFT], [this.zoomPoints[3].notVpEnd, CORNERS.TOP_RIGHT],
+			],
+		];
+	}
+	
+	getPositionConstrainer() {
+		this.bound0 = getBound(this.zoom, this.zoomPoints[0], this.zoomPoints[1], true);
+		this.bound1 = getBound(this.zoom, this.zoomPoints[2], this.zoomPoints[3], false);
+		
+		return getConstrainerFromPoints(this.imageDimensions, this.bound0, this.bound1);
+	}
+	
 	getZoomPoints() {
-		return getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions);
+		const [points, axes] = getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions);
+		
+		this.axes = axes.map((point) => [{x: 0, y: 0}, point]);
+		
+		return points;
 	}
 	
 	getSnappedZoom() {

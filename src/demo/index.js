@@ -5,7 +5,7 @@ import './css';
 import {getTheta, DEGREES} from '@/shared';
 
 import Readout from './readout';
-import LimitDisplay from './limitDisplay';
+import Bounds from './bounds';
 import Target from './target';
 import Progress from './progress';
 
@@ -42,7 +42,7 @@ const dock = (node) => new Promise((resolve) => {
 });
 
 export default class {
-	static limitDisplay = new LimitDisplay();
+	static bounds = new Bounds();
 	static readout = new Readout();
 	static target = new Target();
 	static progress = new Progress();
@@ -74,7 +74,7 @@ export default class {
 		
 		viewport.appendChild(this.constructor.progress.element);
 		resizer.parentElement.insertBefore(this.constructor.readout.element, resizer);
-		imageWrapper.append(this.constructor.limitDisplay.element, this.constructor.target.element);
+		imageWrapper.append(this.constructor.bounds.element, this.constructor.target.element);
 		
 		dock(wrapper).then(() => {
 			const observer = new ResizeObserver(() => {
@@ -86,12 +86,12 @@ export default class {
 				
 				this.updateViewportDimensions();
 				
-				if (this.setLimits) {
-					this.constructor.limitDisplay.show();
+				if (this.setBounds) {
+					this.constructor.bounds.show();
 					
-					this.setLimits();
+					this.setBounds();
 				} else {
-					this.constructor.limitDisplay.show(false);
+					this.constructor.bounds.show(false);
 				}
 			});
 			
@@ -266,8 +266,6 @@ export default class {
 		this.elements.imageWrapper.style.height = `${Math.min(1, this.ratioViewport / this.ratioImage) * 100}%`;
 		
 		this.setDimensions(this.imageDimensions, this.elements.imageWrapper);
-		
-		this.constructor.limitDisplay.setDimensions(this.elements.imageWrapper);
 		
 		if (doApply) {
 			this.constrainPosition(WEIGHTS.RATIO);

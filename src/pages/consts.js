@@ -15,3 +15,10 @@ export const TWEENS_RESET = [
 	['position', 0, {duration: 0}],
 	['zoom', 1, {duration: 0}],
 ];
+
+export const CORNERS = {
+	TOP_LEFT: {x: -0.5, y: 0.5},
+	TOP_RIGHT: {x: 0.5, y: 0.5},
+	BOTTOM_LEFT: {x: -0.5, y: -0.5},
+	BOTTOM_RIGHT: {x: 0.5, y: -0.5},
+};

@@ -1,15 +1,17 @@
-import Demo from '@/demo';
+import Demo from '../demo';
 
 export default class extends Demo {
 	setPositionConstrainer() {
-		const [constrainer, points, tangents] = this.getPositionConstrainer();
+		const [constrainer, bounds, tangents] = this.getPositionConstrainer();
 		
 		this.getConstrainedPosition = constrainer;
 		
-		this.constructor.limitDisplay.setLimits(points, tangents);
+		this.constructor.bounds.set(this, ...bounds);
+		this.setRails(bounds);
+		this.tangents.set(tangents);
 	}
 	
-	setLimits(setZoomPoints = true) {
+	setBounds(setZoomPoints = true) {
 		if (setZoomPoints) {
 			this.zoomPoints = this.getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions);
 		}
@@ -19,7 +21,7 @@ export default class extends Demo {
 	
 	constrainPosition(weight) {
 		if (weight <= 1) {
-			this.setLimits(weight <= 0);
+			this.setBounds(weight <= 0);
 		}
 		
 		this.position = this.getConstrainedPosition(this.position);

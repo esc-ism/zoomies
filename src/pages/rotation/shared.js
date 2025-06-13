@@ -138,8 +138,6 @@ const get1DConstrainer = (() => {
 	const getTangents = (m, point, flipped) => {
 		const isSide = Math.abs(m) < 1;
 		
-		// [points.topLeft, tangents.top, 'left'], [points.topRight, tangents.top, 'right'],
-		
 		const linePoint = getLine(m, point);
 		const lineFlipped = getLine(m, flipped);
 		

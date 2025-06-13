@@ -8,7 +8,7 @@ import Demo, {getImageFit} from './demo';
 export default (wrapper) => {
 	const demo = new Demo();
 	
-	const getFitZoom = () => Math.max(...getImageFit(demo.rotation, demo.viewportDimensions, demo.imageDimensions));
+	const getFitZoom = () => Math.max(...getImageFit(0, demo.viewportDimensions, demo.imageDimensions));
 	
 	wrapper.append(
 		demo.element,
@@ -57,7 +57,11 @@ export default (wrapper) => {
 					['rotation', DEGREES[90], {duration: 2, delay: '>+=0.3'}],
 					['rotation', 0, {ease: 'none', duration: 5, delay: '>'}],
 				]),
-				'',
+				'.',
+			],
+			[
+				'This is only half of the system, however.',
+				'Since points no longer travel directly from the origin towards image corners, we need some way of ',
 			],
 		),
 	);

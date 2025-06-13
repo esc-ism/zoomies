@@ -1,7 +1,7 @@
+import Demo from './demo';
+
 import {DEGREES} from '@/shared';
 import {getText, getCode, getButton} from '../../shared';
-
-import Demo from './demo';
 
 export const badTweens = {};
 
