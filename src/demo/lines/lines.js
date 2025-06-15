@@ -1,93 +1,180 @@
-import Hideable from './index';
+import Hideables from './copies';
 
 import {DEGREES, getTheta} from '@/shared';
 
-const template = document.createElement('div');
+const getLeft = ({x}) => (0.5 + x) * 100;
+const getTop = ({y}) => (0.5 - y) * 100;
 
-template.style.position = 'absolute';
-template.style.transformOrigin = 'top center';
-template.style.translate = '-50% 0';
-template.style.width = `${window.devicePixelRatio}px`;
-
-export const setPosition = ({x, y}, element) => {
-	element.style.left = `${(0.5 + x) * 100}%`;
-	element.style.top = `${(0.5 - y) * 100}%`;
+export const setPosition = (position, element) => {
+	element.style.left = `${getLeft(position)}%`;
+	element.style.top = `${getTop(position)}%`;
 };
 
 export class Line {
-	element = template.cloneNode();
+	static getLines(points) {
+		if (points.length < 2) {
+			return [];
+		}
+		
+		if (points.length === 2) {
+			return [points];
+		}
+		
+		const lines = [];
+		
+		let start = points[points.length - 1];
+		
+		for (const point of points) {
+			lines.push([start, point]);
+			
+			start = point;
+		}
+		
+		return lines;
+	}
 	
-	constructor(demo) {
+	static Reflection = class {
+		constructor(source, flipX, flipY) {
+			this.source = source;
+			this.element = source.element.cloneNode();
+			
+			this.xProperty = flipX ? 'right' : 'left';
+			this.yProperty = flipY ? 'bottom' : 'top';
+			
+			if (flipX) {
+				this.element.style.translate = '50%';
+			}
+			
+			if (flipY) {
+				this.element.style.transformOrigin = 'center bottom';
+			}
+			
+			this.flipRotation = flipX !== flipY;
+		}
+		
+		setHeight() {
+			this.element.style.height = `${this.source.height}%`;
+		}
+		
+		setRotation() {
+			this.element.style.rotate = `${this.flipRotation ? -this.source.rotation : this.source.rotation}rad`;
+		}
+		
+		setPosition() {
+			this.element.style[this.xProperty] = `${this.source.left}%`;
+			this.element.style[this.yProperty] = `${this.source.top}%`;
+		}
+	};
+	
+	static template = document.createElement('div');
+	
+	static {
+		this.template.style.position = 'absolute';
+		this.template.style.transformOrigin = 'top center';
+		this.template.style.translate = '-50% 0';
+		this.template.style.width = `${window.devicePixelRatio}px`;
+	}
+	
+	element = (this.constructor.template ?? Line.template).cloneNode();
+	reflections = [];
+	
+	constructor(demo, flipX, flipY, flipBoth, parent = demo.elements.imageWrapper) {
 		this.demo = demo;
+		
+		const Reflection = this.constructor.Reflection ?? Line.Reflection;
+		
+		if (flipX) {
+			this.reflections.push(new Reflection(this, true, false));
+		}
+		
+		if (flipY) {
+			this.reflections.push(new Reflection(this, false, true));
+		}
+		
+		if (flipBoth) {
+			this.reflections.push(new Reflection(this, true, true));
+		}
+		
+		parent.append(this.element, ...this.reflections.map(({element}) => element));
 	}
 	
 	hide() {
 		this.element.style.display = 'none';
+		
+		for (const {element} of this.reflections) {
+			element.style.display = 'none';
+		}
 	}
 	
 	show() {
 		this.element.style.removeProperty('display');
+		
+		for (const {element} of this.reflections) {
+			element.style.removeProperty('display');
+		}
 	}
 	
-	getHeight(from, to, {ratioImage}) {
-		return Math.sqrt((to.x ? Math.pow((to.x - from.x) * ratioImage, 2) : 0) + (to.y ? Math.pow((to.y - from.y), 2) : 0)) * 100;
+	setHeight(from, to) {
+		const {ratioImage} = this.demo;
+		
+		this.height = Math.sqrt((to.x ? Math.pow((to.x - from.x) * ratioImage, 2) : 0) + (to.y ? Math.pow((to.y - from.y), 2) : 0)) * 100;
+		
+		this.element.style.height = `${this.height}%`;
+		
+		for (const reflection of this.reflections) {
+			reflection.setHeight();
+		}
 	}
 	
-	setRotation(from, to, {ratioImage, ratioImageInverse}) {
+	setRotation(from, to) {
+		const {ratioImage, ratioImageInverse} = this.demo;
+		
 		const ratioWidth = Math.max(1, ratioImage);
 		const ratioHeight = Math.max(1, ratioImageInverse);
 		
-		this.element.style.rotate = `${DEGREES[270] - getTheta(
+		this.rotation = DEGREES[270] - getTheta(
 			from.x * ratioWidth,
 			from.y * ratioHeight,
 			(to.x ?? from.x) * ratioWidth,
 			(to.y ?? from.y) * ratioHeight,
-		)}rad`;
+		);
+		
+		this.element.style.rotate = `${this.rotation}rad`;
+		
+		for (const reflection of this.reflections) {
+			reflection.setRotation();
+		}
 	}
 	
 	setPosition(position) {
-		setPosition(position, this.element);
+		this.left = getLeft(position);
+		this.top = getTop(position);
+		
+		this.element.style.left = `${this.left}%`;
+		this.element.style.top = `${this.top}%`;
+		
+		for (const reflection of this.reflections) {
+			reflection.setPosition();
+		}
 	}
 	
-	set(from, to, demo = this.demo) {
+	set(from, to) {
 		this.show();
 		
-		this.element.style.height = `${this.getHeight(from, to, demo)}%`;
+		this.setHeight(from, to);
 		
-		this.setRotation(from, to, demo);
+		this.setRotation(from, to);
 		
 		this.setPosition(from);
 	}
 }
 
-export default class extends Hideable {
-	constructor(demo, count = 4) {
+export default class extends Hideables {
+	constructor(count, ...args) {
 		super();
 		
 		for (let i = 0; i < count; ++i) {
-			this[i] = new Line(demo);
-		}
-	}
-	
-	set(points, demo) {
-		if (points.length > 2) {
-			let start = points[points.length - 1];
-			
-			this.hide(points.length);
-			
-			for (const [i, point] of points.entries()) {
-				this[i].set(start, point, demo);
-				
-				start = point;
-			}
-		} else if (points.length === 2) {
-			this.hide(1);
-			
-			this[0].set(points[0], points[1], demo);
-		} else {
-			this.hide();
-			
-			return;
+			this[i] = new Line(...args);
 		}
 	}
 }

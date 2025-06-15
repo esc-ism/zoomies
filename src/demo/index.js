@@ -5,21 +5,12 @@ import './css';
 import {getTheta, DEGREES} from '@/shared';
 
 import Readout from './readout';
-import Bounds from './bounds';
 import Target from './target';
 import Progress from './progress';
 
 import getElements from './elements';
 
 import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL, TWEEN_DEFAULT} from './consts';
-
-export const WEIGHTS = {
-	RATIO: -1,
-	ROTATION: 0,
-	ZOOM: 1,
-	POSITION: 2,
-	X: 2, Y: 2,
-};
 
 const cancelRightClick = () => {
 	window.addEventListener('contextmenu', (event) => {
@@ -42,13 +33,12 @@ const dock = (node) => new Promise((resolve) => {
 });
 
 export default class {
-	static bounds = new Bounds();
 	static readout = new Readout();
-	static target = new Target();
 	static progress = new Progress();
 	
-	elements = getElements();
+	target = new Target(this);
 	
+	elements = getElements();
 	element = this.elements.wrapper;
 	
 	imageDimensions = {};
@@ -74,7 +64,7 @@ export default class {
 		
 		viewport.appendChild(this.constructor.progress.element);
 		resizer.parentElement.insertBefore(this.constructor.readout.element, resizer);
-		imageWrapper.append(this.constructor.bounds.element, this.constructor.target.element);
+		imageWrapper.append(this.target.element);
 		
 		dock(wrapper).then(() => {
 			const observer = new ResizeObserver(() => {
@@ -85,14 +75,6 @@ export default class {
 				}
 				
 				this.updateViewportDimensions();
-				
-				if (this.setBounds) {
-					this.constructor.bounds.show();
-					
-					this.setBounds();
-				} else {
-					this.constructor.bounds.show(false);
-				}
 			});
 			
 			observer.observe(wrapper.parentElement);
@@ -154,7 +136,7 @@ export default class {
 				this.zoom /= 1 - increment;
 			}
 			
-			this.constrainPosition(WEIGHTS.ZOOM);
+			this.constrainPosition({zoom: true});
 			
 			this.applyPosition();
 			this.applyZoom();
@@ -203,7 +185,7 @@ export default class {
 					cancelRightClick();
 				}
 				
-				this.constructor.target.hide();
+				this.target.hide();
 				
 				if (!isClick) {
 					return;
@@ -268,7 +250,7 @@ export default class {
 		this.setDimensions(this.imageDimensions, this.elements.imageWrapper);
 		
 		if (doApply) {
-			this.constrainPosition(WEIGHTS.RATIO);
+			this.constrainPosition({ratio: true});
 			this.applyPosition();
 		}
 	}
@@ -278,7 +260,7 @@ export default class {
 		
 		this.setDimensions(this.viewportDimensions, this.elements.viewport);
 		
-		this.constrainPosition(WEIGHTS.RATIO);
+		this.constrainPosition({ratio: true});
 		this.applyPosition();
 	}
 	
@@ -309,9 +291,9 @@ export default class {
 				
 				const target = {...this.position};
 				
-				this.constrainPosition(WEIGHTS.POSITION);
+				this.constrainPosition({position: true});
 				
-				this.constructor.target.set(target, this);
+				this.target.set(target);
 				
 				this.applyPosition();
 			}
@@ -344,9 +326,9 @@ export default class {
 			const target = {...this.position};
 			
 			this.constrainRotation();
-			this.constrainPosition(WEIGHTS.ROTATION);
+			this.constrainPosition({rotation: true});
 			
-			this.constructor.target.set(target, this);
+			this.target.set(target);
 			
 			this.applyRotation();
 			this.applyPosition();
@@ -390,7 +372,7 @@ export default class {
 	}
 	
 	deleteTween() {
-		this.constructor.target.hide();
+		this.target.hide();
 		
 		this.tween.kill();
 		
@@ -402,8 +384,6 @@ export default class {
 		
 		this.tween = gsap.timeline({paused: true, data: {}});
 		const values = {};
-		
-		let weight = Infinity;
 		
 		const actions = [];
 		
@@ -417,8 +397,6 @@ export default class {
 			values[type] = current;
 			
 			this.tween.to(values, {...TWEEN_DEFAULT, [type]: value, ...vars}, delay);
-			
-			weight = Math.min(weight, WEIGHTS[type.toUpperCase()]);
 			
 			hasTween = true;
 		};
@@ -454,13 +432,17 @@ export default class {
 		}
 		
 		if ('ratio' in values) {
-			actions.push(() => {
+			actions.push((effects) => {
+				effects.ratio = true;
+				
 				this.ratioImage = this.ratioViewport / values.ratio;
 			});
 		}
 		
 		if ('rotation' in values) {
-			actions.push(() => {
+			actions.push((effects) => {
+				effects.rotation = true;
+				
 				this.rotation = values.rotation;
 				
 				this.constrainRotation();
@@ -469,7 +451,9 @@ export default class {
 		}
 		
 		if ('zoom' in values) {
-			actions.push(() => {
+			actions.push((effects) => {
+				effects.zoom = true;
+				
 				this.zoom = values.zoom;
 				
 				this.applyZoom();
@@ -477,13 +461,17 @@ export default class {
 		}
 		
 		if ('x' in values) {
-			actions.push(() => {
+			actions.push((effects) => {
+				effects.position = true;
+				
 				this.position.x = values.x;
 			});
 		}
 		
 		if ('y' in values) {
-			actions.push(() => {
+			actions.push((effects) => {
+				effects.position = true;
+				
 				this.position.y = values.y;
 			});
 		}
@@ -492,14 +480,16 @@ export default class {
 		
 		return this.tween
 			.eventCallback('onUpdate', () => {
+				const effects = {};
+				
 				for (const action of actions) {
-					action();
+					action(effects);
 				}
 				
-				this.constrainPosition(weight);
+				this.constrainPosition(effects);
 				this.applyPosition();
 				
-				this.constructor.target.set({x: values.x ?? this.position.x, y: values.y ?? this.position.y}, this);
+				this.target.set({x: values.x ?? this.position.x, y: values.y ?? this.position.y});
 				
 				this.constructor.progress.set(this.tween.totalProgress());
 			})

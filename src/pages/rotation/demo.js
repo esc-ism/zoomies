@@ -1,35 +1,48 @@
-import Demo from '../demo';
+import Demo from '@/demo';
+import Tangents from '@/demo/lines/tangents';
+import Bounds from '@/demo/bounds';
 
 export default class extends Demo {
-	setPositionConstrainer() {
+	bounds = new Bounds(this);
+	tangents = new Tangents(4, this, false, false, true);
+	
+	setBounds() {
 		const [constrainer, bounds, tangents] = this.getPositionConstrainer();
 		
 		this.getConstrainedPosition = constrainer;
 		
-		this.constructor.bounds.set(this, ...bounds);
-		this.setRails(bounds);
-		this.tangents.set(tangents);
+		this.bounds.set(...bounds);
+		this.setRailsProgress(bounds);
+		this.tangents.set(...tangents);
 	}
 	
-	setBounds(setZoomPoints = true) {
-		if (setZoomPoints) {
-			this.zoomPoints = this.getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions);
-		}
+	setZoomPoints() {
+		this.zoomPoints = this.getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions);
 		
-		this.setPositionConstrainer();
+		this.setRails();
 	}
 	
-	constrainPosition(weight) {
-		if (weight <= 1) {
-			this.setBounds(weight <= 0);
+	constrainPosition({ratio, rotation, zoom, position}) {
+		let fallthrough = rotation || ratio;
+		
+		if (fallthrough) {
+			this.setZoomPoints();
 		}
 		
-		this.position = this.getConstrainedPosition(this.position);
+		if (fallthrough || zoom) {
+			this.setBounds();
+			
+			fallthrough = true;
+		}
+		
+		if (fallthrough || position) {
+			this.position = this.getConstrainedPosition(this.position);
+		}
 	}
 	
 	constrainZoom() {
 		this.zoom = this.getSnappedZoom(...this.zoomPoints, this.position);
 		
-		this.setPositionConstrainer();
+		this.setBounds();
 	}
 }

@@ -1,4 +1,5 @@
-import Demo, {WEIGHTS} from '@/demo';
+import Demo from '@/demo';
+import Bounds from '@/demo/bounds';
 import Rails from '@/demo/lines/rails';
 import Tangents from '@/demo/lines/tangents';
 
@@ -6,8 +7,10 @@ import {CORNERS} from '../consts';
 import {getBound} from '../rotation/axis/demo';
 
 export default class extends Demo {
-	rails = new Rails(this, true, true);
-	tangents = new Tangents(this, 8);
+	bounds = new Bounds(this);
+	
+	rails = new Rails(2, this, true, true, true);
+	tangents = new Tangents(2, this, true, true, true);
 	
 	setRailsProgress() {
 		if (!this.bound) {
@@ -19,68 +22,40 @@ export default class extends Demo {
 		}
 	}
 	
-	getXTangents(topLeft, topRight, bottomLeft, bottomRight) {
+	getXTangents(topLeft, topRight) {
 		if (!this.bound || this.bound.x <= 0) {
 			return [];
 		}
 		
-		const top = {
-			right: {c: this.bound.y, m: Infinity, ...topRight},
-			left: {c: this.bound.y, m: Infinity, ...topLeft},
-			isHigh: true,
-			isSide: false,
-		};
-		
-		const bottom = {
-			right: {c: -this.bound.y, m: Infinity, ...bottomRight},
-			left: {c: -this.bound.y, m: Infinity, ...bottomLeft},
-			isHigh: false,
-			isSide: false,
-		};
-		
 		return [
-			[topLeft, top, 'left'],
-			[topRight, top, 'right'],
-			[bottomLeft, bottom, 'left'],
-			[bottomRight, bottom, 'right'],
+			[
+				topRight, {
+					value: {c: this.bound.y, m: Infinity, ...topRight},
+					isHigh: true,
+					isSide: false,
+				}, 'value',
+			],
 		];
 	}
 	
-	getYTangents(topLeft, topRight, bottomLeft, bottomRight) {
+	getYTangents(topLeft, topRight) {
 		if (!this.bound || this.bound.y <= 0) {
 			return [];
 		}
 		
-		const right = {
-			top: {c: this.bound.y, m: 0, ...topRight},
-			bottom: {c: -this.bound.y, m: 0, ...bottomRight},
-			isHigh: true,
-			isSide: true,
-		};
-		
-		const left = {
-			top: {c: this.bound.y, m: 0, ...topLeft},
-			bottom: {c: -this.bound.y, m: 0, ...bottomLeft},
-			isHigh: false,
-			isSide: true,
-		};
-		
 		return [
-			[topLeft, left, 'top'],
-			[bottomLeft, left, 'bottom'],
-			[topRight, right, 'top'],
-			[bottomRight, right, 'bottom'],
+			[
+				topRight, {
+					value: {c: this.bound.y, m: 0, ...topRight},
+					isHigh: true,
+					isSide: true,
+				}, 'value',
+			],
 		];
 	}
 	
 	setTangents(...args) {
-		const tangents = [...this.getXTangents(...args), ...this.getYTangents(...args)];
-		
-		this.tangents.hide(tangents.length);
-		
-		for (const [i, tangent] of tangents.entries()) {
-			this.tangents[i].set(...tangent);
-		}
+		this.tangents.set(...this.getXTangents(...args), ...this.getYTangents(...args));
 	}
 	
 	setZoomPoints() {
@@ -115,7 +90,7 @@ export default class extends Demo {
 		this.setRailsProgress();
 		
 		if (!this.bound) {
-			this.constructor.bounds.set();
+			this.bounds.set();
 			
 			this.tangents.hide();
 		} else {
@@ -124,19 +99,24 @@ export default class extends Demo {
 			const bottomLeft = {x: -this.bound.x, y: -this.bound.y};
 			const bottomRight = {x: this.bound.x, y: -this.bound.y};
 			
-			this.constructor.bounds.set(this, topLeft, topRight, bottomRight, bottomLeft);
+			this.bounds.set(topLeft, topRight, bottomRight, bottomLeft);
 			this.setTangents(topLeft, topRight, bottomLeft, bottomRight);
 		}
 	}
 	
-	constrainPosition(weight = 2) {
-		switch (weight) {
-			case WEIGHTS.RATIO:
-				this.setZoomPoints();
-			
-			// eslint-disable-next-line no-fallthrough
-			case WEIGHTS.ZOOM:
-				this.setBounds();
+	constrainPosition({ratio, zoom, position}) {
+		let fallthrough = ratio;
+		
+		if (fallthrough) {
+			this.setZoomPoints();
+		}
+		
+		if (fallthrough || zoom) {
+			this.setBounds();
+		}
+		
+		if (!fallthrough && !position) {
+			return;
 		}
 		
 		if (!this.bound) {

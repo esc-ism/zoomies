@@ -318,12 +318,12 @@ export const getConstrainerFromPoints = (() => {
 				get2DConstrained.bind(null, points, lines, tangents), Object.values(points), [
 					[points.topLeft, tangents.top, 'left'],
 					[points.topRight, tangents.top, 'right'],
-					[points.bottomLeft, tangents.bottom, 'left'],
-					[points.bottomRight, tangents.bottom, 'right'],
+					// [points.bottomLeft, tangents.bottom, 'left'],
+					// [points.bottomRight, tangents.bottom, 'right'],
 					[points.topLeft, tangents.left, 'top'],
-					[points.bottomLeft, tangents.left, 'bottom'],
+					// [points.bottomLeft, tangents.left, 'bottom'],
 					[points.topRight, tangents.right, 'top'],
-					[points.bottomRight, tangents.right, 'bottom'],
+					// [points.bottomRight, tangents.right, 'bottom'],
 				],
 			];
 		}

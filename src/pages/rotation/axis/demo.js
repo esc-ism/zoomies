@@ -1,4 +1,5 @@
-import Demo from '@/demo';
+import Demo from '../demo';
+import Rails from '@/demo/lines/rails';
 
 import {getTheta, DEGREES} from '@/shared';
 import {getRotatedCorners, getConstrainerFromPoints, getProgressed, getProgressedLine, getIntersectProgress, getProgress} from '../shared';
@@ -177,11 +178,13 @@ const getZoomPoints = (() => {
 		return {x, y, z: line.z / (1 - progress), c: line.y};
 	};
 	
+	const getHighAxis = ({x, y}) => Math.abs(x) > Math.abs(y) ? 'x' : 'y';
+	
 	const getIntersect = (viewport, image, yIntersect, corner, right, top) => {
 		const point0 = getIntersection(viewport, image, yIntersect, corner, right);
 		const point1 = getIntersection(viewport, image, yIntersect, corner, top);
 		
-		const [point, vpEnd, notVpEnd] = point0.z > point1.z ? [point0, {...right}, point1] : [point1, {...top}, point0];
+		const [point, vpEnd] = point0.z > point1.z ? [point0, {...right}] : [point1, {...top}];
 		
 		// todo do you need to reference the specific axis?
 		//  can you just say if either axis' sign isn't equal?
@@ -191,7 +194,9 @@ const getZoomPoints = (() => {
 			vpEnd.y = -vpEnd.y;
 		}
 		
-		return {...point, vpEnd, notVpEnd};
+		const axis = getHighAxis(vpEnd);
+		
+		return {...point, vpEnd, p: vpEnd[axis] / point[axis]};
 	};
 	
 	// the angle from 0,0 to the center of the image edge angled towards the viewport's upper-right corner
@@ -255,42 +260,39 @@ const getZoomPoints = (() => {
 	};
 })();
 
-const getPath = (corner, midpoint, bound) => {
-	if (!bound) {
-		return [[], [{x: 0, y: 0}, midpoint, corner]];
+const getRailProgress = (zoom, first, second) => {
+	if (zoom <= first.z) {
+		return [0, 0];
 	}
 	
-	if (bound.c === 0) {
-		return [[{x: 0, y: 0}, bound], [bound, midpoint, corner]];
+	if (zoom <= second.z) {
+		return [getProgress(first.z, zoom) * second.p, 0];
 	}
 	
-	return [[{x: 0, y: 0}, midpoint, bound], [bound, corner]];
+	return [1, getProgress(second.z, zoom)];
 };
 
 export default class extends Demo {
+	rails = new Rails(4, this, false, false, true);
+	
 	constructor() {
 		super();
-		
+	}
+	
+	setRails() {
 		this.rails.set(
-			[{x: 0, y: 0}, CORNERS.TOP_LEFT],
-			[{x: 0, y: 0}, CORNERS.TOP_RIGHT],
-			[{x: 0, y: 0}, CORNERS.BOTTOM_LEFT],
-			[{x: 0, y: 0}, CORNERS.BOTTOM_RIGHT],
+			[{x: 0, y: 0}, this.zoomPoints[1]],
+			[this.zoomPoints[1], CORNERS.TOP_LEFT],
+			[{x: 0, y: 0}, this.zoomPoints[3]],
+			[this.zoomPoints[3], CORNERS.TOP_RIGHT],
 		);
 	}
 	
-	getLines() {
-		const [rejected0, accepted0] = getPath(CORNERS.TOP_LEFT, this.zoomPoints[1], this.bound0);
-		const [rejected1, accepted1] = getPath(CORNERS.TOP_RIGHT, this.zoomPoints[3], this.bound1);
-		
-		return [
-			[accepted0, accepted1],
-			[rejected0, rejected1],
-			[
-				...this.axes,
-				[this.zoomPoints[1].notVpEnd, CORNERS.TOP_LEFT], [this.zoomPoints[3].notVpEnd, CORNERS.TOP_RIGHT],
-			],
-		];
+	setRailsProgress() {
+		this.rails.setProgress(
+			...getRailProgress(this.zoom, this.zoomPoints[0], this.zoomPoints[1]),
+			...getRailProgress(this.zoom, this.zoomPoints[2], this.zoomPoints[3]),
+		);
 	}
 	
 	getPositionConstrainer() {

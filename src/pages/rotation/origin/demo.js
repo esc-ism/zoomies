@@ -1,9 +1,9 @@
-import Demo from '@/demo';
+import Demo from '../demo';
+import Rails from '@/demo/lines/rails';
 
 import {getTheta} from '@/shared';
 import {getRotatedCorners, getConstrainerFromPoints, isAbove, getProgressedLine, getIntersectProgress} from '../shared';
 
-import {WEIGHTS} from '@/demo';
 import {CORNERS} from '@/pages/consts';
 
 const getBound = (zoom, point, isTopLeft) => {
@@ -45,12 +45,17 @@ const getSnappedZoom = (_point0, point1, {x, y}) => {
 };
 
 export default class extends Demo {
-	setRails(bounds) {
-		this.rails.hide(bounds.length);
-		
-		for (const [i, bound] of bounds.entries()) {
-			this.rails[i].set(this, bound, CORNERS[`${bound.y > 0 ? 'TOP' : 'BOTTOM'}_${bound.x > 0 ? 'RIGHT' : 'LEFT'}`]);
-		}
+	rails = new Rails(2, this, false, false, true);
+	
+	setRails() {
+		this.rails.set(
+			[{x: 0, y: 0}, CORNERS.TOP_LEFT],
+			[{x: 0, y: 0}, CORNERS.TOP_RIGHT],
+		);
+	}
+	
+	setRailsProgress(bounds) {
+		this.rails.setProgress(...bounds.filter(({y}) => y > 0).map(({y}) => [y / 0.5]));
 	}
 	
 	getPositionConstrainer() {
@@ -67,7 +72,7 @@ export default class extends Demo {
 		this.cornerDistance = Math.sqrt(Math.pow(this.imageDimensions.halfWidth, 2) + Math.pow(this.imageDimensions.halfHeight, 2));
 		
 		if (doApply) {
-			this.constrainPosition(WEIGHTS.RATIO);
+			this.constrainPosition({ratio: true});
 			this.applyPosition();
 		}
 	}

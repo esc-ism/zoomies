@@ -1,4 +1,5 @@
-import Lines from './lines/lines';
+import Hideables from './lines/copies';
+import {Line} from './lines/lines';
 
 export const setLineStyle = (() => {
 	const length = 6;
@@ -10,12 +11,30 @@ export const setLineStyle = (() => {
 	};
 })();
 
+class BoundLine extends Line {
+	static template = Line.template.cloneNode();
+	
+	static {
+		setLineStyle(this.template);
+	}
+}
+
+class BoundLines extends Hideables {
+	constructor(count, ...args) {
+		super();
+		
+		for (let i = 0; i < count; ++i) {
+			this[i] = new BoundLine(...args);
+		}
+	}
+}
+
 export default class {
 	element = document.createElement('div');
 	background = document.createElement('div');
-	lines = new Lines();
+	lines = [];
 	
-	constructor() {
+	constructor(demo) {
 		this.element.style.height = this.element.style.width = '100%';
 		this.element.style.pointerEvents = 'none';
 		
@@ -25,11 +44,12 @@ export default class {
 		
 		this.element.appendChild(this.background);
 		
-		for (const {element} of this.lines) {
-			setLineStyle(element);
-			
-			this.element.appendChild(element);
-		}
+		// 1d
+		this.lines[0] = new BoundLine(demo, false, false, false, this.element);
+		// 2d
+		this.lines[1] = new BoundLines(2, demo, false, false, true, this.element);
+		
+		demo.elements.imageWrapper.insertBefore(this.element, demo.target.element);
 	}
 	
 	show(doShow = true) {
@@ -40,17 +60,26 @@ export default class {
 		}
 	}
 	
-	set(demo, ...points) {
-		this.lines.set(points, demo);
-		
-		if (points.length < 2) {
-			this.background.style.removeProperty('clip-path');
+	set(...points) {
+		if (points.length > 2) {
+			const path = points.map(({x, y}) => `${x * 100 + 50}% ${50 - y * 100}%`);
+			
+			this.background.style.clipPath = `polygon(0 0, 0 100%, 100% 100%, 100% 0, 0 0, ${[...path, path[0]].join(',')})`;
+			
+			this.lines[0].hide();
+			this.lines[1].set([points[0], points[1]], [points[1], points[2]]);
 			
 			return;
 		}
 		
-		const path = points.map(({x, y}) => `${x * 100 + 50}% ${50 - y * 100}%`);
+		this.lines[1].hide();
 		
-		this.background.style.clipPath = `polygon(0 0, 0 100%, 100% 100%, 100% 0, 0 0, ${[...path, path[0]].join(',')})`;
+		this.background.style.removeProperty('clip-path');
+		
+		if (points.length === 2) {
+			this.lines[0].set(...points);
+		} else {
+			this.lines[0].hide();
+		}
 	}
 }

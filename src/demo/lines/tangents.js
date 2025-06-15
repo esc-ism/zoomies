@@ -1,5 +1,6 @@
+import Hideables from './copies';
+
 import {setLineStyle} from '../bounds';
-import Hideable from './index';
 import {Line} from './lines';
 
 import {getLineX, getLineY} from '@/pages/rotation/shared';
@@ -13,29 +14,23 @@ const getEnd = ({isHigh, isSide}, line) => {
 };
 
 class Tangent extends Line {
+	static template = Line.template.cloneNode();
+	
+	static {
+		setLineStyle(this.template);
+	}
+	
 	set(from, line, property) {
 		super.set(from, getEnd(line, line[property]));
 	}
 }
 
-export default class extends Hideable {
-	constructor(demo, count = 4) {
+export default class extends Hideables {
+	constructor(count, ...args) {
 		super();
 		
 		for (let i = 0; i < count; ++i) {
-			this[i] = new Tangent(demo);
-			
-			setLineStyle(this[i].element);
-			
-			demo.elements.imageWrapper.appendChild(this[i].element);
-		}
-	}
-	
-	set(tangents) {
-		this.hide(tangents.length);
-		
-		for (const [i, tangent] of tangents.entries()) {
-			this[i].set(...tangent);
+			this[i] = new Tangent(...args);
 		}
 	}
 }

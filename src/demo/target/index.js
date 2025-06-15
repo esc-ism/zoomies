@@ -7,15 +7,18 @@ import {CROSSHAIR} from '../elements';
 export default class {
 	element = document.createElement('div');
 	crosshair = CROSSHAIR.cloneNode(true);
-	line = new Line();
 	
-	constructor() {
+	constructor(demo) {
+		this.demo = demo;
+		
 		this.element.style.display = 'contents';
 		
-		this.element.append(this.crosshair, this.line.element);
+		this.element.append(this.crosshair);
+		
+		this.line = new Line(demo, false, false, false, this.element);
 		
 		this.crosshair.style.opacity = this.line.element.style.opacity = '0.4';
-		this.crosshair.style.position = this.line.element.style.position = 'absolute';
+		this.crosshair.style.position = 'absolute';
 		
 		this.crosshair.style.color = 'white';
 		
@@ -28,8 +31,8 @@ export default class {
 		this.crosshair.style.display = this.line.element.style.display = 'none';
 	}
 	
-	set(target, demo) {
-		const {position, zoom, rotation} = demo;
+	set(target) {
+		const {position, zoom, rotation} = this.demo;
 		
 		if ((!target.x || target.x === position.x) && (!target.y || target.y === position.y)) {
 			this.hide();
@@ -40,7 +43,7 @@ export default class {
 		this.crosshair.style.removeProperty('display');
 		this.line.element.style.removeProperty('display');
 		
-		this.line.set(position, target, demo);
+		this.line.set(position, target);
 		
 		setPosition({x: target.x ?? position.x, y: target.y ?? position.y}, this.crosshair);
 		
