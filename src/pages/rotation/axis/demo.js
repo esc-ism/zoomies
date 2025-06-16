@@ -124,7 +124,7 @@ export const getImageFit = (rotation, viewport, image) => {
 	return [0.5 / x, 0.5 / y];
 };
 
-const getZoomPoints = (() => {
+export const getZoomPoints = (() => {
 	const getPoints = (rotation, image, viewport, fitZoom, doFlip) => {
 		const getGenericRotated = (x, y, angle) => {
 			const radius = Math.sqrt(x * x + y * y);
@@ -251,12 +251,9 @@ const getZoomPoints = (() => {
 		
 		const [originSide, originBase] = fitZoom.map((z) => ({x: 0, y: 0, z}));
 		
-		return [
-			isEvenQuadrant ?
-					[...[originSide, sideIntersection], ...[originBase, baseIntersection]] :
-					[...[originBase, baseIntersection], ...[originSide, sideIntersection]],
-			points,
-		];
+		return isEvenQuadrant ?
+				[...[originSide, sideIntersection], ...[originBase, baseIntersection]] :
+				[...[originBase, baseIntersection], ...[originSide, sideIntersection]];
 	};
 })();
 
@@ -277,6 +274,16 @@ export default class extends Demo {
 	
 	constructor() {
 		super();
+		
+		// todo remove
+		window.setTimeout(() => {
+			this.ratioImage = 1.0195314467196777;
+			this.ratioViewport = 0.7663613978702473;
+			this.zoom = 1.0837706639944453;
+			this.rotation = 1.170796;
+			
+			this.constrainPosition({zoom: true, rotation: true, ratio: true});
+		}, 0);
 	}
 	
 	setRails() {
@@ -303,11 +310,7 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		const [points, axes] = getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions);
-		
-		this.axes = axes.map((point) => [{x: 0, y: 0}, point]);
-		
-		return points;
+		return getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions);
 	}
 	
 	getSnappedZoom() {

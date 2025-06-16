@@ -33,7 +33,7 @@ export const getLineX = ({m, c, x}, y) => !Number.isFinite(m) || m === 0 ? x : (
 
 export const getM = (from, to) => (to.y - from.y) / (to.x - from.x);
 export const getLine = (m, {x, y}) => ({c: y - m * x, m, x, y});
-const getFlipped = ({x, y}) => ({x: -x, y: -y});
+export const getFlipped = ({x, y}) => ({x: -x, y: -y});
 
 export const isAbove = ({m, c}, {x, y}) => m * x + c < y;
 

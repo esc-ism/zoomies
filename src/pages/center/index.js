@@ -62,4 +62,6 @@ export default (wrapper) => {
 			],
 		),
 	);
+	
+	return demo;
 };

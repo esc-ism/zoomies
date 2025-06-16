@@ -22,18 +22,29 @@ export default (wrapper) => {
 				'This particular demonstration neglects to limit panning.',
 				'Try it out!',
 			],
-			getCode(
-				// https://www.tablesgenerator.com/text_tables
-				'╔══════════════╦══════╦════════╦══════════╦═══════╗',
-				'║              ║ Pan  ║ Rotate ║ Snap Pan ║ Reset ║',
-				'╠══════════════╬══════╬════════╬══════════╬═══════╣',
-				'║ Mouse Button ║ Left ║ Right  ║ Left     ║ Right ║',
-				'╠══════════════╬══════╬════════╬══════════╬═══════╣',
-				'║ Action       ║ Drag ║ Click  ║ Drag     ║ Click ║',
-				'╚══════════════╩══════╩════════╩══════════╩═══════╝',
-			),
+			{
+				...getCode(
+					// https://www.tablesgenerator.com/text_tables
+					'╔════════╦════════════════╦══════════╗',
+					'║ ACTION ║ MOUSE          ║ KEYBOARD ║',
+					'╠════════╬════════╦═══════╬══════════╣',
+					'║ Pan    ║ Left   ║ Drag  ║          ║',
+					'╠════════╣ Mouse  ╠═══════╬══════════╣',
+					'║ Snap   ║ Button ║ Click ║          ║',
+					'╠════════╬════════╩═══════╬══════════╣',
+					'║ Zoom   ║                ║          ║',
+					'╠════════╣ Scroll Wheel   ╠══════════╣',
+					'║ Scale  ║                ║ ctrl     ║',
+					'╠════════╬════════╦═══════╬══════════╣',
+					'║ Rotate ║ Right  ║ Drag  ║          ║',
+					'╠════════╣ Mouse  ╠═══════╬══════════╣',
+					'║ Reset  ║ Button ║ Click ║          ║',
+					'╚════════╩════════╩═══════╩══════════╝',
+				),
+				style: {textAlign: 'center'},
+			},
 			[
-				'A sensible user of this system may ',
+				'A competent user of this system may ',
 				getButton('self-impose', demo, [
 					['zoom', 1],
 					['position', 0.2],
@@ -59,4 +70,6 @@ export default (wrapper) => {
 			],
 		),
 	);
+	
+	return demo;
 };

@@ -74,19 +74,19 @@ generate('imageWrapper', paths.viewport, {
 	const childContainer = document.createElement('div');
 	
 	childContainer.style.flexGrow = '1';
-	childContainer.style.backgroundColor = 'white';
 	childContainer.style.position = 'relative';
 	childContainer.style.pointerEvents = 'none';
 	
 	childContainer.append(...[
 		{
-			backgroundImage: 'radial-gradient(at left top, rgb(0 220 0), transparent), radial-gradient(at right top, rgb(0 0 255), transparent), radial-gradient(at left bottom, rgb(255 0 0), transparent), radial-gradient(at right bottom, rgb(179 255 0 / 50%), transparent)',
+			backgroundImage: 'radial-gradient(at left top, rgb(0 255 0), transparent), radial-gradient(at right top, rgb(0 0 255), transparent), radial-gradient(at left bottom, rgb(255 0 0), transparent), radial-gradient(at right bottom, rgb(179 255 0 / 50%), transparent)',
 			backgroundBlendMode: 'color-dodge',
 		},
 		{
 			backgroundImage: 'radial-gradient(circle, black, black 1.5px, transparent 0)',
 			backgroundSize: '18px 18px',
 			backgroundRepeat: 'round',
+			// backgroundColor: '#0000006f',
 		},
 		{
 			boxShadow: 'white 0 0 6px 1px',

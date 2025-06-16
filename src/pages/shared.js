@@ -23,7 +23,7 @@ const addContent = (parent, content) => {
 };
 
 const getNode = (description) => {
-	const {content = [], classList = [], tag = 'p', ...attributes} = (typeof description === 'string' || Array.isArray(description)) ? {content: description} : description;
+	const {content = [], classList = [], tag = 'p', style = {}, ...attributes} = (typeof description === 'string' || Array.isArray(description)) ? {content: description} : description;
 	
 	const node = document.createElement(tag);
 	
@@ -33,6 +33,10 @@ const getNode = (description) => {
 		}
 	} else {
 		addContent(node, content);
+	}
+	
+	for (const [property, value] of Object.entries(style)) {
+		node.style[property] = value;
 	}
 	
 	for (const [property, value] of Object.entries(attributes)) {

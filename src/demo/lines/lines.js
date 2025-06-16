@@ -79,6 +79,7 @@ export class Line {
 	reflections = [];
 	
 	constructor(demo, flipX, flipY, flipBoth, parent = demo.elements.imageWrapper) {
+		this.parent = parent;
 		this.demo = demo;
 		
 		const Reflection = this.constructor.Reflection ?? Line.Reflection;
@@ -96,6 +97,18 @@ export class Line {
 		}
 		
 		parent.append(this.element, ...this.reflections.map(({element}) => element));
+	}
+	
+	remove() {
+		this.element.remove();
+		
+		for (const {element} of this.reflections) {
+			element.remove();
+		}
+	}
+	
+	front() {
+		this.parent.append(this.element, ...this.reflections.map(({element}) => element));
 	}
 	
 	hide() {

@@ -12,4 +12,10 @@ export default class extends Array {
 			this[i].set(...args);
 		}
 	}
+	
+	remove() {
+		for (const child of this) {
+			child.remove();
+		}
+	}
 }

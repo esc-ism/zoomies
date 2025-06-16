@@ -40,7 +40,7 @@ export default class {
 		
 		this.background.style.height = this.background.style.width = '100%';
 		this.background.style.position = 'absolute';
-		this.background.style.backgroundColor = '#000000a0';
+		this.background.style.backgroundColor = '#00000050';
 		
 		this.element.appendChild(this.background);
 		
@@ -50,6 +50,13 @@ export default class {
 		this.lines[1] = new BoundLines(2, demo, false, false, true, this.element);
 		
 		demo.elements.imageWrapper.insertBefore(this.element, demo.target.element);
+	}
+	
+	remove() {
+		this.element.remove();
+		
+		this.lines[0].remove();
+		this.lines[1].remove();
 	}
 	
 	show(doShow = true) {

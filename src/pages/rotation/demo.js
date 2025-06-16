@@ -6,14 +6,22 @@ export default class extends Demo {
 	bounds = new Bounds(this);
 	tangents = new Tangents(4, this, false, false, true);
 	
-	setBounds() {
+	setBounds(bounds) {
+		this.bounds.set(...bounds);
+	}
+	
+	setTangents(tangents) {
+		this.tangents.set(...tangents);
+	}
+	
+	applyZoomPoints() {
 		const [constrainer, bounds, tangents] = this.getPositionConstrainer();
 		
 		this.getConstrainedPosition = constrainer;
 		
-		this.bounds.set(...bounds);
+		this.setBounds(bounds);
 		this.setRailsProgress(bounds);
-		this.tangents.set(...tangents);
+		this.setTangents(tangents);
 	}
 	
 	setZoomPoints() {
@@ -30,7 +38,7 @@ export default class extends Demo {
 		}
 		
 		if (fallthrough || zoom) {
-			this.setBounds();
+			this.applyZoomPoints();
 			
 			fallthrough = true;
 		}
@@ -43,6 +51,6 @@ export default class extends Demo {
 	constrainZoom() {
 		this.zoom = this.getSnappedZoom(...this.zoomPoints, this.position);
 		
-		this.setBounds();
+		this.applyZoomPoints();
 	}
 }

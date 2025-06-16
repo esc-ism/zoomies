@@ -55,7 +55,11 @@ export default class extends Demo {
 	}
 	
 	setRailsProgress(bounds) {
-		this.rails.setProgress(...bounds.filter(({y}) => y > 0).map(({y}) => [y / 0.5]));
+		if (bounds.length === 0) {
+			this.rails.setProgress(0, 0);
+		} else {
+			this.rails.setProgress(...bounds.filter(({y}) => y > 0).map(({y}) => [y / 0.5]));
+		}
 	}
 	
 	getPositionConstrainer() {

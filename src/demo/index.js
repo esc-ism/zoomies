@@ -371,6 +371,10 @@ export default class {
 		};
 	}
 	
+	remove() {
+		this.tween?.progress(0).kill();
+	}
+	
 	deleteTween() {
 		this.target.hide();
 		

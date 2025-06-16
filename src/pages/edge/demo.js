@@ -84,7 +84,7 @@ export default class extends Demo {
 		);
 	}
 	
-	setBounds() {
+	applyZoomPoints() {
 		this.bound = getBound(this.zoom, ...this.zoomPoints);
 		
 		this.setRailsProgress();
@@ -112,7 +112,9 @@ export default class extends Demo {
 		}
 		
 		if (fallthrough || zoom) {
-			this.setBounds();
+			this.applyZoomPoints();
+			
+			fallthrough = true;
 		}
 		
 		if (!fallthrough && !position) {
