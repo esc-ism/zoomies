@@ -11,9 +11,7 @@ export const CLASS_INSTRUCTION = getId('instruction');
 export const CLASS_BUTTON = getId('button');
 
 export const TWEENS_RESET = [
-	['rotation', DEGREES[90], {duration: 0}],
-	['position', 0, {duration: 0}],
-	['zoom', 1, {duration: 0}],
+	[{rotation: DEGREES[90], position: 0, zoom: 1}, {duration: 0}],
 ];
 
 export const CORNERS = {

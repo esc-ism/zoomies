@@ -24,8 +24,8 @@ export default (wrapper) => {
 			[
 				'Let\'s start ',
 				getButton('limiting panning', demo, [
-					['zoom', 1],
-					['x', 0.5, {ease: 'bounce.out', delay: '>', duration: 1.5}],
+					[{zoom: 1}],
+					[{x: 0.5}, {ease: 'bounce.out', duration: 1.5}],
 				]),
 				'!',
 				'Here, we have the simplest reasonable system, where the center of the viewport is bound by the image.',
@@ -43,19 +43,18 @@ export default (wrapper) => {
 			],
 			[
 				'Say we want to ',
-				getButton('fill our screens with the top-right quadrant', demo, [
-					['rotation', DEGREES[90]],
-					['zoom', 2],
-					() => ['position', getSnapPosition(demo)],
+				getButton('fill', demo, [
+					() => [{rotation: DEGREES[90], zoom: 2, position: getSnapPosition(demo)}],
 				]),
-				' of the image.',
+				' our screens with the top-right quadrant of the image.',
 				'We can ',
-				getButton('snap pan', demo, [() => ['position', getSnapPosition(demo), {duration: 0}]]),
+				getButton('snap pan', demo, [
+					() => [{position: getSnapPosition(demo)}, {duration: 0}],
+				]),
 				' to the spot we want, but a ',
 				getButton('manual zoom', demo, [
-					() => ['position', getSnapPosition(demo), {duration: 0}],
-					['rotation', DEGREES[90]],
-					['zoom', 2],
+					() => [{position: getSnapPosition(demo)}, {duration: 0}],
+					[{rotation: DEGREES[90], zoom: 2}, {delay: 0.2}],
 				]),
 				' is necessary to achieve the desired view.',
 				'It\'d be nice if an appropriate zoom could be applied automatically.',

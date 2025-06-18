@@ -6,27 +6,11 @@ import {getText} from '../shared';
 
 import {CLASS_INSTRUCTION} from '../consts';
 import {DEGREES} from '@/shared';
-import {getImageFit} from '../rotation/axis/demo';
-
-const getTopRight = (rotation, doOffset) => {
-	switch ((Math.floor(rotation / DEGREES[90]) % 4) - (doOffset ? 1 : 0)) {
-		case 0: return {x: 0.5, y: 0.5};
-		case 1: return {x: 0.5, y: -0.5};
-		case 2: return {x: -0.5, y: -0.5};
-	}
-	
-	return {x: -0.5, y: 0.5};
-};
-
-const getDimensions = (width = 1, height = 1) => ({
-	width, height,
-	halfWidth: width / 2,
-	halfHeight: height / 2,
-});
+import {getProgressed} from '../rotation/shared';
+import {getZoomPoints} from '../rotation/axis/demo';
+import {getDimensions} from '../rotation/axis';
 
 const tween = async (demo) => {
-	gsap.ticker.fps(20);
-	
 	const wait = async (delay = 1) => await new Promise((resolve, reject) => {
 		window.setTimeout(() => {
 			if (demo.element.isConnected) {
@@ -44,26 +28,43 @@ const tween = async (demo) => {
 			.then(() => {
 				const rotation = gsap.utils.random(DEGREES[180], DEGREES[360]);
 				const ratio = gsap.utils.random(0.5, 2);
-				const [zoom0, zoom1] = getImageFit(
+				const [first, second] = getZoomPoints(
 					rotation,
-					getDimensions(),
-					getDimensions(Math.min(1, 1 / ratio), Math.min(1, 1 * ratio)),
-				);
-				const zoom = Math.max(zoom0, zoom1);
+					demo.viewportDimensions,
+					getDimensions(ratio, demo.viewportDimensions),
+				).slice(2);
 				
-				const position = getTopRight(rotation, zoom0 > zoom1);
+				const getNext = (zoom = 5) => {
+					if (zoom >= second.z) {
+						const {p, ...position} = getProgressed(second, {x: 0.5, y: 0.5}, zoom);
+						
+						return [position, [0, 0, 1, p]];
+					}
+					
+					const {p, ...position} = getProgressed(first, second.vpEnd, zoom);
+					
+					return [position, [0, 0, p * second.p, 0]];
+				};
 				
 				demo.setTween(
-					['ratio', ratio, {delay: 0}],
-					['rotation', rotation, {duration: 3, delay: '>'}],
-					['zoom', zoom, {duration: 3, delay: '<'}],
-					['position', position, {delay: '>+=0.5'}],
-					['zoom', zoom * 4, {duration: 3, delay: '<'}],
+					[{ratio}],
+					[{rotation, zoom: first.z}],
+					[{zoom: 5}, {
+						duration: 2,
+						onUpdate: function () {
+							const [position, progresses] = getNext(demo.zoom);
+							
+							demo.position = position;
+							demo.applyPosition();
+							
+							demo.rails.setProgress(...progresses);
+						},
+					}],
+					[{position: getNext()[0]}, {duration: 0}],
 				);
 				
 				return demo.tween;
 			})
-			.then(() => wait())
 			.then(() => {
 				const {onReverseComplete} = demo.tween.vars;
 				
@@ -94,7 +95,7 @@ export default (wrapper) => {
 			{
 				content: [
 					'Hello! I\'m Callum.',
-					'I\'m a front-end developer who has been unemployed for the past two years whilst working on panning problems.',
+					'I\'m a front-end developer who has spent the past two years working on panning problems.',
 					'Specifically, I\'ve been working on pan-limiting where zoom, rotation and aspect ratios (for both image and viewport) are variable.',
 					'This website serves as my essay on panning, discussing the problems and demonstrating my solutions.',
 				],
@@ -106,11 +107,5 @@ export default (wrapper) => {
 		),
 	);
 	
-	return {
-		remove() {
-			demo.remove();
-			
-			gsap.ticker.fps();
-		},
-	};
+	return demo;
 };

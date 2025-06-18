@@ -19,6 +19,10 @@ addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}`, {
 	cursor: 'pointer',
 });
 
-addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}:hover`, {filter: 'drop-shadow(0 0 6px currentcolor)'});
+addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}:hover`, {
+	// 'text-shadow': '0 0 6px currentcolor',
+	'background-color': '#ffa200',
+	color: 'black',
+});
 
 addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {'font-weight': 'bold'});

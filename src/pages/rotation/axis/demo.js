@@ -27,7 +27,7 @@ export const getBound = (zoom, first, second, isTopLeft) => {
 	};
 };
 
-const getSnappedZoom = (() => {
+export const getSnappedZoom = (() => {
 	const getDirected = (first, second, flipX, flipY) => {
 		const line0 = [first, {}];
 		const line1 = [{z: second.z}, {}];
@@ -99,15 +99,12 @@ const getSnappedZoom = (() => {
 			];
 		};
 		
-		return Math.max(...((x >= 0) === (y >= 0) ?
-				[
-					getZoom(...getPairings(true, false, false, false), absPosition),
-					getZoom(...getPairings(false, true, false, false), absPosition, true),
-				] :
-				[
-					getZoom(...getPairings(false, false, true, false), absPosition, true),
-					getZoom(...getPairings(false, false, false, true), absPosition),
-				]).filter(isValidZoom));
+		return Math.max(...[
+			getZoom(...getPairings(true, false, false, false), absPosition),
+			getZoom(...getPairings(false, true, false, false), absPosition, true),
+			getZoom(...getPairings(false, false, true, false), absPosition, true),
+			getZoom(...getPairings(false, false, false, true), absPosition),
+		].filter(isValidZoom));
 	};
 })();
 
@@ -271,20 +268,6 @@ const getRailProgress = (zoom, first, second) => {
 
 export default class extends Demo {
 	rails = new Rails(4, this, false, false, true);
-	
-	constructor() {
-		super();
-		
-		// todo remove
-		window.setTimeout(() => {
-			this.ratioImage = 1.0195314467196777;
-			this.ratioViewport = 0.7663613978702473;
-			this.zoom = 1.0837706639944453;
-			this.rotation = 1.170796;
-			
-			this.constrainPosition({zoom: true, rotation: true, ratio: true});
-		}, 0);
-	}
 	
 	setRails() {
 		this.rails.set(

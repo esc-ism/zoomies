@@ -2,7 +2,7 @@ import {gsap} from 'gsap';
 
 import './css';
 
-import {getTheta, DEGREES} from '@/shared';
+import {getTheta, DEGREES, ERROR_ALLOWANCE} from '@/shared';
 
 import Readout from './readout';
 import Target from './target';
@@ -383,118 +383,157 @@ export default class {
 		delete this.tween;
 	}
 	
+	getTweenFrom() {
+		const from = {};
+		
+		let effects = {};
+		
+		const doUpdate = (() => {
+			let willUpdate = false;
+			
+			const update = () => {
+				if (this.position.x !== from.x || this.position.y !== from.y) {
+					this.position.x = from.x;
+					this.position.y = from.y;
+					
+					effects.position = true;
+				}
+				
+				this.constrainPosition(effects);
+				this.applyPosition();
+				
+				this.target.set(from);
+				
+				effects = {};
+				willUpdate = false;
+			};
+			
+			return (label) => {
+				effects[label] = true;
+				
+				if (willUpdate) {
+					return;
+				}
+				
+				willUpdate = true;
+				
+				window.setTimeout(update, 0);
+			};
+		})();
+		
+		const getDefinition = (initial, act) => (() => {
+			let value = initial;
+			
+			return {
+				set: (newValue) => {
+					value = act(newValue);
+				},
+				get: () => value,
+			};
+		})();
+		
+		Object.defineProperty(from, 'x', getDefinition(this.position.x, (x) => {
+			doUpdate('position');
+			
+			return this.position.x = x;
+		}));
+		Object.defineProperty(from, 'y', getDefinition(this.position.y, (y) => {
+			doUpdate('position');
+			
+			return this.position.y = y;
+		}));
+		
+		Object.defineProperty(from, 'ratio', getDefinition(this.ratioViewport / this.ratioImage, (ratio) => {
+			doUpdate('ratio');
+			
+			this.ratioImage = this.ratioViewport / ratio;
+			
+			return ratio;
+		}));
+		
+		Object.defineProperty(from, 'rotation', getDefinition(this.rotation, (rotation) => {
+			doUpdate('rotation');
+			
+			this.rotation = rotation;
+			
+			this.constrainRotation();
+			this.applyRotation();
+			
+			return rotation;
+		}));
+		
+		Object.defineProperty(from, 'zoom', getDefinition(this.zoom, (zoom) => {
+			doUpdate('zoom');
+			
+			this.zoom = zoom;
+			
+			this.applyZoom();
+			
+			return zoom;
+		}));
+		
+		return from;
+	}
+	
 	setTween(...targets) {
 		this.tween?.progress(0).kill();
 		
 		this.tween = gsap.timeline({paused: true, data: {}});
-		const values = {};
 		
-		const actions = [];
+		const from = this.getTweenFrom();
 		
-		let hasTween = false;
+		const allEffects = {};
 		
-		const setTween = (type, value, {delay = 0, ...vars} = {}, current = this[type]) => {
-			if (!(type in values) && Math.abs(current - value) < 0.01) {
-				return;
+		for (const [target, {position, ...vars} = {}] of targets) {
+			const to = {};
+			const effects = {};
+			
+			let hasTween = false;
+			
+			const record = (type, value, label = type) => {
+				if (!allEffects[label] && Math.abs(from[type] - value) < ERROR_ALLOWANCE) {
+					return;
+				}
+				
+				to[type] = value;
+				allEffects[label] = effects[label] = true;
+				
+				hasTween = true;
+			};
+			
+			for (const [type, value] of Object.entries(target)) {
+				if (type === 'position') {
+					if (typeof value === 'object') {
+						record('x', value.x, 'position');
+						record('y', value.y, 'position');
+					} else {
+						record('x', value, 'position');
+						record('y', value, 'position');
+					}
+				} else if (type === 'x' || type === 'y') {
+					record(type, value, 'position');
+				} else if (type === 'rotation') {
+					if (value > this.rotation) {
+						record(type, value - this.rotation <= DEGREES[180] ? value : value - DEGREES[360]);
+					} else {
+						record(type, this.rotation - value <= DEGREES[180] ? value : value + DEGREES[360]);
+					}
+				} else {
+					record(type, value);
+				}
 			}
 			
-			values[type] = current;
-			
-			this.tween.to(values, {...TWEEN_DEFAULT, [type]: value, ...vars}, delay);
-			
-			hasTween = true;
-		};
-		
-		for (const [type, value, vars] of targets) {
-			if (type === 'position') {
-				if (typeof value === 'object') {
-					setTween('x', value.x, vars, this.position.x);
-					setTween('y', value.y, {...vars, delay: '<'}, this.position.y);
-				} else {
-					setTween('x', value, vars, this.position.x);
-					setTween('y', value, {...vars, delay: '<'}, this.position.y);
-				}
-			} else if (type === 'x' || type === 'y') {
-				setTween(type, value, vars, this.position[type]);
-			} else if (type === 'ratio') {
-				setTween(type, value, vars, this.ratioViewport / this.ratioImage);
-			} else if (type === 'rotation') {
-				if (value > this.rotation) {
-					setTween(type, value - this.rotation <= DEGREES[180] ? value : value - DEGREES[360], vars);
-				} else {
-					setTween(type, this.rotation - value <= DEGREES[180] ? value : value + DEGREES[360], vars);
-				}
-			} else {
-				setTween(type, value, vars);
+			if (!hasTween) {
+				continue;
 			}
-		}
-		
-		if (!hasTween) {
-			this.deleteTween();
 			
-			return;
-		}
-		
-		if ('ratio' in values) {
-			actions.push((effects) => {
-				effects.ratio = true;
-				
-				this.ratioImage = this.ratioViewport / values.ratio;
-			});
-		}
-		
-		if ('rotation' in values) {
-			actions.push((effects) => {
-				effects.rotation = true;
-				
-				this.rotation = values.rotation;
-				
-				this.constrainRotation();
-				this.applyRotation();
-			});
-		}
-		
-		if ('zoom' in values) {
-			actions.push((effects) => {
-				effects.zoom = true;
-				
-				this.zoom = values.zoom;
-				
-				this.applyZoom();
-			});
-		}
-		
-		if ('x' in values) {
-			actions.push((effects) => {
-				effects.position = true;
-				
-				this.position.x = values.x;
-			});
-		}
-		
-		if ('y' in values) {
-			actions.push((effects) => {
-				effects.position = true;
-				
-				this.position.y = values.y;
-			});
+			this.tween.add(gsap.to(from, {...TWEEN_DEFAULT, ...to, ...vars}), position);
 		}
 		
 		this.constructor.progress.reset();
 		
 		return this.tween
 			.eventCallback('onUpdate', () => {
-				const effects = {};
-				
-				for (const action of actions) {
-					action(effects);
-				}
-				
-				this.constrainPosition(effects);
-				this.applyPosition();
-				
-				this.target.set({x: values.x ?? this.position.x, y: values.y ?? this.position.y});
-				
 				this.constructor.progress.set(this.tween.totalProgress());
 			})
 			.eventCallback('onReverseComplete', () => this.deleteTween())

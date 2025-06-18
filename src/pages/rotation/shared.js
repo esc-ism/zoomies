@@ -22,7 +22,7 @@ export const getProgress = (low, target) => 1 - low / target;
 export const getProgressed = ({x: fromX, y: fromY, z: lowZ}, {x: toX, y: toY}, targetZ) => {
 	const p = getProgress(lowZ, targetZ);
 	
-	return {x: p * (toX - fromX) + fromX, y: p * (toY - fromY) + fromY};
+	return {x: p * (toX - fromX) + fromX, y: p * (toY - fromY) + fromY, p};
 };
 
 // y = mx + c
@@ -32,7 +32,7 @@ export const getLineY = ({m, c}, x) => m * x + c;
 export const getLineX = ({m, c, x}, y) => !Number.isFinite(m) || m === 0 ? x : (y - c) / m;
 
 export const getM = (from, to) => (to.y - from.y) / (to.x - from.x);
-export const getLine = (m, {x, y}) => ({c: y - m * x, m, x, y});
+export const getLine = (m, {x, y}) => ({c: (y - m * x), m, x, y});
 export const getFlipped = ({x, y}) => ({x: -x, y: -y});
 
 export const isAbove = ({m, c}, {x, y}) => m * x + c < y;
@@ -149,6 +149,12 @@ const get1DConstrainer = (() => {
 		];
 	};
 	
+	const getBasicConstrainer = (main, sub, point) => {
+		const limit = Math.abs(point[main]);
+		
+		return ({[main]: value}) => ({[main]: Math.max(-limit, Math.min(limit, value)), [sub]: 0});
+	};
+	
 	return (point) => {
 		const flipped = getFlipped(point);
 		const line = {
@@ -158,15 +164,26 @@ const get1DConstrainer = (() => {
 		};
 		
 		const tangentM = -1 / line.m;
-		const mDiff = line.m - tangentM;
 		
 		return [
-			(position) => {
-				const tangent = getLine(tangentM, position);
-				const x = Math.max(-line.x, Math.min(line.x, tangent.c / mDiff));
+			(() => {
+				if (line.m === 0) {
+					return getBasicConstrainer('x', 'y', point);
+				}
 				
-				return {x, y: getLineY(line, x)};
-			}, [point, flipped], getTangents(tangentM, point, flipped),
+				if (!isFinite(line.m)) {
+					return getBasicConstrainer('y', 'x', point);
+				}
+				
+				const mDiff = line.m - tangentM;
+				
+				return (position) => {
+					const x = Math.max(-line.x, Math.min(line.x, line.m === 0 ? position.x : (getLine(tangentM, position).c / mDiff)));
+					
+					return {x, y: getLineY(line, x)};
+				};
+			})(),
+			[point, flipped], getTangents(tangentM, point, flipped),
 		];
 	};
 })();
@@ -259,19 +276,9 @@ export const getConstrainerFromPoints = (() => {
 			}
 		}
 		
-		if (m0 > 1) {
-			tangents.top.isHigh = lines.top.c < 0;
-			
-			tangents.top.isSide = tangents.bottom.isSide = true;
-		} else if (m0 < -1) {
-			tangents.top.isHigh = lines.top.c > 0;
-			
-			tangents.top.isSide = tangents.bottom.isSide = true;
-		} else {
-			tangents.top.isHigh = true;
-			
-			tangents.top.isSide = tangents.bottom.isSide = false;
-		}
+		tangents.top.isSide = tangents.bottom.isSide = Math.abs(m0) > 1;
+		tangents.top.isHigh = !tangents.top.isSide || (lines.top.c < 0) === (m0 > 0);
+		tangents.bottom.isHigh = !tangents.top.isHigh;
 		
 		if (tangents.top.isSide && tangents.top.isHigh) {
 			setHighTangent(tangents.top, 'right', 'left');
@@ -281,21 +288,9 @@ export const getConstrainerFromPoints = (() => {
 			setHighTangent(tangents.bottom, 'left', 'right');
 		}
 		
-		tangents.bottom.isHigh = !tangents.top.isHigh;
-		
-		if (m1 < 1 && m1 >= 0) {
-			tangents.right.isHigh = lines.right.c < 0;
-			
-			tangents.right.isSide = tangents.left.isSide = false;
-		} else if (m1 > -1 && m1 <= 0) {
-			tangents.right.isHigh = lines.right.c > 0;
-			
-			tangents.right.isSide = tangents.left.isSide = false;
-		} else {
-			tangents.right.isHigh = true;
-			
-			tangents.right.isSide = tangents.left.isSide = true;
-		}
+		tangents.right.isSide = tangents.left.isSide = Math.abs(m1) > 1;
+		tangents.right.isHigh = tangents.right.isSide || lines.right.c > 0;
+		tangents.left.isHigh = !tangents.right.isHigh;
 		
 		if (!tangents.right.isSide && tangents.right.isHigh) {
 			setHighTangent(tangents.right, 'top', 'bottom');
@@ -304,8 +299,6 @@ export const getConstrainerFromPoints = (() => {
 			setHighTangent(tangents.right, 'bottom', 'top');
 			setHighTangent(tangents.left, 'bottom', 'top');
 		}
-		
-		tangents.left.isHigh = !tangents.right.isHigh;
 		
 		return [points, lines, tangents];
 	};

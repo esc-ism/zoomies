@@ -69,6 +69,7 @@ export class Line {
 	static template = document.createElement('div');
 	
 	static {
+		this.template.style.pointerEvents = 'none';
 		this.template.style.position = 'absolute';
 		this.template.style.transformOrigin = 'top center';
 		this.template.style.translate = '-50% 0';
@@ -109,6 +110,20 @@ export class Line {
 	
 	front() {
 		this.parent.append(this.element, ...this.reflections.map(({element}) => element));
+	}
+	
+	deactivate(deactivateSelf = true) {
+		for (const {element} of this.reflections) {
+			element.style.visibility = 'hidden';
+		}
+		
+		if (!deactivateSelf) {
+			return;
+		}
+		
+		this.element.style.visibility = 'hidden';
+		
+		this.set = () => {};
 	}
 	
 	hide() {

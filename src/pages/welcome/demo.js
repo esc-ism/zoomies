@@ -4,27 +4,16 @@ export default class extends Demo {
 	constructor() {
 		super();
 		
-		this.bounds.remove();
+		this.rails[0].deactivate();
+		this.rails[1].deactivate();
+		
+		this.rails[2].deactivate(false);
+		this.rails[3].deactivate(false);
 	}
 	
-	setTangents() {}
-	
-	setBounds() {}
-	
-	updateImageDimensions(...args) {
-		super.updateImageDimensions(...args);
-		
-		this.initialImageDimensions = {...this.imageDimensions};
-	}
-	
-	getImageDimensions(ratio) {
-		const width = Math.min(this.initialImageDimensions.width, this.initialImageDimensions.width / ratio);
-		const height = Math.min(this.initialImageDimensions.height, this.initialImageDimensions.height * ratio);
-		
-		return {
-			width, height,
-			halfWidth: width / 2,
-			halfHeight: height / 2,
-		};
+	// todo instead of using setZoomPoints, CSS transition from one rail state to the next
+	applyZoomPoints() {}
+	getConstrainedPosition(position) {
+		return position;
 	}
 }
