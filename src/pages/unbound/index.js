@@ -9,8 +9,9 @@ export default (wrapper) => {
 		demo.element,
 		getText(
 			{
-				tag: 'h2',
-				content: 'Why Limit Panning?',
+				tag: 'h1',
+				content: 'Unbound',
+				style: {textAlign: 'center'},
 			},
 			[
 				'First thing\'s first: why is pan-limiting necessary?',
@@ -23,24 +24,34 @@ export default (wrapper) => {
 				'Try it out!',
 			],
 			{
-				...getCode(
-					// https://www.tablesgenerator.com/text_tables
-					'╔════════╦════════════════╦══════════╗',
-					'║ ACTION ║     MOUSE      ║ KEYBOARD ║',
-					'╠════════╬═══════╦════════╬══════════╣',
-					'║ Pan    ║ Drag  ║ Left   ║          ║',
-					'╠════════╬═══════╣ Mouse  ╠══════════╣',
-					'║ Snap   ║ Click ║ Button ║          ║',
-					'╠════════╬═══════╩════════╬══════════╣',
-					'║ Zoom   ║                ║          ║',
-					'╠════════╣ Scroll Wheel   ╠══════════╣',
-					'║ Scale  ║                ║ ctrl     ║',
-					'╠════════╬═══════╦════════╬══════════╣',
-					'║ Rotate ║ Drag  ║ Right  ║          ║',
-					'╠════════╬═══════╣ Mouse  ╠══════════╣',
-					'║ Reset  ║ Click ║ Button ║          ║',
+				tag: 'h2',
+				content: 'Controls',
+				style: {textAlign: 'center'},
+			},
+			{
+				tag: 'p',
+				content: [
+					'╔════════╦════════════════╦══════════╗', {tag: 'br'},
+					'║ ACTION ║     MOUSE      ║ KEYBOARD ║', {tag: 'br'},
+					'╠════════╬═══════╦════════╬══════════╣', {tag: 'br'},
+					'║ Pan    ║ Drag  ║ Left   ║          ║', {tag: 'br'},
+					'╠════════╬═══════╣ Mouse  ╠══════════╣', {tag: 'br'},
+					'║ Snap   ║ Click ║ Button ║          ║', {tag: 'br'},
+					'╠════════╬═══════╩════════╬══════════╣', {tag: 'br'},
+					'║ Zoom   ║                ║          ║', {tag: 'br'},
+					'╠════════╣ Scroll Wheel   ╠══════════╣', {tag: 'br'},
+					'║ Scale  ║                ║ ctrl     ║', {tag: 'br'},
+					'╠════════╬═══════╦════════╬══════════╣', {tag: 'br'},
+					'║ Rotate ║ Drag  ║ Right  ║          ║', {tag: 'br'},
+					'╠════════╬═══════╣ Mouse  ╠══════════╣', {tag: 'br'},
+					'║ Reset  ║ Click ║ Button ║          ║', {tag: 'br'},
 					'╚════════╩═══════╩════════╩══════════╝',
-				),
+				],
+				style: {whiteSpace: 'pre', textAlign: 'center', lineHeight: 'normal'},
+			},
+			{
+				tag: 'h2',
+				content: 'Effectiveness',
 				style: {textAlign: 'center'},
 			},
 			[
@@ -63,8 +74,17 @@ export default (wrapper) => {
 				'Pan-limiting systems prevent this by keeping users from the no man\'s land beyond the confines of the image.',
 			],
 			[
-				'Some pan-limiting systems can also take a position and derive an appropriate zoom level.',
+				'Some pan-limiting systems can also take a position and derive an appropriate zoom level; something that this system is incapable of.',
 				'This turns out to be a useful feature when span-panning, but that\'s a topic for the next page.',
+			],
+			{
+				tag: 'h2',
+				content: 'Conclusion',
+				style: {textAlign: 'center'},
+			},
+			[
+				'Some degree of pan limiting is important.',
+				'Let\'s move on and take a look at the minimum viable product.',
 			],
 		),
 	);

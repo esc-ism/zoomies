@@ -112,7 +112,7 @@ export const getImageFit = (rotation, viewport, image) => {
 	const [corner0, corner1] = getRotatedCorners(
 		rotation,
 		Math.sqrt(image.width * image.width / 4 + image.height * image.height / 4),
-		getTheta(0, 0, image.width, image.height),
+		getTheta(image.width, image.height),
 	);
 	
 	const x = Math.max(corner0.x, corner1.x) / viewport.width;
@@ -125,7 +125,7 @@ export const getZoomPoints = (() => {
 	const getPoints = (rotation, image, viewport, fitZoom, doFlip) => {
 		const getGenericRotated = (x, y, angle) => {
 			const radius = Math.sqrt(x * x + y * y);
-			const pointTheta = getTheta(0, 0, x, y) + angle;
+			const pointTheta = getTheta(x, y) + angle;
 			
 			return {
 				x: radius * Math.cos(pointTheta),
@@ -169,7 +169,7 @@ export const getZoomPoints = (() => {
 		};
 		
 		const {x, y} = getIntersection([{x: 0, y: 0}, middle], [line, corner]);
-		const isThin = getTheta(0, 0, viewport.width, viewport.height) < getTheta(0, 0, image.width, image.height);
+		const isThin = getTheta(viewport.width, viewport.height) < getTheta(image.width, image.height);
 		const progress = isThin ? (y - line.y) / (corner.y - line.y) : (x - line.x) / (corner.x - line.x);
 		
 		return {x, y, z: line.z / (1 - progress), c: line.y};

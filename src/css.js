@@ -21,7 +21,7 @@ export const addRule = (selectors, styles, {sheet} = styleNode) => {
 
 addRule(':root', {
 	'--color': '#e6e6e6',
-	'--background': '#242424',
+	'--background': '#252127',
 	
 	'font-family': 'courier-new, monospace',
 	'font-weight': '400',

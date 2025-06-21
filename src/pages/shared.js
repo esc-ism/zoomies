@@ -1,12 +1,22 @@
-import {CLASS_BUTTON, CLASS_WRAPPER, TWEENS_RESET} from './consts';
-
-let buttonCount = 0;
+import {CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET} from './consts';
 
 const getBroken = (lines) => {
 	const broken = [];
 	
-	for (const line of lines) {
-		broken.push(line, {tag: 'br'});
+	for (const [i, line] of lines.entries()) {
+		const children = [];
+		
+		if (i !== 0) {
+			children.push({tag: 'br'});
+		}
+		
+		if (Array.isArray(line)) {
+			children.push(...line);
+		} else {
+			children.push(line);
+		}
+		
+		broken.push(...children);
 	}
 	
 	return broken;
@@ -48,16 +58,39 @@ const getNode = (description) => {
 	return node;
 };
 
-export const getCode = (...content) => ({
-	content: ({
+export const getCode = (...args) => {
+	if (typeof args[0] !== 'object' || Array.isArray(args[0])) {
+		return {
+			content: {
+				tag: 'code',
+				content: getBroken(args),
+			},
+			classList: [CLASS_CODE],
+		};
+	}
+	
+	const [{header, ...vars}, ...text] = args;
+	
+	const content = [{
 		tag: 'code',
-		content: getBroken(content),
-	}),
-});
+		content: getBroken(text),
+		...vars,
+	}];
+	
+	if (header) {
+		content.unshift({
+			tag: 'div',
+			content: header,
+		});
+	}
+	
+	return {
+		content,
+		classList: [CLASS_CODE],
+	};
+};
 
 export const getButton = (text, demo, tweens, {doReset = false, getParam = () => undefined} = {}) => {
-	const id = buttonCount++;
-	
 	const resetTweens = doReset ? TWEENS_RESET : [];
 	
 	return {
@@ -65,17 +98,9 @@ export const getButton = (text, demo, tweens, {doReset = false, getParam = () =>
 		content: text,
 		classList: [CLASS_BUTTON],
 		onpointerover: () => {
-			if (demo.tween?.data.id === id) {
-				demo.tween.play();
-				
-				return;
-			}
-			
 			const param = getParam();
 			
-			if (demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween))) {
-				demo.tween.data.id = id;
-			}
+			demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
 		},
 		onpointerout: () => {
 			if (!demo.tween) {

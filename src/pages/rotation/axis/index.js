@@ -76,7 +76,7 @@ export default (wrapper) => {
 		
 		getText(
 			{
-				tag: 'h2',
+				tag: 'h1',
 				content: 'Good Rotation',
 			},
 			[

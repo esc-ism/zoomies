@@ -313,7 +313,7 @@ export default class {
 		let startRotation = this.rotation;
 		
 		return (event) => {
-			const mouseTheta = getTheta(middleX, middleY, event.clientX, event.clientY);
+			const mouseTheta = getTheta(event.clientX, event.clientY, middleX, middleY);
 			
 			if (priorMouseTheta === undefined) {
 				priorMouseTheta = mouseTheta;

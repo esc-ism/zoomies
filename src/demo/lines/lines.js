@@ -161,11 +161,11 @@ export class Line {
 		const ratioHeight = Math.max(1, ratioImageInverse);
 		
 		this.rotation = DEGREES[270] - getTheta(
-			from.x * ratioWidth,
-			from.y * ratioHeight,
 			(to.x ?? from.x) * ratioWidth,
 			(to.y ?? from.y) * ratioHeight,
-		);
+			from.x * ratioWidth,
+			from.y * ratioHeight,
+	);
 		
 		this.element.style.rotate = `${this.rotation}rad`;
 		

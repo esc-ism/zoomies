@@ -4,6 +4,8 @@ export default class extends Demo {
 	constructor() {
 		super();
 		
+		this.bounds.remove();
+		
 		this.rails[0].deactivate();
 		this.rails[1].deactivate();
 		

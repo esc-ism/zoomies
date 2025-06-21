@@ -87,7 +87,7 @@ export default class extends Demo {
 		return getRotatedCorners(
 			this.rotation,
 			this.cornerDistance,
-			getTheta(0, 0, halfWidth, halfHeight),
+			getTheta(halfWidth, halfHeight),
 		).map(({x, y}) => ({x: 0, y: 0, z: 0.5 / Math.max(x / this.viewportDimensions.width, y / this.viewportDimensions.height)}));
 	}
 	

@@ -13,8 +13,9 @@ export default (wrapper) => {
 		
 		getText(
 			{
-				tag: 'h2',
+				tag: 'h1',
 				content: 'Viewport Edge',
+				style: {textAlign: 'center'},
 			},
 			[
 				'To solve this snap panning problem, we need a pan-limiting system that\'s affected by the viewport\'s dimensions.',
@@ -28,6 +29,11 @@ export default (wrapper) => {
 				]),
 				' than the image.',
 			],
+			{
+				tag: 'h2',
+				content: 'Pan-Limit Maths',
+				style: {textAlign: 'center'},
+			},
 			[
 				'Notice that the viewport\'s dimensions half as zoom ',
 				getButton('doubles', demo, [
@@ -50,6 +56,11 @@ export default (wrapper) => {
 				'  paddingY = viewportHeight ÷ zoom ÷ imageHeight ÷ 2',
 				'  -0.5 + paddingY ⩽ y ⩽ 0.5 - paddingY',
 			),
+			{
+				tag: 'h2',
+				content: 'Snap-Pan Maths',
+				style: {textAlign: 'center'},
+			},
 			[
 				'Snap panning now requires an accommodating zoom adjustment.',
 				'We can derive the calculation by solving the pan limiting calculation for zoom.',
@@ -60,6 +71,11 @@ export default (wrapper) => {
 				'',
 				'zoom = max(zoomX, zoomY)',
 			),
+			{
+				tag: 'h2',
+				content: 'Snap-Pan Effectiveness',
+				style: {textAlign: 'center'},
+			},
 			[
 				'So now, zoom is adjusted for us automatically when ',
 				getButton('snap panning', demo, [
@@ -84,6 +100,11 @@ export default (wrapper) => {
 					(position) => [{position}, {ease: 'bounce.out', duration: 0.4, delay: 0.1}],
 				], {doReset: true, getParam: () => getSnapPosition(demo)}),
 				' when it\'s introduced.',
+				{
+					tag: 'h2',
+					content: 'Conclusion',
+					style: {textAlign: 'center'},
+				},
 				'Handling rotation will require a significant jump in complexity...',
 			],
 		),

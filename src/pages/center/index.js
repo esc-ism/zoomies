@@ -18,7 +18,7 @@ export default (wrapper) => {
 		
 		getText(
 			{
-				tag: 'h2',
+				tag: 'h1',
 				content: 'Viewport Center',
 			},
 			[
@@ -35,6 +35,11 @@ export default (wrapper) => {
 				'-0.5 ⩽ x ⩽ 0.5',
 				'-0.5 ⩽ y ⩽ 0.5',
 			),
+			{
+				tag: 'h2',
+				content: 'Effectiveness',
+				style: {textAlign: 'center'},
+			},
 			[
 				'Despite its simplicity, this system actually works wonderfully.',
 				'In most cases, I think it\'s the best solution.',
@@ -58,6 +63,17 @@ export default (wrapper) => {
 				]),
 				' is necessary to achieve the desired view.',
 				'It\'d be nice if an appropriate zoom could be applied automatically.',
+			],
+			{
+				tag: 'h2',
+				content: 'Conclusion',
+				style: {textAlign: 'center'},
+			},
+			[
+				'It\'s hard to beat this system for pan-limiting; it can\'t be improved without also making concessions.',
+				'As a snap-panning system, however, it\'s useless.',
+				'If an image can be rotated, I\'d advocate for using this system for pan-limiting and an upcoming system for snap-panning.',
+				'If your image can\'t be rotated, I\'d recommend the next system up.',
 			],
 		),
 	);

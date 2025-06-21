@@ -6,6 +6,8 @@ const getId = getIdGetter('text');
 
 export const CLASS_WRAPPER = getId('wrapper');
 
+export const CLASS_CODE = getId('code');
+
 export const CLASS_INSTRUCTION = getId('instruction');
 
 export const CLASS_BUTTON = getId('button');

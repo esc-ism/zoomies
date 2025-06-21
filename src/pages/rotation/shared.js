@@ -1,8 +1,10 @@
 import {DEGREES} from '@/shared';
 
 export const getRotatedCorners = (rotation, radius, theta) => {
-	const angle0 = DEGREES[90] - theta + rotation;
-	const angle1 = theta + rotation - DEGREES[90];
+	const offset = theta - DEGREES[90];
+	
+	const angle0 = rotation - offset;
+	const angle1 = rotation + offset;
 	
 	return [
 		{
@@ -332,7 +334,7 @@ export const getConstrainerFromPoints = (() => {
 // https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point
 export const getIntersectProgress = ({x, y}, [{x: g, y: e}, {x: f, y: d}], [{x: k, y: i}, {x: j, y: h}], doFlip) => {
 	const a = d * j - d * k - j * e + e * k - h * f + h * g + i * f - i * g;
-	const b = d * k - d * x - e * k + e * x + j * e - k * e - j * y + k * y - h * g + h * x + i * g - i * x - f * i + g * i + f * y - g * y;
+	const b = d * k - d * x - e * k * 2 + e * x + j * e - j * y + k * y - h * g + h * x + i * g - i * x - f * i + g * i + f * y - g * y;
 	const c = k * e - e * x - k * y - g * i + i * x + g * y;
 	
 	return (doFlip ? -b - Math.sqrt(b * b - 4 * a * c) : -b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);

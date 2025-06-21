@@ -6,6 +6,6 @@ export const DEGREES = {
 	360: Math.PI * 2,
 };
 
-export const getTheta = (fromX, fromY, toX, toY) => Math.atan2(toY - fromY, toX - fromX);
+export const getTheta = (toX, toY, fromX = 0, fromY = 0) => Math.atan2(toY - fromY, toX - fromX);
 
 export const ERROR_ALLOWANCE = 0.001;
