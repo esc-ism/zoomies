@@ -1,7 +1,7 @@
 import Hideables from './copies';
 
 import {setLineStyle} from '../bounds';
-import {Line} from './lines';
+import {Connection} from './lines';
 
 import {getLineX, getLineY} from '@/pages/rotation/shared';
 
@@ -13,8 +13,8 @@ const getEnd = ({isHigh, isSide}, line) => {
 	return isHigh ? {y: 0.5, x: getLineX(line, 0.5)} : {y: -0.5, x: getLineX(line, -0.5)};
 };
 
-class Tangent extends Line {
-	static template = Line.template.cloneNode();
+class Tangent extends Connection {
+	static template = Connection.template.cloneNode();
 	
 	static {
 		setLineStyle(this.template);

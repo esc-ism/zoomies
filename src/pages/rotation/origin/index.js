@@ -1,7 +1,9 @@
 import Demo from './demo';
 
+import * as code from '@/pages/code';
+
 import {DEGREES, ERROR_ALLOWANCE} from '@/shared';
-import {getText, getCode, getButton} from '../../shared';
+import {getText, getCode, getButton, registerDemo} from '../../shared';
 
 export const badTweens = {
 	ratio: 0.6,
@@ -10,14 +12,259 @@ export const badTweens = {
 	zoom: 2,
 };
 
-const getSub = (content) => ({tag: 'sub', content});
+const functions = [
+	{op: 'func', id: 'getBound', args: ['cornerX', 'cornerY', 'cornerZoom'], and: [
+		{op: 'if', and: [
+			{op: '<=', and: [
+				'zoom',
+				'cornerZoom',
+			]},
+			{op: 'return', and: [0, 0]},
+		]},
+		{op: '=', id: 'progress', and: {
+			op: '/', and: [
+				'zoom',
+				'cornerZoom',
+			],
+		}},
+		'',
+		{op: 'return', and: [
+			{op: '-', and: [
+				'cornerX',
+				{op: '/', and: [
+					'cornerX',
+					'progress',
+				]},
+			]},
+			{op: '-', and: [
+				'cornerY',
+				{op: '/', and: [
+					'cornerY',
+					'progress',
+				]},
+			]},
+		]},
+	]},
+	{op: 'func', id: 'getSnippedStart', args: ['cornerX', 'cornerY', 'cornerZoom', 'otherZoom'], and: [
+		{op: 'if', and: [
+			{op: '>', and: ['cornerZoom', 'otherZoom']},
+			{op: 'return', and: [0, 0]},
+		]},
+		{op: '=', id: 'proportion', and: {
+			op: '-', and: [
+				1,
+				{op: '/', and: [
+					'cornerZoom',
+					'otherZoom',
+				]},
+			],
+		}},
+		'',
+		{op: 'return', and: [
+			{op: '*', and: [
+				'proportion',
+				'cornerX',
+			]},
+			{op: '*', and: [
+				'proportion',
+				'cornerY',
+			]},
+		]},
+	]},
+	{op: 'func', id: 'getCorners', and: [
+		{op: 'if', and: [
+			{op: '<=', and: [
+				{op: '-', and: 'x'},
+				'y',
+			]},
+			{op: 'if', and: [
+				{op: '<=', and: [
+					'x',
+					'y',
+				]},
+				{op: 'return', and: [-0.5, 0.5, 0.5, 0.5]},
+			]},
+			{op: 'return', and: [0.5, 0.5, 0.5, -0.5]},
+		]},
+		{op: 'if', and: [
+			{op: '<=', and: [
+				'x',
+				'y',
+			]},
+			{op: 'return', and: [-0.5, 0.5, -0.5, -0.5]},
+		]},
+		{op: 'return', and: [0.5, -0.5, -0.5, -0.5]},
+	]},
+	{op: 'func', id: 'getCornerZooms', and: [
+		{op: '=', id: 'offset', type: 'angle', and: {
+			op: '-', and: [
+				{op: 'atan', and: {
+					op: '/', and: [
+						'imageHeight',
+						'imageWidth',
+					],
+				}},
+				{op: '/', and: [
+					'π',
+					2,
+				]},
+			],
+		}},
+		'',
+		{op: '=', id: 'topLeftAngle', type: 'angle', and: {
+			op: '-', and: [
+				'rotation',
+				'offset',
+			],
+		}},
+		{op: '=', id: 'topRightAngle', type: 'angle', and: {
+			op: '+', and: [
+				'rotation',
+				'offset',
+			],
+		}},
+		'',
+		{op: '=', id: 'distance', type: 'position', angle: 'topRightAngle', and: {
+			op: '*', and: [
+				0.5,
+				{op: 'root', and: {
+					op: '+', and: [
+						{op: 'pow', and: 'imageWidth'},
+						{op: 'pow', and: 'imageHeight'},
+					],
+				}},
+			],
+		}},
+		'',
+		{op: '=', id: 'topLeftX', type: 'x', and: {
+			op: '*', and: [
+				'distance',
+				{op: 'cos', and: 'topLeftAngle'},
+			],
+		}},
+		{op: '=', id: 'topLeftY', type: 'y', and: {
+			op: '*', and: [
+				'distance',
+				{op: 'sin', and: 'topLeftAngle'},
+			],
+		}},
+		'',
+		{op: '=', id: 'topRightX', type: 'x', and: {
+			op: '*', and: [
+				'distance',
+				{op: 'cos', and: 'topRightAngle'},
+			],
+		}},
+		{op: '=', id: 'topRightY', type: 'y', and: {
+			op: '*', and: [
+				'distance',
+				{op: 'sin', and: 'topRightAngle'},
+			],
+		}},
+		'',
+		{op: 'return', and: [
+			{op: '/', and: [
+				0.5,
+				{op: 'max', and: [
+					{op: '/', and: [
+						{op: 'abs', and: 'topLeftX'},
+						'viewportWidth',
+					]},
+					{op: '/', and: [
+						{op: 'abs', and: 'topLeftY'},
+						'viewportHeight',
+					]},
+				]},
+			]},
+			{op: '/', and: [
+				0.5,
+				{op: 'max', and: [
+					{op: '/', and: [
+						{op: 'abs', and: 'topRightX'},
+						'viewportWidth',
+					]},
+					{op: '/', and: [
+						{op: 'abs', and: 'topRightY'},
+						'viewportHeight',
+					]},
+				]},
+			]},
+		]},
+	]},
+	{op: 'func', id: 'getIntersectRatio', args: ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k'], and: [
+		{op: '=', id: 'a', and: {
+			op: '-', and: [
+				{op: '+', and: [
+					{op: '*', and: ['g', 'j']},
+					{op: '*', and: ['e', 'h']},
+					{op: '*', and: ['k', 'd']},
+					{op: '*', and: ['i', 'f']},
+				]},
+				{op: '*', and: ['g', 'h']},
+				{op: '*', and: ['j', 'e']},
+				{op: '*', and: ['k', 'g']},
+				{op: '*', and: ['i', 'd']},
+			],
+		}},
+		{op: '=', id: 'b', and: {
+			op: '-', and: [
+				{op: '+', and: [
+					{op: '*', and: ['g', 'h']},
+					{op: '*', and: ['e', 'x']},
+					{op: '*', and: ['j', 'e']},
+					{op: '*', and: ['k', 'x']},
+					{op: '*', and: ['i', 'd', 2]},
+					{op: '*', and: ['f', 'y']},
+					{op: '*', and: ['h', 'y']},
+				]},
+				{op: '*', and: ['g', 'x']},
+				{op: '*', and: ['e', 'h', 2]},
+				{op: '*', and: ['j', 'y']},
+				{op: '*', and: ['k', 'd']},
+				{op: '*', and: ['i', 'x']},
+				{op: '*', and: ['f', 'i']},
+				{op: '*', and: ['d', 'y']},
+			],
+		}},
+		{op: '=', id: 'c', and: {
+			op: '-', and: [
+				{op: '+', and: [
+					{op: '*', and: ['h', 'e']},
+					{op: '*', and: ['i', 'x']},
+					{op: '*', and: ['d', 'y']},
+				]},
+				{op: '*', and: ['e', 'x']},
+				{op: '*', and: ['h', 'y']},
+				{op: '*', and: ['d', 'i']},
+			],
+		}},
+		'',
+		{op: 'return', and: {
+			op: '+', and: [
+				{op: '-', and: 'b'},
+				{op: '/', and: [
+					{op: 'root', and: {
+						op: '-', and: [
+							{op: 'pow', and: 'b'},
+							{op: '*', and: [4, 'a', 'c']},
+						],
+					}},
+					{op: '*', and: [2, 'a']},
+				]},
+			],
+		}},
+	]},
+];
 
 export default (wrapper) => {
 	const demo = new Demo();
 	
+	registerDemo(demo);
+	
+	code.register(...functions);
+	
 	wrapper.append(
 		demo.element,
-		
 		getText(
 			{
 				tag: 'h1',
@@ -25,8 +272,9 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Now that we\'re considering rotation, how exactly do we want our system to behave?',
-				'There are many approaches, some more effective than others.',
+				'Because the last system was so simple, it\'s obvious that there\'s no way to improve its behaviour for un-rotated images.',
+				'This won\'t be case for rotated images;',
+				'there are myriad approaches to pan-limiting, some more effective than others, but no clear "perfect" solution.',
 				'Here, I\'ll again start with the most simple.',
 			],
 			[
@@ -43,45 +291,51 @@ export default (wrapper) => {
 				'First, I calculate the maximum zoom at which corners are visible from the origin.',
 				'Adjacent corners can have different values but opposite corners are always equivalent.',
 				'Knowing this, I only need to calculate a zoom for the top-left and top-right corners.',
-			],
-			getCode(
-				['theta = tan', {tag: 'sup', content: '-1'}, '(imageHeight ÷ imageWidth)'],
-				'',
-				'topLeftAngle = rotation - (theta - π ÷ 2)',
-				'topRightAngle = rotation + (theta - π ÷ 2)',
-				'',
-				['distance = 0.5 × √(imageWidth', {tag: 'sup', content: '2'}, ' + imageHeight', {tag: 'sup', content: '2'}, ')'],
-				'',
-				'topLeftX = distance × cos(topLeftAngle)',
-				'topLeftY = distance × sin(topLeftAngle)',
-				'',
-				'topRightX = distance × cos(topRightAngle)',
-				'topRightY = distance × sin(topRightAngle)',
-				'',
-				'topLeftZoom = 0.5 ÷ max(|topLeftX| ÷ viewportWidth, |topLeftY| ÷ viewportHeight)',
-				'topRightZoom = 0.5 ÷ max(|topRightX| ÷ viewportWidth, |topRightY| ÷ viewportHeight)',
-			),
-			[
+				[
+					'Note that the "rotation" value\'s unit is ', {
+						tag: 'a',
+						content: 'radians',
+						href: 'https://en.wikipedia.org/wiki/Radian',
+					},
+					' and has a default value of "π ÷ 2".',
+				],
 				'Given these zoom values, we can derive pan limits from the user\'s zoom level.',
 			],
-			getCode(
-				'function getBound(corner, cornerZoom):',
-				'  if zoom ⩽ cornerZoom:',
-				'    return {x: 0, y: 0}',
+			getCode([
+				{op: '=', id: ['topLeftZoom', 'topRightZoom'], type: 'zoom', and: {
+					op: 'call', id: 'getCornerZooms',
+				}},
 				'',
-				'  progress = zoom ÷ cornerZoom',
+				{op: '=', id: ['topLeftX', 'topLeftY'], and: {
+					op: 'call', id: 'getBound', and: [
+						-0.5,
+						0.5,
+						'topLeftZoom',
+					],
+				}},
 				'',
-				'  return {',
-				'    x: corner.x - corner.x ÷ progress,',
-				'    y: corner.y - corner.y ÷ progress',
-				'  }',
+				{op: '=', id: 'bottomRightX', and: {
+					op: '-', and: 'topLeftX',
+				}},
+				{op: '=', id: 'bottomRightY', and: {
+					op: '-', and: 'topLeftY',
+				}},
 				'',
-				'topLeftBound = getBound({x: -0.5, y: 0.5}, topLeftZoom)',
-				'topRightBound = getBound({x: 0.5, y: 0.5}, topRightZoom)',
+				{op: '=', id: ['topRightX', 'topRightY'], and: {
+					op: 'call', id: 'getBound', and: [
+						0.5,
+						0.5,
+						'topRightZoom',
+					],
+				}},
 				'',
-				'bottomLeftBound = {x: -topRightBound.x, y: -topRightBound.y}',
-				'bottomRightBound = {x: -topLeftBound.x, y: -topLeftBound.y}',
-			),
+				{op: '=', id: 'bottomLeftX', and: {
+					op: '-', and: 'topRightX',
+				}},
+				{op: '=', id: 'bottomLeftY', and: {
+					op: '-', and: 'topRightY',
+				}},
+			]),
 			{
 				tag: 'h2',
 				content: 'Pan-Limit Effectiveness',
@@ -89,33 +343,33 @@ export default (wrapper) => {
 			},
 			[
 				'You\'ll find that this system works ',
-				getButton('perfectly', demo, [
+				getButton('perfectly', [
 					() => [{ratio: demo.ratioViewport, position: {x: -0.5, y: 0.5}}],
 					() => [{rotation: demo.rotation - DEGREES[180] + ERROR_ALLOWANCE}, {duration: 4}],
 					() => [{zoom: demo.zoom * 2}, {duration: 2, ease: 'power3.inOut', yoyo: true, repeat: 1, position: '<'}],
 				]),
 				' if the viewport and image share an aspect ratio.',
 				'The system\'s flaw is only revealed when the ratios are ',
-				getButton('decoupled', demo, [[{ratio: badTweens.ratio}]]),
+				getButton('decoupled', [[{ratio: badTweens.ratio}]]),
 				'.',
 			],
 			[
 				'Consider ',
-				getButton('this', demo, [[badTweens]]),
+				getButton('this', [[badTweens]]),
 				' demo state.',
 				'Imagine that you want to see the entirety of the image\'s top-right corner.',
 				'You\'ll find that it\'s ',
-				getButton('impossible', demo, [
+				getButton('impossible', [
 					[badTweens],
 					[{position: {x: 0.5, y: 0.1}}],
 				]),
 				' to achieve this without ',
-				getButton('rotating', demo, [
+				getButton('rotating', [
 					[badTweens],
 					[{rotation: Math.round(badTweens.rotation / DEGREES[90]) * DEGREES[90]}],
 				]),
 				' or ',
-				getButton('zooming', demo, [
+				getButton('zooming', [
 					[badTweens],
 					[{zoom: 1}],
 				]),
@@ -132,14 +386,28 @@ export default (wrapper) => {
 				'The snap position will fall into one of these segments; I disregard the two lines that don\'t contribute to the position\'s segment.',
 				'If the zoom value that I\'ve calculated for one of the relevant corners is lower than the other, I snip off the start of its line.',
 			],
-			getCode(
-				'proportion = 1 - lowZoom ÷ highZoom',
+			getCode([
+				{op: '=', id: ['toX0', 'toY0', 'toX1', 'toY1'], and: {
+					op: 'call', id: 'getCorners',
+				}},
 				'',
-				'snippedStart = {',
-				'  x: proportion × corner.x,',
-				'  y: proportion × corner.y',
-				'}',
-			),
+				{op: '=', id: ['fromX0', 'fromY0'], and: {
+					op: 'call', id: 'getSnippedStart', and: [
+						'toX0',
+						'toY0',
+						'topLeftZoom',
+						'topRightZoom',
+					],
+				}},
+				{op: '=', id: ['fromX1', 'fromY1'], and: {
+					op: 'call', id: 'getSnippedStart', and: [
+						'toX1',
+						'toY1',
+						'topRightZoom',
+						'topLeftZoom',
+					],
+				}},
+			]),
 			[
 				'This snip makes the line begin on its corner\'s bound at the other corner\'s zoom.',
 				'From here, I need to find a line that intersects the snap point and ',
@@ -157,41 +425,38 @@ export default (wrapper) => {
 				},
 				' formula, replacing slope with a variable (r) to be solved.',
 			],
-			getCode(
-				['x', getSub('r'), ' = x', getSub('0'), ' + r × (x', getSub('1'), ' - x', getSub('0'), ')'],
-				['y', getSub('r'), ' = y', getSub('0'), ' + r × (y', getSub('1'), ' - y', getSub('0'), ')'],
-			),
 			[
 				'We can use the point as a seperator, splitting the intersecting line into two smaller lines.',
 				'Knowing that these sub-lines must share a gradient, we can use ',
 				{tag: 'span', content: '"m = dY / dX"', style: {whiteSpace: 'nowrap'}},
 				' to write the equation we\'re trying to solve.',
-				'For the two lines that form the snap point\'s segment, I\'ll label the first line as follows:',
 			],
-			'bottomY = a, topY = b, bottomX = c, topX = d, interpolatedY = rA, interpolatedX = rB',
-			'and the second line as:',
-			'bottomY = e, topY = f, bottomX = g, topX = h, interpolatedY = rC, interpolatedX = rD',
-			getCode(
-				'm = (rA - y) ÷ (rB - x)',
-				'  = (rC - y) ÷ (rD - x)',
-				'',
-				'  (a + r × (b - a) - y) ÷ (c + r × (d - c) - x)',
-				'= (e + r × (f - e) - y) ÷ (g + r × (h - g) - x)',
-				'',
-				'...',
-				'',
-				['  r', {tag: 'sup', content: 2}, ' × (bh - bg - ah + ag - dg + cd + de - ce)'],
-				'+ r × (bg - bx - 2ag + ax + ah - hy + gy - cf + fx + ce - ex - de + ce + dy - cy)',
-				'+ (ag - ax - gy - ce + ex + cy)',
-				'= 0',
-			),
 			[
 				'We end up with a quadratic expression and solve it with the ',
 				{tag: 'a', content: 'quadratic formula', href: 'https://en.wikipedia.org/wiki/Quadratic_formula'},
 				' to find our ratio.',
 				'From here, it\'s a simple calculation using the highZoom value from earlier to find our final snap zoom.',
 			],
-			getCode('snapZoom = highZoom / (1 - r)'),
+			getCode([
+				{op: '=', id: 'snapZoom', type: 'zoom', and: {
+					op: '/', and: [
+						{op: 'max', and: ['topLeftZoom', 'topRightZoom']},
+						{op: '-', and: [
+							1,
+							{op: 'call', id: 'getIntersectRatio', and: [
+								'fromX0',
+								'fromY0',
+								'fromX1',
+								'fromY1',
+								'toX0',
+								'toY0',
+								'toX1',
+								'toY1',
+							]},
+						]},
+					],
+				}},
+			]),
 			{
 				tag: 'h2',
 				content: 'Pan-Limit Effectiveness',
@@ -201,13 +466,13 @@ export default (wrapper) => {
 				'Okay! So how does the system perform as a medium for snap-panning?',
 				'Again, it\'s perfect until we decouple aspect ratios.',
 				'Specifically, consider ',
-				getButton('this', demo, [
+				getButton('this', [
 					[{ratio: 0.5, rotation: DEGREES[90], position: 0, zoom: 1}],
 					[{y: 0.25, zoom: 2}, {duration: 0}],
 				]),
 				' snap pan.',
 				'It doesn\'t make any sense to show the empty space above the image here. ',
-				getButton('Increasing', demo, [
+				getButton('Increasing', [
 					[{ratio: 0.25, rotation: DEGREES[90], position: {x: 0, y: 0.25}, zoom: 2}],
 				]),
 				' the differential makes it even less sensible, with empty space appearing below too.',

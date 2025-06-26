@@ -1,5 +1,5 @@
 import Hideables from './lines/copies';
-import {Line} from './lines/lines';
+import {Connection} from './lines/lines';
 
 export const setLineStyle = (() => {
 	const length = 6;
@@ -11,8 +11,8 @@ export const setLineStyle = (() => {
 	};
 })();
 
-class BoundLine extends Line {
-	static template = Line.template.cloneNode();
+class BoundLine extends Connection {
+	static template = Connection.template.cloneNode();
 	
 	static {
 		setLineStyle(this.template);

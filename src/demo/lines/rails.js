@@ -1,6 +1,6 @@
 import Hideables from './copies';
 
-import {Line} from './lines';
+import {Connection} from './lines';
 
 const getBackgroundImage = (() => {
 	const lowColour = '#a00';
@@ -9,8 +9,8 @@ const getBackgroundImage = (() => {
 	return (progress, doMirror) => `linear-gradient(${doMirror ? 'to top, ' : ''}${lowColour} 0, ${lowColour} ${progress * 100}%, ${highColour} 0, ${highColour} 100%)`;
 })();
 
-class Rail extends Line {
-	static Reflection = class extends Line.Reflection {
+class Rail extends Connection {
+	static Reflection = class extends Connection.Reflection {
 		constructor(source, flipX, flipY) {
 			super(source, flipX, flipY);
 			

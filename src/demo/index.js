@@ -54,6 +54,8 @@ export default class {
 	_ratioViewport = 1;
 	ratioViewportInverse = 1;
 	
+	#onInit = [];
+	
 	constructor() {
 		const {wrapper, viewport, image, resizer, imageWrapper} = this.elements;
 		
@@ -75,6 +77,12 @@ export default class {
 				}
 				
 				this.updateViewportDimensions();
+				
+				for (const callback of this.#onInit) {
+					callback();
+				}
+				
+				this.#onInit = false;
 			});
 			
 			observer.observe(wrapper.parentElement);
@@ -234,6 +242,14 @@ export default class {
 	
 	get ratioViewport() {
 		return this._ratioViewport;
+	}
+	
+	onInit(callback) {
+		if (this.#onInit) {
+			this.#onInit.push(callback);
+		} else {
+			callback();
+		}
 	}
 	
 	setDimensions(data, {offsetWidth, offsetHeight}) {

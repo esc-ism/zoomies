@@ -2,6 +2,9 @@ import Demo from '@/demo';
 import Tangents from '@/demo/lines/tangents';
 import Bounds from '@/demo/bounds';
 
+import {getTheta} from '@/shared';
+import {getRotatedCorners} from './shared';
+
 export default class extends Demo {
 	bounds = new Bounds(this);
 	tangents = new Tangents(4, this, false, false, true);
@@ -12,6 +15,28 @@ export default class extends Demo {
 	
 	setTangents(tangents) {
 		this.tangents.set(...tangents);
+	}
+	
+	updateImageDimensions(doApply = true) {
+		super.updateImageDimensions(false);
+		
+		const {halfWidth, halfHeight} = this.imageDimensions;
+		
+		this.cornerDistance = Math.sqrt(Math.pow(halfWidth, 2) + Math.pow(halfHeight, 2));
+		this.cornerAngle = getTheta(halfWidth, halfHeight);
+		
+		if (doApply) {
+			this.constrainPosition({ratio: true});
+			this.applyPosition();
+		}
+	}
+	
+	getRotatedCorners() {
+		return getRotatedCorners(
+			this.rotation,
+			this.cornerDistance,
+			this.cornerAngle,
+		);
 	}
 	
 	applyZoomPoints() {

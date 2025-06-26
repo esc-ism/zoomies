@@ -11,32 +11,9 @@ export const setPosition = (position, element) => {
 };
 
 export class Line {
-	static getLines(points) {
-		if (points.length < 2) {
-			return [];
-		}
-		
-		if (points.length === 2) {
-			return [points];
-		}
-		
-		const lines = [];
-		
-		let start = points[points.length - 1];
-		
-		for (const point of points) {
-			lines.push([start, point]);
-			
-			start = point;
-		}
-		
-		return lines;
-	}
-	
 	static Reflection = class {
-		constructor(source, flipX, flipY) {
-			this.source = source;
-			this.element = source.element.cloneNode();
+		constructor({element}, flipX, flipY) {
+			this.element = element.cloneNode();
 			
 			this.xProperty = flipX ? 'right' : 'left';
 			this.yProperty = flipY ? 'bottom' : 'top';
@@ -52,17 +29,17 @@ export class Line {
 			this.flipRotation = flipX !== flipY;
 		}
 		
-		setHeight() {
-			this.element.style.height = `${this.source.height}%`;
+		setHeight(height) {
+			this.element.style.height = `${height}%`;
 		}
 		
-		setRotation() {
-			this.element.style.rotate = `${this.flipRotation ? -this.source.rotation : this.source.rotation}rad`;
+		setRotation(rotation) {
+			this.element.style.rotate = `${this.flipRotation ? -rotation : rotation}rad`;
 		}
 		
-		setPosition() {
-			this.element.style[this.xProperty] = `${this.source.left}%`;
-			this.element.style[this.yProperty] = `${this.source.top}%`;
+		setPosition(left, top) {
+			this.element.style[this.xProperty] = `${left}%`;
+			this.element.style[this.yProperty] = `${top}%`;
 		}
 	};
 	
@@ -142,16 +119,45 @@ export class Line {
 		}
 	}
 	
+	setHeight(height) {
+		this.element.style.height = `${height}%`;
+		
+		for (const reflection of this.reflections) {
+			reflection.setHeight(height);
+		}
+	}
+	
+	setRotation(rotation) {
+		const adjustedRotation = DEGREES[270] - rotation;
+		
+		this.element.style.rotate = `${adjustedRotation}rad`;
+		
+		for (const reflection of this.reflections) {
+			reflection.setRotation(adjustedRotation);
+		}
+	}
+	
+	setPosition(from) {
+		const left = getLeft(from);
+		const top = getTop(from);
+		
+		this.element.style.left = `${left}%`;
+		this.element.style.top = `${top}%`;
+		
+		for (const reflection of this.reflections) {
+			reflection.setPosition(left, top);
+		}
+	}
+}
+
+export class Connection extends Line {
 	setHeight(from, to) {
 		const {ratioImage} = this.demo;
 		
-		this.height = Math.sqrt((to.x ? Math.pow((to.x - from.x) * ratioImage, 2) : 0) + (to.y ? Math.pow((to.y - from.y), 2) : 0)) * 100;
+		const xSquared = to.x ? Math.pow((to.x - from.x) * ratioImage, 2) : 0;
+		const ySquared = to.y ? Math.pow((to.y - from.y), 2) : 0;
 		
-		this.element.style.height = `${this.height}%`;
-		
-		for (const reflection of this.reflections) {
-			reflection.setHeight();
-		}
+		super.setHeight(Math.sqrt(xSquared + ySquared) * 100);
 	}
 	
 	setRotation(from, to) {
@@ -160,30 +166,12 @@ export class Line {
 		const ratioWidth = Math.max(1, ratioImage);
 		const ratioHeight = Math.max(1, ratioImageInverse);
 		
-		this.rotation = DEGREES[270] - getTheta(
+		super.setRotation(getTheta(
 			(to.x ?? from.x) * ratioWidth,
 			(to.y ?? from.y) * ratioHeight,
 			from.x * ratioWidth,
 			from.y * ratioHeight,
-	);
-		
-		this.element.style.rotate = `${this.rotation}rad`;
-		
-		for (const reflection of this.reflections) {
-			reflection.setRotation();
-		}
-	}
-	
-	setPosition(position) {
-		this.left = getLeft(position);
-		this.top = getTop(position);
-		
-		this.element.style.left = `${this.left}%`;
-		this.element.style.top = `${this.top}%`;
-		
-		for (const reflection of this.reflections) {
-			reflection.setPosition();
-		}
+		));
 	}
 	
 	set(from, to) {
@@ -202,7 +190,7 @@ export default class extends Hideables {
 		super();
 		
 		for (let i = 0; i < count; ++i) {
-			this[i] = new Line(...args);
+			this[i] = new Connection(...args);
 		}
 	}
 }

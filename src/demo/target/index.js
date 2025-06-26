@@ -1,4 +1,4 @@
-import {Line, setPosition} from '../lines/lines';
+import {Connection, setPosition} from '../lines/lines';
 import {setLineStyle} from '../bounds';
 
 import {DEGREES} from '@/shared';
@@ -15,7 +15,7 @@ export default class {
 		
 		this.element.append(this.crosshair);
 		
-		this.line = new Line(demo, false, false, false, this.element);
+		this.line = new Connection(demo, false, false, false, this.element);
 		
 		this.crosshair.style.opacity = this.line.element.style.opacity = '0.4';
 		this.crosshair.style.position = 'absolute';

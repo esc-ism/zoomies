@@ -1,25 +1,18 @@
+import {getIdGetter} from '@css';
+
+import * as code from './code';
+
 import {CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET} from './consts';
 
-const getBroken = (lines) => {
-	const broken = [];
+const getCodeId = getIdGetter('text', 'code');
+
+let count = 0;
+let demo;
+
+export const registerDemo = (newDemo) => {
+	demo = newDemo;
 	
-	for (const [i, line] of lines.entries()) {
-		const children = [];
-		
-		if (i !== 0) {
-			children.push({tag: 'br'});
-		}
-		
-		if (Array.isArray(line)) {
-			children.push(...line);
-		} else {
-			children.push(line);
-		}
-		
-		broken.push(...children);
-	}
-	
-	return broken;
+	count = 0;
 };
 
 const addContent = (parent, content) => {
@@ -58,39 +51,33 @@ const getNode = (description) => {
 	return node;
 };
 
-export const getCode = (...args) => {
-	if (typeof args[0] !== 'object' || Array.isArray(args[0])) {
-		return {
-			content: {
-				tag: 'code',
-				content: getBroken(args),
-			},
-			classList: [CLASS_CODE],
-		};
-	}
+export const getCode = (statements) => {
+	const doReset = count === 0;
+	const id = getCodeId(count++);
 	
-	const [{header, ...vars}, ...text] = args;
-	
-	const content = [{
-		tag: 'code',
-		content: getBroken(text),
-		...vars,
-	}];
-	
-	if (header) {
-		content.unshift({
-			tag: 'div',
-			content: header,
-		});
-	}
+	demo.onInit(() => {
+		if (doReset) {
+			code.reset(demo);
+		}
+		
+		code.generate(document.getElementById(id), statements, demo);
+		
+		if (id === 'text-code-0') {
+			document.getElementById(id).scrollIntoView({block: 'center'});
+		}
+	});
 	
 	return {
-		content,
+		content: {
+			tag: 'code',
+			content: '',
+			id,
+		},
 		classList: [CLASS_CODE],
 	};
 };
 
-export const getButton = (text, demo, tweens, {doReset = false, getParam = () => undefined} = {}) => {
+export const getButton = (text, tweens, {doReset = false, getParam = () => undefined} = {}) => {
 	const resetTweens = doReset ? TWEENS_RESET : [];
 	
 	return {
@@ -108,7 +95,9 @@ export const getButton = (text, demo, tweens, {doReset = false, getParam = () =>
 			}
 			
 			if (demo.tween.totalDuration() > 0) {
-				demo.tween.reverse();
+				demo.tween
+					.timeScale(3)
+					.reverse();
 			} else {
 				demo.tween.revert();
 				

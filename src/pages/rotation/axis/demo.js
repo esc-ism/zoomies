@@ -2,7 +2,10 @@ import Demo from '../demo';
 import Rails from '@/demo/lines/rails';
 
 import {getTheta, DEGREES} from '@/shared';
-import {getRotatedCorners, getConstrainerFromPoints, getProgressed, getProgressedLine, getIntersectProgress, getProgress} from '../shared';
+import {
+	getConstrainerFromPoints, getProgressed, getProgressedLine,
+	getIntersectProgress, getProgress, getRotatedCorners,
+} from '../shared';
 
 import {CORNERS} from '@/pages/consts';
 
@@ -108,13 +111,7 @@ export const getSnappedZoom = (() => {
 	};
 })();
 
-export const getImageFit = (rotation, viewport, image) => {
-	const [corner0, corner1] = getRotatedCorners(
-		rotation,
-		Math.sqrt(image.width * image.width / 4 + image.height * image.height / 4),
-		getTheta(image.width, image.height),
-	);
-	
+export const getImageFit = (viewport, [corner0, corner1]) => {
 	const x = Math.max(corner0.x, corner1.x) / viewport.width;
 	const y = Math.max(corner0.y, corner1.y) / viewport.height;
 	
@@ -123,30 +120,21 @@ export const getImageFit = (rotation, viewport, image) => {
 
 export const getZoomPoints = (() => {
 	const getPoints = (rotation, image, viewport, fitZoom, doFlip) => {
-		const getGenericRotated = (x, y, angle) => {
+		const angle = (DEGREES[90] - rotation) % DEGREES[180];
+		
+		const getRotated = (x, y) => {
 			const radius = Math.sqrt(x * x + y * y);
 			const pointTheta = getTheta(x, y) + angle;
 			
 			return {
-				x: radius * Math.cos(pointTheta),
-				y: radius * Math.sin(pointTheta),
+				x: radius * Math.cos(pointTheta) / image.width,
+				y: radius * Math.sin(pointTheta) / image.height,
 			};
 		};
 		
-		const getRotated = (xRaw, yRaw) => {
-			// Multiplying by image dimensions to have the axes' scales match the image's
-			// Using midPoint's raw values would only work if points moved elliptically around the centre of rotation
-			const rotated = getGenericRotated(xRaw * image.width, yRaw * image.height, (DEGREES[90] - rotation) % DEGREES[180]);
-			
-			rotated.x /= image.width;
-			rotated.y /= image.height;
-			
-			return rotated;
-		};
-		
 		return [
-			{...getRotated(viewport.width / 2 / image.width / fitZoom[0], 0), axis: doFlip ? 'y' : 'x'},
-			{...getRotated(0, viewport.height / 2 / image.height / fitZoom[1]), axis: doFlip ? 'x' : 'y'},
+			{...getRotated(viewport.halfWidth / fitZoom[0], 0), axis: doFlip ? 'y' : 'x'},
+			{...getRotated(0, viewport.halfHeight / fitZoom[1]), axis: doFlip ? 'x' : 'y'},
 		];
 	};
 	
@@ -203,7 +191,12 @@ export const getZoomPoints = (() => {
 		return isEvenQuadrant ? angle : DEGREES[90] - angle;
 	};
 	
-	return (rotation, viewport, image) => {
+	return (rotation, viewport, image, rotatedCorners) => {
+		rotatedCorners ??= getRotatedCorners(
+			Math.sqrt(Math.pow(image.halfWidth, 2) + Math.pow(image.halfHeight, 2)),
+			getTheta(image.width, image.height),
+		);
+		
 		const isEvenQuadrant = (Math.floor(rotation / DEGREES[90]) + 3) % 2 === 0;
 		const quadrantAngle = getQuadrantAngle(rotation, isEvenQuadrant);
 		
@@ -219,7 +212,7 @@ export const getZoomPoints = (() => {
 			side: Math.cos(progressAngles.side),
 		};
 		
-		const fitZoom = getImageFit(rotation, viewport, image);
+		const fitZoom = getImageFit(viewport, image, rotatedCorners);
 		const points = getPoints(rotation, image, viewport, fitZoom, quadrantAngle >= DEGREES[45]);
 		
 		const sideIntersection = getIntersect(
@@ -293,7 +286,7 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		return getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions);
+		return getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions, this.getRotatedCorners());
 	}
 	
 	getSnappedZoom() {

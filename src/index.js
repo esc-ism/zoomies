@@ -1,6 +1,7 @@
 import './css';
 
 import pages from './pages';
+import {CLASS_WRAPPER as CLASS_TEXT} from './pages/consts';
 
 const params = new URLSearchParams(location.search);
 
@@ -19,6 +20,8 @@ const flipPage = (() => {
 		root.appendChild(wrapper);
 		
 		const page = pages[index](wrapper);
+		
+		wrapper.querySelector(`.${CLASS_TEXT}`).focus();
 		
 		return () => {
 			page.remove();

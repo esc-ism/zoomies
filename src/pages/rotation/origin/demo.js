@@ -1,8 +1,7 @@
 import Demo from '../demo';
 import Rails from '@/demo/lines/rails';
 
-import {getTheta} from '@/shared';
-import {getRotatedCorners, getConstrainerFromPoints, isAbove, getProgressedLine, getIntersectProgress} from '../shared';
+import {getConstrainerFromPoints, isAbove, getProgressedLine, getIntersectProgress} from '../shared';
 
 import {CORNERS} from '@/pages/consts';
 
@@ -70,25 +69,10 @@ export default class extends Demo {
 		);
 	}
 	
-	updateImageDimensions(doApply = true) {
-		super.updateImageDimensions(false);
-		
-		this.cornerDistance = Math.sqrt(Math.pow(this.imageDimensions.halfWidth, 2) + Math.pow(this.imageDimensions.halfHeight, 2));
-		
-		if (doApply) {
-			this.constrainPosition({ratio: true});
-			this.applyPosition();
-		}
-	}
-	
 	getZoomPoints() {
-		const {halfWidth, halfHeight} = this.imageDimensions;
+		const {width, height} = this.viewportDimensions;
 		
-		return getRotatedCorners(
-			this.rotation,
-			this.cornerDistance,
-			getTheta(halfWidth, halfHeight),
-		).map(({x, y}) => ({x: 0, y: 0, z: 0.5 / Math.max(x / this.viewportDimensions.width, y / this.viewportDimensions.height)}));
+		return this.getRotatedCorners().map(({x, y}) => ({x: 0, y: 0, z: 0.5 / Math.max(x / width, y / height)}));
 	}
 	
 	getSnappedZoom() {

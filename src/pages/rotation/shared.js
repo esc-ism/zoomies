@@ -332,10 +332,10 @@ export const getConstrainerFromPoints = (() => {
 })();
 
 // https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point
-export const getIntersectProgress = ({x, y}, [{x: g, y: e}, {x: f, y: d}], [{x: k, y: i}, {x: j, y: h}], doFlip) => {
-	const a = d * j - d * k - j * e + e * k - h * f + h * g + i * f - i * g;
-	const b = d * k - d * x - e * k * 2 + e * x + j * e - j * y + k * y - h * g + h * x + i * g - i * x - f * i + g * i + f * y - g * y;
-	const c = k * e - e * x - k * y - g * i + i * x + g * y;
+export const getIntersectProgress = ({x, y}, [{x: d, y: e}, {x: f, y: g}], [{x: h, y: i}, {x: j, y: k}], doFlip) => {
+	const a = g * j + e * h + k * d + i * f - g * h - j * e - k * f - i * d;
+	const b = g * h + e * x + j * e + k * x + i * d * 2 + f * y - g * x - e * h * 2 - j * y + h * y - k * d - i * x - f * i - d * y;
+	const c = h * e + i * x + d * y - e * x - h * y - d * i;
 	
 	return (doFlip ? -b - Math.sqrt(b * b - 4 * a * c) : -b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
 };

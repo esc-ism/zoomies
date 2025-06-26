@@ -3,12 +3,12 @@ import gsap from 'gsap';
 import Demo from './demo';
 
 import {getText} from '../shared';
-
-import {CLASS_INSTRUCTION} from '../consts';
-import {DEGREES} from '@/shared';
 import {getProgressed} from '../rotation/shared';
 import {getZoomPoints} from '../rotation/axis/demo';
 import {getDimensions} from '../rotation/axis';
+
+import {CLASS_INSTRUCTION} from '../consts';
+import {DEGREES} from '@/shared';
 
 const tween = async (demo) => {
 	const wait = async (delay = 1) => await new Promise((resolve, reject) => {

@@ -73,11 +73,11 @@ export default (wrapper) => {
 			),
 			{
 				tag: 'h2',
-				content: 'Snap-Pan Effectiveness',
+				content: 'Effectiveness',
 				style: {textAlign: 'center'},
 			},
 			[
-				'So now, zoom is adjusted for us automatically when ',
+				'Zoom is now adjusted for us automatically when ',
 				getButton('snap panning', demo, [
 					[{position: 0.5, zoom: 2}, {duration: 0}],
 				]),
@@ -91,7 +91,7 @@ export default (wrapper) => {
 				' if aspect ratios change!',
 			],
 			[
-				'However, since we\'re not considering rotation, our system ',
+				'This is the perfect system for images that can\'t be rotated, but it ',
 				getButton('fails', demo, [
 					(position) => [{position}, {duration: 0}],
 					[{zoom: 2}],
@@ -99,13 +99,16 @@ export default (wrapper) => {
 					({x, y}) => [{position: {x: x - 0.05, y: y - 0.05}}, {ease: 'power1.inOut', duration: 0.2, delay: 0.6}],
 					(position) => [{position}, {ease: 'bounce.out', duration: 0.4, delay: 0.1}],
 				], {doReset: true, getParam: () => getSnapPosition(demo)}),
-				' when it\'s introduced.',
-				{
-					tag: 'h2',
-					content: 'Conclusion',
-					style: {textAlign: 'center'},
-				},
-				'Handling rotation will require a significant jump in complexity...',
+				' when rotation is introduced.',
+			],
+			{
+				tag: 'h2',
+				content: 'Conclusion',
+				style: {textAlign: 'center'},
+			},
+			[
+				'From now on, we\'ll only be looking at systems built for rotation.',
+				'Those systems will build on this one, taking two different approaches to replicating its behaviour.',
 			],
 		),
 	);
