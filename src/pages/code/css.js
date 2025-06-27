@@ -12,6 +12,7 @@ for (const [name, content = name] of [
 	['>'],
 	['<=', '⩽'],
 	['>=', '⩾'],
+	['!=', '≠'],
 ]) {
 	addPseudoRule(`.${CLASS_NAMES[name]}::after`, ` ${content} `);
 }
@@ -74,7 +75,17 @@ for (const [name, color] of [
 
 addRule(`.${CLASS_NAMES.evocation}`, {color: 'rgb(212 188 0)'});
 
-addRule(`.${CLASS_NAMES.branch.accept} *`, {'background-color': 'rgb(41 255 0 / 20%)'});
+addRule(`.${CLASS_NAMES.branch.accept} *`, {'background-color': 'rgb(0 255 0 / 20%)'});
 addRule(`.${CLASS_NAMES.branch.reject} *`, {'background-color': 'rgb(255 0 0 / 20%)'});
 
 addRule(`.${CLASS_NAMES.hovered}`, {'background-color': 'rgb(255 255 255 / 25%)'});
+
+addRule(`.${CLASS_NAMES.refresh}`, {
+	position: 'absolute',
+	top: '10px',
+	right: '10px',
+	cursor: 'pointer',
+	width: '20px',
+});
+
+addRule(`.${CLASS_NAMES.refresh}:not(:hover)`, {opacity: 0.4});

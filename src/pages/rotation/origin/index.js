@@ -84,7 +84,7 @@ const functions = [
 				]},
 				{op: 'return', and: [-0.5, 0.5, 0.5, 0.5]},
 			]},
-			{op: 'return', and: [0.5, 0.5, 0.5, -0.5]},
+			{op: 'return', and: [0.5, -0.5, 0.5, 0.5]},
 		]},
 		{op: 'if', and: [
 			{op: '<=', and: [
@@ -202,7 +202,7 @@ const functions = [
 				]},
 				{op: '*', and: ['g', 'h']},
 				{op: '*', and: ['j', 'e']},
-				{op: '*', and: ['k', 'g']},
+				{op: '*', and: ['k', 'f']},
 				{op: '*', and: ['i', 'd']},
 			],
 		}},
@@ -239,18 +239,35 @@ const functions = [
 			],
 		}},
 		'',
+		{op: 'if', and: [
+			{op: '!=', and: ['g', 'k']},
+			{op: 'return', and: {
+				op: '/', and: [
+					{op: '-', and: [
+						{op: '-', and: 'b'},
+						{op: 'root', and: {
+							op: '-', and: [
+								{op: 'pow', and: 'b'},
+								{op: '*', and: [4, 'a', 'c']},
+							],
+						}},
+					]},
+					{op: '*', and: [2, 'a']},
+				],
+			}},
+		]},
 		{op: 'return', and: {
-			op: '+', and: [
-				{op: '-', and: 'b'},
-				{op: '/', and: [
+			op: '/', and: [
+				{op: '+', and: [
+					{op: '-', and: 'b'},
 					{op: 'root', and: {
 						op: '-', and: [
 							{op: 'pow', and: 'b'},
 							{op: '*', and: [4, 'a', 'c']},
 						],
 					}},
-					{op: '*', and: [2, 'a']},
 				]},
+				{op: '*', and: [2, 'a']},
 			],
 		}},
 	]},
@@ -438,21 +455,25 @@ export default (wrapper) => {
 				'From here, it\'s a simple calculation using the highZoom value from earlier to find our final snap zoom.',
 			],
 			getCode([
+				{op: '=', id: 'ratio', type: 'zoom', and: {
+					op: 'call', id: 'getIntersectRatio', and: [
+						'fromX0',
+						'fromY0',
+						'toX0',
+						'toY0',
+						'fromX1',
+						'fromY1',
+						'toX1',
+						'toY1',
+					],
+				}},
+				'',
 				{op: '=', id: 'snapZoom', type: 'zoom', and: {
 					op: '/', and: [
 						{op: 'max', and: ['topLeftZoom', 'topRightZoom']},
 						{op: '-', and: [
 							1,
-							{op: 'call', id: 'getIntersectRatio', and: [
-								'fromX0',
-								'fromY0',
-								'fromX1',
-								'fromY1',
-								'toX0',
-								'toY0',
-								'toX1',
-								'toY1',
-							]},
+							'ratio',
 						]},
 					],
 				}},

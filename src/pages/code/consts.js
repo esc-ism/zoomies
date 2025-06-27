@@ -30,6 +30,7 @@ export const CLASS_NAMES = {
 	'>=': getId('ge'),
 	'<': getId('l'),
 	'>': getId('g'),
+	'!=': getId('ne'),
 	abs: getId('abs'),
 	max: getId('max'),
 	sin: getId('sin'),
@@ -55,4 +56,6 @@ export const CLASS_NAMES = {
 		reject: getId('branch', 'reject'),
 	},
 	hovered: getId('hovered'),
+	
+	refresh: getId('refresh'),
 };

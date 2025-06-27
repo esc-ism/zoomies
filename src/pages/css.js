@@ -3,11 +3,11 @@ import {addRule} from '@css';
 import {CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION} from './consts';
 
 addRule(`.${CLASS_CODE}`, {
-	'overflow-x': 'auto',
 	'line-height': 'normal',
 	'background-color': '#3c3448',
 	'box-shadow': 'white 0 0 2px',
 	'border-radius': '10px',
+	position: 'relative',
 });
 
 addRule(`.${CLASS_CODE} > div`, {
@@ -19,10 +19,11 @@ addRule(`.${CLASS_CODE} > div`, {
 });
 
 addRule(`.${CLASS_CODE} > code`, {
+	'overflow-x': 'auto',
 	padding: '10px 1em',
 	'font-family': 'consolas, monospace',
 	'line-height': 'normal',
-	display: 'inline-block',
+	display: 'block',
 	'white-space': 'pre',
 });
 

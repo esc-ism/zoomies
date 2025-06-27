@@ -1,15 +1,20 @@
 import {Line, Connection} from '@/demo/lines/lines';
 
+import getButton from './button';
+
 import {DEGREES} from '@/shared';
 import {BUILT_INS, CLASS_NAMES} from './consts';
 
 import './css';
 
 let globalScope = {};
+
 const functions = {};
 const visuals = [];
 
 const arrayify = (arg) => Array.isArray(arg) ? arg : [arg];
+
+const refreshParams = [];
 
 export const reset = (demo) => {
 	globalScope = Object.fromEntries(Object.entries(BUILT_INS).map(([id, getValue]) => [id, getValue(demo)]));
@@ -102,17 +107,9 @@ const getCombiner = (() => {
 		return {value, elements};
 	};
 	
-	return (combiner, doClause = false) => (statement, demo, scope, indent, parentOp) => {
-		switch (parentOp) {
-			case '/':
-			case '*':
-				if (doClause) {
-					break;
-				}
-			
-			// eslint-disable-next-line no-fallthrough
-			default:
-				return getCombined(statement, demo, scope, indent, combiner);
+	return (combiner, clauseForcers = []) => (statement, demo, scope, indent, parentOp) => {
+		if (!clauseForcers.includes(parentOp)) {
+			return getCombined(statement, demo, scope, indent, combiner);
 		}
 		
 		const wrapper = getElement(CLASS_NAMES.clause);
@@ -281,9 +278,9 @@ const interpretters = {
 		
 		return {elements: [idWrapper, getElement(CLASS_NAMES['=']), ...operand]};
 	},
-	'+': getCombiner((a, b) => a + b, true),
+	'+': getCombiner((a, b) => a + b, ['*', '/']),
 	'-': (() => {
-		const combiner = getCombiner((a, b) => a - b, true);
+		const combiner = getCombiner((a, b) => a - b, ['*', '/']);
 		
 		return (statement, demo, scope, indent, parentOp) => {
 			if (!Array.isArray(statement.and)) {
@@ -299,12 +296,13 @@ const interpretters = {
 			return combiner(statement, demo, scope, indent, parentOp);
 		};
 	})(),
-	'*': getCombiner((a, b) => a * b),
+	'*': getCombiner((a, b) => a * b, ['/']),
 	'/': getCombiner((a, b) => a / b),
 	'<=': getComparater((a, b) => a <= b),
 	'>=': getComparater((a, b) => a >= b),
 	'<': getComparater((a, b) => a < b),
 	'>': getComparater((a, b) => a > b),
+	'!=': getComparater((a, b) => a !== b),
 	if: (statement, demo, scope, indent) => {
 		const elements = {
 			header: getElement(CLASS_NAMES.if),
@@ -442,6 +440,30 @@ const interpretters = {
 const interpret = (statement, demo, scope, indent, parentOp) => interpretters[statement?.op ?? typeof statement](statement, demo, scope, indent, parentOp);
 
 export const generate = (parent, snippet, demo, scope = globalScope, indent = 0) => {
+	if (indent === 0) {
+		for (let i = parent.children.length - 1; i >= 0; --i) {
+			parent.children[i].remove();
+		}
+		
+		const button = getButton();
+		
+		parent.appendChild(button);
+		
+		refreshParams.push([parent, snippet, demo]);
+		
+		button.addEventListener('click', () => {
+			const oldRefreshParams = [...refreshParams];
+			
+			refreshParams.length = 0;
+			
+			reset(demo);
+			
+			for (const args of oldRefreshParams) {
+				generate(...args);
+			}
+		});
+	}
+	
 	for (const statement of snippet) {
 		const {elements} = interpret(statement, demo, scope, indent);
 		
