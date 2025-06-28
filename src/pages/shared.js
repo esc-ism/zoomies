@@ -26,9 +26,9 @@ const addContent = (parent, content) => {
 };
 
 const getNode = (description) => {
-	const {content = [], classList = [], tag = 'p', style = {}, ...attributes} = (typeof description === 'string' || Array.isArray(description)) ? {content: description} : description;
+	const {content = [], classList = [], tag = 'p', style = {}, xmlns, ...attributes} = (typeof description === 'string' || Array.isArray(description)) ? {content: description} : description;
 	
-	const node = document.createElement(tag);
+	const node = xmlns ? document.createElementNS(xmlns, tag) : document.createElement(tag);
 	
 	if (Array.isArray(content)) {
 		for (const part of content) {
@@ -43,7 +43,7 @@ const getNode = (description) => {
 	}
 	
 	for (const [property, value] of Object.entries(attributes)) {
-		node[property] = value;
+		node.setAttribute(property, value);
 	}
 	
 	node.classList.add(...classList);
@@ -60,9 +60,9 @@ export const getCode = (statements) => {
 			code.reset(demo);
 		}
 		
-		code.generate(document.getElementById(id), statements, demo);
+		code.generate(document.getElementById(id), statements);
 		
-		if (id === 'text-code-0') {
+		if (id === 'text-code-2') {
 			document.getElementById(id).scrollIntoView({block: 'center'});
 		}
 	});

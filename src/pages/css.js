@@ -1,6 +1,6 @@
 import {addRule} from '@css';
 
-import {CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION} from './consts';
+import {CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION, CLASS_MATH} from './consts';
 
 addRule(`.${CLASS_CODE}`, {
 	'line-height': 'normal',
@@ -25,6 +25,21 @@ addRule(`.${CLASS_CODE} > code`, {
 	'line-height': 'normal',
 	display: 'block',
 	'white-space': 'pre',
+});
+
+addRule(`.${CLASS_CODE} br + br + br, br:last-child`, {display: 'none'});
+
+addRule(`.${CLASS_WRAPPER} .${CLASS_MATH}`, {
+	'text-align': 'center',
+	border: '8px double currentcolor',
+	'border-radius': '10px',
+});
+
+addRule(`.${CLASS_MATH} math`, {
+	'overflow-x': 'auto',
+	'font-family': '"cambria math", math',
+	padding: '0.4em',
+	display: 'block',
 });
 
 const buttonColour = '#d4acfd';

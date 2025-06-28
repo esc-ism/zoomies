@@ -2,8 +2,10 @@ import Demo from './demo';
 
 import * as code from '@/pages/code';
 
-import {DEGREES, ERROR_ALLOWANCE} from '@/shared';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
+
+import {DEGREES, ERROR_ALLOWANCE} from '@/shared';
+import {CLASS_MATH} from '../../consts';
 
 export const badTweens = {
 	ratio: 0.6,
@@ -11,6 +13,15 @@ export const badTweens = {
 	rotation: -4.467,
 	zoom: 2,
 };
+
+const xmlns = 'http://www.w3.org/1998/Math/MathML';
+
+const opSpace = {tag: 'mspace', width: '0.8em', xmlns};
+const getOverlined = (content) => ({
+	tag: 'mrow', xmlns, style: {textDecoration: 'overline', textDecorationThickness: '1px'}, content: content.split('').map((content) => ({
+		tag: 'mi', xmlns, content,
+	})),
+});
 
 const functions = [
 	{op: 'func', id: 'getBound', args: ['cornerX', 'cornerY', 'cornerZoom'], and: [
@@ -47,7 +58,7 @@ const functions = [
 	]},
 	{op: 'func', id: 'getSnippedStart', args: ['cornerX', 'cornerY', 'cornerZoom', 'otherZoom'], and: [
 		{op: 'if', and: [
-			{op: '>', and: ['cornerZoom', 'otherZoom']},
+			{op: '>=', and: ['cornerZoom', 'otherZoom']},
 			{op: 'return', and: [0, 0]},
 		]},
 		{op: '=', id: 'proportion', and: {
@@ -442,12 +453,609 @@ export default (wrapper) => {
 				},
 				' formula, replacing slope with a variable (r) to be solved.',
 			],
+			{tag: 'p', classList: [CLASS_MATH], content: [
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'x'},
+									{tag: 'mi', xmlns, content: 'r'},
+								]},
+								{tag: 'mo', xmlns, content: '='},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'x'},
+									{tag: 'mi', xmlns, content: 'start'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'x'},
+									{tag: 'mi', xmlns, content: 'end'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'x'},
+									{tag: 'mi', xmlns, content: 'start'},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'y'},
+									{tag: 'mi', xmlns, content: 'r'},
+								]},
+								{tag: 'mo', xmlns, content: '='},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'y'},
+									{tag: 'mi', xmlns, content: 'start'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'y'},
+									{tag: 'mi', xmlns, content: 'end'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'y'},
+									{tag: 'mi', xmlns, content: 'start'},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+					]},
+				]},
+			]},
 			[
-				'We can use the point as a seperator, splitting the intersecting line into two smaller lines.',
+				'We can use the point as a separator, splitting the intersecting line into two smaller lines.',
 				'Knowing that these sub-lines must share a gradient, we can use ',
 				{tag: 'span', content: '"m = dY / dX"', style: {whiteSpace: 'nowrap'}},
 				' to write the equation we\'re trying to solve.',
 			],
+			{tag: 'p', classList: [CLASS_MATH], content: [
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: 'let the lines be '},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								getOverlined('AB'),
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: ' and '},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								getOverlined('CD'),
+							]},
+						]},
+					]},
+				]},
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'E'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: '='},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+							{tag: 'mtd', xmlns, content: opSpace},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'F'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: '='},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'D'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'E'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '='},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+							{tag: 'mtd', xmlns, content: opSpace},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'F'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '='},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'D'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+					]},
+				]},
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'E'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'E'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'x'},
+									]},
+								]},
+							]},
+							{tag: 'mtd', xmlns, content: {
+								tag: 'mo', xmlns, content: '=',
+							}},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'F'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'F'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'x'},
+									]},
+								]},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'A'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: '+'},
+										{tag: 'mi', xmlns, content: 'r'},
+										{tag: 'mo', xmlns, content: '('},
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'B'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'A'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: ')'},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'A'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: '+'},
+										{tag: 'mi', xmlns, content: 'r'},
+										{tag: 'mo', xmlns, content: '('},
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'B'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'A'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: ')'},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+								]},
+							]},
+							{tag: 'mtd', xmlns, content: {
+								tag: 'mo', xmlns, content: '=',
+							}},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'C'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: '+'},
+										{tag: 'mi', xmlns, content: 'r'},
+										{tag: 'mo', xmlns, content: '('},
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'D'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'C'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: ')'},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'C'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: '+'},
+										{tag: 'mi', xmlns, content: 'r'},
+										{tag: 'mo', xmlns, content: '('},
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'D'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'C'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: ')'},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+								]},
+							]},
+						]},
+					]},
+				]},
+				{tag: 'div', content: '...'},
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '0'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, style: {textAlign: 'left'}, content: [
+								{tag: 'msup', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'r'},
+									{tag: 'mn', xmlns, content: '2'},
+								]},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'D'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'D'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns},
+							{tag: 'mtd', xmlns},
+							{tag: 'mtd', xmlns, style: {textAlign: 'left'}, content: [
+								{tag: 'mo', xmlns, content: '+'},
+								opSpace,
+								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mtable', xmlns, content: [
+										{tag: 'mtr', xmlns, content: [
+											{tag: 'mtd', xmlns, content: [
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'B'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'C'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'mo', xmlns, content: '+'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'A'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'mi', xmlns, content: 'x'},
+												{tag: 'mo', xmlns, content: '+'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'A'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'D'},
+													{tag: 'mi', xmlns, content: 'x'},
+												]},
+												{tag: 'mo', xmlns, content: '+'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'D'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'mi', xmlns, content: 'x'},
+												{tag: 'mo', xmlns, content: '+'},
+												{tag: 'mn', xmlns, content: '2'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'A'},
+													{tag: 'mi', xmlns, content: 'x'},
+												]},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'C'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'mo', xmlns, content: '+'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'B'},
+													{tag: 'mi', xmlns, content: 'x'},
+												]},
+												{tag: 'mi', xmlns, content: 'y'},
+												{tag: 'mo', xmlns, content: '+'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'C'},
+													{tag: 'mi', xmlns, content: 'x'},
+												]},
+												{tag: 'mi', xmlns, content: 'y'},
+											]},
+										]},
+										{tag: 'mtr', xmlns, content: [
+											{tag: 'mtd', xmlns, content: [
+												{tag: 'mo', xmlns, content: '-'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'D'},
+													{tag: 'mi', xmlns, content: 'x'},
+												]},
+												{tag: 'mi', xmlns, content: 'y'},
+												{tag: 'mo', xmlns, content: '-'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'A'},
+													{tag: 'mi', xmlns, content: 'x'},
+												]},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'D'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'mo', xmlns, content: '-'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'B'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'mi', xmlns, content: 'x'},
+												{tag: 'mo', xmlns, content: '-'},
+												{tag: 'mn', xmlns, content: '2'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'A'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'C'},
+													{tag: 'mi', xmlns, content: 'x'},
+												]},
+												{tag: 'mo', xmlns, content: '-'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'C'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'mi', xmlns, content: 'x'},
+												{tag: 'mo', xmlns, content: '-'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'B'},
+													{tag: 'mi', xmlns, content: 'x'},
+												]},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'C'},
+													{tag: 'mi', xmlns, content: 'y'},
+												]},
+												{tag: 'mo', xmlns, content: '-'},
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'A'},
+													{tag: 'mi', xmlns, content: 'x'},
+												]},
+												{tag: 'mi', xmlns, content: 'y'},
+											]},
+										]},
+									]},
+								]},
+								{tag: 'mo', xmlns, stretchy: 'true', content: ')'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns},
+							{tag: 'mtd', xmlns},
+							{tag: 'mtd', xmlns, style: {textAlign: 'left'}, content: [
+								{tag: 'mo', xmlns, content: '+'},
+								opSpace,
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mi', xmlns, content: 'x'},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mi', xmlns, content: 'y'},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+								{tag: 'mi', xmlns, content: 'x'},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'mi', xmlns, content: 'y'},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+							]},
+						]},
+					]},
+				]},
+			]},
 			[
 				'We end up with a quadratic expression and solve it with the ',
 				{tag: 'a', content: 'quadratic formula', href: 'https://en.wikipedia.org/wiki/Quadratic_formula'},

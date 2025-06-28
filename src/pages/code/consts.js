@@ -55,6 +55,7 @@ export const CLASS_NAMES = {
 		accept: getId('branch', 'accept'),
 		reject: getId('branch', 'reject'),
 	},
+	inactive: getId('inactive'),
 	hovered: getId('hovered'),
 	
 	refresh: getId('refresh'),
