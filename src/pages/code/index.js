@@ -73,7 +73,7 @@ export const register = (newDemo, statements) => {
 			
 			generate(body, statement.and, scope, indent + 1, meta);
 			
-			funcWrapper.append(funcElement, argsElement, body);
+			funcWrapper.append(funcElement, argsElement, body, ...getIndents(indent));
 			
 			const value = meta.return;
 			
@@ -360,7 +360,7 @@ const interpretters = {
 	if: (statement, scope, indent, meta) => {
 		const elements = {
 			condition: getElement(CLASS_NAMES.if),
-			body: document.createElement('div'),
+			body: document.createElement('span'),
 		};
 		
 		const {value, elements: conditionElements} = interpret(statement.and[0], scope, indent, meta);
@@ -466,7 +466,7 @@ const interpretters = {
 		if (makeHoverable(id, undefined, scope)) {
 			makeHoverable(expansion.target, undefined, scope);
 			
-			let newline = document.createElement('br');
+			const newline = document.createElement('br');
 			
 			id.addEventListener('click', () => {
 				id.replaceWith(expansion.wrapper);
@@ -558,7 +558,11 @@ const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {bran
 			}
 		}
 		
-		parent.append(...getIndents(indent), ...elements, document.createElement('br'));
+		if (elements.length > 0) {
+			parent.append(...getIndents(indent), ...elements);
+		}
+		
+		parent.appendChild(document.createElement('br'));
 	}
 	
 	if (indent > 0 && meta.branch[meta.branch.length - 1].id === 'getIntersection') {
