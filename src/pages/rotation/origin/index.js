@@ -324,11 +324,7 @@ export default (wrapper) => {
 				}},
 				'',
 				{op: '=', id: ['topLeftX', 'topLeftY'], and: {
-					op: 'call', id: 'getBound', and: [
-						-0.5,
-						0.5,
-						'topLeftZoom',
-					],
+					op: 'call', id: 'getBound', and: [-0.5, 0.5, 'topLeftZoom'],
 				}},
 				'',
 				{op: '=', id: 'bottomRightX', and: {
@@ -339,11 +335,7 @@ export default (wrapper) => {
 				}},
 				'',
 				{op: '=', id: ['topRightX', 'topRightY'], and: {
-					op: 'call', id: 'getBound', and: [
-						0.5,
-						0.5,
-						'topRightZoom',
-					],
+					op: 'call', id: 'getBound', and: [0.5, 0.5, 'topRightZoom'],
 				}},
 				'',
 				{op: '=', id: 'bottomLeftX', and: {

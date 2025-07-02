@@ -57,6 +57,7 @@ export const CLASS_NAMES = {
 	params: getId('params'),
 	csv: getId('csv'),
 	id: getId('id'),
+	bool: getId('bool'),
 	number: getId('number'),
 	negative: getId('negative'),
 	clause: getId('clause'),

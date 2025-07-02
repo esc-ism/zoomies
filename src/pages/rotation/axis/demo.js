@@ -1,7 +1,7 @@
 import Rails from '@/demo/lines/rails';
 import Demo, {getAllStartZooms} from '../demo';
 
-import {getTheta, DEGREES} from '@/shared';
+import {DEGREES} from '@/shared';
 import {
 	getConstrainerFromPoints, getZoomProgressed, getProgressedLine,
 	getIntersectProgress, getProgress,
@@ -19,6 +19,7 @@ export const getBound = (zoom, first, second, isTopLeft) => {
 		};
 	}
 	
+	// todo === 0 condition seems unnecessary
 	if (zoom <= first.z || (second.x === 0 && second.y === 0)) {
 		return false;
 	}

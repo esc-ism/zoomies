@@ -61,7 +61,7 @@ export const register = (newDemo, statements) => {
 				
 				scope[argId] = {value: typeof value === 'string' ? scope[value] : value, element: arg};
 				
-				makeHoverable(arg, argId, scope, ...args.unwrapped[i]);
+				makeHoverable(arg, argId, scope, meta, ...args.unwrapped[i]);
 				
 				arg.innerText = argId;
 				
@@ -75,12 +75,16 @@ export const register = (newDemo, statements) => {
 			
 			funcWrapper.append(funcElement, argsElement, body, ...getIndents(indent));
 			
-			const value = meta.return;
+			if (active) {
+				const value = meta.return;
+				
+				delete meta.return;
+				meta.active = true;
+				
+				return {value, wrapper: funcWrapper, target: funcElement};
+			}
 			
-			delete meta.return;
-			meta.active = active;
-			
-			return {value, wrapper: funcWrapper, target: funcElement};
+			return {wrapper: funcWrapper, target: funcElement};
 		},
 	]));
 	
@@ -227,8 +231,8 @@ const visualisers = {
 	},
 };
 
-const makeHoverable = (element, id, scope, ...sources) => {
-	if ('return' in scope) {
+const makeHoverable = (element, id, scope, meta, ...sources) => {
+	if (!meta.active) {
 		return false;
 	}
 	
@@ -270,7 +274,7 @@ const makeHoverable = (element, id, scope, ...sources) => {
 };
 
 const interpretters = {
-	string: (id, scope) => {
+	string: (id, scope, indent, meta) => {
 		if (id === '') {
 			return {elements: []};
 		}
@@ -281,7 +285,7 @@ const interpretters = {
 		
 		const sources = 'element' in scope[id] ? [scope[id].element] : [];
 		
-		makeHoverable(element, id, scope, ...sources);
+		makeHoverable(element, id, scope, meta, ...sources);
 		
 		if (scope[id].pending) {
 			scope[id].element = element;
@@ -293,6 +297,13 @@ const interpretters = {
 	},
 	number: (value) => {
 		const element = getElement(CLASS_NAMES.number);
+		
+		element.innerText = value;
+		
+		return {value, elements: [element]};
+	},
+	boolean: (value) => {
+		const element = getElement(CLASS_NAMES.bool);
 		
 		element.innerText = value;
 		
@@ -375,7 +386,7 @@ const interpretters = {
 		
 		generate(elements.body, statement.and.slice(1), {...scope}, indent + 1, meta);
 		
-		if (active && !meta.return) {
+		if (active && !('return' in meta)) {
 			meta.active = true;
 		}
 		
@@ -463,8 +474,8 @@ const interpretters = {
 		
 		const expansion = functions[statement.id](csvs, {...scope}, indent, meta);
 		
-		if (makeHoverable(id, undefined, scope)) {
-			makeHoverable(expansion.target, undefined, scope);
+		if (makeHoverable(id, undefined, scope, meta)) {
+			makeHoverable(expansion.target, undefined, scope, meta);
 			
 			const newline = document.createElement('br');
 			
