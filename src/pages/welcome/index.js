@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import Demo from './demo';
 
 import {getText} from '../shared';
-import {getProgressed} from '../rotation/shared';
+import {getZoomProgressed} from '../rotation/shared';
 import {getZoomPoints} from '../rotation/axis/demo';
 import {getDimensions} from '../rotation/axis';
 
@@ -36,12 +36,12 @@ const tween = async (demo) => {
 				
 				const getNext = (zoom = 5) => {
 					if (zoom >= second.z) {
-						const {p, ...position} = getProgressed(second, {x: 0.5, y: 0.5}, zoom);
+						const {p, ...position} = getZoomProgressed(second, {x: 0.5, y: 0.5}, zoom);
 						
 						return [position, [0, 0, 1, p]];
 					}
 					
-					const {p, ...position} = getProgressed(first, second.vpEnd, zoom);
+					const {p, ...position} = getZoomProgressed(first, second.vpEnd, zoom);
 					
 					return [position, [0, 0, p * second.p, 0]];
 				};

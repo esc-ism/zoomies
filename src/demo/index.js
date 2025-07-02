@@ -54,21 +54,8 @@ export default class {
 	_ratioViewport = 1;
 	ratioViewportInverse = 1;
 	
-	#onInit = [];
-	
-	constructor() {
-		const {wrapper, viewport, image, resizer, imageWrapper} = this.elements;
-		
-		this.constructor.readout.setPosition(this);
-		this.constructor.readout.setZoom(this);
-		this.constructor.readout.setRotation(this);
-		this.constructor.readout.setRatio(this);
-		
-		viewport.appendChild(this.constructor.progress.element);
-		resizer.parentElement.insertBefore(this.constructor.readout.element, resizer);
-		imageWrapper.append(this.target.element);
-		
-		dock(wrapper).then(() => {
+	#init = dock(this.element)
+		.then(() => new Promise((resolve) => {
 			const observer = new ResizeObserver(() => {
 				if (!this.element.isConnected) {
 					observer.disconnect();
@@ -78,15 +65,23 @@ export default class {
 				
 				this.updateViewportDimensions();
 				
-				for (const callback of this.#onInit) {
-					callback();
-				}
-				
-				this.#onInit = false;
+				resolve();
 			});
 			
-			observer.observe(wrapper.parentElement);
-		});
+			observer.observe(this.element.parentElement);
+		}));
+	
+	constructor() {
+		const {viewport, image, resizer, imageWrapper} = this.elements;
+		
+		this.constructor.readout.setPosition(this);
+		this.constructor.readout.setZoom(this);
+		this.constructor.readout.setRotation(this);
+		this.constructor.readout.setRatio(this);
+		
+		viewport.appendChild(this.constructor.progress.element);
+		resizer.parentElement.insertBefore(this.constructor.readout.element, resizer);
+		imageWrapper.append(this.target.element);
 		
 		resizer.addEventListener('pointerdown', (event) => {
 			const {buttons, offsetX} = event;
@@ -244,12 +239,8 @@ export default class {
 		return this._ratioViewport;
 	}
 	
-	onInit(callback) {
-		if (this.#onInit) {
-			this.#onInit.push(callback);
-		} else {
-			callback();
-		}
+	init(callback) {
+		return this.#init;
 	}
 	
 	setDimensions(data, {offsetWidth, offsetHeight}) {

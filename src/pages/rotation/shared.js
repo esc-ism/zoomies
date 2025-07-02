@@ -1,50 +1,19 @@
-import {DEGREES} from '@/shared';
-
-export const getRotatedCorners = (rotation, radius, theta) => {
-	const offset = theta - DEGREES[90];
-	
-	const angle0 = rotation - offset;
-	const angle1 = rotation + offset;
-	
-	return [
-		{
-			x: Math.abs(radius * Math.cos(angle0)),
-			y: Math.abs(radius * Math.sin(angle0)),
-		},
-		{
-			x: Math.abs(radius * Math.cos(angle1)),
-			y: Math.abs(radius * Math.sin(angle1)),
-		},
-	];
-};
-
 // logarithmic progress from "low" to infinity
 export const getProgress = (low, target) => 1 - low / target;
+const getProgressed = (from, to, p) => ({x: p * (to.x - from.x) + from.x, y: p * (to.y - from.y) + from.y, p});
+export const getZoomProgressed = ({z: lowZ, ...from}, to, targetZ) => getProgressed(from, to, getProgress(lowZ, targetZ));
 
-export const getProgressed = ({x: fromX, y: fromY, z: lowZ}, {x: toX, y: toY}, targetZ) => {
-	const p = getProgress(lowZ, targetZ);
-	
-	return {x: p * (toX - fromX) + fromX, y: p * (toY - fromY) + fromY, p};
-};
+const perfectSlopes = [0, Infinity, -Infinity];
 
-// y = mx + c
-export const getLineY = ({m, c}, x) => m * x + c;
+export const getLineY = ({m, c, y}, x) => perfectSlopes.includes(m) ? y : m * x + c; // y = mx + c
+export const getLineX = ({m, c, x}, y) => perfectSlopes.includes(m) ? x : (y - c) / m; // x = (y - c) / m
 
-// x = (y - c) / m
-export const getLineX = ({m, c, x}, y) => !Number.isFinite(m) || m === 0 ? x : (y - c) / m;
+export const isAbove = (line, {x, y}) => y > getLineY(line, x);
+const isRight = (line, {x, y}) => x > getLineX(line, y);
 
 export const getM = (from, to) => (to.y - from.y) / (to.x - from.x);
 export const getLine = (m, {x, y}) => ({c: (y - m * x), m, x, y});
 export const getFlipped = ({x, y}) => ({x: -x, y: -y});
-
-export const isAbove = ({m, c}, {x, y}) => m * x + c < y;
-
-// requires special case for infinite gradient
-const isRight = (line, {x, y}) => {
-	const lineX = (y - line.c) / line.m;
-	
-	return x > (isNaN(lineX) ? line.x : lineX);
-};
 
 const get2DConstrained = (() => {
 	const isBetween = (() => {
@@ -137,17 +106,16 @@ const get2DConstrained = (() => {
 })();
 
 const get1DConstrainer = (() => {
-	const getTangents = (m, point, flipped) => {
+	const getTangents = (m, point) => {
 		const isSide = Math.abs(m) < 1;
 		
 		const linePoint = getLine(m, point);
-		const lineFlipped = getLine(m, flipped);
 		
 		return [
 			[point, {line: linePoint, isSide, isHigh: false}, 'line'],
 			[point, {line: linePoint, isSide, isHigh: true}, 'line'],
-			[flipped, {line: lineFlipped, isSide, isHigh: false}, 'line'],
-			[flipped, {line: lineFlipped, isSide, isHigh: true}, 'line'],
+			// [flipped, {line: lineFlipped, isSide, isHigh: false}, 'line'],
+			// [flipped, {line: lineFlipped, isSide, isHigh: true}, 'line'],
 		];
 	};
 	
@@ -185,7 +153,7 @@ const get1DConstrainer = (() => {
 					return {x, y: getLineY(line, x)};
 				};
 			})(),
-			[point, flipped], getTangents(tangentM, point, flipped),
+			[point, flipped], getTangents(tangentM, point),
 		];
 	};
 })();
@@ -341,4 +309,4 @@ export const getIntersectProgress = ({x, y}, [{x: d, y: e}, {x: f, y: g}], [{x: 
 };
 
 // line with progressed start point
-export const getProgressedLine = (line, {z}) => [getProgressed(...line, z), line[1]];
+export const getProgressedLine = (line, {z}) => [getZoomProgressed(...line, z), line[1]];

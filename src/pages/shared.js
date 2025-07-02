@@ -1,6 +1,6 @@
 import {getIdGetter} from '@css';
 
-import * as code from './code';
+import {generateWhenReady as generateCode} from './code';
 
 import {CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET} from './consts';
 
@@ -26,7 +26,15 @@ const addContent = (parent, content) => {
 };
 
 const getNode = (description) => {
-	const {content = [], classList = [], tag = 'p', style = {}, xmlns, ...attributes} = (typeof description === 'string' || Array.isArray(description)) ? {content: description} : description;
+	const {
+		content = [],
+		classList = [],
+		tag = 'p',
+		style = {},
+		xmlns,
+		callback,
+		...attributes
+	} = (typeof description === 'string' || Array.isArray(description)) ? {content: description} : description;
 	
 	const node = xmlns ? document.createElementNS(xmlns, tag) : document.createElement(tag);
 	
@@ -48,30 +56,24 @@ const getNode = (description) => {
 	
 	node.classList.add(...classList);
 	
+	if (callback) {
+		callback(node);
+	}
+	
 	return node;
 };
 
 export const getCode = (statements) => {
-	const doReset = count === 0;
 	const id = getCodeId(count++);
-	
-	demo.onInit(() => {
-		if (doReset) {
-			code.reset(demo);
-		}
-		
-		code.generate(document.getElementById(id), statements);
-		
-		if (id === 'text-code-2') {
-			document.getElementById(id).scrollIntoView({block: 'center'});
-		}
-	});
 	
 	return {
 		content: {
 			tag: 'code',
 			content: '',
 			id,
+			callback: (node) => {
+				generateCode(node, statements);
+			},
 		},
 		classList: [CLASS_CODE],
 	};

@@ -1,6 +1,7 @@
 import {DEGREES} from '@/shared';
 
-import {getText, getCode, getButton} from '../../shared';
+import {register as registerFunctions} from '../../code';
+import {getText, getCode, getButton, registerDemo} from '../../shared';
 import {badTweens} from '../origin';
 
 import Demo, {getSnappedZoom, getZoomPoints} from './demo';
@@ -53,20 +54,397 @@ const getSnapVars = (demo, getRatio) => {
 	
 	const zoom = getSnappedZoom(...zoomPoints, position);
 	
-	return {ratio, rotation, fitZoom: Math.min(zoomPoints[0].z, zoomPoints[2].z), zoom, position};
+	return {ratio, rotation, startZoom: Math.min(zoomPoints[0].z, zoomPoints[2].z), zoom, position};
 };
 
 export const getSnapTweens = (demo, getRatio) => [
 	[
-		({rotation, ratio, fitZoom}) => [{rotation, ratio, zoom: fitZoom, position: 0}],
+		({rotation, ratio, startZoom}) => [{rotation, ratio, zoom: startZoom, position: 0}],
 		({position}) => [{position}],
 		({zoom}) => [{zoom}, {duration: 0}],
 	],
 	{getParam: getSnapVars.bind(null, demo, getRatio)},
 ];
 
+const functions = [
+	{op: 'func', id: 'getAllStartZooms', and: [
+		{op: '=', id: 'offset', type: 'angle', and: {
+			op: 'atan', and: {
+				op: '/', and: [
+					'imageWidth',
+					'imageHeight',
+				],
+			},
+		}},
+		'',
+		{op: '=', id: 'topLeftAngle', type: 'angle', and: {
+			op: '+', and: [
+				'rotation',
+				'offset',
+			],
+		}},
+		{op: '=', id: 'topRightAngle', type: 'angle', and: {
+			op: '-', and: [
+				'rotation',
+				'offset',
+			],
+		}},
+		'',
+		{op: '=', id: 'distance', type: 'position', angle: 'topRightAngle', and: {
+			op: 'root', and: {
+				op: '+', and: [
+					{op: 'pow', and: 'image½Width'},
+					{op: 'pow', and: 'image½Height'},
+				],
+			},
+		}},
+		'',
+		{op: 'return', multiline: true, and: [
+			{op: '/', and: [
+				'viewport½Width',
+				{op: 'abs', and: {
+					op: '*', and: [
+						'distance',
+						{op: 'cos', and: 'topLeftAngle'},
+					],
+				}},
+			]},
+			{op: '/', and: [
+				'viewport½Height',
+				{op: 'abs', and: {
+					op: '*', and: [
+						'distance',
+						{op: 'sin', and: 'topLeftAngle'},
+					],
+				}},
+			]},
+			{op: '/', and: [
+				'viewport½Width',
+				{op: 'abs', and: {
+					op: '*', and: [
+						'distance',
+						{op: 'cos', and: 'topRightAngle'},
+					],
+				}},
+			]},
+			{op: '/', and: [
+				'viewport½Height',
+				{op: 'abs', and: {
+					op: '*', and: [
+						'distance',
+						{op: 'sin', and: 'topRightAngle'},
+					],
+				}},
+			]},
+		]},
+	]},
+	{op: 'func', id: 'getStartZooms', and: [
+		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], and: {
+			op: 'call', id: 'getAllStartZooms',
+		}},
+		'',
+		{op: 'return', multiline: true, and: [
+			{op: 'min', and: ['topLeftX', 'topRightX']},
+			{op: 'min', and: ['topLeftY', 'topRightY']},
+		]},
+	]},
+	{op: 'func', id: 'getViewportPoints', args: ['zoomSide', 'zoomBase'], and: [
+		{op: '=', id: 'rightX', and: {
+			op: '/', and: [
+				'viewport½Width',
+				'zoomSide',
+			],
+		}},
+		{op: '=', id: 'topY', and: {
+			op: '/', and: [
+				'viewport½Height',
+				'zoomBase',
+			],
+		}},
+		'',
+		{op: '=', id: 'rightTheta', and: {
+			op: '-', and: [
+				'½π',
+				'rotation',
+			],
+		}},
+		{op: '=', id: 'topTheta', and: {
+			op: '+', and: [
+				'rightTheta',
+				'½π',
+			],
+		}},
+		'',
+		{op: 'return', multiline: true, and: [
+			{op: '/', and: [
+				{op: '*', and: [
+					'rightX',
+					{op: 'cos', and: 'rightTheta'},
+				]},
+				'imageWidth',
+			]},
+			{op: '/', and: [
+				{op: '*', and: [
+					'rightX',
+					{op: 'sin', and: 'rightTheta'},
+				]},
+				'imageHeight',
+			]},
+			{op: '/', and: [
+				{op: '*', and: [
+					'topY',
+					{op: 'cos', and: 'topTheta'},
+				]},
+				'imageWidth',
+			]},
+			{op: '/', and: [
+				{op: '*', and: [
+					'topY',
+					{op: 'sin', and: 'topTheta'},
+				]},
+				'imageHeight',
+			]},
+		]},
+	]},
+	{op: 'func', id: 'getQuadrantAngle', args: ['isEvenQuadrant'], and: [
+		{op: '=', id: 'angle', and: {
+			op: '%', and: [
+				{op: '+', and: [
+					'rotation',
+					{op: '*', and: [
+						'π',
+						2,
+					]},
+				]},
+				'½π',
+			],
+		}},
+		'',
+		{op: 'if', and: [
+			'isEvenQuadrant',
+			{op: 'return', and: 'angle'},
+		]},
+		'',
+		{op: 'return', and: {
+			op: '-', and: [
+				'½π',
+				'angle',
+			],
+		}},
+	]},
+	{op: 'func', id: 'getIntersection', args: ['viewportX', 'viewportY', 'axisY', 'cornerX', 'axisZoom'], and: [
+		{op: '=', id: 'c', and: {
+			op: '*', and: ['cornerX', 'axisY'],
+		}},
+		'',
+		{op: '=', id: 'd', and: {
+			op: '-', and: [
+				{op: '*', and: [{op: '-', and: 'viewportY'}, 'cornerX']},
+				{op: '*', and: ['viewportX', {op: '-', and: ['axisY', 0.5]}]},
+			],
+		}},
+		'',
+		{op: '=', id: 'intersectX', and: {
+			op: '/', and: [
+				{op: '*', and: [{op: '-', and: 'viewportX'}, 'c']},
+				'd',
+			],
+		}},
+		{op: '=', id: 'intersectY', and: {
+			op: '/', and: [
+				{op: '*', and: [{op: '-', and: 'viewportY'}, 'c']},
+				'd',
+			],
+		}},
+		'',
+		{op: '=', id: 'progress', and: {
+			op: '/', and: ['intersectX', 'cornerX'],
+		}},
+		'',
+		{op: 'return', and: [
+			'intersectX',
+			'intersectY',
+			{op: '/', and: [
+				'axisZoom',
+				{op: '-', and: [1, 'progress']},
+			]},
+			'axisY',
+		]},
+	]},
+	{op: 'func', id: 'getCloseIntersection', args: ['rightX', 'rightY', 'topX', 'topY', 'axisY', 'axisZoom', 'isLeft'], and: [
+		{op: '=', id: 'cornerX', and: {
+			op: '?', and: [
+				'isLeft',
+				-0.5,
+				0.5,
+			],
+		}},
+		{op: '=', multiline: true, id: ['intersectRightX', 'intersectRightY', 'intersectRightZoom', 'intersectRightC'], and: {
+			op: 'call', id: 'getIntersection', and: ['rightX', 'rightY', 'axisY', 'cornerX', 'axisZoom'],
+		}},
+		{op: '=', multiline: true, id: ['intersectTopX', 'intersectTopY', 'intersectTopZoom', 'intersectTopC'], and: {
+			op: 'call', id: 'getIntersection', and: ['topX', 'topY', 'axisY', 'cornerX', 'axisZoom'],
+		}},
+		'',
+		{op: 'if', and: [
+			{op: '>', and: ['intersectRightZoom', 'intersectTopZoom']},
+			{op: 'return', and: ['intersectRightX', 'intersectRightY', 'intersectRightZoom', 'intersectRightC', 'rightX', 'rightY']},
+		]},
+		'',
+		{op: 'return', and: ['intersectTopX', 'intersectTopY', 'intersectTopZoom', 'intersectTopC', 'topX', 'topY']},
+	]},
+	{op: 'func', id: 'getZoomPoints', and: [
+		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
+			op: 'call', id: 'getStartZooms',
+		}},
+		{op: '=', id: 'angle', type: 'angle', and: {
+			op: '%', and: [
+				{op: '-', and: [
+					'½π',
+					'rotation',
+				]},
+				'π',
+			],
+		}},
+		'',
+		{op: '=', id: ['rightX', 'rightY', 'topX', 'topY'], and: {
+			op: 'call', id: 'getViewportPoints', and: ['zoomSide', 'zoomBase'],
+		}},
+		'',
+		{op: '=', id: 'isEvenQuadrant', and: {
+			op: '!=', and: [
+				{op: '%', and: [
+					{op: 'floor', and: {
+						op: '/', and: [
+							'rotation',
+							'½π',
+						],
+					}},
+					2,
+				]},
+				0,
+			],
+		}},
+		{op: '=', id: 'quadrantAngle', type: 'angle', and: {
+			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
+		}},
+		'',
+		{op: '=', id: 'progress', and: {
+			op: '+', and: [
+				{op: '*', and: [
+					{op: '/', and: [
+						'quadrantAngle',
+						'½π',
+					]},
+					-2,
+				]},
+				1,
+			],
+		}},
+		{op: '=', id: 'angleBase', type: 'angle', and: {
+			op: 'atan', and: {
+				op: '*', and: [
+					'progress',
+					{op: '/', and: [
+						'viewportWidth',
+						'viewportHeight',
+					]},
+				],
+			},
+		}},
+		{op: '=', id: 'angleSide', type: 'angle', and: {
+			op: 'atan', and: {
+				op: '*', and: [
+					'progress',
+					{op: '/', and: [
+						'viewportHeight',
+						'viewportWidth',
+					]},
+				],
+			},
+		}},
+		'',
+		{op: '=', id: 'axisIntersectSideAngle', and: {
+			op: '+', and: ['quadrantAngle', 'angleSide'],
+		}},
+		{op: '=', id: 'axisIntersectSideY', and: {
+			op: '/', and: [
+				{op: '-', and: [
+					'image½Height',
+					{op: '*', and: [
+						'image½Width',
+						{op: 'tan', and: 'axisIntersectSideAngle'},
+					]},
+				]},
+				'imageHeight',
+			],
+		}},
+		{op: '=', id: 'axisIntersectSideZoom', and: {
+			op: '/', and: [
+				'viewport½Width',
+				{op: '*', and: [
+					{op: 'cos', and: 'angleSide'},
+					{op: 'abs', and: {
+						op: '/', and: [
+							'image½Width',
+							{op: 'cos', and: 'axisIntersectSideAngle'},
+						],
+					}},
+				]},
+			],
+		}},
+		'',
+		{op: '=', id: 'axisIntersectBaseAngle', and: {
+			op: '-', and: ['½π', 'quadrantAngle', 'angleBase'],
+		}},
+		{op: '=', id: 'axisIntersectBaseY', and: {
+			op: '/', and: [
+				{op: '-', and: [
+					'image½Height',
+					{op: '*', and: [
+						'image½Width',
+						{op: 'tan', and: 'axisIntersectBaseAngle'},
+					]},
+				]},
+				'imageHeight',
+			],
+		}},
+		{op: '=', id: 'axisIntersectBaseZoom', and: {
+			op: '/', and: [
+				'viewport½Height',
+				{op: '*', and: [
+					{op: 'cos', and: 'angleBase'},
+					{op: 'abs', and: {
+						op: '/', and: [
+							'image½Width',
+							{op: 'cos', and: 'axisIntersectBaseAngle'},
+						],
+					}},
+				]},
+			],
+		}},
+		'',
+		{op: '=', multiline: true, id: ['intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideC', 'intersectSideEndX', 'intersectSideEndY'], and: {
+			op: 'call', id: 'getCloseIntersection', and: ['rightX', 'rightY', 'topX', 'topY', 'axisIntersectSideY', 'axisIntersectSideZoom', 'isEvenQuadrant'],
+		}},
+		{op: '=', multiline: true, id: ['intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseC', 'intersectBaseEndX', 'intersectBaseEndY'], and: {
+			op: 'call', id: 'getCloseIntersection', and: ['rightX', 'rightY', 'topX', 'topY', 'axisIntersectBaseY', 'axisIntersectBaseZoom', {op: '!', and: 'isEvenQuadrant'}],
+		}},
+		'',
+		{op: 'if', and: [
+			'isEvenQuadrant',
+			{op: 'return', and: ['zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideC', 'intersectSideEndX', 'intersectSideEndY', 'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseC', 'intersectBaseEndX', 'intersectBaseEndY']},
+		]},
+		'',
+		{op: 'return', and: ['zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseC', 'intersectBaseEndX', 'intersectBaseEndY', 'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideC', 'intersectSideEndX', 'intersectSideEndY']},
+	]},
+];
+
 export default (wrapper) => {
 	const demo = new Demo();
+	
+	registerDemo(demo);
+	registerFunctions(demo, functions);
 	
 	const getTraceVars = getVarGetter(demo, DEGREES[90] - 0.4, 0.75);
 	const getDirectVars = getVarGetter(demo, DEGREES[90] - 0.4);
@@ -131,21 +509,11 @@ export default (wrapper) => {
 				content: 'Pan-Limit Maths',
 				style: {textAlign: 'center'},
 			},
-			getCode(
-				'function getRotated(x, y, angle):',
-				['  distance = √(x', {tag: 'sup', content: '2'}, ' + y', {tag: 'sup', content: '2'}, ')'],
-				['  theta = tan', {tag: 'sup', content: '-1'}, '(y ÷ x) + angle'],
-				'',
-				'  return {',
-				'    x: distance × cos(theta) / imageWidth,',
-				'    y: distance × sin(theta) / imageHeight',
-				'  }',
-				'',
-				'angle = (π ÷ 2 - rotation) mod π',
-				'',
-				'right = getRotated(viewportWidth ÷ 2 ÷ fitZoom[0], 0, angle)',
-				'top = getRotated(0, viewportHeight ÷ 2 ÷ fitZoom[1], angle)',
-			),
+			getCode([
+				{op: '=', multiline: true, id: ['originZoom0', 'x0', 'y0', 'zoom0', 'c0', 'endX0', 'endY0', 'originZoom1', 'x1', 'y1', 'zoom1', 'c1', 'endX1', 'endY1'], and: {
+					op: 'call', id: 'getZoomPoints',
+				}},
+			]),
 			{
 				tag: 'h2',
 				content: 'Pan-Limit Effectiveness',

@@ -3,7 +3,24 @@ import Tangents from '@/demo/lines/tangents';
 import Bounds from '@/demo/bounds';
 
 import {getTheta} from '@/shared';
-import {getRotatedCorners} from './shared';
+
+const getCornerDistance = ({halfWidth, halfHeight}) => Math.sqrt(Math.pow(halfWidth, 2) + Math.pow(halfHeight, 2));
+
+export const getAllStartZooms = (rotation, viewport, image, radius = getCornerDistance(image), offset = getTheta(image.height, image.width)) => {
+	const angle0 = rotation + offset;
+	const angle1 = rotation - offset;
+	
+	return [
+		{
+			x: viewport.halfWidth / Math.abs(radius * Math.cos(angle0)),
+			y: viewport.halfHeight / Math.abs(radius * Math.sin(angle0)),
+		},
+		{
+			x: viewport.halfWidth / Math.abs(radius * Math.cos(angle1)),
+			y: viewport.halfHeight / Math.abs(radius * Math.sin(angle1)),
+		},
+	];
+};
 
 export default class extends Demo {
 	bounds = new Bounds(this);
@@ -20,10 +37,8 @@ export default class extends Demo {
 	updateImageDimensions(doApply = true) {
 		super.updateImageDimensions(false);
 		
-		const {halfWidth, halfHeight} = this.imageDimensions;
-		
-		this.cornerDistance = Math.sqrt(Math.pow(halfWidth, 2) + Math.pow(halfHeight, 2));
-		this.cornerAngle = getTheta(halfWidth, halfHeight);
+		this.cornerAngle = Math.atan(this.ratioImage);
+		this.cornerDistance = getCornerDistance(this.imageDimensions);
 		
 		if (doApply) {
 			this.constrainPosition({ratio: true});
@@ -31,12 +46,8 @@ export default class extends Demo {
 		}
 	}
 	
-	getRotatedCorners() {
-		return getRotatedCorners(
-			this.rotation,
-			this.cornerDistance,
-			this.cornerAngle,
-		);
+	getAllStartZooms() {
+		return getAllStartZooms(this.rotation, this.viewportDimensions, this.imageDimensions, this.cornerDistance, this.cornerAngle);
 	}
 	
 	applyZoomPoints() {

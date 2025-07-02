@@ -6,11 +6,17 @@ import {Connection} from './lines';
 import {getLineX, getLineY} from '@/pages/rotation/shared';
 
 const getEnd = ({isHigh, isSide}, line) => {
-	if (isSide) {
-		return isHigh ? {x: 0.5, y: getLineY(line, 0.5)} : {x: -0.5, y: getLineY(line, -0.5)};
+	const fixed = isHigh ? 0.5 : -0.5;
+	const derived = (isSide ? getLineY : getLineX)(line, fixed);
+	const [fixedProp, derivedProp] = isSide ? ['x', 'y'] : ['y', 'x'];
+	
+	if (Math.abs(derived) <= 0.5) {
+		return {[fixedProp]: fixed, [derivedProp]: derived};
 	}
 	
-	return isHigh ? {y: 0.5, x: getLineX(line, 0.5)} : {y: -0.5, x: getLineX(line, -0.5)};
+	const limited = 0.5 * Math.sign(derived);
+	
+	return {[derivedProp]: limited, [fixedProp]: (isSide ? getLineX : getLineY)(line, limited)};
 };
 
 class Tangent extends Connection {

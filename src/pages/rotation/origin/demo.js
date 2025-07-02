@@ -5,6 +5,7 @@ import {getConstrainerFromPoints, isAbove, getProgressedLine, getIntersectProgre
 
 import {CORNERS} from '@/pages/consts';
 
+// todo tangents & rails are fucked for 1d bounds
 const getBound = (zoom, point, isTopLeft) => {
 	if (zoom <= point.z) {
 		return false;
@@ -43,6 +44,26 @@ const getSnappedZoom = (_point0, point1, {x, y}) => {
 	return p >= 0 ? z / (1 - p) : z;
 };
 
+const getRailProgresses = [
+	() => [0, 0],
+	({x, y}) => {
+		const progress = Math.abs(y) / 0.5;
+		
+		return (x > 0) === (y > 0) ? [0, progress] : [progress, 0];
+	},
+	(bounds) => {
+		const progresses = [];
+		
+		for (const {y} of bounds) {
+			if (y > 0) {
+				progresses.push(y / 0.5);
+			}
+		}
+		
+		return progresses;
+	},
+];
+
 export default class extends Demo {
 	rails = new Rails(2, this, false, false, true);
 	
@@ -54,11 +75,7 @@ export default class extends Demo {
 	}
 	
 	setRailsProgress(bounds) {
-		if (bounds.length === 0) {
-			this.rails.setProgress(0, 0);
-		} else {
-			this.rails.setProgress(...bounds.filter(({y}) => y > 0).map(({y}) => [y / 0.5]));
-		}
+		this.rails.setProgress(...getRailProgresses[bounds.length / 2](bounds));
 	}
 	
 	getPositionConstrainer() {
@@ -70,9 +87,7 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		const {width, height} = this.viewportDimensions;
-		
-		return this.getRotatedCorners().map(({x, y}) => ({x: 0, y: 0, z: 0.5 / Math.max(x / width, y / height)}));
+		return this.getAllStartZooms().map(({x, y}) => ({x: 0, y: 0, z: Math.min(x, y)}));
 	}
 	
 	getSnappedZoom() {

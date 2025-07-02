@@ -2,19 +2,24 @@ import {addRule} from '@css';
 
 import {CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION, CLASS_MATH} from './consts';
 
-addRule(`.${CLASS_CODE}`, {
-	'line-height': 'normal',
-	'background-color': '#3c3448',
+addRule([`.${CLASS_CODE}`, `.${CLASS_MATH}`], {
 	'box-shadow': 'white 0 0 2px',
 	'border-radius': '10px',
+});
+
+addRule(`.${CLASS_CODE}`, {
+	'line-height': 'normal',
+	'background-color': '#343a45',
 	position: 'relative',
 });
 
+// header
+// todo delete?
 addRule(`.${CLASS_CODE} > div`, {
 	'font-size': '1.5em',
 	padding: '7px 1em',
 	'text-align': 'center',
-	'box-shadow': 'white 0 0 2px',
+	'box-shadow': 'inherit',
 	'background-color': 'rgb(0 0 0 / 10%)',
 });
 
@@ -22,17 +27,15 @@ addRule(`.${CLASS_CODE} > code`, {
 	'overflow-x': 'auto',
 	padding: '10px 1em',
 	'font-family': 'consolas, monospace',
-	'line-height': 'normal',
 	display: 'block',
 	'white-space': 'pre',
 });
 
 addRule(`.${CLASS_CODE} br + br + br, br:last-child`, {display: 'none'});
 
-addRule(`.${CLASS_WRAPPER} .${CLASS_MATH}`, {
+addRule(`.${CLASS_MATH}`, {
 	'text-align': 'center',
-	border: '8px double currentcolor',
-	'border-radius': '10px',
+	'background-color': '#372d2d',
 });
 
 addRule(`.${CLASS_MATH} math`, {

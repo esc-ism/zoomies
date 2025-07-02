@@ -7,29 +7,27 @@ const addKeywordPseudoRule = (selector, content, display = 'inline') => addRule(
 
 // infix binary ops
 for (const [name, content = name] of [
+	['?'],
+	[':'],
 	['='],
 	['<'],
 	['>'],
 	['<=', '⩽'],
 	['>=', '⩾'],
 	['!=', '≠'],
+	['+'],
+	['-'],
+	['*', '×'],
+	['/', '÷'],
+	['%', 'mod'],
 ]) {
 	addPseudoRule(`.${CLASS_NAMES[name]}::after`, ` ${content} `);
 }
 
 addPseudoRule(`.${CLASS_NAMES.negative}::before`, '-');
+addPseudoRule(`.${CLASS_NAMES['!']}::before`, '!');
 addKeywordPseudoRule(`.${CLASS_NAMES.return}::after`, 'return ');
 addKeywordPseudoRule(`.${CLASS_NAMES.func}::after`, 'function');
-
-// infix binary ops
-for (const [name, content = name] of [
-	['+'],
-	['-'],
-	['*', '×'],
-	['/', '÷'],
-]) {
-	addPseudoRule(`.${CLASS_NAMES[name]}:has(+ .${CLASS_NAMES[name]})::after`, ` ${content} `);
-}
 
 addPseudoRule(`.${CLASS_NAMES.csv}:has(+ .${CLASS_NAMES.csv})::after`, ', ');
 
@@ -46,7 +44,7 @@ for (const [name, before, after = before] of [
 }
 
 // functions
-for (const name of ['max', 'sin', 'cos', 'tan']) {
+for (const name of ['floor', 'min', 'max', 'sin', 'cos', 'tan']) {
 	addPseudoRule(`.${CLASS_NAMES[name]}::before`, `${name}`);
 }
 

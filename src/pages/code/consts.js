@@ -5,9 +5,16 @@ export const BUILT_INS = {
 	imageHeight: ({imageDimensions: {height: value}}) => ({value, type: 'y', showRotation: false}),
 	
 	viewportWidth: ({viewportDimensions: {width: value}}) => ({value, type: 'xvp', showRotation: false}),
-	viewportHeight: ({viewportDimensions: {height: value}}) => ({value, type: 'yvp', length, showRotation: false}),
+	viewportHeight: ({viewportDimensions: {height: value}}) => ({value, type: 'yvp', showRotation: false}),
 	
-	π: () => ({value: Math.PI}),
+	'image½Width': ({imageDimensions: {halfWidth: value}}) => ({value, type: 'x', showRotation: false}),
+	'image½Height': ({imageDimensions: {halfHeight: value}}) => ({value, type: 'y', showRotation: false}),
+	
+	'viewport½Width': ({viewportDimensions: {halfWidth: value}}) => ({value, type: 'xvp', showRotation: false}),
+	'viewport½Height': ({viewportDimensions: {halfHeight: value}}) => ({value, type: 'yvp', showRotation: false}),
+	
+	π: () => ({value: Math.PI, type: 'angle'}),
+	'½π': () => ({value: Math.PI / 2, type: 'angle'}),
 	
 	x: ({position: {x}}) => ({value: x}),
 	y: ({position: {y}}) => ({value: y}),
@@ -26,12 +33,17 @@ export const CLASS_NAMES = {
 	'=': getId('assign'),
 	array: getId('array'),
 	if: getId('if'),
+	'?': getId('question'),
+	':': getId('colon'),
+	'!': getId('not'),
 	'<=': getId('le'),
 	'>=': getId('ge'),
 	'<': getId('l'),
 	'>': getId('g'),
 	'!=': getId('ne'),
 	abs: getId('abs'),
+	floor: getId('floor'),
+	min: getId('min'),
 	max: getId('max'),
 	sin: getId('sin'),
 	cos: getId('cos'),

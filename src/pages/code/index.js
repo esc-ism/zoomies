@@ -7,13 +7,13 @@ import {BUILT_INS, CLASS_NAMES} from './consts';
 
 import './css';
 
+let init;
 let demo;
-let globalScope = {};
-
-const functions = {};
+let globalScope;
+let functions;
 const visuals = [];
 
-const getRoundedString = (number, pow = 3) => {
+const getRoundedString = (number, pow = 4) => {
 	const mult = Math.pow(10, pow);
 	
 	return Math.round(number * mult) / mult;
@@ -23,11 +23,7 @@ const arrayify = (arg) => Array.isArray(arg) ? arg : [arg];
 
 const refreshParams = [];
 
-export const reset = (newDemo) => {
-	if (newDemo) {
-		demo = newDemo;
-	}
-	
+const reset = () => {
 	globalScope = Object.fromEntries(Object.entries(BUILT_INS).map(([id, getValue]) => [id, getValue(demo)]));
 	
 	for (const visual of visuals) {
@@ -47,48 +43,48 @@ const getIndents = (depth) => {
 	return elements;
 };
 
-export const register = (statement, ...remaining) => {
-	functions[statement.id] = (args, scope, indent, meta) => {
-		const funcWrapper = getElement(CLASS_NAMES.clause);
-		const funcElement = getElement(CLASS_NAMES.func);
-		const argsElement = getElement(CLASS_NAMES.params);
-		const body = document.createElement('div');
-		
-		for (const [i, argId] of statement.args?.entries() ?? []) {
-			if (typeof args[i] === 'string') {
-				scope[argId] = scope[args[i]];
-			} else {
-				scope[argId] = {value: args[i]};
+export const register = (newDemo, statements) => {
+	demo = newDemo;
+	
+	functions = Object.fromEntries(statements.map((statement) => [
+		statement.id,
+		(args, scope, indent, meta) => {
+			const funcWrapper = getElement(CLASS_NAMES.clause);
+			const funcElement = getElement(CLASS_NAMES.func);
+			const argsElement = getElement(CLASS_NAMES.params);
+			const body = document.createElement('div');
+			
+			for (const [i, argId] of statement.args?.entries() ?? []) {
+				const wrapper = getElement(CLASS_NAMES.csv);
+				const arg = getElement(CLASS_NAMES.id);
+				const value = args.values[i];
+				
+				scope[argId] = {value: typeof value === 'string' ? scope[value] : value, element: arg};
+				
+				makeHoverable(arg, argId, scope, ...args.unwrapped[i]);
+				
+				arg.innerText = argId;
+				
+				wrapper.appendChild(arg);
+				argsElement.appendChild(wrapper);
 			}
 			
-			const wrapper = getElement(CLASS_NAMES.csv);
-			const arg = getElement(CLASS_NAMES.id);
+			const {active} = meta;
 			
-			makeHoverable(arg, argId, scope);
+			generate(body, statement.and, scope, indent + 1, meta);
 			
-			arg.innerText = argId;
+			funcWrapper.append(funcElement, argsElement, body);
 			
-			wrapper.appendChild(arg);
-			argsElement.appendChild(wrapper);
-		}
-		
-		const {active} = meta;
-		
-		generate(body, statement.and, scope, indent + 1, meta);
-		
-		funcWrapper.append(funcElement, argsElement, body);
-		
-		const value = meta.return;
-		
-		delete meta.return;
-		meta.active = active;
-		
-		return {value, wrapper: funcWrapper, target: funcElement};
-	};
+			const value = meta.return;
+			
+			delete meta.return;
+			meta.active = active;
+			
+			return {value, wrapper: funcWrapper, target: funcElement};
+		},
+	]));
 	
-	if (remaining.length > 0) {
-		register(...remaining);
-	}
+	init = demo.init().then(() => reset());
 };
 
 const getElement = (...classes) => {
@@ -110,14 +106,12 @@ const getCombiner = (() => {
 			if (elements.length === 0) {
 				value = result.value;
 			} else {
+				elements.push(getElement(CLASS_NAMES[statement.op]));
+				
 				value = combiner(value, result.value);
 			}
 			
-			const wrapper = getElement(CLASS_NAMES[statement.op]);
-			
-			wrapper.append(...result.elements);
-			
-			elements.push(wrapper);
+			elements.push(...result.elements);
 		}
 		
 		return {value, elements};
@@ -141,20 +135,11 @@ const getCombiner = (() => {
 const getFunction = (getValue) => (statement, scope, indent, meta) => {
 	const func = getElement(CLASS_NAMES[statement.op], CLASS_NAMES.evocation);
 	const args = getElement(CLASS_NAMES.args);
+	const csvs = getCsvs(statement, scope, indent, meta);
 	
-	const values = arrayify(statement.and).reduce((values, statement) => {
-		const wrapper = getElement(CLASS_NAMES.csv);
-		const {value, elements} = interpret(statement, scope, indent, meta);
-		
-		wrapper.append(...elements);
-		args.appendChild(wrapper);
-		
-		values.push(value);
-		
-		return values;
-	}, []);
+	args.append(...csvs.elements);
 	
-	return {value: getValue(...values), elements: [func, args]};
+	return {value: getValue(...csvs.values), elements: [func, args]};
 };
 
 const getInverseFunction = (getValue) => {
@@ -172,12 +157,43 @@ const getInverseFunction = (getValue) => {
 	};
 };
 
-const getComparater = (comparater) => (statement, scope, indent, meta) => {
-	const element = getElement(CLASS_NAMES[statement.op]);
+const getCsvs = (statement, scope, indent, meta, property = 'and') => {
+	if (!(property in statement)) {
+		return {elements: []};
+	}
 	
-	const results = statement.and.map((subStatement) => interpret(subStatement, scope, indent, meta));
+	const unwrapped = [];
+	const elements = [];
+	const values = [];
 	
-	return {value: comparater(...results.map(({value}) => value)), elements: [...results[0].elements, element, ...results[1].elements]};
+	const {multiline = false} = statement;
+	
+	if (multiline) {
+		elements.push(document.createElement('br'));
+	}
+	
+	for (const result of arrayify(statement[property]).map((statement) => interpret(statement, scope, indent + multiline, meta))) {
+		const wrapper = getElement(CLASS_NAMES.csv);
+		
+		if (multiline) {
+			wrapper.append(...getIndents(indent + 1));
+			
+			wrapper.style.display = 'block';
+		}
+		
+		unwrapped.push(result.elements);
+		
+		wrapper.append(...result.elements);
+		elements.push(wrapper);
+		
+		values.push(result.value);
+	}
+	
+	if (multiline) {
+		elements.push(...getIndents(indent));
+	}
+	
+	return {values, elements, unwrapped};
 };
 
 const getLine = (demo, length, rotation) => {
@@ -211,7 +227,7 @@ const visualisers = {
 	},
 };
 
-const makeHoverable = (element, id, scope) => {
+const makeHoverable = (element, id, scope, ...sources) => {
 	if ('return' in scope) {
 		return false;
 	}
@@ -222,12 +238,21 @@ const makeHoverable = (element, id, scope) => {
 	element.style.cursor = 'pointer';
 	
 	if (id && 'value' in scope[id]) {
-		element.setAttribute('title', getRoundedString(scope[id].value));
+		if (typeof scope[id].value === 'boolean') {
+			element.setAttribute('title', scope[id].value);
+		} else if ('type' in scope[id] && scope[id].type === 'angle') {
+			element.setAttribute('title', `${getRoundedString(scope[id].value / Math.PI)}π`);
+		} else {
+			element.setAttribute('title', getRoundedString(scope[id].value));
+		}
 	}
 	
 	element.addEventListener('mouseenter', () => {
 		element.classList.add(CLASS_NAMES.hovered);
 		
+		for (const source of sources) {
+			source.classList.add(CLASS_NAMES.hovered);
+		}
 		// for (const visual of visuals) {
 		// 	visual.show();
 		// }
@@ -235,6 +260,10 @@ const makeHoverable = (element, id, scope) => {
 	
 	element.addEventListener('mouseout', () => {
 		element.classList.remove(CLASS_NAMES.hovered);
+		
+		for (const source of sources) {
+			source.classList.remove(CLASS_NAMES.hovered);
+		}
 	});
 	
 	return true;
@@ -250,7 +279,15 @@ const interpretters = {
 		
 		element.innerText = id;
 		
-		makeHoverable(element, id, scope);
+		const sources = 'element' in scope[id] ? [scope[id].element] : [];
+		
+		makeHoverable(element, id, scope, ...sources);
+		
+		if (scope[id].pending) {
+			scope[id].element = element;
+			
+			delete scope[id].pending;
+		}
 		
 		return {value: scope[id].value, elements: [element]};
 	},
@@ -262,47 +299,32 @@ const interpretters = {
 		return {value, elements: [element]};
 	},
 	'=': (statement, scope, indent, meta) => {
-		const ids = arrayify(statement.id);
-		
-		const idElements = [];
-		
 		const {value, elements: operand} = interpret(statement.and, scope, indent, meta);
 		const values = arrayify(value);
 		
-		for (const [i, id] of ids.entries()) {
-			const idElement = getElement(CLASS_NAMES.id);
-			
-			idElement.innerText = id;
-			
-			scope[id] = {value: values[i]};
+		for (const [i, id] of arrayify(statement.id).entries()) {
+			scope[id] = {value: values[i], pending: true};
 			
 			if ('type' in statement) {
 				scope[id].type = statement.type;
 			}
-			
-			makeHoverable(idElement, id, scope);
-			
-			idElements.push(idElement);
 		}
 		
-		if (ids.length === 1) {
-			return {elements: [idElements[0], getElement(CLASS_NAMES['=']), ...operand]};
+		const csvs = getCsvs(statement, scope, indent, meta, 'id');
+		
+		if (!Array.isArray(statement.id)) {
+			return {elements: [...csvs.elements, getElement(CLASS_NAMES['=']), ...operand]};
 		}
 		
 		const idWrapper = getElement(CLASS_NAMES.array);
 		
-		for (const element of idElements) {
-			const wrapper = getElement(CLASS_NAMES.csv);
-			
-			wrapper.appendChild(element);
-			idWrapper.appendChild(wrapper);
-		}
+		idWrapper.append(...csvs.elements);
 		
 		return {elements: [idWrapper, getElement(CLASS_NAMES['=']), ...operand]};
 	},
-	'+': getCombiner((a, b) => a + b, ['*', '/']),
+	'+': getCombiner((a, b) => a + b, ['%', '*', '/']),
 	'-': (() => {
-		const combiner = getCombiner((a, b) => a - b, ['*', '/']);
+		const combiner = getCombiner((a, b) => a - b, ['%', '*', '/']);
 		
 		return (statement, scope, indent, meta) => {
 			if (!Array.isArray(statement.and)) {
@@ -318,24 +340,32 @@ const interpretters = {
 			return combiner(statement, scope, indent, meta);
 		};
 	})(),
-	'*': getCombiner((a, b) => a * b, ['/']),
-	'/': getCombiner((a, b) => a / b),
-	'<=': getComparater((a, b) => a <= b),
-	'>=': getComparater((a, b) => a >= b),
-	'<': getComparater((a, b) => a < b),
-	'>': getComparater((a, b) => a > b),
-	'!=': getComparater((a, b) => a !== b),
+	'!': (statement, scope, indent, meta) => {
+		const element = getElement(CLASS_NAMES['!']);
+		
+		const {value, elements: operand} = interpret(statement.and, scope, indent, meta);
+		
+		element.append(...operand);
+		
+		return {value: !value, elements: [element]};
+	},
+	'*': getCombiner((a, b) => a * b, ['%', '/']),
+	'/': getCombiner((a, b) => a / b, ['%']),
+	'<=': getCombiner((a, b) => a <= b),
+	'>=': getCombiner((a, b) => a >= b),
+	'<': getCombiner((a, b) => a < b),
+	'>': getCombiner((a, b) => a > b),
+	'!=': getCombiner((a, b) => a !== b),
+	'%': getCombiner((a, b) => a % b, ['*', '/', '+', '-', '<=', '>=', '<', '>', '!=']),
 	if: (statement, scope, indent, meta) => {
 		const elements = {
-			header: getElement(CLASS_NAMES.if),
+			condition: getElement(CLASS_NAMES.if),
 			body: document.createElement('div'),
 		};
 		
-		elements.header.classList.add(CLASS_NAMES.if);
+		const {value, elements: conditionElements} = interpret(statement.and[0], scope, indent, meta);
 		
-		const {value, elements: headerElements} = interpret(statement.and[0], scope, indent, meta);
-		
-		elements.header.append(...headerElements);
+		elements.condition.append(...conditionElements);
 		
 		const {active} = meta;
 		
@@ -349,9 +379,30 @@ const interpretters = {
 			meta.active = true;
 		}
 		
-		elements.header.classList.add(CLASS_NAMES.branch[value ? 'accept' : 'reject']);
+		elements.condition.classList.add(CLASS_NAMES.branch[value ? 'accept' : 'reject']);
 		
-		return {value, elements: [elements.header, document.createElement('br'), elements.body]};
+		return {value, elements: [elements.condition, document.createElement('br'), elements.body]};
+	},
+	'?': (statement, scope, indent, meta) => {
+		const {value: conditionValue, elements: conditionElements} = interpret(statement.and[0], scope, indent, meta);
+		const {value: truthyValue, elements: truthyElements} = interpret(statement.and[1], scope, indent, {...meta, active: meta.active && conditionValue});
+		const {value: falsyValue, elements: falsyElements} = interpret(statement.and[2], scope, indent, {...meta, active: meta.active && !conditionValue});
+		
+		const conditionWrapper = getElement(CLASS_NAMES.branch[conditionValue ? 'accept' : 'reject']);
+		
+		conditionWrapper.append(...conditionElements);
+		
+		for (const element of (conditionValue ? falsyElements : truthyElements)) {
+			element.classList.add(CLASS_NAMES.inactive);
+		}
+		
+		return {value: conditionValue ? truthyValue : falsyValue, elements: [
+			conditionWrapper,
+			getElement(CLASS_NAMES['?']),
+			...truthyElements,
+			getElement(CLASS_NAMES[':']),
+			...falsyElements,
+		]};
 	},
 	abs: (statement, scope, indent, meta) => {
 		const element = getElement(CLASS_NAMES.abs);
@@ -362,6 +413,8 @@ const interpretters = {
 		
 		return {value: Math.abs(value), elements: [element]};
 	},
+	floor: getFunction(Math.floor),
+	min: getFunction(Math.min),
 	max: getFunction(Math.max),
 	sin: getFunction(Math.sin),
 	cos: getFunction(Math.cos),
@@ -404,20 +457,11 @@ const interpretters = {
 		
 		id.innerText = statement.id;
 		
-		const values = [];
+		const csvs = getCsvs(statement, scope, indent, meta);
 		
-		for (const arg of statement.and ?? []) {
-			const wrapper = getElement(CLASS_NAMES.csv);
-			
-			const {value, elements: [element]} = interpret(arg, scope, indent, meta);
-			
-			values.push(value);
-			
-			wrapper.appendChild(element);
-			args.appendChild(wrapper);
-		}
+		args.append(...csvs.elements);
 		
-		const expansion = functions[statement.id](values, {...scope}, indent, meta);
+		const expansion = functions[statement.id](csvs, {...scope}, indent, meta);
 		
 		if (makeHoverable(id, undefined, scope)) {
 			makeHoverable(expansion.target, undefined, scope);
@@ -451,18 +495,11 @@ const interpretters = {
 			value = result.value;
 		} else {
 			const array = getElement(CLASS_NAMES.array);
+			const csvs = getCsvs(statement, scope, indent, meta);
 			
-			value = [];
+			value = csvs.values;
 			
-			for (const result of statement.and.map((statement) => interpret(statement, scope, indent, meta))) {
-				const wrapper = getElement(CLASS_NAMES.csv);
-				
-				wrapper.append(...result.elements);
-				array.appendChild(wrapper);
-				
-				value.push(result.value);
-			}
-			
+			array.append(...csvs.elements);
 			elements.push(array);
 		}
 		
@@ -486,7 +523,7 @@ const interpret = (statement, scope, indent, meta) => {
 	return result;
 };
 
-export const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {branch: [], active: true}) => {
+const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {branch: [], active: true}) => {
 	if (indent === 0) {
 		for (let i = parent.children.length - 1; i >= 0; --i) {
 			parent.children[i].remove();
@@ -523,4 +560,14 @@ export const generate = (parent, snippet, scope = globalScope, indent = 0, meta 
 		
 		parent.append(...getIndents(indent), ...elements, document.createElement('br'));
 	}
+	
+	if (indent > 0 && meta.branch[meta.branch.length - 1].id === 'getIntersection') {
+		console.log({...scope});
+	}
+};
+
+export const generateWhenReady = async (parent, statements) => {
+	await init;
+	
+	generate(parent, statements);
 };

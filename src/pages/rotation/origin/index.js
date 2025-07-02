@@ -1,7 +1,6 @@
 import Demo from './demo';
 
-import * as code from '@/pages/code';
-
+import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
 
 import {DEGREES, ERROR_ALLOWANCE} from '@/shared';
@@ -106,99 +105,90 @@ const functions = [
 		]},
 		{op: 'return', and: [0.5, -0.5, -0.5, -0.5]},
 	]},
-	{op: 'func', id: 'getCornerZooms', and: [
+	{op: 'func', id: 'getAllStartZooms', and: [
 		{op: '=', id: 'offset', type: 'angle', and: {
-			op: '-', and: [
-				{op: 'atan', and: {
-					op: '/', and: [
-						'imageHeight',
-						'imageWidth',
-					],
-				}},
-				{op: '/', and: [
-					'π',
-					2,
-				]},
-			],
+			op: 'atan', and: {
+				op: '/', and: [
+					'imageWidth',
+					'imageHeight',
+				],
+			},
 		}},
 		'',
 		{op: '=', id: 'topLeftAngle', type: 'angle', and: {
-			op: '-', and: [
+			op: '+', and: [
 				'rotation',
 				'offset',
 			],
 		}},
 		{op: '=', id: 'topRightAngle', type: 'angle', and: {
-			op: '+', and: [
+			op: '-', and: [
 				'rotation',
 				'offset',
 			],
 		}},
 		'',
 		{op: '=', id: 'distance', type: 'position', angle: 'topRightAngle', and: {
-			op: '*', and: [
-				0.5,
-				{op: 'root', and: {
-					op: '+', and: [
-						{op: 'pow', and: 'imageWidth'},
-						{op: 'pow', and: 'imageHeight'},
+			op: 'root', and: {
+				op: '+', and: [
+					{op: 'pow', and: 'image½Width'},
+					{op: 'pow', and: 'image½Height'},
+				],
+			},
+		}},
+		'',
+		{op: 'return', multiline: true, and: [
+			{op: '/', and: [
+				'viewport½Width',
+				{op: 'abs', and: {
+					op: '*', and: [
+						'distance',
+						{op: 'cos', and: 'topLeftAngle'},
 					],
 				}},
-			],
-		}},
-		'',
-		{op: '=', id: 'topLeftX', type: 'x', and: {
-			op: '*', and: [
-				'distance',
-				{op: 'cos', and: 'topLeftAngle'},
-			],
-		}},
-		{op: '=', id: 'topLeftY', type: 'y', and: {
-			op: '*', and: [
-				'distance',
-				{op: 'sin', and: 'topLeftAngle'},
-			],
-		}},
-		'',
-		{op: '=', id: 'topRightX', type: 'x', and: {
-			op: '*', and: [
-				'distance',
-				{op: 'cos', and: 'topRightAngle'},
-			],
-		}},
-		{op: '=', id: 'topRightY', type: 'y', and: {
-			op: '*', and: [
-				'distance',
-				{op: 'sin', and: 'topRightAngle'},
-			],
-		}},
-		'',
-		{op: 'return', and: [
-			{op: '/', and: [
-				0.5,
-				{op: 'max', and: [
-					{op: '/', and: [
-						{op: 'abs', and: 'topLeftX'},
-						'viewportWidth',
-					]},
-					{op: '/', and: [
-						{op: 'abs', and: 'topLeftY'},
-						'viewportHeight',
-					]},
-				]},
 			]},
 			{op: '/', and: [
-				0.5,
-				{op: 'max', and: [
-					{op: '/', and: [
-						{op: 'abs', and: 'topRightX'},
-						'viewportWidth',
-					]},
-					{op: '/', and: [
-						{op: 'abs', and: 'topRightY'},
-						'viewportHeight',
-					]},
-				]},
+				'viewport½Height',
+				{op: 'abs', and: {
+					op: '*', and: [
+						'distance',
+						{op: 'sin', and: 'topLeftAngle'},
+					],
+				}},
+			]},
+			{op: '/', and: [
+				'viewport½Width',
+				{op: 'abs', and: {
+					op: '*', and: [
+						'distance',
+						{op: 'cos', and: 'topRightAngle'},
+					],
+				}},
+			]},
+			{op: '/', and: [
+				'viewport½Height',
+				{op: 'abs', and: {
+					op: '*', and: [
+						'distance',
+						{op: 'sin', and: 'topRightAngle'},
+					],
+				}},
+			]},
+		]},
+	]},
+	{op: 'func', id: 'getStartZooms', and: [
+		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], type: ['zoom', 'zoom', 'zoom', 'zoom'], and: {
+			op: 'call', id: 'getAllStartZooms',
+		}},
+		'',
+		{op: 'return', multiline: true, and: [
+			{op: 'min', and: [
+				'topLeftX',
+				'topLeftY',
+			]},
+			{op: 'min', and: [
+				'topRightX',
+				'topRightY',
 			]},
 		]},
 	]},
@@ -288,8 +278,7 @@ export default (wrapper) => {
 	const demo = new Demo();
 	
 	registerDemo(demo);
-	
-	code.register(...functions);
+	registerFunctions(demo, functions);
 	
 	wrapper.append(
 		demo.element,
@@ -331,7 +320,7 @@ export default (wrapper) => {
 			],
 			getCode([
 				{op: '=', id: ['topLeftZoom', 'topRightZoom'], type: 'zoom', and: {
-					op: 'call', id: 'getCornerZooms',
+					op: 'call', id: 'getStartZooms',
 				}},
 				'',
 				{op: '=', id: ['topLeftX', 'topLeftY'], and: {
@@ -459,25 +448,25 @@ export default (wrapper) => {
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'intersect'},
 									{tag: 'mi', xmlns, content: 'x'},
-									{tag: 'mi', xmlns, content: 'r'},
 								]},
 								{tag: 'mo', xmlns, content: '='},
 								{tag: 'msub', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'x'},
 									{tag: 'mi', xmlns, content: 'start'},
+									{tag: 'mi', xmlns, content: 'x'},
 								]},
 								{tag: 'mo', xmlns, content: '+'},
 								{tag: 'mi', xmlns, content: 'r'},
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'msub', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'x'},
 									{tag: 'mi', xmlns, content: 'end'},
+									{tag: 'mi', xmlns, content: 'x'},
 								]},
 								{tag: 'mo', xmlns, content: '-'},
 								{tag: 'msub', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'x'},
 									{tag: 'mi', xmlns, content: 'start'},
+									{tag: 'mi', xmlns, content: 'x'},
 								]},
 								{tag: 'mo', xmlns, content: ')'},
 							]},
@@ -485,25 +474,25 @@ export default (wrapper) => {
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'intersect'},
 									{tag: 'mi', xmlns, content: 'y'},
-									{tag: 'mi', xmlns, content: 'r'},
 								]},
 								{tag: 'mo', xmlns, content: '='},
 								{tag: 'msub', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'y'},
 									{tag: 'mi', xmlns, content: 'start'},
+									{tag: 'mi', xmlns, content: 'y'},
 								]},
 								{tag: 'mo', xmlns, content: '+'},
 								{tag: 'mi', xmlns, content: 'r'},
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'msub', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'y'},
 									{tag: 'mi', xmlns, content: 'end'},
+									{tag: 'mi', xmlns, content: 'y'},
 								]},
 								{tag: 'mo', xmlns, content: '-'},
 								{tag: 'msub', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'y'},
 									{tag: 'mi', xmlns, content: 'start'},
+									{tag: 'mi', xmlns, content: 'y'},
 								]},
 								{tag: 'mo', xmlns, content: ')'},
 							]},
