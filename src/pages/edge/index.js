@@ -24,7 +24,7 @@ export default (wrapper) => {
 			[
 				'When possible, our new system keeps the viewport wholly within the image.',
 				'Panning is prevented along axes where the viewport is ',
-				getButton('larger', demo, [
+				getButton('larger', [
 					[{rotation: DEGREES[90], zoom: 0.8}],
 				]),
 				' than the image.',
@@ -36,7 +36,7 @@ export default (wrapper) => {
 			},
 			[
 				'Notice that the viewport\'s dimensions half as zoom ',
-				getButton('doubles', demo, [
+				getButton('doubles', [
 					[{position: 0.5}],
 					() => [{zoom: demo.zoom * 2}],
 				]),
@@ -78,12 +78,12 @@ export default (wrapper) => {
 			},
 			[
 				'Zoom is now adjusted for us automatically when ',
-				getButton('snap panning', demo, [
+				getButton('snap panning', [
 					[{position: 0.5, zoom: 2}, {duration: 0}],
 				]),
 				'.',
 				'Position will even be ',
-				getButton('corrected', demo, [
+				getButton('corrected', [
 					[{ratio: 1, position: 0.5}, {duration: 0}],
 					[{zoom: 1.5}, {position: 0}],
 					[{ratio: 2}],
@@ -92,7 +92,7 @@ export default (wrapper) => {
 			],
 			[
 				'This is the perfect system for images that can\'t be rotated, but it ',
-				getButton('fails', demo, [
+				getButton('fails', [
 					(position) => [{position}, {duration: 0}],
 					[{zoom: 2}],
 					[{rotation: DEGREES[90] - 0.2}, {duration: 0.5}],

@@ -239,7 +239,7 @@ export default class {
 		return this._ratioViewport;
 	}
 	
-	init(callback) {
+	init() {
 		return this.#init;
 	}
 	

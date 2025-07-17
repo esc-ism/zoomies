@@ -2,8 +2,8 @@ import {Line, Connection} from '@/demo/lines/lines';
 
 import getButton from './button';
 
-import {DEGREES} from '@/shared';
-import {BUILT_INS, CLASS_NAMES} from './consts';
+import {DEGREES, SVG_NAMESPACE} from '@/shared';
+import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES} from './consts';
 
 import './css';
 
@@ -12,6 +12,16 @@ let demo;
 let globalScope;
 let functions;
 const visuals = [];
+
+const visualClasses = {
+	Line: class extends Line {
+		static template = Line.template.cloneNode();
+		
+		static {
+			this.template.style.backgroundColor = 'white';
+		}
+	},
+};
 
 const getRoundedString = (number, pow = 4) => {
 	const mult = Math.pow(10, pow);
@@ -57,9 +67,8 @@ export const register = (newDemo, statements) => {
 			for (const [i, argId] of statement.args?.entries() ?? []) {
 				const wrapper = getElement(CLASS_NAMES.csv);
 				const arg = getElement(CLASS_NAMES.id);
-				const value = args.values[i];
 				
-				scope[argId] = {value: typeof value === 'string' ? scope[value] : value, element: arg};
+				scope[argId] = {value: args.values[i], ...args.shapeData[i], element: arg};
 				
 				makeHoverable(arg, argId, scope, meta, ...args.unwrapped[i]);
 				
@@ -79,9 +88,10 @@ export const register = (newDemo, statements) => {
 				const value = meta.return;
 				
 				delete meta.return;
+				
 				meta.active = true;
 				
-				return {value, wrapper: funcWrapper, target: funcElement};
+				return {value, shapeData: getOtherProps(statement, 'op', 'id', 'args', 'and'), wrapper: funcWrapper, target: funcElement};
 			}
 			
 			return {wrapper: funcWrapper, target: funcElement};
@@ -169,6 +179,7 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 	const unwrapped = [];
 	const elements = [];
 	const values = [];
+	const shapeData = [];
 	
 	const {multiline = false} = statement;
 	
@@ -176,7 +187,7 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 		elements.push(document.createElement('br'));
 	}
 	
-	for (const result of arrayify(statement[property]).map((statement) => interpret(statement, scope, indent + multiline, meta))) {
+	for (const {elements: subElements, value, ...subShapeData} of arrayify(statement[property]).map((statement) => interpret(statement, scope, indent + multiline, meta))) {
 		const wrapper = getElement(CLASS_NAMES.csv);
 		
 		if (multiline) {
@@ -185,60 +196,149 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 			wrapper.style.display = 'block';
 		}
 		
-		unwrapped.push(result.elements);
+		unwrapped.push(subElements);
 		
-		wrapper.append(...result.elements);
+		wrapper.append(...subElements);
 		elements.push(wrapper);
 		
-		values.push(result.value);
+		values.push(value);
+		shapeData.push(subShapeData);
 	}
 	
 	if (multiline) {
 		elements.push(...getIndents(indent));
 	}
 	
-	return {values, elements, unwrapped};
+	return {values, elements, unwrapped, shapeData};
 };
 
-const getLine = (demo, length, rotation) => {
-	const line = new Line(demo, false, false, false);
+const getLine = ({value: length, doCenter = false, isPercent = false}, rotation, isWidth = false) => {
+	const line = new visualClasses.Line(demo, false, false, doCenter);
 	
-	line.setPosition(0, 0);
-	line.setHeight(length);
-	line.setRotation(rotation);
+	line.setPosition({x: 0, y: 0});
 	
-	line.hide();
+	let height = length * 100;
 	
-	return line;
+	if (isWidth) {
+		height *= demo.ratioImage;
+	}
+	
+	if (doCenter) {
+		height /= 2;
+	}
+	
+	if (!isPercent) {
+		height /= demo.imageDimensions.height;
+	}
+	
+	if (height < 0) {
+		line.setRotation(rotation + DEGREES[180]);
+		
+		height = -height;
+	} else {
+		line.setRotation(rotation);
+	}
+	
+	line.setHeight(height);
+	
+	return () => line.remove();
 };
 
 const visualisers = {
-	zoom: () => [],
-	x: (demo, id, scope) => [getLine(demo, scope[id].value, 0)],
-	y: (demo, id, scope) => [getLine(demo, scope[id].value, DEGREES[90])],
-	xvp: (demo, id, scope) => [getLine(demo, scope[id].value, -demo.rotation)],
-	yvp: (demo, id, scope) => [getLine(demo, scope[id].value, DEGREES[90] - demo.rotation)],
-	position: (demo, id, scope) => [getLine(demo, scope[id].value, scope[id].angle ?? 0)],
-	angle: (demo, id, scope) => {
-		return [];
-		const line = new Line(demo, false, false, false);
+	zoom: (scope, id) => {
+		const {zoom, position: {x, y}} = demo;
 		
-		line.setPosition(0, 0);
-		line.setHeight(scope[id].value);
-		line.setRotation(scope[id].angle ?? 0);
+		demo.zoom = scope[id].value;
+		demo.position.x = demo.position.y = 0;
 		
-		return [line];
+		demo.applyZoom();
+		demo.constrainPosition({zoom: true});
+		demo.applyPosition();
+		
+		return () => {
+			demo.zoom = zoom;
+			demo.position.x = x;
+			demo.position.y = y;
+			
+			demo.applyZoom();
+			demo.constrainPosition({zoom: true});
+			demo.applyPosition();
+		};
+	},
+	x: (scope, id) => getLine(scope[id], 0, true),
+	y: (scope, id) => getLine(scope[id], DEGREES[90], false),
+	xvp: (scope, id) => getLine(scope[id], DEGREES[90] - demo.rotation, true),
+	yvp: (scope, id) => getLine(scope[id], DEGREES[180] - demo.rotation, false),
+	position: (scope, id) => getLine(scope[id], scope[id].angle ?? 0),
+	angle: (scope, id) => {
+		const value = scope[id].value;
+		const curveX = ANGLE_RADIUS * Math.cos(value) * Math.max(1, demo.ratioImage);
+		const curveY = -ANGLE_RADIUS * Math.sin(value) * Math.max(1, demo.ratioImageInverse);
+		const sweep = value >= 0 ? 0 : 1;
+		let rotation = 0;
+		
+		if (scope[id].fight ?? false) {
+			rotation += demo.rotation - DEGREES[90];
+		}
+		
+		if (scope[id].isBase ?? false) {
+			rotation -= DEGREES[90];
+		}
+		
+		const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
+		
+		svg.setAttribute('viewBox', `-${ANGLE_RADIUS} -${ANGLE_RADIUS} ${ANGLE_RADIUS * 2} ${ANGLE_RADIUS * 2}`);
+		
+		svg.style.position = 'absolute';
+		svg.style.left = `${50 - ANGLE_RADIUS}%`;
+		svg.style.top = `${50 - ANGLE_RADIUS}%`;
+		svg.style.width = `${ANGLE_RADIUS * 2}%`;
+		svg.style.height = `${ANGLE_RADIUS * 2}%`;
+		svg.style.rotate = `${rotation}rad`;
+		
+		const path = document.createElementNS(SVG_NAMESPACE, 'path');
+		
+		path.setAttribute('fill', 'white');
+		// path.setAttribute('stroke-linecap', 'round');
+		// path.setAttribute('stroke-width', '2.5');
+		path.setAttribute('d', `M0 0L${ANGLE_RADIUS} 0A${ANGLE_RADIUS} ${ANGLE_RADIUS} 0 ${sweep} ${sweep} ${curveX} ${curveY}Z`);
+		
+		svg.append(path);
+		
+		demo.elements.imageWrapper.appendChild(svg);
+		
+		return () => svg.remove();
 	},
 };
 
-const makeHoverable = (element, id, scope, meta, ...sources) => {
+const visualise = (scope, ...ids) => {
+	if (ids.length === 1) {
+		const [id] = ids;
+		
+		return visualisers[scope[id].type](scope, id);
+	}
+	
+	const [first, second] = (scope[ids[0]].type[0] === 'x' ? ids : [ids[1], ids[0]]).map((id) => scope[id]);
+	
+	const angle = Math.atan(second.value / (first.value * demo.ratioImage));
+	const value = Math.sqrt(Math.pow(first.value * demo.ratioImage, 2) + Math.pow(second.value, 2));
+	
+	return getLine({...first, value}, angle + (first.value < 0 ? DEGREES[180] : 0));
+};
+
+const makeHoverable = (element, id, scope, meta, isVar) => {
 	if (!meta.active) {
 		return false;
 	}
 	
-	// if ('type' in scope[id]) {
-	// const visuals = visualisers[scope[id].type](demo, id, scope);
-	// }
+	const doShowVisuals = id && 'type' in scope[id];
+	const visuals = [];
+	let hovered = [];
+	
+	if (doShowVisuals) {
+		element.style.color = 'lime';
+	}
+	
 	element.style.cursor = 'pointer';
 	
 	if (id && 'value' in scope[id]) {
@@ -252,25 +352,59 @@ const makeHoverable = (element, id, scope, meta, ...sources) => {
 	}
 	
 	element.addEventListener('mouseenter', () => {
+		const ids = [id];
+		
 		element.classList.add(CLASS_NAMES.hovered);
 		
-		for (const source of sources) {
-			source.classList.add(CLASS_NAMES.hovered);
+		if (isVar) {
+			const data = scope[id];
+			
+			if ('element' in data && !element.isSameNode(data.element)) {
+				hovered.push(data.element);
+				
+				data.element.classList.add(CLASS_NAMES.hovered);
+			}
+			
+			if ('pair' in data) {
+				hovered.push(scope[data.pair].element);
+				
+				scope[data.pair].element.classList.add(CLASS_NAMES.hovered);
+				
+				ids.push(data.pair);
+			}
 		}
-		// for (const visual of visuals) {
-		// 	visual.show();
-		// }
+		
+		if (doShowVisuals) {
+			visuals.push(visualise(scope, ...ids));
+		}
 	});
 	
-	element.addEventListener('mouseout', () => {
+	element.addEventListener('mouseleave', () => {
 		element.classList.remove(CLASS_NAMES.hovered);
 		
-		for (const source of sources) {
+		for (const source of hovered) {
 			source.classList.remove(CLASS_NAMES.hovered);
 		}
+		
+		for (const visual of visuals) {
+			visual();
+		}
+		
+		visuals.length = 0;
+		hovered.length = 0;
 	});
 	
 	return true;
+};
+
+const getOtherProps = (object, ...exclusions) => {
+	const excluded = {...object};
+	
+	for (const exclusion of exclusions) {
+		delete excluded[exclusion];
+	}
+	
+	return excluded;
 };
 
 const interpretters = {
@@ -283,9 +417,7 @@ const interpretters = {
 		
 		element.innerText = id;
 		
-		const sources = 'element' in scope[id] ? [scope[id].element] : [];
-		
-		makeHoverable(element, id, scope, meta, ...sources);
+		makeHoverable(element, id, scope, meta, true);
 		
 		if (scope[id].pending) {
 			scope[id].element = element;
@@ -293,7 +425,7 @@ const interpretters = {
 			delete scope[id].pending;
 		}
 		
-		return {value: scope[id].value, elements: [element]};
+		return {...scope[id], elements: [element]};
 	},
 	number: (value) => {
 		const element = getElement(CLASS_NAMES.number);
@@ -307,17 +439,33 @@ const interpretters = {
 		
 		element.innerText = value;
 		
-		return {value, elements: [element]};
+		return {value, elements: [element], type: 'boolean'};
 	},
 	'=': (statement, scope, indent, meta) => {
-		const {value, elements: operand} = interpret(statement.and, scope, indent, meta);
+		const {value, elements: operand, ...call} = interpret(statement.and, scope, indent, meta);
 		const values = arrayify(value);
 		
+		const shapeData = {...(call.shapeData ?? {})};
+		const refs = arrayify(statement.ref).map((id) => (scope[id]));
+		
+		if ('pair' in shapeData) {
+			shapeData.pair = shapeData.pair.map((i) => statement.id[i]);
+		}
+		
+		Object.assign(shapeData, getOtherProps(statement, 'op', 'id', 'and', 'multiline'));
+		
 		for (const [i, id] of arrayify(statement.id).entries()) {
-			scope[id] = {value: values[i], pending: true};
+			scope[id] = {...(refs?.[i] ?? {})};
 			
-			if ('type' in statement) {
-				scope[id].type = statement.type;
+			scope[id].value = values[i];
+			scope[id].pending = true;
+			
+			for (const property in shapeData) {
+				const value = arrayify(shapeData[property])[i];
+				
+				if (value !== undefined) {
+					scope[id][property] = value;
+				}
 			}
 		}
 		
@@ -472,30 +620,31 @@ const interpretters = {
 		
 		args.append(...csvs.elements);
 		
-		const expansion = functions[statement.id](csvs, {...scope}, indent, meta);
+		const {target, wrapper, ...result} = functions[statement.id](csvs, {...scope}, indent, meta);
 		
 		if (makeHoverable(id, undefined, scope, meta)) {
-			makeHoverable(expansion.target, undefined, scope, meta);
+			makeHoverable(target, undefined, scope, meta);
 			
 			const newline = document.createElement('br');
 			
 			id.addEventListener('click', () => {
-				id.replaceWith(expansion.wrapper);
+				id.replaceWith(wrapper);
 				
 				args.insertAdjacentElement('afterend', newline);
 			});
 			
-			expansion.target.addEventListener('click', () => {
-				expansion.wrapper.replaceWith(id);
+			target.addEventListener('click', () => {
+				wrapper.replaceWith(id);
 				
 				newline.remove();
 			});
 		}
 		
-		return {value: expansion.value, elements: [id, args]};
+		return {...result, elements: [id, args]};
 	},
 	return: (statement, scope, indent, meta) => {
 		const elements = [getElement(CLASS_NAMES.return)];
+		
 		let value;
 		
 		if (!Array.isArray(statement.and)) {
@@ -574,10 +723,6 @@ const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {bran
 		}
 		
 		parent.appendChild(document.createElement('br'));
-	}
-	
-	if (indent > 0 && meta.branch[meta.branch.length - 1].id === 'getIntersection') {
-		console.log({...scope});
 	}
 };
 

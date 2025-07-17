@@ -1,4 +1,4 @@
-import {getText, getCode, getButton} from '../shared';
+import {getText, getButton} from '../shared';
 
 import Demo from './demo';
 
@@ -56,7 +56,7 @@ export default (wrapper) => {
 			},
 			[
 				'A competent user of this system may ',
-				getButton('self-impose', demo, [
+				getButton('self-impose', [
 					[{zoom: 1, position: 0.2}],
 					['position', {x: 0.3, y: -0.2}],
 					['position', {x: -0.2, y: -0.3}],
@@ -64,7 +64,7 @@ export default (wrapper) => {
 				]),
 				' a pan-limiting algorithm to keep their bearings.',
 				'But what if their ',
-				getButton('finger slips', demo, [
+				getButton('finger slips', [
 					[{position: 2, zoom: 1}],
 				]),
 				'?',

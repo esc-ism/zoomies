@@ -45,6 +45,7 @@ export default [
 			'no-console': ['warn', {allow: ['warn', 'error']}],
 			'object-shorthand': 'error',
 			'jsdoc/require-jsdoc': 'off',
+			'no-sparse-arrays': 'off',
 			'@stylistic/no-extra-semi': 'error',
 			'@stylistic/no-extra-parens': 'error',
 			'@stylistic/quote-props': ['error', 'as-needed'],

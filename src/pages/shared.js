@@ -51,7 +51,7 @@ const getNode = (description) => {
 	}
 	
 	for (const [property, value] of Object.entries(attributes)) {
-		node.setAttribute(property, value);
+		node[property] = value;
 	}
 	
 	node.classList.add(...classList);

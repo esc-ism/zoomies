@@ -23,7 +23,7 @@ export default (wrapper) => {
 			},
 			[
 				'Let\'s start ',
-				getButton('limiting panning', demo, [
+				getButton('limiting panning', [
 					[{zoom: 1}],
 					[{x: 0.5}, {ease: 'bounce.out', duration: 1.5}],
 				]),
@@ -48,16 +48,16 @@ export default (wrapper) => {
 			],
 			[
 				'Say we want to ',
-				getButton('fill', demo, [
+				getButton('fill', [
 					() => [{rotation: DEGREES[90], zoom: 2, position: getSnapPosition(demo)}],
 				]),
 				' our screens with the top-right quadrant of the image.',
 				'We can ',
-				getButton('snap pan', demo, [
+				getButton('snap pan', [
 					() => [{position: getSnapPosition(demo)}, {duration: 0}],
 				]),
 				' to the spot we want, but a ',
-				getButton('manual zoom', demo, [
+				getButton('manual zoom', [
 					() => [{position: getSnapPosition(demo)}, {duration: 0}],
 					[{rotation: DEGREES[90], zoom: 2}, {delay: 0.2}],
 				]),
