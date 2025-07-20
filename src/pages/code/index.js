@@ -1,9 +1,9 @@
 import {Line, Connection} from '@/demo/lines/lines';
 
-import getButton from './button';
+import getButtons from './buttons';
 
 import {DEGREES, SVG_NAMESPACE} from '@/shared';
-import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES} from './consts';
+import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED} from './consts';
 
 import './css';
 
@@ -111,15 +111,20 @@ const getElement = (...classes) => {
 
 const getCombiner = (() => {
 	const getCombined = (statement, scope, indent, meta, combiner) => {
-		let value;
 		const elements = [];
+		let value;
 		
 		for (const subStatement of statement.and) {
-			const result = interpret(subStatement, scope, indent, meta);
+			const subIndent = elements.length === 0 || !statement.multiline ? indent : indent + 1;
+			const result = interpret(subStatement, scope, subIndent, meta);
 			
 			if (elements.length === 0) {
 				value = result.value;
 			} else {
+				if (statement.multiline) {
+					elements.push(document.createElement('br'), ...getIndents(indent + 1));
+				}
+				
 				elements.push(getElement(CLASS_NAMES[statement.op]));
 				
 				value = combiner(value, result.value);
@@ -171,6 +176,20 @@ const getInverseFunction = (getValue) => {
 	};
 };
 
+const getLineLength = (statement, property = 'and') => {
+	const {multiline, [property]: {length}} = statement;
+	
+	if (!multiline) {
+		return Infinity;
+	}
+	
+	if (typeof multiline === 'boolean') {
+		return 1;
+	}
+	
+	return Math.ceil(length / multiline);
+};
+
 const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 	if (!(property in statement)) {
 		return {elements: []};
@@ -181,19 +200,15 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 	const values = [];
 	const shapeData = [];
 	
-	const {multiline = false} = statement;
+	const subIndent = indent + !!statement.multiline;
+	const lineLength = getLineLength(statement, property);
 	
-	if (multiline) {
-		elements.push(document.createElement('br'));
-	}
-	
-	for (const {elements: subElements, value, ...subShapeData} of arrayify(statement[property]).map((statement) => interpret(statement, scope, indent + multiline, meta))) {
+	for (const [i, subStatement] of arrayify(statement[property]).entries()) {
+		const {elements: subElements, value, ...subShapeData} = interpret(subStatement, scope, subIndent, meta);
 		const wrapper = getElement(CLASS_NAMES.csv);
 		
-		if (multiline) {
-			wrapper.append(...getIndents(indent + 1));
-			
-			wrapper.style.display = 'block';
+		if (statement.multiline && i % lineLength === 0) {
+			wrapper.append(document.createElement('br'), ...getIndents(indent + 1));
 		}
 		
 		unwrapped.push(subElements);
@@ -201,18 +216,25 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 		wrapper.append(...subElements);
 		elements.push(wrapper);
 		
-		values.push(value);
 		shapeData.push(subShapeData);
+		
+		if (meta.spread && meta.active) {
+			values.push(...value);
+			
+			delete meta.spread;
+		} else {
+			values.push(value);
+		}
 	}
 	
-	if (multiline) {
-		elements.push(...getIndents(indent));
+	if (statement.multiline) {
+		elements.push(document.createElement('br'), ...getIndents(indent));
 	}
 	
 	return {values, elements, unwrapped, shapeData};
 };
 
-const getLine = ({value: length, doCenter = false, isPercent = false}, rotation, isWidth = false) => {
+const getLine = ({value: length, doCenter = false, isPercent = true}, rotation, isWidth = false) => {
 	const line = new visualClasses.Line(demo, false, false, doCenter);
 	
 	line.setPosition({x: 0, y: 0});
@@ -249,7 +271,7 @@ const visualisers = {
 		const {zoom, position: {x, y}} = demo;
 		
 		demo.zoom = scope[id].value;
-		demo.position.x = demo.position.y = 0;
+		// demo.position.x = demo.position.y = 0;
 		
 		demo.applyZoom();
 		demo.constrainPosition({zoom: true});
@@ -336,7 +358,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 	let hovered = [];
 	
 	if (doShowVisuals) {
-		element.style.color = 'lime';
+		element.style.color = '#9fd49f';
 	}
 	
 	element.style.cursor = 'pointer';
@@ -439,7 +461,15 @@ const interpretters = {
 		
 		element.innerText = value;
 		
-		return {value, elements: [element], type: 'boolean'};
+		return {value, elements: [element]};
+	},
+	array: (statement, scope, indent, meta) => {
+		const wrapper = getElement(CLASS_NAMES.array);
+		const csvs = getCsvs(statement, scope, indent, meta);
+		
+		wrapper.append(...csvs.elements);
+		
+		return {value: csvs.values, elements: [wrapper]};
 	},
 	'=': (statement, scope, indent, meta) => {
 		const {value, elements: operand, ...call} = interpret(statement.and, scope, indent, meta);
@@ -514,6 +544,8 @@ const interpretters = {
 	'>=': getCombiner((a, b) => a >= b),
 	'<': getCombiner((a, b) => a < b),
 	'>': getCombiner((a, b) => a > b),
+	'&&': getCombiner((a, b) => a && b),
+	'||': getCombiner((a, b) => a || b),
 	'!=': getCombiner((a, b) => a !== b),
 	'%': getCombiner((a, b) => a % b, ['*', '/', '+', '-', '<=', '>=', '<', '>', '!=']),
 	if: (statement, scope, indent, meta) => {
@@ -543,9 +575,11 @@ const interpretters = {
 		return {value, elements: [elements.condition, document.createElement('br'), elements.body]};
 	},
 	'?': (statement, scope, indent, meta) => {
+		const subIndent = indent + !!statement.multiline;
+		
 		const {value: conditionValue, elements: conditionElements} = interpret(statement.and[0], scope, indent, meta);
-		const {value: truthyValue, elements: truthyElements} = interpret(statement.and[1], scope, indent, {...meta, active: meta.active && conditionValue});
-		const {value: falsyValue, elements: falsyElements} = interpret(statement.and[2], scope, indent, {...meta, active: meta.active && !conditionValue});
+		const {value: truthyValue, elements: truthyElements} = interpret(statement.and[1], scope, subIndent, {...meta, active: meta.active && conditionValue});
+		const {value: falsyValue, elements: falsyElements} = interpret(statement.and[2], scope, subIndent, {...meta, active: meta.active && !conditionValue});
 		
 		const conditionWrapper = getElement(CLASS_NAMES.branch[conditionValue ? 'accept' : 'reject']);
 		
@@ -555,13 +589,28 @@ const interpretters = {
 			element.classList.add(CLASS_NAMES.inactive);
 		}
 		
+		const getSeperator = statement.multiline ? () => [document.createElement('br'), ...getIndents(indent + 1)] : () => [];
+		
 		return {value: conditionValue ? truthyValue : falsyValue, elements: [
 			conditionWrapper,
 			getElement(CLASS_NAMES['?']),
+			...getSeperator(),
 			...truthyElements,
 			getElement(CLASS_NAMES[':']),
+			...getSeperator(),
 			...falsyElements,
 		]};
+	},
+	'...': (statement, scope, indent, meta) => {
+		const element = getElement(CLASS_NAMES['...']);
+		
+		const {value, elements: operand} = interpret(statement.and, scope, indent, meta);
+		
+		element.append(...operand);
+		
+		meta.spread = true;
+		
+		return {value, elements: [element]};
 	},
 	abs: (statement, scope, indent, meta) => {
 		const element = getElement(CLASS_NAMES.abs);
@@ -626,11 +675,14 @@ const interpretters = {
 			makeHoverable(target, undefined, scope, meta);
 			
 			const newline = document.createElement('br');
+			const {multiline} = meta.branch[meta.branch.length - 2];
 			
 			id.addEventListener('click', () => {
 				id.replaceWith(wrapper);
 				
-				args.insertAdjacentElement('afterend', newline);
+				if (!multiline) {
+					args.insertAdjacentElement('afterend', newline);
+				}
 			});
 			
 			target.addEventListener('click', () => {
@@ -647,13 +699,7 @@ const interpretters = {
 		
 		let value;
 		
-		if (!Array.isArray(statement.and)) {
-			const result = interpret(statement.and, scope, indent, meta);
-			
-			elements.push(...result.elements);
-			
-			value = result.value;
-		} else {
+		if (Array.isArray(statement.and)) {
 			const array = getElement(CLASS_NAMES.array);
 			const csvs = getCsvs(statement, scope, indent, meta);
 			
@@ -661,6 +707,12 @@ const interpretters = {
 			
 			array.append(...csvs.elements);
 			elements.push(array);
+		} else {
+			const result = interpret(statement.and, scope, indent, meta);
+			
+			elements.push(...result.elements);
+			
+			value = result.value;
 		}
 		
 		if (meta.active) {
@@ -689,13 +741,13 @@ const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {bran
 			parent.children[i].remove();
 		}
 		
-		const button = getButton();
+		const buttons = getButtons();
 		
-		parent.appendChild(button);
+		parent.insertAdjacentElement('beforebegin', buttons.wrapper);
 		
 		refreshParams.push([parent, snippet]);
 		
-		button.addEventListener('click', () => {
+		buttons.refresh.addEventListener('click', () => {
 			const oldRefreshParams = [...refreshParams];
 			
 			refreshParams.length = 0;
@@ -705,6 +757,18 @@ const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {bran
 			for (const args of oldRefreshParams) {
 				generate(...args);
 			}
+		});
+		
+		buttons.max.addEventListener('click', () => {
+			buttons.max.replaceWith(buttons.min);
+			
+			parent.parentElement.parentElement.classList.add(CLASS_MAXIMISED);
+		});
+		
+		buttons.min.addEventListener('click', () => {
+			buttons.min.replaceWith(buttons.max);
+			
+			parent.parentElement.parentElement.classList.remove(CLASS_MAXIMISED);
 		});
 	}
 	
@@ -724,6 +788,8 @@ const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {bran
 		
 		parent.appendChild(document.createElement('br'));
 	}
+	
+	parent.lastChild.remove();
 };
 
 export const generateWhenReady = async (parent, statements) => {

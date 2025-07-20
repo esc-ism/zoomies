@@ -68,11 +68,14 @@ export const getCode = (statements) => {
 	
 	return {
 		content: {
-			tag: 'code',
-			content: '',
-			id,
-			callback: (node) => {
-				generateCode(node, statements);
+			tag: 'div',
+			content: {
+				tag: 'code',
+				content: '',
+				id,
+				callback: (node) => {
+					generateCode(node, statements);
+				},
 			},
 		},
 		classList: [CLASS_CODE],

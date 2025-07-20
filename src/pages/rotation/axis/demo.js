@@ -86,7 +86,7 @@ export const getSnappedZoom = (() => {
 			const [lineFirst0, lineSecond0] = getDirected(first0, second0, flipX0, flipY0);
 			const [lineFirst1, lineSecond1] = getDirected(first1, second1, flipX1, flipY1);
 			
-			return [
+			const a = [
 				first0.z >= first1.z ?
 						[first0.z, lineFirst0, getProgressedLine(lineFirst1, first0)] :
 						[first1.z, getProgressedLine(lineFirst0, first1), lineFirst1],
@@ -101,6 +101,10 @@ export const getSnappedZoom = (() => {
 							[second1.z, getProgressedLine(lineSecond0, second1), lineSecond1],
 						],
 			];
+			
+			console.log(a);
+			
+			return a;
 		};
 		
 		return Math.max(...[

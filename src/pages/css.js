@@ -10,28 +10,33 @@ addRule([`.${CLASS_CODE}`, `.${CLASS_MATH}`], {
 addRule(`.${CLASS_CODE}`, {
 	'line-height': 'normal',
 	'background-color': '#343a45',
+});
+
+// todo delete?
+// header
+// addRule(`.${CLASS_CODE} > div`, {
+// 	'font-size': '1.5em',
+// 	padding: '7px 1em',
+// 	'text-align': 'center',
+// 	'box-shadow': 'inherit',
+// 	'background-color': 'rgb(0 0 0 / 10%)',
+// });
+
+addRule(`.${CLASS_CODE} > div`, {
+	'overflow-x': 'auto',
 	position: 'relative',
 });
 
-// header
-// todo delete?
-addRule(`.${CLASS_CODE} > div`, {
-	'font-size': '1.5em',
-	padding: '7px 1em',
-	'text-align': 'center',
-	'box-shadow': 'inherit',
-	'background-color': 'rgb(0 0 0 / 10%)',
-});
-
-addRule(`.${CLASS_CODE} > code`, {
-	'overflow-x': 'auto',
-	padding: '10px 1em',
+addRule(`.${CLASS_CODE} code`, {
 	'font-family': 'consolas, monospace',
-	display: 'block',
 	'white-space': 'pre',
+	
+	padding: '10px 1em',
+	display: 'block',
+	width: 'fit-content',
 });
 
-addRule(`.${CLASS_CODE} br + br + br, br:last-child`, {display: 'none'});
+addRule(`.${CLASS_CODE} br + br + br`, {display: 'none'});
 
 addRule(`.${CLASS_MATH}`, {
 	'text-align': 'center',

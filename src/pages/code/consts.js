@@ -3,29 +3,31 @@ import {getIdGetter} from '@css';
 export const ANGLE_RADIUS = 10;
 
 export const BUILT_INS = {
-	imageWidth: ({imageDimensions: {width: value}}) => ({value, type: 'x', showRotation: false, doCenter: true}),
-	imageHeight: ({imageDimensions: {height: value}}) => ({value, type: 'y', showRotation: false, doCenter: true}),
+	imageWidth: ({imageDimensions: {width: value}}) => ({value, type: 'x', showRotation: false, isPercent: false, doCenter: true}),
+	imageHeight: ({imageDimensions: {height: value}}) => ({value, type: 'y', showRotation: false, isPercent: false, doCenter: true}),
 	
-	viewportWidth: ({viewportDimensions: {width: value}}) => ({value, type: 'xvp', showRotation: false, doCenter: true}),
-	viewportHeight: ({viewportDimensions: {height: value}}) => ({value, type: 'yvp', showRotation: false, doCenter: true}),
+	viewportWidth: ({viewportDimensions: {width: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false, doCenter: true}),
+	viewportHeight: ({viewportDimensions: {height: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false, doCenter: true}),
 	
-	'image½Width': ({imageDimensions: {halfWidth: value}}) => ({value, type: 'x', showRotation: false}),
-	'image½Height': ({imageDimensions: {halfHeight: value}}) => ({value, type: 'y', showRotation: false}),
+	'image½Width': ({imageDimensions: {halfWidth: value}}) => ({value, type: 'x', showRotation: false, isPercent: false}),
+	'image½Height': ({imageDimensions: {halfHeight: value}}) => ({value, type: 'y', showRotation: false, isPercent: false}),
 	
-	'viewport½Width': ({viewportDimensions: {halfWidth: value}}) => ({value, type: 'xvp', showRotation: false}),
-	'viewport½Height': ({viewportDimensions: {halfHeight: value}}) => ({value, type: 'yvp', showRotation: false}),
+	'viewport½Width': ({viewportDimensions: {halfWidth: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false}),
+	'viewport½Height': ({viewportDimensions: {halfHeight: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false}),
 	
 	π: () => ({value: Math.PI, type: 'angle', fight: true}),
 	'½π': () => ({value: Math.PI / 2, type: 'angle', fight: true}),
 	
-	x: ({position: {x}}) => ({value: x, isPercent: true}),
-	y: ({position: {y}}) => ({value: y, isPercent: true}),
+	x: ({position: {x}}) => ({value: x}),
+	y: ({position: {y}}) => ({value: y}),
 	
 	rotation: ({rotation: value}) => ({value, type: 'angle', fight: true}),
 	zoom: ({zoom: value}) => ({value, type: 'zoom'}),
 };
 
 const getId = getIdGetter('codegen');
+
+export const CLASS_MAXIMISED = getId('maximised');
 
 export const CLASS_NAMES = {
 	'+': getId('add'),
@@ -43,6 +45,9 @@ export const CLASS_NAMES = {
 	'<': getId('l'),
 	'>': getId('g'),
 	'!=': getId('ne'),
+	'||': getId('or'),
+	'&&': getId('and'),
+	'...': getId('spread'),
 	abs: getId('abs'),
 	floor: getId('floor'),
 	min: getId('min'),
@@ -72,6 +77,4 @@ export const CLASS_NAMES = {
 	},
 	inactive: getId('inactive'),
 	hovered: getId('hovered'),
-	
-	refresh: getId('refresh'),
 };

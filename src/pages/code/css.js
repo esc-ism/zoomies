@@ -1,6 +1,6 @@
 import {addRule} from '@css';
 
-import {CLASS_NAMES} from './consts';
+import {CLASS_NAMES, CLASS_MAXIMISED} from './consts';
 
 const addPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`});
 const addKeywordPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`, color: 'rgb(219 142 56)'});
@@ -10,6 +10,8 @@ for (const [name, content = name] of [
 	['?'],
 	[':'],
 	['='],
+	['||'],
+	['&&'],
 	['<'],
 	['>'],
 	['<=', '⩽'],
@@ -26,10 +28,11 @@ for (const [name, content = name] of [
 
 addPseudoRule(`.${CLASS_NAMES.negative}::before`, '-');
 addPseudoRule(`.${CLASS_NAMES['!']}::before`, '!');
+addPseudoRule(`.${CLASS_NAMES['...']}::before`, '...');
+addPseudoRule(`.${CLASS_NAMES.csv}:has(+ .${CLASS_NAMES.csv})::after`, ', ');
+
 addKeywordPseudoRule(`.${CLASS_NAMES.return}::after`, 'return ');
 addKeywordPseudoRule(`.${CLASS_NAMES.func}::after`, 'function');
-
-addPseudoRule(`.${CLASS_NAMES.csv}:has(+ .${CLASS_NAMES.csv})::after`, ', ');
 
 // wrappers
 for (const [name, before, after = before] of [
@@ -80,12 +83,17 @@ addRule(`.${CLASS_NAMES.hovered}`, {'background-color': 'rgb(255 255 255 / 25%)'
 
 addRule(`.${CLASS_NAMES.inactive}:not(.${CLASS_NAMES.inactive} *)`, {opacity: 0.4});
 
-addRule(`.${CLASS_NAMES.refresh}`, {
-	position: 'absolute',
-	top: '10px',
-	right: '10px',
-	cursor: 'pointer',
-	width: '20px',
+addRule(`p.${CLASS_MAXIMISED}`, {
+	position: 'fixed',
+	top: '0',
+	left: '0',
+	width: '100vw',
+	height: '100vh',
+	margin: '0',
+	'border-radius': '0',
 });
 
-addRule(`.${CLASS_NAMES.refresh}:not(:hover)`, {opacity: 0.4});
+addRule(`.${CLASS_MAXIMISED} > *`, {
+	overflow: 'auto',
+	height: '100%',
+});
