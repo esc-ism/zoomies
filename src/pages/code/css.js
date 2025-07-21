@@ -61,7 +61,7 @@ addPseudoRule(`.${CLASS_NAMES.root}::before`, '√');
 addKeywordPseudoRule(`.${CLASS_NAMES.if}::before`, 'if ');
 addPseudoRule(`.${CLASS_NAMES.if}::after`, ':');
 
-addPseudoRule(`.${CLASS_NAMES.indent}::before`, '  ');
+addPseudoRule(`.${CLASS_NAMES.indent}::after`, '  ');
 
 addRule(`.${CLASS_NAMES['=']} > :last-child::after`, {display: 'block'});
 

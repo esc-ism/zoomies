@@ -348,6 +348,18 @@ const visualise = (scope, ...ids) => {
 	return getLine({...first, value}, angle + (first.value < 0 ? DEGREES[180] : 0));
 };
 
+const getTitle = (value, type) => {
+	if (typeof value === 'boolean') {
+		return value;
+	}
+	
+	if (type === 'angle') {
+		return `${getRoundedString(value / Math.PI)}π`;
+	}
+	
+	return `${getRoundedString(value)}`;
+};
+
 const makeHoverable = (element, id, scope, meta, isVar) => {
 	if (!meta.active) {
 		return false;
@@ -364,13 +376,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 	element.style.cursor = 'pointer';
 	
 	if (id && 'value' in scope[id]) {
-		if (typeof scope[id].value === 'boolean') {
-			element.setAttribute('title', scope[id].value);
-		} else if ('type' in scope[id] && scope[id].type === 'angle') {
-			element.setAttribute('title', `${getRoundedString(scope[id].value / Math.PI)}π`);
-		} else {
-			element.setAttribute('title', getRoundedString(scope[id].value));
-		}
+		element.setAttribute('title', getTitle(scope[id].value, scope[id].type));
 	}
 	
 	element.addEventListener('mouseenter', () => {
@@ -671,6 +677,8 @@ const interpretters = {
 		
 		const {target, wrapper, ...result} = functions[statement.id](csvs, {...scope}, indent, meta);
 		
+		id.setAttribute('title', getTitle(result.value, result.type));
+		
 		if (makeHoverable(id, undefined, scope, meta)) {
 			makeHoverable(target, undefined, scope, meta);
 			
@@ -736,42 +744,6 @@ const interpret = (statement, scope, indent, meta) => {
 };
 
 const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {branch: [], active: true}) => {
-	if (indent === 0) {
-		for (let i = parent.children.length - 1; i >= 0; --i) {
-			parent.children[i].remove();
-		}
-		
-		const buttons = getButtons();
-		
-		parent.insertAdjacentElement('beforebegin', buttons.wrapper);
-		
-		refreshParams.push([parent, snippet]);
-		
-		buttons.refresh.addEventListener('click', () => {
-			const oldRefreshParams = [...refreshParams];
-			
-			refreshParams.length = 0;
-			
-			reset();
-			
-			for (const args of oldRefreshParams) {
-				generate(...args);
-			}
-		});
-		
-		buttons.max.addEventListener('click', () => {
-			buttons.max.replaceWith(buttons.min);
-			
-			parent.parentElement.parentElement.classList.add(CLASS_MAXIMISED);
-		});
-		
-		buttons.min.addEventListener('click', () => {
-			buttons.min.replaceWith(buttons.max);
-			
-			parent.parentElement.parentElement.classList.remove(CLASS_MAXIMISED);
-		});
-	}
-	
 	for (const statement of snippet) {
 		const {active} = meta;
 		const {elements} = interpret(statement, scope, indent, meta);
@@ -792,8 +764,42 @@ const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {bran
 	parent.lastChild.remove();
 };
 
+const generateButtons = (parent, statements) => {
+	const buttons = getButtons();
+	
+	parent.insertAdjacentElement('beforebegin', buttons.wrapper);
+	
+	refreshParams.push({parent, statements});
+	
+	buttons.refresh.addEventListener('click', () => {
+		reset();
+		
+		for (const args of refreshParams) {
+			for (let i = args.parent.children.length - 1; i >= 0; --i) {
+				args.parent.children[i].remove();
+			}
+			
+			generate(args.parent, args.statements);
+		}
+	});
+	
+	buttons.max.addEventListener('click', () => {
+		buttons.max.replaceWith(buttons.min);
+		
+		parent.parentElement.parentElement.classList.add(CLASS_MAXIMISED);
+	});
+	
+	buttons.min.addEventListener('click', () => {
+		buttons.min.replaceWith(buttons.max);
+		
+		parent.parentElement.parentElement.classList.remove(CLASS_MAXIMISED);
+	});
+};
+
 export const generateWhenReady = async (parent, statements) => {
 	await init;
+	
+	generateButtons(parent, statements);
 	
 	generate(parent, statements);
 };

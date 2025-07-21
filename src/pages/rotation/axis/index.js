@@ -86,31 +86,31 @@ const functions = [
 			op: '-', and: [
 				{op: '+', and: [
 					{op: '*', and: ['g', 'h']},
-					{op: '*', and: ['e', 'absX']},
+					{op: '*', and: ['e', 'x']},
 					{op: '*', and: ['j', 'e']},
-					{op: '*', and: ['k', 'absX']},
+					{op: '*', and: ['k', 'x']},
 					{op: '*', and: ['i', 'd', 2]},
-					{op: '*', and: ['f', 'absY']},
-					{op: '*', and: ['h', 'absY']},
+					{op: '*', and: ['f', 'y']},
+					{op: '*', and: ['h', 'y']},
 				]},
-				{op: '*', and: ['g', 'absX']},
+				{op: '*', and: ['g', 'x']},
 				{op: '*', and: ['e', 'h', 2]},
-				{op: '*', and: ['j', 'absY']},
+				{op: '*', and: ['j', 'y']},
 				{op: '*', and: ['k', 'd']},
-				{op: '*', and: ['i', 'absX']},
+				{op: '*', and: ['i', 'x']},
 				{op: '*', and: ['f', 'i']},
-				{op: '*', and: ['d', 'absY']},
+				{op: '*', and: ['d', 'y']},
 			],
 		}},
 		{op: '=', id: 'c', and: {
 			op: '-', and: [
 				{op: '+', and: [
 					{op: '*', and: ['h', 'e']},
-					{op: '*', and: ['i', 'absX']},
-					{op: '*', and: ['d', 'absY']},
+					{op: '*', and: ['i', 'x']},
+					{op: '*', and: ['d', 'y']},
 				]},
-				{op: '*', and: ['e', 'absX']},
-				{op: '*', and: ['h', 'absY']},
+				{op: '*', and: ['e', 'x']},
+				{op: '*', and: ['h', 'y']},
 				{op: '*', and: ['d', 'i']},
 			],
 		}},
@@ -537,23 +537,22 @@ const functions = [
 		'',
 		{op: 'return', and: ['boundX', 'boundY']},
 	]},
-	{op: 'func', id: 'getDirected', args: ['endX', 'endY', 'midX', 'midY', 'flipX', 'flipY'], type: ['x', 'y', 'x', 'y', 'x', 'y'], pair: [1, 0, 3, 2, 5, 4], and: [
-		{op: '=', id: ['dEndX', 'dMidX', 'dCX'], pair: ['dEndY', 'dMidY', 'dCY'], and: {
+	{op: 'func', id: 'getDirected', args: ['endX', 'endY', 'midX', 'midY', 'flip', 'cX'], type: ['x', 'y', 'x', 'y', 'x', 'y'], pair: [1, 0, 3, 2, 5, 4], and: [
+		{op: 'return', and: {
 			op: '?', multiline: true, and: [
-				'flipX',
-				{op: 'array', and: [{op: '-', and: 'endX'}, {op: '-', and: 'midX'}, -0.5]},
-				{op: 'array', and: ['endX', 'midX', 0.5]},
+				'flip',
+				{op: 'array', and: [
+					{op: '-', and: 'endX'}, {op: '-', and: 'endY'},
+					{op: '-', and: 'midX'}, {op: '-', and: 'midY'},
+					{op: '-', and: 'cX'}, -0.5,
+				]},
+				{op: 'array', and: [
+					'endX', 'endY',
+					'midX', 'midY',
+					'cX', 0.5,
+				]},
 			],
 		}},
-		{op: '=', id: ['dEndY', 'dMidY', 'dCY'], pair: ['dEndX', 'dMidX', 'dCX'], and: {
-			op: '?', multiline: true, and: [
-				'flipY',
-				{op: 'array', and: [{op: '-', and: 'endY'}, {op: '-', and: 'midY'}, -0.5]},
-				{op: 'array', and: ['endY', 'midY', 0.5]},
-			],
-		}},
-		'',
-		{op: 'return', and: ['dEndX', 'dEndY', 'dMidX', 'dMidY', 'dCX', 'dCY']},
 	]},
 	{op: 'func', id: 'getIntersectZoom', args: ['startZoom', 'fromX0', 'fromY0', 'toX0', 'toY0', 'fromX1', 'fromY1', 'toX1', 'toY1', 'isInverse', 'maxP'], type: 'zoom', and: [
 		{op: 'if', and: [
@@ -578,7 +577,7 @@ const functions = [
 		'',
 		{op: 'return', and: 0},
 	]},
-	{op: 'func', id: 'getPairings', args: ['flipX0', 'flipY0', 'flipX1', 'flipY1'], type: [
+	{op: 'func', id: 'getPairings', args: ['flip0', 'flip1'], type: [
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
@@ -588,10 +587,10 @@ const functions = [
 		20, 19, 22, 21, 24, 23, 26, 25,
 	], and: [
 		{op: '=', id: ['dEndX0', 'dEndY0', 'dMidX0', 'dMidY0', 'dCX0', 'dCY0'], and: {
-			op: 'call', id: 'getDirected', and: [{op: '-', and: 'endX0'}, 'endY0', {op: '-', and: 'x0'}, 'y0', 'flipX0', 'flipY0'],
+			op: 'call', id: 'getDirected', and: ['endX0', 'endY0', 'x0', 'y0', 'flip0', -0.5],
 		}},
 		{op: '=', id: ['dEndX1', 'dEndY1', 'dMidX1', 'dMidY1', 'dCX1', 'dCY1'], and: {
-			op: 'call', id: 'getDirected', and: ['endX0', 'endY0', 'x0', 'y0', 'flipX1', 'flipY1'],
+			op: 'call', id: 'getDirected', and: ['endX1', 'endY1', 'x1', 'y1', 'flip1', 0.5],
 		}},
 		'',
 		{op: 'return', multiline: true, and: [
@@ -641,13 +640,13 @@ const functions = [
 			]}},
 		]},
 	]},
-	{op: 'func', id: 'getZoom', args: ['flipX0', 'flipY0', 'flipX1', 'flipY1', 'isInverse'], type: 'zoom', and: [
+	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], type: 'zoom', and: [
 		{op: '=', multiline: 3, id: [
 			'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A',
 			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B',
 			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C',
 		], and: {
-			op: 'call', id: 'getPairings', and: ['flipX0', 'flipY0', 'flipX1', 'flipY1'],
+			op: 'call', id: 'getPairings', and: ['flip0', 'flip1'],
 		}},
 		'',
 		{op: 'return', and: {
@@ -806,15 +805,12 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			getCode([
-				{op: '=', id: 'absX', and: {op: 'abs', and: 'x'}},
-				{op: '=', id: 'absY', and: {op: 'abs', and: 'y'}},
-				'',
 				{op: '=', id: 'snapZoom', type: 'zoom', and: {
 					op: 'max', multiline: true, and: [
-						{op: 'call', id: 'getZoom', and: [true, false, false, false, false]},
-						{op: 'call', id: 'getZoom', and: [false, true, false, false, true]},
-						{op: 'call', id: 'getZoom', and: [false, false, true, false, true]},
-						{op: 'call', id: 'getZoom', and: [false, false, false, true, false]},
+						{op: 'call', id: 'getZoom', and: [false, false, false]},
+						{op: 'call', id: 'getZoom', and: [false, true, true]},
+						{op: 'call', id: 'getZoom', and: [true, false, true]},
+						{op: 'call', id: 'getZoom', and: [true, true, false]},
 					],
 				}},
 			]),

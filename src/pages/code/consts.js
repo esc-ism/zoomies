@@ -77,4 +77,5 @@ export const CLASS_NAMES = {
 	},
 	inactive: getId('inactive'),
 	hovered: getId('hovered'),
+	line: getId('line'),
 };

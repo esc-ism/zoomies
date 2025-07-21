@@ -4,7 +4,7 @@ import Demo, {getAllStartZooms} from '../demo';
 import {DEGREES} from '@/shared';
 import {
 	getConstrainerFromPoints, getZoomProgressed, getProgressedLine,
-	getIntersectProgress, getProgress,
+	getIntersectProgress, getProgress, getFlipped,
 } from '../shared';
 
 import {CORNERS} from '@/pages/consts';
@@ -32,31 +32,10 @@ export const getBound = (zoom, first, second, isTopLeft) => {
 };
 
 export const getSnappedZoom = (() => {
-	const getDirected = (first, second, flipX, flipY) => {
-		const line0 = [first, {}];
-		const line1 = [{z: second.z}, {}];
+	const getDirected = (first, second, flip, cornerX) => {
+		const get = flip ? (position) => getFlipped(position) : ({x, y}) => ({x, y});
 		
-		if (flipX) {
-			line0[1].x = -second.vpEnd.x;
-			line1[0].x = -second.x;
-			line1[1].x = -0.5;
-		} else {
-			line0[1].x = second.vpEnd.x;
-			line1[0].x = second.x;
-			line1[1].x = 0.5;
-		}
-		
-		if (flipY) {
-			line0[1].y = -second.vpEnd.y;
-			line1[0].y = -second.y;
-			line1[1].y = -0.5;
-		} else {
-			line0[1].y = second.vpEnd.y;
-			line1[0].y = second.y;
-			line1[1].y = 0.5;
-		}
-		
-		return [line0, line1];
+		return [[first, get(second.vpEnd)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
 	};
 	
 	const isValidZoom = (zoom) => zoom !== null && !isNaN(zoom);
@@ -78,15 +57,12 @@ export const getSnappedZoom = (() => {
 		|| getZoomPairSecond(pair1, position, doFlip, getProgress(pair1[0], pair2[0]))
 		|| getZoomPairSecond(pair0, position, doFlip, getProgress(pair0[0], pair1[0]));
 	
-	return (first0, _second0, first1, second1, {x, y}) => {
-		const second0 = {..._second0, x: -_second0.x, vpEnd: {..._second0.vpEnd, x: -_second0.vpEnd.x}};
-		const absPosition = {x: Math.abs(x), y: Math.abs(y)};
-		
-		const getPairings = (flipX0, flipY0, flipX1, flipY1) => {
-			const [lineFirst0, lineSecond0] = getDirected(first0, second0, flipX0, flipY0);
-			const [lineFirst1, lineSecond1] = getDirected(first1, second1, flipX1, flipY1);
+	return (first0, second0, first1, second1, position) => {
+		const getPairings = (flip0, flip1) => {
+			const [lineFirst0, lineSecond0] = getDirected(first0, second0, flip0, -0.5);
+			const [lineFirst1, lineSecond1] = getDirected(first1, second1, flip1, 0.5);
 			
-			const a = [
+			return [
 				first0.z >= first1.z ?
 						[first0.z, lineFirst0, getProgressedLine(lineFirst1, first0)] :
 						[first1.z, getProgressedLine(lineFirst0, first1), lineFirst1],
@@ -101,17 +77,13 @@ export const getSnappedZoom = (() => {
 							[second1.z, getProgressedLine(lineSecond0, second1), lineSecond1],
 						],
 			];
-			
-			console.log(a);
-			
-			return a;
 		};
 		
 		return Math.max(...[
-			getZoom(...getPairings(true, false, false, false), absPosition),
-			getZoom(...getPairings(false, true, false, false), absPosition, true),
-			getZoom(...getPairings(false, false, true, false), absPosition, true),
-			getZoom(...getPairings(false, false, false, true), absPosition),
+			getZoom(...getPairings(false, false), position),
+			getZoom(...getPairings(false, true), position, true),
+			getZoom(...getPairings(true, false), position, true),
+			getZoom(...getPairings(true, true), position),
 		].filter(isValidZoom));
 	};
 })();
