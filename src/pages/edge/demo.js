@@ -141,6 +141,7 @@ export default class extends Demo {
 	constrainZoom() {
 		this.zoom = this.getConstrainedZoom();
 		
-		this.setBounds();
+		this.setZoomPoints();
+		this.applyZoomPoints();
 	}
 }

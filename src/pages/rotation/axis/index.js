@@ -164,15 +164,15 @@ const functions = [
 		{op: '=', id: 'distance', type: 'position', angle: 'topRightAngle', isPercent: false, and: {
 			op: 'root', and: {
 				op: '+', and: [
-					{op: 'pow', and: 'image½Width'},
-					{op: 'pow', and: 'image½Height'},
+					{op: 'pow', and: '½imageWidth'},
+					{op: 'pow', and: '½imageHeight'},
 				],
 			},
 		}},
 		'',
 		{op: 'return', multiline: true, and: [
 			{op: '/', and: [
-				'viewport½Width',
+				'½viewportWidth',
 				{op: 'abs', and: {
 					op: '*', and: [
 						'distance',
@@ -181,7 +181,7 @@ const functions = [
 				}},
 			]},
 			{op: '/', and: [
-				'viewport½Height',
+				'½viewportHeight',
 				{op: 'abs', and: {
 					op: '*', and: [
 						'distance',
@@ -190,7 +190,7 @@ const functions = [
 				}},
 			]},
 			{op: '/', and: [
-				'viewport½Width',
+				'½viewportWidth',
 				{op: 'abs', and: {
 					op: '*', and: [
 						'distance',
@@ -199,7 +199,7 @@ const functions = [
 				}},
 			]},
 			{op: '/', and: [
-				'viewport½Height',
+				'½viewportHeight',
 				{op: 'abs', and: {
 					op: '*', and: [
 						'distance',
@@ -221,10 +221,10 @@ const functions = [
 	]},
 	{op: 'func', id: 'getViewportPoints', args: ['zoomSide', 'zoomBase'], type: ['xvp', 'yvp', 'xvp', 'yvp'], pair: [1, 0, 3, 2], and: [
 		{op: '=', id: 'rightX', isPercent: false, type: 'xvp', and: {
-			op: '/', and: ['viewport½Width', 'zoomSide'],
+			op: '/', and: ['½viewportWidth', 'zoomSide'],
 		}},
 		{op: '=', id: 'topY', isPercent: false, type: 'yvp', and: {
-			op: '/', and: ['viewport½Height', 'zoomBase'],
+			op: '/', and: ['½viewportHeight', 'zoomBase'],
 		}},
 		'',
 		{op: '=', id: 'rightTheta', type: 'angle', and: {
@@ -405,9 +405,9 @@ const functions = [
 		{op: '=', id: 'axisIntersectSideY', type: 'y', and: {
 			op: '/', and: [
 				{op: '-', and: [
-					'image½Height',
+					'½imageHeight',
 					{op: '*', and: [
-						'image½Width',
+						'½imageWidth',
 						{op: 'tan', and: 'axisIntersectSideAngle'},
 					]},
 				]},
@@ -416,12 +416,12 @@ const functions = [
 		}},
 		{op: '=', id: 'axisIntersectSideZoom', type: 'zoom', and: {
 			op: '/', and: [
-				'viewport½Width',
+				'½viewportWidth',
 				{op: '*', and: [
 					{op: 'cos', and: 'angleSide'},
 					{op: 'abs', and: {
 						op: '/', and: [
-							'image½Width',
+							'½imageWidth',
 							{op: 'cos', and: 'axisIntersectSideAngle'},
 						],
 					}},
@@ -435,9 +435,9 @@ const functions = [
 		{op: '=', id: 'axisIntersectBaseY', type: 'y', and: {
 			op: '/', and: [
 				{op: '-', and: [
-					'image½Height',
+					'½imageHeight',
 					{op: '*', and: [
-						'image½Width',
+						'½imageWidth',
 						{op: 'tan', and: 'axisIntersectBaseAngle'},
 					]},
 				]},
@@ -446,12 +446,12 @@ const functions = [
 		}},
 		{op: '=', id: 'axisIntersectBaseZoom', type: 'zoom', and: {
 			op: '/', and: [
-				'viewport½Height',
+				'½viewportHeight',
 				{op: '*', and: [
 					{op: 'cos', and: 'angleBase'},
 					{op: 'abs', and: {
 						op: '/', and: [
-							'image½Width',
+							'½imageWidth',
 							{op: 'cos', and: 'axisIntersectBaseAngle'},
 						],
 					}},

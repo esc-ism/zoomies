@@ -1,6 +1,6 @@
 import {addRule} from '@css';
 
-import {CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION, CLASS_MATH} from './consts';
+import {CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION, CLASS_MATH, CLASS_MATH_EQUATION} from './consts';
 
 addRule([`.${CLASS_CODE}`, `.${CLASS_MATH}`], {
 	'box-shadow': 'white 0 0 2px',
@@ -11,6 +11,10 @@ addRule(`.${CLASS_CODE}`, {
 	'line-height': 'normal',
 	'background-color': '#343a45',
 });
+
+addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(1)`, {'text-align': '-webkit-right'});
+addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(1)`, {'text-align': 'right'});
+addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(3)`, {'text-align': 'left'});
 
 // todo delete?
 // header

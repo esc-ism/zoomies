@@ -31,10 +31,10 @@ export default class {
 		this.crosshair.style.display = this.line.element.style.display = 'none';
 	}
 	
-	set(target) {
+	set({x = this.demo.position.x, y = this.demo.position.y}) {
 		const {position, zoom, rotation} = this.demo;
 		
-		if ((!target.x || target.x === position.x) && (!target.y || target.y === position.y)) {
+		if (x === position.x && y === position.y) {
 			this.hide();
 			
 			return;
@@ -43,9 +43,9 @@ export default class {
 		this.crosshair.style.removeProperty('display');
 		this.line.element.style.removeProperty('display');
 		
-		this.line.set(position, target);
+		this.line.set(position, {x, y});
 		
-		setPosition({x: target.x ?? position.x, y: target.y ?? position.y}, this.crosshair);
+		setPosition({x, y}, this.crosshair);
 		
 		this.crosshair.style.scale = `${1 / zoom}`;
 		this.crosshair.style.rotate = `${rotation - DEGREES[90]}rad`;

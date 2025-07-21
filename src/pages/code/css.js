@@ -91,6 +91,7 @@ addRule(`p.${CLASS_MAXIMISED}`, {
 	height: '100vh',
 	margin: '0',
 	'border-radius': '0',
+	'z-index': 2,
 });
 
 addRule(`.${CLASS_MAXIMISED} > *`, {

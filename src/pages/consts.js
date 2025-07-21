@@ -10,6 +10,8 @@ export const CLASS_CODE = getId('code');
 
 export const CLASS_MATH = getId('math');
 
+export const CLASS_MATH_EQUATION = getId('math', 'equation');
+
 export const CLASS_INSTRUCTION = getId('instruction');
 
 export const CLASS_BUTTON = getId('button');

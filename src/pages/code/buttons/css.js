@@ -8,6 +8,7 @@ addRule(`.${CLASS_WRAPPER}`, {
 	left: '100%',
 	float: 'right',
 	
+	'z-index': 1,
 	'user-select': 'none',
 });
 

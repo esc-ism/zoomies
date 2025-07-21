@@ -9,11 +9,11 @@ export const BUILT_INS = {
 	viewportWidth: ({viewportDimensions: {width: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false, doCenter: true}),
 	viewportHeight: ({viewportDimensions: {height: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false, doCenter: true}),
 	
-	'image½Width': ({imageDimensions: {halfWidth: value}}) => ({value, type: 'x', showRotation: false, isPercent: false}),
-	'image½Height': ({imageDimensions: {halfHeight: value}}) => ({value, type: 'y', showRotation: false, isPercent: false}),
+	'½imageWidth': ({imageDimensions: {halfWidth: value}}) => ({value, type: 'x', showRotation: false, isPercent: false}),
+	'½imageHeight': ({imageDimensions: {halfHeight: value}}) => ({value, type: 'y', showRotation: false, isPercent: false}),
 	
-	'viewport½Width': ({viewportDimensions: {halfWidth: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false}),
-	'viewport½Height': ({viewportDimensions: {halfHeight: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false}),
+	'½viewportWidth': ({viewportDimensions: {halfWidth: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false}),
+	'½viewportHeight': ({viewportDimensions: {halfHeight: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false}),
 	
 	π: () => ({value: Math.PI, type: 'angle', fight: true}),
 	'½π': () => ({value: Math.PI / 2, type: 'angle', fight: true}),

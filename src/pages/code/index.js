@@ -53,7 +53,7 @@ const getIndents = (depth) => {
 	return elements;
 };
 
-export const register = (newDemo, statements) => {
+export const register = (newDemo, statements = []) => {
 	demo = newDemo;
 	
 	functions = Object.fromEntries(statements.map((statement) => [
@@ -677,7 +677,9 @@ const interpretters = {
 		
 		const {target, wrapper, ...result} = functions[statement.id](csvs, {...scope}, indent, meta);
 		
-		id.setAttribute('title', getTitle(result.value, result.type));
+		id.setAttribute('title', Array.isArray(result.value) ?
+			`[${result.value.map((value) => getTitle(value, result.type)).join(', ')}]` :
+				getTitle(result.value, result.type));
 		
 		if (makeHoverable(id, undefined, scope, meta)) {
 			makeHoverable(target, undefined, scope, meta);

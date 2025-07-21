@@ -1,12 +1,17 @@
-import {DEGREES} from '@/shared';
+import {DEGREES, xmlns} from '@/shared';
+import {CLASS_MATH, CLASS_MATH_EQUATION} from '../consts';
 
-import {getText, getCode, getButton} from '../shared';
+import {register as registerFunctions} from '../code';
+import {getText, getCode, getButton, registerDemo} from '../shared';
 import {getSnapPosition} from '../center';
 
 import Demo from './demo';
 
 export default (wrapper) => {
 	const demo = new Demo();
+	
+	registerDemo(demo);
+	registerFunctions(demo);
 	
 	wrapper.append(
 		demo.element,
@@ -43,19 +48,29 @@ export default (wrapper) => {
 				'.',
 				'This reciprocal relationship between zoom and viewport size gives the following calculation for pan limits along the x & y axes:',
 			],
-			getCode(
-				'if viewportWidth ÷ zoom ⩾ imageWidth:',
-				'  x = 0',
-				'else:',
-				'  paddingX = viewportWidth ÷ zoom ÷ imageWidth ÷ 2',
-				'  -0.5 + paddingX ⩽ x ⩽ 0.5 - paddingX',
+			getCode([
+				{op: '=', id: 'boundX', type: 'x', and: {
+					op: '?', multiline: true, and: [
+						{op: '>=', and: [
+							{op: '/', and: ['viewportWidth', 'zoom']},
+							'imageWidth',
+						]},
+						0,
+						{op: '-', and: [0.5, {op: '/', and: ['½viewportWidth', 'zoom', 'imageWidth']}]},
+					],
+				}},
 				'',
-				'if viewportHeight ÷ zoom ⩾ imageHeight:',
-				'  y = 0',
-				'else:',
-				'  paddingY = viewportHeight ÷ zoom ÷ imageHeight ÷ 2',
-				'  -0.5 + paddingY ⩽ y ⩽ 0.5 - paddingY',
-			),
+				{op: '=', id: 'boundY', type: 'y', and: {
+					op: '?', multiline: true, and: [
+						{op: '>=', and: [
+							{op: '/', and: ['viewportHeight', 'zoom']},
+							'imageHeight',
+						]},
+						0,
+						{op: '-', and: [0.5, {op: '/', and: ['½viewportHeight', 'zoom', 'imageHeight']}]},
+					],
+				}},
+			]),
 			{
 				tag: 'h2',
 				content: 'Snap-Pan Maths',
@@ -65,12 +80,123 @@ export default (wrapper) => {
 				'Snap panning now requires an accommodating zoom adjustment.',
 				'We can derive the calculation by solving the pan limiting calculation for zoom.',
 			],
-			getCode(
-				'zoomX = viewportWidth ÷ imageWidth ÷ 2 ÷ (0.5 - |x|)',
-				'zoomY = viewportHeight ÷ imageHeight ÷ 2 ÷ (0.5 - |y|)',
+			{tag: 'p', classList: [CLASS_MATH], content: [
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', classList: [CLASS_MATH_EQUATION], xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'r'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mn', xmlns, content: '½'},
+										{tag: 'mi', xmlns, content: 'viewportSize'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'imageSize'},
+									]},
+								]},
+							]},
+						]},
+					]},
+				]},
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', classList: [CLASS_MATH_EQUATION], xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '0.5'},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'r'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'zoom'},
+									]},
+								]},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: '|position|'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '0.5'},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'mi', xmlns, content: '|position|'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'r'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'zoom'},
+									]},
+								]},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'zoom'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mn', xmlns, content: '0.5'},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'mi', xmlns, content: '|position|'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'r'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'zoom'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'r'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mn', xmlns, content: '0.5'},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: '|position|'},
+									]},
+								]},
+							]},
+						]},
+					]},
+				]},
+			]},
+			getCode([
+				{op: '=', id: 'zoomX', type: 'zoom', and: {
+					op: '/', and: ['½viewportWidth', 'imageWidth', {op: '-', and: [0.5, {op: 'abs', and: 'x'}]}],
+				}},
+				{op: '=', id: 'zoomY', type: 'zoom', and: {
+					op: '/', and: ['½viewportHeight', 'imageHeight', {op: '-', and: [0.5, {op: 'abs', and: 'y'}]}],
+				}},
 				'',
-				'zoom = max(zoomX, zoomY)',
-			),
+				{op: '=', id: 'snapZoom', type: 'zoom', and: {
+					op: 'max', and: ['zoomX', 'zoomY'],
+				}},
+			]),
 			{
 				tag: 'h2',
 				content: 'Effectiveness',

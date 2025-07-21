@@ -3,8 +3,8 @@ import Demo from './demo';
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
 
-import {DEGREES, ERROR_ALLOWANCE} from '@/shared';
-import {CLASS_MATH} from '../../consts';
+import {DEGREES, ERROR_ALLOWANCE, xmlns} from '@/shared';
+import {CLASS_MATH, CLASS_MATH_EQUATION} from '../../consts';
 
 export const badTweens = {
 	ratio: 0.6,
@@ -13,9 +13,7 @@ export const badTweens = {
 	zoom: 2,
 };
 
-const xmlns = 'http://www.w3.org/1998/Math/MathML';
-
-const opSpace = {tag: 'mspace', width: '0.8em', xmlns};
+const opSpace = {tag: 'mspace', style: {width: '0.8em'}, xmlns};
 const getOverlined = (content) => ({
 	tag: 'mrow', xmlns, style: {textDecoration: 'overline', textDecorationThickness: '1px'}, content: content.split('').map((content) => ({
 		tag: 'mi', xmlns, content,
@@ -131,15 +129,15 @@ const functions = [
 		{op: '=', id: 'distance', type: 'position', angle: 'topRightAngle', and: {
 			op: 'root', and: {
 				op: '+', and: [
-					{op: 'pow', and: 'image½Width'},
-					{op: 'pow', and: 'image½Height'},
+					{op: 'pow', and: '½imageWidth'},
+					{op: 'pow', and: '½imageHeight'},
 				],
 			},
 		}},
 		'',
 		{op: 'return', multiline: true, and: [
 			{op: '/', and: [
-				'viewport½Width',
+				'½viewportWidth',
 				{op: 'abs', and: {
 					op: '*', and: [
 						'distance',
@@ -148,7 +146,7 @@ const functions = [
 				}},
 			]},
 			{op: '/', and: [
-				'viewport½Height',
+				'½viewportHeight',
 				{op: 'abs', and: {
 					op: '*', and: [
 						'distance',
@@ -157,7 +155,7 @@ const functions = [
 				}},
 			]},
 			{op: '/', and: [
-				'viewport½Width',
+				'½viewportWidth',
 				{op: 'abs', and: {
 					op: '*', and: [
 						'distance',
@@ -166,7 +164,7 @@ const functions = [
 				}},
 			]},
 			{op: '/', and: [
-				'viewport½Height',
+				'½viewportHeight',
 				{op: 'abs', and: {
 					op: '*', and: [
 						'distance',
@@ -314,7 +312,12 @@ export default (wrapper) => {
 						content: 'radians',
 						href: 'https://en.wikipedia.org/wiki/Radian',
 					},
-					' and has a default value of "π ÷ 2".',
+					' and has a default value of ',
+					{tag: 'math', xmlns, content: [
+						{tag: 'mn', xmlns, content: '½'},
+						{tag: 'mi', xmlns, content: 'π'},
+					]},
+					'.',
 				],
 				'Given these zoom values, we can derive pan limits from the user\'s zoom level.',
 			],
@@ -771,7 +774,7 @@ export default (wrapper) => {
 				]},
 				{tag: 'div', content: '...'},
 				{tag: 'math', xmlns, content: [
-					{tag: 'mtable', xmlns, content: [
+					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mn', xmlns, content: '0'},
@@ -779,7 +782,7 @@ export default (wrapper) => {
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '='},
 							]},
-							{tag: 'mtd', xmlns, style: {textAlign: 'left'}, content: [
+							{tag: 'mtd', xmlns, content: [
 								{tag: 'msup', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'r'},
 									{tag: 'mn', xmlns, content: '2'},
@@ -862,7 +865,7 @@ export default (wrapper) => {
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns},
 							{tag: 'mtd', xmlns},
-							{tag: 'mtd', xmlns, style: {textAlign: 'left'}, content: [
+							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '+'},
 								opSpace,
 								{tag: 'mi', xmlns, content: 'r'},
@@ -988,7 +991,7 @@ export default (wrapper) => {
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns},
 							{tag: 'mtd', xmlns},
-							{tag: 'mtd', xmlns, style: {textAlign: 'left'}, content: [
+							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '+'},
 								opSpace,
 								{tag: 'msub', xmlns, content: [

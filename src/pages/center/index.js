@@ -1,6 +1,7 @@
-import {DEGREES} from '@/shared';
+import {DEGREES, xmlns} from '@/shared';
+import {CLASS_MATH} from '../consts';
 
-import {getText, getCode, getButton} from '../shared';
+import {getText, getButton, registerDemo} from '../shared';
 
 import Demo from './demo';
 
@@ -12,6 +13,8 @@ export const getSnapPosition = (demo) => ({
 
 export default (wrapper) => {
 	const demo = new Demo();
+	
+	registerDemo(demo);
 	
 	wrapper.append(
 		demo.element,
@@ -31,10 +34,30 @@ export default (wrapper) => {
 				'Here, we have the simplest reasonable system, where the center of the viewport is bound by the image.',
 				'The system may be described like:',
 			],
-			getCode(
-				'-0.5 ⩽ x ⩽ 0.5',
-				'-0.5 ⩽ y ⩽ 0.5',
-			),
+			{tag: 'p', classList: [CLASS_MATH], content: [
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '-0.5'},
+								{tag: 'mo', xmlns, content: '⩽'},
+								{tag: 'mi', xmlns, content: 'x'},
+								{tag: 'mo', xmlns, content: '⩽'},
+								{tag: 'mn', xmlns, content: '0.5'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '-0.5'},
+								{tag: 'mo', xmlns, content: '⩽'},
+								{tag: 'mi', xmlns, content: 'y'},
+								{tag: 'mo', xmlns, content: '⩽'},
+								{tag: 'mn', xmlns, content: '0.5'},
+							]},
+						]},
+					]},
+				]},
+			]},
 			{
 				tag: 'h2',
 				content: 'Effectiveness',

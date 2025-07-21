@@ -11,3 +11,5 @@ export const getTheta = (toX, toY, fromX = 0, fromY = 0) => Math.atan2(toY - fro
 export const ERROR_ALLOWANCE = 0.001;
 
 export const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+export const xmlns = 'http://www.w3.org/1998/Math/MathML';
