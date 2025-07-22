@@ -24,6 +24,7 @@ for (const [name, content = name] of [
 	['%', 'mod'],
 ]) {
 	addPseudoRule(`.${CLASS_NAMES[name]}::after`, ` ${content} `);
+	addPseudoRule([`br + .${CLASS_NAMES[name]}::after`, `.${CLASS_NAMES.indent} + .${CLASS_NAMES[name]}::after`], `${content} `);
 }
 
 addPseudoRule(`.${CLASS_NAMES.negative}::before`, '-');
@@ -79,7 +80,10 @@ addRule(`.${CLASS_NAMES.evocation}`, {color: 'rgb(212 188 0)'});
 addRule(`.${CLASS_NAMES.branch.accept} > :not(.${CLASS_NAMES.inactive} *)`, {'background-color': 'rgb(0 255 0 / 10%)'});
 addRule(`.${CLASS_NAMES.branch.reject} > :not(.${CLASS_NAMES.inactive} *)`, {'background-color': 'rgb(255 0 0 / 10%)'});
 
-addRule(`.${CLASS_NAMES.hovered}`, {'background-color': 'rgb(255 255 255 / 25%)'});
+addRule([
+	`.${CLASS_NAMES.hovered}:not(.${CLASS_NAMES.csv})`,
+	`.${CLASS_NAMES.hovered}.${CLASS_NAMES.csv} > *`,
+], {'background-color': 'rgb(255 255 255 / 25%)'});
 
 addRule(`.${CLASS_NAMES.inactive}:not(.${CLASS_NAMES.inactive} *)`, {opacity: 0.4});
 

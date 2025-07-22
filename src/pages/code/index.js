@@ -68,9 +68,9 @@ export const register = (newDemo, statements = []) => {
 				const wrapper = getElement(CLASS_NAMES.csv);
 				const arg = getElement(CLASS_NAMES.id);
 				
-				scope[argId] = {value: args.values[i], ...args.shapeData[i], element: arg};
+				scope[argId] = {value: args.values[i], ...args.shapeData[i], element: args.elements[i]};
 				
-				makeHoverable(arg, argId, scope, meta, ...args.unwrapped[i]);
+				makeHoverable(arg, argId, scope, meta, true);
 				
 				arg.innerText = argId;
 				
@@ -391,9 +391,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 				hovered.push(data.element);
 				
 				data.element.classList.add(CLASS_NAMES.hovered);
-			}
-			
-			if ('pair' in data) {
+			} else if ('pair' in data) {
 				hovered.push(scope[data.pair].element);
 				
 				scope[data.pair].element.classList.add(CLASS_NAMES.hovered);
@@ -612,11 +610,9 @@ const interpretters = {
 		
 		const {value, elements: operand} = interpret(statement.and, scope, indent, meta);
 		
-		element.append(...operand);
-		
 		meta.spread = true;
 		
-		return {value, elements: [element]};
+		return {value, elements: [element, ...operand]};
 	},
 	abs: (statement, scope, indent, meta) => {
 		const element = getElement(CLASS_NAMES.abs);
@@ -684,13 +680,23 @@ const interpretters = {
 		if (makeHoverable(id, undefined, scope, meta)) {
 			makeHoverable(target, undefined, scope, meta);
 			
-			const newline = document.createElement('br');
+			const newline = document.createElement('span');
 			const {multiline} = meta.branch[meta.branch.length - 2];
+			
+			newline.append(document.createElement('br'), ...getIndents(indent));
 			
 			id.addEventListener('click', () => {
 				id.replaceWith(wrapper);
 				
-				if (!multiline) {
+				if (multiline) {
+					return;
+				}
+				
+				if (args.parentElement.classList.contains(CLASS_NAMES.csv)) {
+					const {nextSibling} = args.parentElement;
+					
+					nextSibling.insertBefore(newline, nextSibling.firstChild);
+				} else {
 					args.insertAdjacentElement('afterend', newline);
 				}
 			});

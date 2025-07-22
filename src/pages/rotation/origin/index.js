@@ -1,4 +1,5 @@
 import Demo from './demo';
+import SHARED_FUNCTIONS from '../code';
 
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
@@ -21,7 +22,8 @@ const getOverlined = (content) => ({
 });
 
 const functions = [
-	{op: 'func', id: 'getBound', args: ['cornerX', 'cornerY', 'cornerZoom'], and: [
+	...SHARED_FUNCTIONS,
+	{op: 'func', id: 'getBound', args: ['cornerX', 'cornerY', 'cornerZoom'], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '<=', and: [
 				'zoom',
@@ -53,11 +55,12 @@ const functions = [
 			]},
 		]},
 	]},
-	{op: 'func', id: 'getSnippedStart', args: ['cornerX', 'cornerY', 'cornerZoom', 'otherZoom'], and: [
+	{op: 'func', id: 'getSnippedStart', args: ['cornerX', 'cornerY', 'cornerZoom', 'otherZoom'], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '>=', and: ['cornerZoom', 'otherZoom']},
 			{op: 'return', and: [0, 0]},
 		]},
+		'',
 		{op: '=', id: 'proportion', and: {
 			op: '-', and: [
 				1,
@@ -79,7 +82,7 @@ const functions = [
 			]},
 		]},
 	]},
-	{op: 'func', id: 'getCorners', and: [
+	{op: 'func', id: 'getCorners', type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
 		{op: 'if', and: [
 			{op: '<=', and: [
 				{op: '-', and: 'x'},
@@ -103,78 +106,7 @@ const functions = [
 		]},
 		{op: 'return', and: [0.5, -0.5, -0.5, -0.5]},
 	]},
-	{op: 'func', id: 'getAllStartZooms', and: [
-		{op: '=', id: 'offset', type: 'angle', and: {
-			op: 'atan', and: {
-				op: '/', and: [
-					'imageWidth',
-					'imageHeight',
-				],
-			},
-		}},
-		'',
-		{op: '=', id: 'topLeftAngle', type: 'angle', and: {
-			op: '+', and: [
-				'rotation',
-				'offset',
-			],
-		}},
-		{op: '=', id: 'topRightAngle', type: 'angle', and: {
-			op: '-', and: [
-				'rotation',
-				'offset',
-			],
-		}},
-		'',
-		{op: '=', id: 'distance', type: 'position', angle: 'topRightAngle', and: {
-			op: 'root', and: {
-				op: '+', and: [
-					{op: 'pow', and: '½imageWidth'},
-					{op: 'pow', and: '½imageHeight'},
-				],
-			},
-		}},
-		'',
-		{op: 'return', multiline: true, and: [
-			{op: '/', and: [
-				'½viewportWidth',
-				{op: 'abs', and: {
-					op: '*', and: [
-						'distance',
-						{op: 'cos', and: 'topLeftAngle'},
-					],
-				}},
-			]},
-			{op: '/', and: [
-				'½viewportHeight',
-				{op: 'abs', and: {
-					op: '*', and: [
-						'distance',
-						{op: 'sin', and: 'topLeftAngle'},
-					],
-				}},
-			]},
-			{op: '/', and: [
-				'½viewportWidth',
-				{op: 'abs', and: {
-					op: '*', and: [
-						'distance',
-						{op: 'cos', and: 'topRightAngle'},
-					],
-				}},
-			]},
-			{op: '/', and: [
-				'½viewportHeight',
-				{op: 'abs', and: {
-					op: '*', and: [
-						'distance',
-						{op: 'sin', and: 'topRightAngle'},
-					],
-				}},
-			]},
-		]},
-	]},
-	{op: 'func', id: 'getStartZooms', and: [
+	{op: 'func', id: 'getStartZooms', type: ['zoom', 'zoom'], and: [
 		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], type: ['zoom', 'zoom', 'zoom', 'zoom'], and: {
 			op: 'call', id: 'getAllStartZooms',
 		}},
@@ -189,86 +121,6 @@ const functions = [
 				'topRightY',
 			]},
 		]},
-	]},
-	{op: 'func', id: 'getIntersectRatio', args: ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k'], and: [
-		{op: '=', id: 'a', and: {
-			op: '-', and: [
-				{op: '+', and: [
-					{op: '*', and: ['g', 'j']},
-					{op: '*', and: ['e', 'h']},
-					{op: '*', and: ['k', 'd']},
-					{op: '*', and: ['i', 'f']},
-				]},
-				{op: '*', and: ['g', 'h']},
-				{op: '*', and: ['j', 'e']},
-				{op: '*', and: ['k', 'f']},
-				{op: '*', and: ['i', 'd']},
-			],
-		}},
-		{op: '=', id: 'b', and: {
-			op: '-', and: [
-				{op: '+', and: [
-					{op: '*', and: ['g', 'h']},
-					{op: '*', and: ['e', 'x']},
-					{op: '*', and: ['j', 'e']},
-					{op: '*', and: ['k', 'x']},
-					{op: '*', and: ['i', 'd', 2]},
-					{op: '*', and: ['f', 'y']},
-					{op: '*', and: ['h', 'y']},
-				]},
-				{op: '*', and: ['g', 'x']},
-				{op: '*', and: ['e', 'h', 2]},
-				{op: '*', and: ['j', 'y']},
-				{op: '*', and: ['k', 'd']},
-				{op: '*', and: ['i', 'x']},
-				{op: '*', and: ['f', 'i']},
-				{op: '*', and: ['d', 'y']},
-			],
-		}},
-		{op: '=', id: 'c', and: {
-			op: '-', and: [
-				{op: '+', and: [
-					{op: '*', and: ['h', 'e']},
-					{op: '*', and: ['i', 'x']},
-					{op: '*', and: ['d', 'y']},
-				]},
-				{op: '*', and: ['e', 'x']},
-				{op: '*', and: ['h', 'y']},
-				{op: '*', and: ['d', 'i']},
-			],
-		}},
-		'',
-		{op: 'if', and: [
-			{op: '!=', and: ['g', 'k']},
-			{op: 'return', and: {
-				op: '/', and: [
-					{op: '-', and: [
-						{op: '-', and: 'b'},
-						{op: 'root', and: {
-							op: '-', and: [
-								{op: 'pow', and: 'b'},
-								{op: '*', and: [4, 'a', 'c']},
-							],
-						}},
-					]},
-					{op: '*', and: [2, 'a']},
-				],
-			}},
-		]},
-		{op: 'return', and: {
-			op: '/', and: [
-				{op: '+', and: [
-					{op: '-', and: 'b'},
-					{op: 'root', and: {
-						op: '-', and: [
-							{op: 'pow', and: 'b'},
-							{op: '*', and: [4, 'a', 'c']},
-						],
-					}},
-				]},
-				{op: '*', and: [2, 'a']},
-			],
-		}},
 	]},
 ];
 
@@ -322,7 +174,7 @@ export default (wrapper) => {
 				'Given these zoom values, we can derive pan limits from the user\'s zoom level.',
 			],
 			getCode([
-				{op: '=', id: ['topLeftZoom', 'topRightZoom'], type: 'zoom', and: {
+				{op: '=', id: ['topLeftZoom', 'topRightZoom'], and: {
 					op: 'call', id: 'getStartZooms',
 				}},
 				'',
@@ -330,10 +182,10 @@ export default (wrapper) => {
 					op: 'call', id: 'getBound', and: [-0.5, 0.5, 'topLeftZoom'],
 				}},
 				'',
-				{op: '=', id: 'bottomRightX', and: {
+				{op: '=', id: 'bottomRightX', ref: 'topLeftX', pair: 'bottomRightY', and: {
 					op: '-', and: 'topLeftX',
 				}},
-				{op: '=', id: 'bottomRightY', and: {
+				{op: '=', id: 'bottomRightY', ref: 'topLeftY', pair: 'bottomRightX', and: {
 					op: '-', and: 'topLeftY',
 				}},
 				'',
@@ -341,10 +193,10 @@ export default (wrapper) => {
 					op: 'call', id: 'getBound', and: [0.5, 0.5, 'topRightZoom'],
 				}},
 				'',
-				{op: '=', id: 'bottomLeftX', and: {
+				{op: '=', id: 'bottomLeftX', ref: 'topRightX', pair: 'bottomLeftY', and: {
 					op: '-', and: 'topRightX',
 				}},
-				{op: '=', id: 'bottomLeftY', and: {
+				{op: '=', id: 'bottomLeftY', ref: 'topRightY', pair: 'bottomLeftX', and: {
 					op: '-', and: 'topRightY',
 				}},
 			]),
@@ -1047,7 +899,7 @@ export default (wrapper) => {
 				'From here, it\'s a simple calculation using the highZoom value from earlier to find our final snap zoom.',
 			],
 			getCode([
-				{op: '=', id: 'ratio', type: 'zoom', and: {
+				{op: '=', id: 'ratio', and: {
 					op: 'call', id: 'getIntersectRatio', and: [
 						'fromX0',
 						'fromY0',
@@ -1057,6 +909,7 @@ export default (wrapper) => {
 						'fromY1',
 						'toX1',
 						'toY1',
+						{op: '!=', and: ['toY0', 'toY1']},
 					],
 				}},
 				'',
