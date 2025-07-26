@@ -1,4 +1,4 @@
-import Demo from '../rotation/axis/demo';
+import Demo from '../rotation/2line/axisViewport/demo';
 
 export default class extends Demo {
 	constructor() {

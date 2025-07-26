@@ -4,8 +4,8 @@ import Demo from './demo';
 
 import {getText} from '../shared';
 import {getZoomProgressed} from '../rotation/shared';
-import {getZoomPoints} from '../rotation/axis/demo';
-import {getDimensions} from '../rotation/axis';
+import {getZoomPoints} from '../rotation/2line/axisViewport/demo';
+import {getDimensions} from '../rotation/2line/axisViewport';
 
 import {CLASS_INSTRUCTION} from '../consts';
 import {DEGREES} from '@/shared';

@@ -1,9 +1,11 @@
-import {getText, getButton} from '../shared';
+import {getText, getButton, registerDemo} from '../shared';
 
 import Demo from './demo';
 
 export default (wrapper) => {
 	const demo = new Demo();
+	
+	registerDemo(demo);
 	
 	wrapper.append(
 		demo.element,
@@ -58,9 +60,9 @@ export default (wrapper) => {
 				'A competent user of this system may ',
 				getButton('self-impose', [
 					[{zoom: 1, position: 0.2}],
-					['position', {x: 0.3, y: -0.2}],
-					['position', {x: -0.2, y: -0.3}],
-					['position', {x: -0.4, y: 0.2}],
+					[{position: {x: 0.3, y: -0.2}}],
+					[{position: {x: -0.2, y: -0.3}}],
+					[{position: {x: -0.4, y: 0.2}}],
 				]),
 				' a pan-limiting algorithm to keep their bearings.',
 				'But what if their ',

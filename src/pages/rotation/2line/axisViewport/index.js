@@ -1,11 +1,12 @@
 import {DEGREES} from '@/shared';
 
-import {register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, registerDemo} from '../../shared';
-import {badTweens} from '../origin';
+import {register as registerFunctions} from '../../../code';
+import {getText, getCode, getButton, registerDemo} from '../../../shared';
+import {badTweens} from '../../origin';
 
-import SHARED_FUNCTIONS from '../code';
-import Demo, {getSnappedZoom, getZoomPoints} from './demo';
+import SHARED_FUNCTIONS from '../../code';
+import Demo, {getZoomPoints} from './demo';
+import {getSnappedZoom} from '../demo';
 
 export const getDimensions = (ratio, {width, height}) => {
 	const dimensions = {};
@@ -542,7 +543,7 @@ export default (wrapper) => {
 		getText(
 			{
 				tag: 'h1',
-				content: 'Good Rotation',
+				content: 'Two-Line Rotation',
 			},
 			[
 				'Let\'s start by seeing how that ',

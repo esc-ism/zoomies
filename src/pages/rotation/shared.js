@@ -158,13 +158,6 @@ const get1DConstrainer = (() => {
 	};
 })();
 
-const swap = (array, i0, i1) => {
-	const temp = array[i0];
-	
-	array[i0] = array[i1];
-	array[i1] = temp;
-};
-
 export const getConstrainerFromPoints = (() => {
 	const setHighTangent = (tangent, low, high) => {
 		tangent.low = tangent[low];
@@ -174,7 +167,10 @@ export const getConstrainerFromPoints = (() => {
 		tangent[high].isHigh = true;
 	};
 	
-	const getFrame = ({width, height}, point0, point1) => {
+	const isHighSide = (lines, high, low) => (lines[high].c < lines[low].c) === (lines[high].m > 0);
+	const isHighTop = (lines, high, low) => lines[high].c > lines[low].c;
+	
+	const getFrame = (point0, point1) => {
 		const flipped0 = getFlipped(point0);
 		const flipped1 = getFlipped(point1);
 		
@@ -222,35 +218,15 @@ export const getConstrainerFromPoints = (() => {
 			side: tangentM1,
 		};
 		
-		if (width < height) {
-			if (getLineX(lines.right, 0) < getLineX(lines.left, 0)) {
-				swap(lines, 'right', 'left');
-				
-				swap(points, 'bottomLeft', 'bottomRight');
-				swap(points, 'topLeft', 'topRight');
-				
-				swap(tangents, 'right', 'left');
-				swap(tangents.top, 'right', 'left');
-				swap(tangents.bottom, 'right', 'left');
-			}
-		} else {
-			if (lines.top.c < lines.bottom.c) {
-				swap(lines, 'top', 'bottom');
-				
-				swap(points, 'topLeft', 'bottomLeft');
-				swap(points, 'topRight', 'bottomRight');
-				
-				swap(tangents, 'top', 'bottom');
-				swap(tangents.left, 'top', 'bottom');
-				swap(tangents.right, 'top', 'bottom');
-			}
-		}
-		
 		tangents.top.isSide = tangents.bottom.isSide = Math.abs(m0) > 1;
-		tangents.top.isHigh = !tangents.top.isSide || (lines.top.c < 0) === (m0 > 0);
+		tangents.top.isHigh = (tangents.top.isSide ? isHighSide : isHighTop)(lines, 'top', 'bottom');
 		tangents.bottom.isHigh = !tangents.top.isHigh;
 		
-		if (tangents.top.isSide && tangents.top.isHigh) {
+		tangents.right.isSide = tangents.left.isSide = Math.abs(m1) > 1;
+		tangents.right.isHigh = (tangents.right.isSide ? isHighSide : isHighTop)(lines, 'right', 'left');
+		tangents.left.isHigh = !tangents.right.isHigh;
+		
+		if (tangents.top.isSide === tangents.top.isHigh) {
 			setHighTangent(tangents.top, 'right', 'left');
 			setHighTangent(tangents.bottom, 'right', 'left');
 		} else {
@@ -258,11 +234,7 @@ export const getConstrainerFromPoints = (() => {
 			setHighTangent(tangents.bottom, 'left', 'right');
 		}
 		
-		tangents.right.isSide = tangents.left.isSide = Math.abs(m1) > 1;
-		tangents.right.isHigh = tangents.right.isSide || lines.right.c > 0;
-		tangents.left.isHigh = !tangents.right.isHigh;
-		
-		if (!tangents.right.isSide && tangents.right.isHigh) {
+		if (tangents.right.isSide !== tangents.right.isHigh) {
 			setHighTangent(tangents.right, 'top', 'bottom');
 			setHighTangent(tangents.left, 'top', 'bottom');
 		} else {
@@ -273,9 +245,13 @@ export const getConstrainerFromPoints = (() => {
 		return [points, lines, tangents];
 	};
 	
-	return (image, point0, point1) => {
+	return (point0, point1) => {
 		if (point0 && point1) {
-			const [points, lines, tangents] = getFrame(image, point0, point1);
+			if (point0.isFirst && point1.isFirst && point0.m === point1.m) {
+				return get1DConstrainer(point0.p > point1.p ? point0 : point1);
+			}
+			
+			const [points, lines, tangents] = getFrame(point0, point1);
 			
 			return [
 				get2DConstrained.bind(null, points, lines, tangents), Object.values(points), [

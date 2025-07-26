@@ -80,7 +80,6 @@ export default class extends Demo {
 	
 	getPositionConstrainer() {
 		return getConstrainerFromPoints(
-			this.imageDimensions,
 			getBound(this.zoom, this.zoomPoints[0], true),
 			getBound(this.zoom, this.zoomPoints[1], false),
 		);
