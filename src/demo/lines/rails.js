@@ -52,25 +52,25 @@ export default class extends Hideables {
 		const ordered = [];
 		
 		const addToOrdered = (progress, index) => {
-			for (const [i, orderedIndex] of ordered.entries()) {
-				if (progresses[orderedIndex] >= progress) {
-					ordered.splice(i, 0, index);
+			for (const [i, [, orderedProgress]] of ordered.entries()) {
+				if (orderedProgress >= progress) {
+					ordered.splice(i, 0, [index, progress]);
 					
 					return;
 				}
 			}
 			
-			ordered.push(index);
+			ordered.push([index, progress]);
 		};
 		
 		for (const [i, progress] of progresses.entries()) {
 			this[i].setProgress(progress);
 			
-			addToOrdered(progress, i);
+			addToOrdered(progress * this[i].element.clientHeight, i);
 		}
 		
 		// where rails overlap, show the one that farther progressed
-		for (const i of ordered.slice(1)) {
+		for (const [i] of ordered.slice(1)) {
 			this[i].front();
 		}
 	}
