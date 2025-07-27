@@ -46,6 +46,7 @@ export default [
 			'object-shorthand': 'error',
 			'jsdoc/require-jsdoc': 'off',
 			'no-sparse-arrays': 'off',
+			'no-unused-vars': ['error', {args: 'all'}],
 			'@stylistic/no-extra-semi': 'error',
 			'@stylistic/no-extra-parens': 'error',
 			'@stylistic/quote-props': ['error', 'as-needed'],
@@ -56,7 +57,7 @@ export default [
 			'@stylistic/arrow-parens': ['error', 'always'],
 			'@stylistic/linebreak-style': ['error', 'unix'],
 			'@stylistic/no-trailing-spaces': ['error', {skipBlankLines: true}],
-			// '@stylistic/array-bracket-newline': ['error', {multiline: true}],
+			'@stylistic/array-bracket-newline': ['error', {multiline: true}],
 			'@stylistic/array-element-newline': 'off',
 			// the exceptions thing is weird
 			'@stylistic/comma-style': ['error', 'last', {exceptions: {CallExpression: false}}],
@@ -68,8 +69,6 @@ export default [
 				{blankLine: 'any', prev: 'case', next: 'case'},
 			],
 			'indent-empty-lines/indent-empty-lines': ['error', 'tab'],
-			// 'no-unused-vars': 'off',
-			// 'no-undef': 'off',
 		},
 	},
 ];
