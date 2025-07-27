@@ -34,11 +34,11 @@ export default class extends Demo {
 		this.tangents.set(...tangents);
 	}
 	
-	updateImageDimensions(doApply = true) {
-		super.updateImageDimensions(false);
+	updatesizesImage(doApply = true) {
+		super.updatesizesImage(false);
 		
 		this.cornerAngle = Math.atan(this.ratioImage);
-		this.cornerDistance = getCornerDistance(this.imageDimensions);
+		this.cornerDistance = getCornerDistance(this.sizesImage);
 		
 		if (doApply) {
 			this.constrainPosition({ratio: true});
@@ -47,7 +47,7 @@ export default class extends Demo {
 	}
 	
 	getAllStartZooms() {
-		return getAllStartZooms(this.rotation, this.viewportDimensions, this.imageDimensions, this.cornerDistance, this.cornerAngle);
+		return getAllStartZooms(this.rotation, this.sizesViewport, this.sizesImage, this.cornerDistance, this.cornerAngle);
 	}
 	
 	applyZoomPoints() {
@@ -61,7 +61,7 @@ export default class extends Demo {
 	}
 	
 	setZoomPoints() {
-		this.zoomPoints = this.getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions);
+		this.zoomPoints = this.getZoomPoints(this.rotation, this.sizesViewport, this.sizesImage);
 		
 		this.setRails();
 	}

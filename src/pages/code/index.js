@@ -250,7 +250,7 @@ const getLine = ({value: length, doCenter = false, isPercent = true}, rotation, 
 	}
 	
 	if (!isPercent) {
-		height /= demo.imageDimensions.height;
+		height /= demo.sizesImage.height;
 	}
 	
 	if (height < 0) {

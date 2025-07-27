@@ -1,13 +1,4 @@
-import {getSecond} from '../axisViewport/zoomPoints';
 import {getFlipped, getProgress} from '../../shared';
-
-export const isPartialTarget = (secondSide, secondBase, {isEvenQuadrant, image}) => {
-	if (image.width > image.height) {
-		return secondBase.y < -secondSide.y;
-	}
-	
-	return (secondBase.x < secondSide.x) === isEvenQuadrant;
-};
 
 const getGenericIntersection = (line0, line1) => {
 	const a0 = line0[0].y - line0[1].y;
@@ -26,20 +17,9 @@ const getGenericIntersection = (line0, line1) => {
 	};
 };
 
-const replaceVpEnd = (() => {
-	/*
-			x=(1-lZ/hZ)*(eX-sX)+sX
-			
-			x-sX=(1-lZ/hZ)*(eX-sX)
-			(x-sX)/(1-lZ/hZ)=eX-sX
-			(x-sX)/(1-lZ/hZ)+sX=eX
-			
-			(x-sX)/(eX-sX)=1-lZ/hZ
-			lZ/hZ=1-(x-sX)/(eX-sX)
-			lZ/(1-(x-sX)/(eX-sX))=hZ
-		*/
-	const getModdedSecond = (intersection, [second, end], firstZoom, secondZoom) => {
-		const z = secondZoom / (1 - (intersection.x - second.x) / (end.x - second.x));
+export const replaceVpEnd = (() => {
+	const getModdedSecond = (intersection, second, end, firstZoom) => {
+		const z = second.z / (1 - (intersection.x - second.x) / (end.x - second.x));
 		const zoomProgress = getProgress(firstZoom, z);
 		const vpEnd = {x: intersection.x / zoomProgress, y: intersection.y / zoomProgress};
 		
@@ -51,48 +31,28 @@ const replaceVpEnd = (() => {
 		};
 	};
 	
-	return (secondSide, secondBase, {isEvenQuadrant, image, startZooms: [firstZoomSide, firstZoomBase]}, force) => {
-		const baseLine = [];
-		const sideLine = [];
-		
-		let flipped;
-		
-		// side is top-left if isEvenQuadrant
-		if (image.width > image.height) {
-			if (isEvenQuadrant) {
-				flipped = Object.assign(secondSide, getFlipped(secondSide));
-				
-				baseLine.push(secondBase, {x: 0.5, y: 0.5});
-				sideLine.push(flipped, {x: 0.5, y: -0.5});
-			} else {
-				flipped = Object.assign(secondBase, getFlipped(secondBase));
-				
-				baseLine.push(flipped, {x: 0.5, y: -0.5});
-				sideLine.push(secondSide, {x: 0.5, y: 0.5});
-			}
-		} else {
-			baseLine.push(secondBase, {x: isEvenQuadrant ? 0.5 : -0.5, y: 0.5});
-			sideLine.push(secondSide, {x: isEvenQuadrant ? -0.5 : 0.5, y: 0.5});
+	const getEnds = (secondSide, secondBase, {isEvenQuadrant, cornerSide, cornerBase, ratio}) => {
+		if (ratio > 1) {
+			return [cornerSide, cornerBase];
 		}
 		
-		const intersection = getGenericIntersection(baseLine, sideLine);
+		return isEvenQuadrant ?
+				[getFlipped(cornerSide), cornerBase, Object.assign(secondSide, getFlipped(secondSide))] :
+				[cornerSide, getFlipped(cornerBase), Object.assign(secondBase, getFlipped(secondBase))];
+	};
+	
+	return (secondSide, secondBase, data) => {
+		const [endSide, endBase, flipped] = getEnds(secondSide, secondBase, data);
+		const intersection = getGenericIntersection([secondSide, endSide], [secondBase, endBase]);
 		
-		Object.assign(secondBase, getModdedSecond(intersection, baseLine, firstZoomBase, secondBase.z));
-		Object.assign(secondSide, getModdedSecond(intersection, sideLine, firstZoomSide, secondSide.z));
+		Object.assign(secondSide, getModdedSecond(intersection, secondSide, endSide, data.startZooms[0]));
+		Object.assign(secondBase, getModdedSecond(intersection, secondBase, endBase, data.startZooms[1]));
 		
 		if (flipped) {
 			flipped.vpEnd = getFlipped(flipped.vpEnd);
 			Object.assign(flipped, getFlipped(flipped));
 		}
+		
+		return [secondSide, secondBase];
 	};
 })();
-
-export default (data, force) => {
-	const [secondSide, secondBase] = getSecond(data);
-	
-	if (force || isPartialTarget(secondSide, secondBase, data)) {
-		replaceVpEnd(secondSide, secondBase, data, force);
-	}
-	
-	return [secondSide, secondBase];
-};

@@ -1,4 +1,4 @@
 import getZoomPoints from '../../zoomPoints';
-import getSecond from '../zoomPoints';
+import {modAll} from '../zoomPoints';
 
-export default getZoomPoints.bind(null, (data) => getSecond(data, true));
+export default getZoomPoints.bind(null, (data) => modAll(data));

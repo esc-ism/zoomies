@@ -3,17 +3,17 @@ import {getIdGetter} from '@css';
 export const ANGLE_RADIUS = 10;
 
 export const BUILT_INS = {
-	imageWidth: ({imageDimensions: {width: value}}) => ({value, type: 'x', showRotation: false, isPercent: false, doCenter: true}),
-	imageHeight: ({imageDimensions: {height: value}}) => ({value, type: 'y', showRotation: false, isPercent: false, doCenter: true}),
+	imageWidth: ({sizesImage: {width: value}}) => ({value, type: 'x', showRotation: false, isPercent: false, doCenter: true}),
+	imageHeight: ({sizesImage: {height: value}}) => ({value, type: 'y', showRotation: false, isPercent: false, doCenter: true}),
 	
-	viewportWidth: ({viewportDimensions: {width: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false, doCenter: true}),
-	viewportHeight: ({viewportDimensions: {height: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false, doCenter: true}),
+	viewportWidth: ({sizesViewport: {width: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false, doCenter: true}),
+	viewportHeight: ({sizesViewport: {height: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false, doCenter: true}),
 	
-	'½imageWidth': ({imageDimensions: {halfWidth: value}}) => ({value, type: 'x', showRotation: false, isPercent: false}),
-	'½imageHeight': ({imageDimensions: {halfHeight: value}}) => ({value, type: 'y', showRotation: false, isPercent: false}),
+	'½imageWidth': ({sizesImage: {halfWidth: value}}) => ({value, type: 'x', showRotation: false, isPercent: false}),
+	'½imageHeight': ({sizesImage: {halfHeight: value}}) => ({value, type: 'y', showRotation: false, isPercent: false}),
 	
-	'½viewportWidth': ({viewportDimensions: {halfWidth: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false}),
-	'½viewportHeight': ({viewportDimensions: {halfHeight: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false}),
+	'½viewportWidth': ({sizesViewport: {halfWidth: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false}),
+	'½viewportHeight': ({sizesViewport: {halfHeight: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false}),
 	
 	π: () => ({value: Math.PI, type: 'angle', fight: true}),
 	'½π': () => ({value: Math.PI / 2, type: 'angle', fight: true}),

@@ -127,7 +127,7 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		return this.constructor.getZoomPoints(this.rotation, this.viewportDimensions, this.imageDimensions, this.viewportRatio, this.ratioViewportInverse, this.getAllStartZooms());
+		return this.constructor.getZoomPoints(this, this.getAllStartZooms());
 	}
 	
 	getSnappedZoom() {

@@ -7,8 +7,8 @@ import Demo from './demo';
 
 // top right corner with zoom=2
 export const getSnapPosition = (demo) => ({
-	x: 0.5 - demo.viewportDimensions.width / demo.imageDimensions.width / 4,
-	y: 0.5 - demo.viewportDimensions.height / demo.imageDimensions.height / 4,
+	x: 0.5 - demo.sizesViewport.width / demo.sizesImage.width / 4,
+	y: 0.5 - demo.sizesViewport.height / demo.sizesImage.height / 4,
 });
 
 export default (wrapper) => {

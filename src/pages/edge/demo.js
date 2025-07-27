@@ -59,20 +59,17 @@ export default class extends Demo {
 	}
 	
 	setZoomPoints() {
-		const zoomX = this.ratioImage / this.ratioViewport;
-		const zoomY = this.ratioViewport / this.ratioImage;
-		
-		if (zoomX > zoomY) {
+		if (this.ratio < 1) {
 			this.zoomPoints = [
 				{x: 0, y: 0, z: 1},
-				{x: 0.5 - 0.5 / zoomX, y: 0, z: zoomX, vpEnd: {x: 0.5, y: 0}},
+				{x: 0.5 - 0.5 / this.ratioInverse, y: 0, z: this.ratioInverse, vpEnd: {x: 0.5, y: 0}},
 			];
 			
 			this.lowAxis = 'x';
 		} else {
 			this.zoomPoints = [
 				{x: 0, y: 0, z: 1},
-				{x: 0, y: 0.5 - 0.5 / zoomY, z: zoomY, vpEnd: {x: 0, y: 0.5}},
+				{x: 0, y: 0.5 - 0.5 / this.ratio, z: this.ratio, vpEnd: {x: 0, y: 0.5}},
 			];
 			
 			this.lowAxis = 'y';
@@ -133,8 +130,8 @@ export default class extends Demo {
 	
 	getConstrainedZoom({x, y} = this.position) {
 		return Math.max(
-			this.viewportDimensions.width / this.imageDimensions.width / 2 / (0.5 - Math.abs(x)),
-			this.viewportDimensions.height / this.imageDimensions.height / 2 / (0.5 - Math.abs(y)),
+			this.sizesViewport.width / this.sizesImage.width / 2 / (0.5 - Math.abs(x)),
+			this.sizesViewport.height / this.sizesImage.height / 2 / (0.5 - Math.abs(y)),
 		);
 	}
 	

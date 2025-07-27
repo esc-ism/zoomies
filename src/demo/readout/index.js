@@ -55,7 +55,7 @@ export default class {
 		this.#set(IDS.ANGLE, rotation);
 	}
 	
-	setRatio({ratioViewport, ratioImage}) {
-		this.#set(IDS.RATIO, ratioViewport / ratioImage);
+	setRatio({ratio}) {
+		this.#set(IDS.RATIO, ratio);
 	}
 }

@@ -41,8 +41,8 @@ export default class {
 	elements = getElements();
 	element = this.elements.wrapper;
 	
-	imageDimensions = {};
-	viewportDimensions = {};
+	sizesImage = {};
+	sizesViewport = {};
 	
 	position = {x: 0, y: 0};
 	rotation = DEGREES[90];
@@ -54,6 +54,9 @@ export default class {
 	_ratioViewport = 1;
 	ratioViewportInverse = 1;
 	
+	ratio = 1;
+	ratioInverse = 1;
+	
 	#init = dock(this.element)
 		.then(() => new Promise((resolve) => {
 			const observer = new ResizeObserver(() => {
@@ -63,7 +66,7 @@ export default class {
 					return;
 				}
 				
-				this.updateViewportDimensions();
+				this.updatesizesViewport();
 				
 				resolve();
 			});
@@ -94,7 +97,7 @@ export default class {
 			event.preventDefault();
 			
 			const moveCallback = (event) => {
-				this.ratioViewport = (event.clientX - offsetX) / this.viewportDimensions.height;
+				this.ratioViewport = (event.clientX - offsetX) / this.sizesViewport.height;
 			};
 			
 			resizer.setPointerCapture(event.pointerId);
@@ -195,8 +198,8 @@ export default class {
 				}
 				
 				if (buttons === 1) {
-					this.position.x = (offsetX / this.imageDimensions.width) - 0.5;
-					this.position.y = (-offsetY / this.imageDimensions.height) + 0.5;
+					this.position.x = (offsetX / this.sizesImage.width) - 0.5;
+					this.position.y = (-offsetY / this.sizesImage.height) + 0.5;
 					
 					this.constrainZoom();
 					
@@ -215,9 +218,7 @@ export default class {
 		
 		this.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
 		
-		this.constructor.readout.setRatio(this);
-		
-		this.updateImageDimensions();
+		this.updatesizesImage();
 	}
 	
 	get ratioImage() {
@@ -230,9 +231,7 @@ export default class {
 		
 		this.elements.viewport.style.aspectRatio = `${ratio}`;
 		
-		this.constructor.readout.setRatio(this);
-		
-		this.updateViewportDimensions();
+		this.updatesizesViewport();
 	}
 	
 	get ratioViewport() {
@@ -251,10 +250,15 @@ export default class {
 		data.halfHeight = data.height / 2;
 	}
 	
-	updateImageDimensions(doApply = true) {
-		this.elements.imageWrapper.style.height = `${Math.min(1, this.ratioViewport / this.ratioImage) * 100}%`;
+	updatesizesImage(doApply = true) {
+		this.ratio = this.ratioViewport / this.ratioImage;
+		this.ratioInverse = 1 / this.ratio;
 		
-		this.setDimensions(this.imageDimensions, this.elements.imageWrapper);
+		this.elements.imageWrapper.style.height = `${Math.min(1, this.ratio) * 100}%`;
+		
+		this.setDimensions(this.sizesImage, this.elements.imageWrapper);
+		
+		this.constructor.readout.setRatio(this);
 		
 		if (doApply) {
 			this.constrainPosition({ratio: true});
@@ -262,10 +266,10 @@ export default class {
 		}
 	}
 	
-	updateViewportDimensions() {
-		this.updateImageDimensions(false);
+	updatesizesViewport() {
+		this.updatesizesImage(false);
 		
-		this.setDimensions(this.viewportDimensions, this.elements.viewport);
+		this.setDimensions(this.sizesViewport, this.elements.viewport);
 		
 		this.constrainPosition({ratio: true});
 		this.applyPosition();
@@ -293,8 +297,8 @@ export default class {
 				change.x = priorEvent.offsetX + change.x - offsetX;
 				change.y = change.y + offsetY - priorEvent.offsetY;
 				
-				this.position.x += change.x / this.imageDimensions.width;
-				this.position.y += change.y / this.imageDimensions.height;
+				this.position.x += change.x / this.sizesImage.width;
+				this.position.y += change.y / this.sizesImage.height;
 				
 				const target = {...this.position};
 				
@@ -313,8 +317,8 @@ export default class {
 	
 	getRotateListener() {
 		const {left, top} = this.elements.viewport.getBoundingClientRect();
-		const middleX = left + this.viewportDimensions.halfWidth;
-		const middleY = top + this.viewportDimensions.halfHeight;
+		const middleX = left + this.sizesViewport.halfWidth;
+		const middleY = top + this.sizesViewport.halfHeight;
 		
 		let priorMouseTheta;
 		let startRotation = this.rotation;
@@ -450,7 +454,7 @@ export default class {
 			return this.position.y = y;
 		}));
 		
-		Object.defineProperty(from, 'ratio', getDefinition(this.ratioViewport / this.ratioImage, (ratio) => {
+		Object.defineProperty(from, 'ratio', getDefinition(this.ratio, (ratio) => {
 			doUpdate('ratio');
 			
 			this.ratioImage = this.ratioViewport / ratio;

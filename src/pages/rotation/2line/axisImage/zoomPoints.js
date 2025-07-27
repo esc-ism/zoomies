@@ -1,6 +1,4 @@
-import {getSecond} from '../axisViewport/zoomPoints';
 import {getLineX, getM, getProgress} from '../../shared';
-import {isPartialTarget} from '../intersect/zoomPoints';
 
 const mod = (second, corner, originZoom) => {
 	if (second.y < 0) {
@@ -18,15 +16,7 @@ const mod = (second, corner, originZoom) => {
 	return second;
 };
 
-export default (data, force) => {
-	const [secondSide, secondBase] = getSecond(data);
-	
-	if (force || isPartialTarget(secondSide, secondBase, data)) {
-		return [
-			mod({...data.yIntersectSide}, data.cornerSide, data.startZooms[0]),
-			mod({...data.yIntersectBase}, data.cornerBase, data.startZooms[1]),
-		];
-	}
-	
-	return [secondSide, secondBase];
-};
+export const modAll = (data) => [
+	mod({...data.yIntersectSide}, data.cornerSide, data.startZooms[0]),
+	mod({...data.yIntersectBase}, data.cornerBase, data.startZooms[1]),
+];

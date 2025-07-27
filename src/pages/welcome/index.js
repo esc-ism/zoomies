@@ -30,8 +30,8 @@ const tween = async (demo) => {
 				const ratio = gsap.utils.random(0.5, 2);
 				const [first, second] = getZoomPoints(
 					rotation,
-					demo.viewportDimensions,
-					getDimensions(ratio, demo.viewportDimensions),
+					demo.sizesViewport,
+					getDimensions(ratio, demo.sizesViewport),
 				).slice(2);
 				
 				const getNext = (zoom = 5) => {

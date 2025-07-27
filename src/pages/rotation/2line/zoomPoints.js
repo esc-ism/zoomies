@@ -24,17 +24,17 @@ const getYIntersect = (image, viewportSize, cornerAngle, progressAngle) => ({
 	z: viewportSize / (Math.cos(progressAngle) * Math.abs(image.halfWidth / Math.cos(cornerAngle))),
 });
 
-export default (getSecond, rotation, viewport, image, viewportRatio = viewport.width / viewport.height, viewportRatioInverse = 1 / viewportRatio, allStartZooms) => {
-	allStartZooms ??= getAllStartZooms(rotation, viewport, image);
+export default (getSecond, demo, allStartZooms) => {
+	allStartZooms ??= getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage);
 	const startZooms = [
 		Math.min(allStartZooms[0].x, allStartZooms[1].x),
 		Math.min(allStartZooms[0].y, allStartZooms[1].y),
 	];
 	
-	const isEvenQuadrant = Math.floor(rotation / DEGREES[90]) % 2 !== 0;
-	const quadrantAngle = getQuadrantAngle(rotation, isEvenQuadrant);
+	const isEvenQuadrant = Math.floor(demo.rotation / DEGREES[90]) % 2 !== 0;
+	const quadrantAngle = getQuadrantAngle(demo.rotation, isEvenQuadrant);
 	
-	const progressAngles = getProgressAngles(quadrantAngle, viewportRatio, viewportRatioInverse);
+	const progressAngles = getProgressAngles(quadrantAngle, demo.ratioViewport, demo.ratioViewportInverse);
 	
 	const [firstSide, firstBase] = startZooms.map((z) => ({x: 0, y: 0, z}));
 	
@@ -42,9 +42,9 @@ export default (getSecond, rotation, viewport, image, viewportRatio = viewport.w
 	const cornerBase = {x: isEvenQuadrant ? 0.5 : -0.5, y: 0.5};
 	
 	const [secondSide, secondBase] = getSecond({
-		rotation, viewport, image, cornerSide, cornerBase, startZooms, quadrantAngle, isEvenQuadrant,
-		yIntersectSide: getYIntersect(image, viewport.halfWidth, quadrantAngle + progressAngles.side, progressAngles.side),
-		yIntersectBase: getYIntersect(image, viewport.halfHeight, DEGREES[90] - quadrantAngle - progressAngles.base, progressAngles.base),
+		...demo, cornerSide, cornerBase, startZooms, quadrantAngle, isEvenQuadrant,
+		yIntersectSide: getYIntersect(demo.sizesImage, demo.sizesViewport.halfWidth, quadrantAngle + progressAngles.side, progressAngles.side),
+		yIntersectBase: getYIntersect(demo.sizesImage, demo.sizesViewport.halfHeight, DEGREES[90] - quadrantAngle - progressAngles.base, progressAngles.base),
 	});
 	
 	return isEvenQuadrant ?

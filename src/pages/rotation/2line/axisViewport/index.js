@@ -29,8 +29,8 @@ export const getDimensions = (ratio, {width, height}) => {
 const getVarGetter = (demo, rotation = DEGREES[90], ratio = 1) => () => {
 	const [first, second] = getZoomPoints(
 		rotation,
-		demo.viewportDimensions,
-		getDimensions(ratio, demo.viewportDimensions),
+		demo.sizesViewport,
+		getDimensions(ratio, demo.sizesViewport),
 	).slice(2);
 	
 	return {first, second, rotation, ratio};
@@ -50,8 +50,8 @@ const getSnapVars = (demo, getRatio) => {
 	
 	const zoomPoints = getZoomPoints(
 		rotation,
-		demo.viewportDimensions,
-		getDimensions(ratio, demo.viewportDimensions),
+		demo.sizesViewport,
+		getDimensions(ratio, demo.sizesViewport),
 	);
 	
 	const zoom = getSnappedZoom(...zoomPoints, position);

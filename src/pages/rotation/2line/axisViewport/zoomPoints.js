@@ -2,23 +2,33 @@ import {DEGREES} from '@/shared';
 
 import getZoomPoints from '../zoomPoints';
 
-const getPoints = (rotation, image, viewport, startZooms, doFlip) => {
-	const rightX = viewport.halfWidth / startZooms[0];
-	const topY = viewport.halfHeight / startZooms[1];
+export const isPartialTarget = (secondSide, secondBase, {isEvenQuadrant, ratio}) => {
+	if (ratio < 1) {
+		return secondBase.y < -secondSide.y;
+	}
 	
-	const rightTheta = DEGREES[90] - rotation;
-	const topTheta = rightTheta + DEGREES[90];
+	return (secondBase.x < secondSide.x) === isEvenQuadrant;
+};
+
+const getPoints = ({rotation, sizesImage, sizesViewport, startZooms, quadrantAngle}) => {
+	const [axisRight, axisTop] = quadrantAngle >= DEGREES[45] ? ['y', 'x'] : ['x', 'y'];
+	
+	const xRight = sizesViewport.halfWidth / startZooms[0];
+	const yTop = sizesViewport.halfHeight / startZooms[1];
+	
+	const thetaRight = DEGREES[90] - rotation;
+	const thetaTop = thetaRight + DEGREES[90];
 	
 	return [
 		{
-			x: rightX * Math.cos(rightTheta) / image.width,
-			y: rightX * Math.sin(rightTheta) / image.height,
-			axis: doFlip ? 'y' : 'x',
+			x: xRight * Math.cos(thetaRight) / sizesImage.width,
+			y: xRight * Math.sin(thetaRight) / sizesImage.height,
+			axis: axisRight,
 		},
 		{
-			x: topY * Math.cos(topTheta) / image.width,
-			y: topY * Math.sin(topTheta) / image.height,
-			axis: doFlip ? 'x' : 'y',
+			x: yTop * Math.cos(thetaTop) / sizesImage.width,
+			y: yTop * Math.sin(thetaTop) / sizesImage.height,
+			axis: axisTop,
 		},
 	];
 };
@@ -40,38 +50,30 @@ const getGenericIntersection = (line0, line1) => {
 	};
 };
 
-const getIntersection = (viewport, image, line, corner, middle) => {
+const getIntersection = (line, corner, middle) => {
 	const {x, y} = getGenericIntersection([{x: 0, y: 0}, middle], [line, corner]);
 	const progress = (y - line.y) / (corner.y - line.y);
 	
 	return {x, y, z: line.z / (1 - progress), c: line.y};
 };
 
-const getIntersect = (viewport, image, yIntersect, corner, right, top) => {
-	const point0 = getIntersection(viewport, image, yIntersect, corner, right);
-	const point1 = getIntersection(viewport, image, yIntersect, corner, top);
+const getIntersect = (yIntersect, corner, right, top) => {
+	const point0 = getIntersection(yIntersect, corner, right);
+	const point1 = getIntersection(yIntersect, corner, top);
 	
 	const [point, vpEnd] = point0.z > point1.z ? [point0, {...right}] : [point1, {...top}];
-	
-	// todo do you need to reference the specific axis?
-	//  can you just say if either axis' sign isn't equal?
-	//  if so get rid of the axis assignments
-	// if (Math.sign(point[vpEnd.axis]) !== Math.sign(vpEnd[vpEnd.axis])) {
-	// 	vpEnd.x = -vpEnd.x;
-	// 	vpEnd.y = -vpEnd.y;
-	// }
 	
 	const axis = Math.abs(vpEnd.x) > Math.abs(vpEnd.y) ? 'x' : 'y';
 	
 	return {...point, vpEnd, p: vpEnd[axis] / point[axis]};
 };
 
-export const getSecond = ({rotation, viewport, image, yIntersectSide, yIntersectBase, cornerSide, cornerBase, startZooms, quadrantAngle}) => {
-	const points = getPoints(rotation, image, viewport, startZooms, quadrantAngle >= DEGREES[45]);
+export const getSecond = (data) => {
+	const points = getPoints(data);
 	
 	return [
-		getIntersect(viewport, image, yIntersectSide, cornerSide, ...points),
-		getIntersect(viewport, image, yIntersectBase, cornerBase, ...points),
+		getIntersect(data.yIntersectSide, data.cornerSide, ...points),
+		getIntersect(data.yIntersectBase, data.cornerBase, ...points),
 	];
 };
 
