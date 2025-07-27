@@ -226,7 +226,7 @@ export const getConstrainerFromPoints = (() => {
 		tangents.right.isHigh = (tangents.right.isSide ? isHighSide : isHighTop)(lines, 'right', 'left');
 		tangents.left.isHigh = !tangents.right.isHigh;
 		
-		if (tangents.top.isSide === tangents.top.isHigh) {
+		if (tangents.top.isSide === tangents.right.isHigh) {
 			setHighTangent(tangents.top, 'right', 'left');
 			setHighTangent(tangents.bottom, 'right', 'left');
 		} else {
@@ -234,12 +234,12 @@ export const getConstrainerFromPoints = (() => {
 			setHighTangent(tangents.bottom, 'left', 'right');
 		}
 		
-		if (tangents.right.isSide !== tangents.right.isHigh) {
-			setHighTangent(tangents.right, 'top', 'bottom');
-			setHighTangent(tangents.left, 'top', 'bottom');
-		} else {
+		if (tangents.right.isSide === tangents.top.isHigh) {
 			setHighTangent(tangents.right, 'bottom', 'top');
 			setHighTangent(tangents.left, 'bottom', 'top');
+		} else {
+			setHighTangent(tangents.right, 'top', 'bottom');
+			setHighTangent(tangents.left, 'top', 'bottom');
 		}
 		
 		return [points, lines, tangents];
