@@ -24,8 +24,7 @@ const getYIntersect = (image, viewportSize, cornerAngle, progressAngle) => ({
 	z: viewportSize / (Math.cos(progressAngle) * Math.abs(image.halfWidth / Math.cos(cornerAngle))),
 });
 
-export default (getSecond, demo, allStartZooms) => {
-	allStartZooms ??= getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage);
+export default (getSecond, demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage)) => {
 	const startZooms = [
 		Math.min(allStartZooms[0].x, allStartZooms[1].x),
 		Math.min(allStartZooms[0].y, allStartZooms[1].y),

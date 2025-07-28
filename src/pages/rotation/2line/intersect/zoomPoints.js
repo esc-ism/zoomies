@@ -1,3 +1,4 @@
+import {CORNERS} from '@/pages/consts';
 import {getFlipped, getProgress} from '../../shared';
 
 const getGenericIntersection = (line0, line1) => {
@@ -37,8 +38,8 @@ export const replaceVpEnd = (() => {
 		}
 		
 		return isEvenQuadrant ?
-				[getFlipped(cornerSide), cornerBase, Object.assign(secondSide, getFlipped(secondSide))] :
-				[cornerSide, getFlipped(cornerBase), Object.assign(secondBase, getFlipped(secondBase))];
+				[CORNERS.BOTTOM_RIGHT, CORNERS.TOP_RIGHT, Object.assign(secondSide, getFlipped(secondSide))] :
+				[CORNERS.TOP_RIGHT, CORNERS.BOTTOM_RIGHT, Object.assign(secondBase, getFlipped(secondBase))];
 	};
 	
 	return (secondSide, secondBase, data) => {

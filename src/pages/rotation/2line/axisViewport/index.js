@@ -26,14 +26,25 @@ export const getDimensions = (ratio, {width, height}) => {
 	};
 };
 
-const getVarGetter = (demo, rotation = DEGREES[90], ratio = 1) => () => {
-	const [first, second] = getZoomPoints(
-		rotation,
-		demo.sizesViewport,
-		getDimensions(ratio, demo.sizesViewport),
-	).slice(2);
+export const getVarGetter = (demo, rotation = DEGREES[90], ratio = 1) => () => {
+	const sizesImage = getDimensions(ratio, demo.sizesViewport);
+	const ratioImage = sizesImage.width / sizesImage.height;
 	
-	return {first, second, rotation, ratio};
+	const {sizesViewport, ratioViewport, ratioViewportInverse} = demo;
+	
+	const zoomPoints = getZoomPoints({
+		sizesViewport,
+		ratioViewport,
+		ratioViewportInverse,
+		rotation,
+		sizesImage,
+		ratioImage,
+		ratioImageInverse: 1 / ratioImage,
+		ratio: demo.ratioViewport / ratioImage,
+		ratioInverse: ratioImage / demo.ratioViewport,
+	});
+	
+	return {first: zoomPoints[2], second: zoomPoints[3], zoomPoints, rotation, ratio};
 };
 
 const getCornerProgressTweens = (rotation) => [
@@ -44,15 +55,8 @@ const getCornerProgressTweens = (rotation) => [
 const getLimitedPosition = (limit = 0.4) => Math.max(-limit, Math.min(limit, Math.random() - 0.5));
 
 const getSnapVars = (demo, getRatio) => {
-	const ratio = getRatio();
-	const rotation = Math.random() * DEGREES[180];
 	const position = {x: getLimitedPosition(), y: getLimitedPosition()};
-	
-	const zoomPoints = getZoomPoints(
-		rotation,
-		demo.sizesViewport,
-		getDimensions(ratio, demo.sizesViewport),
-	);
+	const {zoomPoints, rotation, ratio} = getVarGetter(demo, Math.random() * DEGREES[180], getRatio())();
 	
 	const zoom = getSnappedZoom(...zoomPoints, position);
 	
@@ -440,7 +444,8 @@ const functions = [
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
-	], pair: [,
+	], pair: [
+		,
 		2, 1, 4, 3, 6, 5, 8, 7,,
 		11, 10, 13, 12, 15, 14, 17, 16,,
 		20, 19, 22, 21, 24, 23, 26, 25,
@@ -511,18 +516,22 @@ const functions = [
 		{op: 'return', and: {
 			op: '||', multiline: true, and: [
 				{op: 'call', id: 'getIntersectZoom', and: ['zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C', 'isInverse', 1]},
-				{op: 'call', id: 'getIntersectZoom', and: ['zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', 'isInverse', {
-					op: '-', and: [
-						1,
-						{op: '/', and: ['zoomB', 'zoomC']},
-					],
-				}]},
-				{op: 'call', id: 'getIntersectZoom', and: ['zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A', 'isInverse', {
-					op: '-', and: [
-						1,
-						{op: '/', and: ['zoomA', 'zoomB']},
-					],
-				}]},
+				{op: 'call', id: 'getIntersectZoom', and: [
+					'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', 'isInverse', {
+						op: '-', and: [
+							1,
+							{op: '/', and: ['zoomB', 'zoomC']},
+						],
+					},
+				]},
+				{op: 'call', id: 'getIntersectZoom', and: [
+					'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A', 'isInverse', {
+						op: '-', and: [
+							1,
+							{op: '/', and: ['zoomA', 'zoomB']},
+						],
+					},
+				]},
 			],
 		}},
 	]},
@@ -543,7 +552,7 @@ export default (wrapper) => {
 		getText(
 			{
 				tag: 'h1',
-				content: 'Two-Line Rotation',
+				content: 'Double-Line Rotation',
 			},
 			[
 				'Let\'s start by seeing how that ',
@@ -658,10 +667,14 @@ export default (wrapper) => {
 					({second}) => [{position: second.vpEnd}, {duration: 0}],
 				], {getParam: getDirectVars}),
 				' to an offscreen corner.',
-				'On the other, extreme aspect ratio differentials can cause ',
+				'On the other, for any image aspect ratio other than 1:1 there are rotation values that cause crossed axis lines.',
+				'This leads to two issues.',
+				'First is that optimal panning paths are replaced with circuitous routes.',
+				'Second is that bounds don\'t travel fluidly when rotating, with a breakdown of the linear travel of image corners between viewport corners.',
+				'This behaviour gets increasingly worse as aspect ratios get more extreme',
 				getButton('odd behaviour', [
 					[{position: 0.5}, {duration: 0}],
-					[{ratio: 0.25, zoom: 1}],
+					[{ratioImage: 2, zoom: 1}],
 					[{rotation: DEGREES[90]}, {duration: 2, delay: 0.2}],
 					[{rotation: 0}, {ease: 'none', duration: 5}],
 				], {getParam: getDirectVars}),

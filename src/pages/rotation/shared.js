@@ -159,16 +159,28 @@ const get1DConstrainer = (() => {
 })();
 
 export const getConstrainerFromPoints = (() => {
-	const setHighTangent = (tangent, low, high) => {
-		tangent.low = tangent[low];
-		tangent.high = tangent[high];
-		
-		tangent[low].isHigh = false;
-		tangent[high].isHigh = true;
-	};
-	
 	const isHighSide = (lines, high, low) => (lines[high].c < lines[low].c) === (lines[high].m > 0);
 	const isHighTop = (lines, high, low) => lines[high].c > lines[low].c;
+	
+	const setHighTangent = (source, a, b, ...copies) => {
+		const isHigh = source.isSide ? isHighTop : isHighSide;
+		const [low, high] = isHigh(source, a, b) ? [b, a] : [a, b];
+		
+		for (const tangent of [source, ...copies]) {
+			tangent.low = tangent[low];
+			tangent.high = tangent[high];
+			
+			tangent[low].isHigh = false;
+			tangent[high].isHigh = true;
+		}
+	};
+	
+	const swap = (array, i0, i1) => {
+		const temp = array[i0];
+		
+		array[i0] = array[i1];
+		array[i1] = temp;
+	};
 	
 	const getFrame = (point0, point1) => {
 		const flipped0 = getFlipped(point0);
@@ -226,20 +238,32 @@ export const getConstrainerFromPoints = (() => {
 		tangents.right.isHigh = (tangents.right.isSide ? isHighSide : isHighTop)(lines, 'right', 'left');
 		tangents.left.isHigh = !tangents.right.isHigh;
 		
-		if (tangents.top.isSide === tangents.right.isHigh) {
-			setHighTangent(tangents.top, 'right', 'left');
-			setHighTangent(tangents.bottom, 'right', 'left');
-		} else {
-			setHighTangent(tangents.top, 'left', 'right');
-			setHighTangent(tangents.bottom, 'left', 'right');
+		setHighTangent(tangents.top, 'left', 'right', tangents.bottom);
+		setHighTangent(tangents.right, 'bottom', 'top', tangents.left);
+		
+		// checking for flips in complete viewport-axis
+		// maybe doesn't work in crazy edge cases?
+		// something like `(...) || (tangents.bottom.isSide && (tangents.bottom.isHigh === isEvenQuadrant))` will be bulletproof
+		if (tangents.bottom.isHigh && !tangents.bottom.isSide) {
+			swap(points, 'topLeft', 'bottomLeft');
+			swap(points, 'topRight', 'bottomRight');
+			
+			swap(lines, 'top', 'bottom');
+			
+			swap(tangents, 'top', 'bottom');
+			swap(tangents.left, 'top', 'bottom');
+			swap(tangents.right, 'top', 'bottom');
 		}
 		
-		if (tangents.right.isSide === tangents.top.isHigh) {
-			setHighTangent(tangents.right, 'bottom', 'top');
-			setHighTangent(tangents.left, 'bottom', 'top');
-		} else {
-			setHighTangent(tangents.right, 'top', 'bottom');
-			setHighTangent(tangents.left, 'top', 'bottom');
+		if (tangents.left.isHigh && tangents.left.isSide) {
+			swap(points, 'bottomLeft', 'bottomRight');
+			swap(points, 'topLeft', 'topRight');
+			
+			swap(lines, 'right', 'left');
+			
+			swap(tangents, 'right', 'left');
+			swap(tangents.top, 'right', 'left');
+			swap(tangents.bottom, 'right', 'left');
 		}
 		
 		return [points, lines, tangents];

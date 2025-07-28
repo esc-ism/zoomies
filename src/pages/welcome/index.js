@@ -4,8 +4,7 @@ import Demo from './demo';
 
 import {getText} from '../shared';
 import {getZoomProgressed} from '../rotation/shared';
-import {getZoomPoints} from '../rotation/2line/axisViewport/demo';
-import {getDimensions} from '../rotation/2line/axisViewport';
+import {getVarGetter} from '../rotation/2line/axisViewport';
 
 import {CLASS_INSTRUCTION} from '../consts';
 import {DEGREES} from '@/shared';
@@ -26,13 +25,11 @@ const tween = async (demo) => {
 	while (isActive) {
 		await wait()
 			.then(() => {
-				const rotation = gsap.utils.random(DEGREES[180], DEGREES[360]);
-				const ratio = gsap.utils.random(0.5, 2);
-				const [first, second] = getZoomPoints(
-					rotation,
-					demo.sizesViewport,
-					getDimensions(ratio, demo.sizesViewport),
-				).slice(2);
+				const {first, second, rotation, ratio} = getVarGetter(
+					demo,
+					gsap.utils.random(DEGREES[180], DEGREES[360]),
+					gsap.utils.random(0.5, 2),
+				);
 				
 				const getNext = (zoom = 5) => {
 					if (zoom >= second.z) {
@@ -51,7 +48,7 @@ const tween = async (demo) => {
 					[{rotation, zoom: first.z}],
 					[{zoom: 5}, {
 						duration: 2,
-						onUpdate: function () {
+						onUpdate() {
 							const [position, progresses] = getNext(demo.zoom);
 							
 							demo.position = position;

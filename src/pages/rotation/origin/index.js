@@ -135,7 +135,7 @@ export default (wrapper) => {
 		getText(
 			{
 				tag: 'h1',
-				content: 'Naive Rotation',
+				content: 'Single-Line Rotation',
 				style: {textAlign: 'center'},
 			},
 			[

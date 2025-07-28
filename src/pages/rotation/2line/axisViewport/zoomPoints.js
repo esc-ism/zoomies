@@ -63,6 +63,11 @@ const getIntersect = (yIntersect, corner, right, top) => {
 	
 	const [point, vpEnd] = point0.z > point1.z ? [point0, {...right}] : [point1, {...top}];
 	
+	if (Math.sign(point[vpEnd.axis]) !== Math.sign(vpEnd[vpEnd.axis])) {
+		vpEnd.x = -vpEnd.x;
+		vpEnd.y = -vpEnd.y;
+	}
+	
 	const axis = Math.abs(vpEnd.x) > Math.abs(vpEnd.y) ? 'x' : 'y';
 	
 	return {...point, vpEnd, p: vpEnd[axis] / point[axis]};

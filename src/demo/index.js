@@ -462,6 +462,14 @@ export default class {
 			return ratio;
 		}));
 		
+		Object.defineProperty(from, 'ratioImage', getDefinition(this.ratio, (ratio) => {
+			doUpdate('ratio');
+			
+			this.ratioImage = ratio;
+			
+			return ratio;
+		}));
+		
 		Object.defineProperty(from, 'rotation', getDefinition(this.rotation, (rotation) => {
 			doUpdate('rotation');
 			

@@ -57,7 +57,7 @@ export default [
 			'@stylistic/arrow-parens': ['error', 'always'],
 			'@stylistic/linebreak-style': ['error', 'unix'],
 			'@stylistic/no-trailing-spaces': ['error', {skipBlankLines: true}],
-			'@stylistic/array-bracket-newline': ['error', {multiline: true}],
+			'@stylistic/array-bracket-newline': ['error', 'consistent'],
 			'@stylistic/array-element-newline': 'off',
 			// the exceptions thing is weird
 			'@stylistic/comma-style': ['error', 'last', {exceptions: {CallExpression: false}}],
