@@ -10,6 +10,10 @@ export default (wrapper) => {
 	
 	registerDemo(demo);
 	
+	demo.ratioImage = 2;
+	demo.zoom = 0.8;
+	demo.applyZoom();
+	
 	wrapper.append(
 		demo.element,
 		

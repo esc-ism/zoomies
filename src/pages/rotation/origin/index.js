@@ -244,8 +244,8 @@ export default (wrapper) => {
 				content: 'Snap-Pan Maths',
 				style: {textAlign: 'center'},
 			},
+			'The maths for snap panning will take a little longer to run through.',
 			[
-				'The maths for snap panning will take a little longer to run though.',
 				'First, I split the image into four segments using lines from the origin to each corner.',
 				'The snap position will fall into one of these segments; I disregard the two lines that don\'t contribute to the position\'s segment.',
 				'If the zoom value that I\'ve calculated for one of the relevant corners is lower than the other, I snip off the start of its line.',
@@ -273,7 +273,7 @@ export default (wrapper) => {
 				}},
 			]),
 			[
-				'This snip makes the line begin on its corner\'s bound at the other corner\'s zoom.',
+				'The resulting start position is where the corner\'s bound would lie at the other corner\'s zoom.',
 				'From here, I need to find a line that intersects the snap point and ',
 				{
 					tag: 'a',

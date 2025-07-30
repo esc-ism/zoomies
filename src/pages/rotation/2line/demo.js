@@ -45,7 +45,7 @@ export const getSnappedZoom = (() => {
 			const p = getIntersectProgress(position, ...pair, doFlip);
 			
 			if (p >= 0 && p <= maxP) {
-			// I don't think the >= 1 check is necessary but best be safe
+				// I don't think the >= 1 check is necessary but best be safe
 				return p >= 1 ? Number.MAX_SAFE_INTEGER : z / (1 - p);
 			}
 		}

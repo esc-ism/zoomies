@@ -13,5 +13,5 @@ import axisImageComplete from './rotation/2line/axisImage/complete';
 
 export default [
 	welcome, unbound, center, edge, origin,
-	axisViewport, axisIntersectPartial, axisIntersectComplete, axisImagePartial, axisImageComplete,
+	axisViewport, axisIntersectComplete, axisIntersectPartial, axisImageComplete, axisImagePartial,
 ];

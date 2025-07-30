@@ -2,13 +2,9 @@ import {DEGREES} from '@/shared';
 
 import getZoomPoints from '../zoomPoints';
 
-export const isPartialTarget = (secondSide, secondBase, {isEvenQuadrant, ratio}) => {
-	if (ratio < 1) {
-		return secondBase.y < -secondSide.y;
-	}
-	
-	return (secondBase.x < secondSide.x) === isEvenQuadrant;
-};
+const isPositiveM = (to, from = {x: 0, y: 0}) => (to.x > from.x) === (to.y > from.y);
+
+export const isPartialTarget = (second, corner) => isPositiveM(corner, second) !== isPositiveM(second.vpEnd);
 
 const getPoints = ({rotation, sizesImage, sizesViewport, startZooms, quadrantAngle}) => {
 	const [axisRight, axisTop] = quadrantAngle >= DEGREES[45] ? ['y', 'x'] : ['x', 'y'];

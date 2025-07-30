@@ -26,6 +26,10 @@ const addContent = (parent, content) => {
 };
 
 const getNode = (description) => {
+	if (description instanceof Node) {
+		return description;
+	}
+	
 	const {
 		content = [],
 		classList = [],

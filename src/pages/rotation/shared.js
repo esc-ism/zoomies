@@ -1,7 +1,9 @@
 // logarithmic progress from "low" to infinity
 export const getProgress = (low, target) => 1 - low / target;
-const getProgressed = (from, to, p) => ({x: p * (to.x - from.x) + from.x, y: p * (to.y - from.y) + from.y, p});
+export const getProgressed = (from, to, p) => ({x: p * (to.x - from.x) + from.x, y: p * (to.y - from.y) + from.y, p});
 export const getZoomProgressed = ({z: lowZ, ...from}, to, targetZ) => getProgressed(from, to, getProgress(lowZ, targetZ));
+
+export const getDistance = (from, to) => Math.sqrt(Math.pow(from.x - to.x, 2) + Math.pow(from.y - to.y, 2));
 
 const perfectSlopes = [0, Infinity, -Infinity];
 

@@ -16,9 +16,11 @@ export default (wrapper) => {
 		getText(
 			{
 				tag: 'h1',
-				content: 'Intersection Partial',
+				content: 'Intersection (Partial)',
 			},
-			[],
+			[
+				'',
+			],
 		),
 	);
 	

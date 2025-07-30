@@ -1,6 +1,6 @@
 import {getLineX, getM, getProgress} from '../../shared';
 
-const mod = (second, corner, originZoom) => {
+export const mod = (second, corner, originZoom) => {
 	if (second.y < 0) {
 		second.x = getLineX({m: getM(second, corner), c: second.y, x: 0}, 0);
 		second.y = 0;

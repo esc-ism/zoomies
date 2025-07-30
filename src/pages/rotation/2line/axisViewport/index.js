@@ -7,6 +7,7 @@ import {badTweens} from '../../origin';
 import SHARED_FUNCTIONS from '../../code';
 import Demo, {getZoomPoints} from './demo';
 import {getSnappedZoom} from '../demo';
+import snapImage from './snapImage';
 
 export const getDimensions = (ratio, {width, height}) => {
 	const dimensions = {};
@@ -671,20 +672,46 @@ export default (wrapper) => {
 				'This leads to two issues.',
 				'First is that optimal panning paths are replaced with circuitous routes.',
 				'Second is that bounds don\'t travel fluidly when rotating, with a breakdown of the linear travel of image corners between viewport corners.',
-				'This behaviour gets increasingly worse as aspect ratios get more extreme',
-				getButton('odd behaviour', [
+				'This behaviour gets ',
+				getButton('increasingly worse', [
 					[{position: 0.5}, {duration: 0}],
 					[{ratioImage: 2, zoom: 1}],
 					[{rotation: DEGREES[90]}, {duration: 2, delay: 0.2}],
 					[{rotation: 0}, {ease: 'none', duration: 5}],
 				], {getParam: getDirectVars}),
-				' when rotating.',
+				' as image aspect ratio gets more extreme.',
 			],
 			{
 				tag: 'h2',
 				content: 'Snap-Pan Maths',
 				style: {textAlign: 'center'},
 			},
+			[
+				'The maths here build upon those of the single-line system.',
+				'As before, a line is snipped to achieve matching start zooms.',
+				'Now, however, another snip is necessary to match zooms for the later lines.',
+			],
+			{
+				tag: 'div',
+				content: snapImage,
+				style: {textAlign: 'center'},
+			},
+			[
+				'The final lines look something like what\'s shown above.',
+				'One pair of green lines starts at the origin and the other is snipped to start later.',
+				'One pair of orange lines ends at the gradient change and the other starts there.',
+				'The red lines span the remaining distance from the end of the orange lines to the corners',
+			],
+			[
+				'Before, I needed to find a line that intersects the snap point and any two adjacent lines.',
+				'Now, the intersected lines must share a colour.',
+				'Thus, the number of checks required to find the correct snap zoom is tripled.',
+			],
+			[
+				'On top of this, the region in which the position lies is no longer obvious.',
+				'For simplicity, I simply check every region, further quadrupling checks for a total of 12x complexity.',
+			],
+			'If a snap zoom may be derived from more than one of the 12 pairs, the highest zoom value is used.',
 			getCode([
 				{op: '=', id: 'snapZoom', type: 'zoom', and: {
 					op: 'max', multiline: true, and: [
@@ -697,14 +724,11 @@ export default (wrapper) => {
 			]),
 			{
 				tag: 'h2',
-				content: 'Conclusion',
+				content: 'Snap-Pan Effectiveness',
 				style: {textAlign: 'center'},
 			},
 			[
-				'Besides efficiency, the system\'s only drawback is its pan-limiting behaviour when rotating',
-				'No doubt there\'s a clever way around this flaw; using the image\'s axes instead of the viewport\'s would probably work.',
-				'However, acting as a perfect pan-limiting system is beyond the system\'s scope.',
-				'Its purpose is to facilitate snap panning, and in this role it\'s hard to fault.',
+				'As a snap-panning facilitator, this system is hard to fault.',
 				'Of course it performs fine on ',
 				getButton('similar', ...getSnapTweens(demo, () => Math.random() / 5 + 0.9)),
 				' aspect ratios,',
@@ -712,7 +736,15 @@ export default (wrapper) => {
 				getButton('distant', ...getSnapTweens(demo, () => Math.random() / 10 + 0.2)),
 				' aspect ratios reveal no flaw in its ability to derive sensible zoom levels.',
 			],
-			
+			{
+				tag: 'h2',
+				content: 'Conclusion',
+				style: {textAlign: 'center'},
+			},
+			[
+				'Besides efficiency, the system\'s only drawback is its spotty pan-limiting when image aspect ratio isn\'t 1:1.',
+				'The upcoming systems will try to solve this issue.',
+			],
 		),
 	);
 	

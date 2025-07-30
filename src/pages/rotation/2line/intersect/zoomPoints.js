@@ -1,5 +1,5 @@
 import {CORNERS} from '@/pages/consts';
-import {getFlipped, getProgress} from '../../shared';
+import {getFlipped, getProgress, getDistance} from '../../shared';
 
 const getGenericIntersection = (line0, line1) => {
 	const a0 = line0[0].y - line0[1].y;
@@ -32,8 +32,8 @@ export const replaceVpEnd = (() => {
 		};
 	};
 	
-	const getEnds = (secondSide, secondBase, {isEvenQuadrant, cornerSide, cornerBase, ratio}) => {
-		if (ratio > 1) {
+	const getEnds = (secondSide, secondBase, {isEvenQuadrant, cornerSide, cornerBase}) => {
+		if (getDistance(secondSide, cornerSide) + getDistance(secondBase, cornerBase) <= Math.SQRT2) {
 			return [cornerSide, cornerBase];
 		}
 		
