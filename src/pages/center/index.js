@@ -23,6 +23,7 @@ export default (wrapper) => {
 			{
 				tag: 'h1',
 				content: 'Viewport Center',
+				style: {textAlign: 'center'},
 			},
 			[
 				'Let\'s start ',

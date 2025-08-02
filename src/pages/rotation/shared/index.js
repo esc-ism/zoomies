@@ -17,7 +17,6 @@ export const getM = (from, to) => (to.y - from.y) / (to.x - from.x);
 export const getLine = (m, {x, y}) => ({c: (y - m * x), m, x, y});
 export const getFlipped = ({x, y}) => ({x: -x, y: -y});
 
-// https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point
 export const getIntersectProgress = ({x, y}, [{x: d, y: e}, {x: f, y: g}], [{x: h, y: i}, {x: j, y: k}], doFlip) => {
 	const a = g * j + e * h + k * d + i * f - g * h - j * e - k * f - i * d;
 	const b = g * h + e * x + j * e + k * x + i * d * 2 + f * y + h * y - g * x - e * h * 2 - j * y - k * d - i * x - f * i - d * y;

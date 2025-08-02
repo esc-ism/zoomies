@@ -14,18 +14,42 @@ export default (wrapper) => {
 		demo.rotation = DEGREES[90] - (35 / 180 * DEGREES[180]);
 		demo.constrainRotation();
 		demo.applyRotation();
-		demo.ratioImage = 1 / 1.6;
+		demo.ratioImage = 1.6;
 	});
 	
 	wrapper.append(
 		demo.element,
-		
 		getText(
 			{
 				tag: 'h1',
-				content: '3 Line',
+				content: 'Triple-Line Rotation',
+				style: {textAlign: 'center'},
 			},
-			[],
+			{
+				tag: 'h2',
+				content: 'Pan-Limit Maths',
+				style: {textAlign: 'center'},
+			},
+			{
+				tag: 'h2',
+				content: 'Pan-Limit Effectiveness',
+				style: {textAlign: 'center'},
+			},
+			{
+				tag: 'h2',
+				content: 'Snap-Pan Maths',
+				style: {textAlign: 'center'},
+			},
+			{
+				tag: 'h2',
+				content: 'Snap-Pan Effectiveness',
+				style: {textAlign: 'center'},
+			},
+			{
+				tag: 'h2',
+				content: 'Conclusion',
+				style: {textAlign: 'center'},
+			},
 		),
 	);
 	

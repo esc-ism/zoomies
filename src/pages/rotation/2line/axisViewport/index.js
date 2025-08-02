@@ -540,6 +540,7 @@ export default (wrapper) => {
 			{
 				tag: 'h1',
 				content: 'Double-Line Rotation',
+				style: {textAlign: 'center'},
 			},
 			[
 				'Let\'s start by seeing how that ',

@@ -1,7 +1,7 @@
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
-import {getZoomProgressed, getProgressedLine, getIntersectProgress, getProgress, getFlipped} from '../shared';
+import {getZoomProgressed, getProgressedLine, getIntersectProgress, getProgress, getFlipped, isAbove} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
@@ -40,7 +40,7 @@ export const getSnappedZoom = (() => {
 	const getDirected = (first, second, flip, cornerX) => {
 		const get = flip ? (position) => getFlipped(position) : ({x, y}) => ({x, y});
 		
-		return [[first, get(second.vpEnd)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
+		return [[first, get(first.end)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
 	};
 	
 	const isValidZoom = (zoom) => zoom !== null && !isNaN(zoom);
@@ -58,30 +58,23 @@ export const getSnappedZoom = (() => {
 		return null;
 	};
 	
-	const getZoom = (pair0, pair1, pair2, position, doFlip) => getZoomPairSecond(pair2, position, doFlip)
-		|| getZoomPairSecond(pair1, position, doFlip, getProgress(pair1[0], pair2[0]))
+	const getZoom = (pair0, pair1, position, doFlip) => getZoomPairSecond(pair1, position, doFlip)
 		|| getZoomPairSecond(pair0, position, doFlip, getProgress(pair0[0], pair1[0]));
 	
-	return (first0, second0, first1, second1, position) => {
+	return (second, third0, third1, position) => {
 		const getPairings = (flip0, flip1) => {
-			const [lineFirst0, lineSecond0] = getDirected(first0, second0, flip0, -0.5);
-			const [lineFirst1, lineSecond1] = getDirected(first1, second1, flip1, 0.5);
+			const [lineFirst0, lineSecond0] = getDirected(second, third0, flip0, -0.5);
+			const [lineFirst1, lineSecond1] = getDirected(second, third1, flip1, 0.5);
 			
-			return [
-				first0.z >= first1.z ?
-						[first0.z, lineFirst0, getProgressedLine(lineFirst1, first0)] :
-						[first1.z, getProgressedLine(lineFirst0, first1), lineFirst1],
-				
-				...second0.z >= second1.z ?
-						[
-							[second1.z, getProgressedLine(lineFirst0, second1), lineSecond1],
-							[second0.z, lineSecond0, getProgressedLine(lineSecond1, second0)],
-						] :
-						[
-							[second0.z, lineSecond0, getProgressedLine(lineFirst1, second0)],
-							[second1.z, getProgressedLine(lineSecond0, second1), lineSecond1],
-						],
-			];
+			return third0.z >= third1.z ?
+					[
+						[third1.z, getProgressedLine(lineFirst0, third1), lineSecond1],
+						[third0.z, lineSecond0, getProgressedLine(lineSecond1, third0)],
+					] :
+					[
+						[third0.z, lineSecond0, getProgressedLine(lineFirst1, third0)],
+						[third1.z, getProgressedLine(lineSecond0, third1), lineSecond1],
+					];
 		};
 		
 		return Math.max(...[
@@ -156,6 +149,6 @@ export default class extends Demo {
 	}
 	
 	getSnappedZoom() {
-		return getSnappedZoom(...this.zoomPoints, this.position);
+		return getSnappedZoom(...this.zoomPoints.slice(1), this.position);
 	}
 }
