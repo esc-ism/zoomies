@@ -51,6 +51,7 @@ export class Line {
 		this.template.style.transformOrigin = 'top center';
 		this.template.style.translate = '-50% 0';
 		this.template.style.width = `${window.devicePixelRatio}px`;
+		this.template.style.backgroundColor = 'grey';
 	}
 	
 	element = (this.constructor.template ?? Line.template).cloneNode();

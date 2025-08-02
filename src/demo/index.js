@@ -66,7 +66,7 @@ export default class {
 					return;
 				}
 				
-				this.updatesizesViewport();
+				this.updateSizesViewport();
 				
 				resolve();
 			});
@@ -218,7 +218,7 @@ export default class {
 		
 		this.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
 		
-		this.updatesizesImage();
+		this.updateSizesImage();
 	}
 	
 	get ratioImage() {
@@ -231,7 +231,7 @@ export default class {
 		
 		this.elements.viewport.style.aspectRatio = `${ratio}`;
 		
-		this.updatesizesViewport();
+		this.updateSizesViewport();
 	}
 	
 	get ratioViewport() {
@@ -250,7 +250,7 @@ export default class {
 		data.halfHeight = data.height / 2;
 	}
 	
-	updatesizesImage(doApply = true) {
+	updateSizesImage(doApply = true) {
 		this.ratio = this.ratioViewport / this.ratioImage;
 		this.ratioInverse = 1 / this.ratio;
 		
@@ -266,8 +266,8 @@ export default class {
 		}
 	}
 	
-	updatesizesViewport() {
-		this.updatesizesImage(false);
+	updateSizesViewport() {
+		this.updateSizesImage(false);
 		
 		this.setDimensions(this.sizesViewport, this.elements.viewport);
 		
@@ -292,7 +292,7 @@ export default class {
 		
 		const change = {x: 0, y: 0};
 		
-		return ({offsetX, offsetY}) => {
+		return ({offsetX, offsetY, ctrlKey}) => {
 			if (priorEvent) {
 				change.x = priorEvent.offsetX + change.x - offsetX;
 				change.y = change.y + offsetY - priorEvent.offsetY;
@@ -302,7 +302,9 @@ export default class {
 				
 				const target = {...this.position};
 				
-				this.constrainPosition({position: true});
+				if (!ctrlKey) {
+					this.constrainPosition({position: true});
+				}
 				
 				this.target.set(target);
 				

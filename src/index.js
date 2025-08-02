@@ -53,13 +53,17 @@ const setIndex = (newIndex) => {
 	history.replaceState(null, '', `${location.origin}?${params.toString()}`);
 };
 
-window.addEventListener('keydown', ({key}) => {
-	switch (key) {
+window.addEventListener('keydown', (event) => {
+	switch (event.key) {
 		case 'ArrowRight':
 			setIndex(Math.min(pages.length - 1, index + 1));
 			break;
 		case 'ArrowLeft':
 			setIndex(Math.max(0, index - 1));
 			break;
+		default:
+			return;
 	}
+	
+	event.preventDefault();
 });

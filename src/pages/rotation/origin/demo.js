@@ -1,7 +1,8 @@
 import Demo from '../demo';
 import Rails from '@/demo/lines/rails';
 
-import {getConstrainerFromPoints, isAbove, getProgressedLine, getIntersectProgress} from '../shared';
+import {isAbove, getProgressedLine, getIntersectProgress} from '../shared';
+import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
 

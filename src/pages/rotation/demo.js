@@ -34,8 +34,8 @@ export default class extends Demo {
 		this.tangents.set(...tangents);
 	}
 	
-	updatesizesImage(doApply = true) {
-		super.updatesizesImage(false);
+	updateSizesImage(doApply = true) {
+		super.updateSizesImage(false);
 		
 		this.cornerAngle = Math.atan(this.ratioImage);
 		this.cornerDistance = getCornerDistance(this.sizesImage);

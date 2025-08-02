@@ -1,3 +1,4 @@
+import {CORNERS} from '@/pages/consts';
 import {getAllStartZooms} from '../demo';
 
 import {DEGREES} from '@/shared';
@@ -24,6 +25,18 @@ const getYIntersect = (image, viewportSize, cornerAngle, progressAngle) => ({
 	z: viewportSize / (Math.cos(progressAngle) * Math.abs(image.halfWidth / Math.cos(cornerAngle))),
 });
 
+export const getRelevantDemo = ({
+	rotation,
+	sizesViewport,
+	sizesImage,
+	ratioViewport = sizesViewport.width / sizesViewport.height,
+	ratioViewportInverse = 1 / ratioViewport,
+	ratioImage = sizesImage.width / sizesImage.height,
+	ratioImageInverse = 1 / ratioImage,
+	ratio = ratioViewport / ratioImage,
+	ratioInverse = 1 / ratio,
+}) => ({sizesViewport, ratioViewport, ratioViewportInverse, rotation, sizesImage, ratioImage, ratioImageInverse, ratio, ratioInverse});
+
 export default (getSecond, demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage)) => {
 	const startZooms = [
 		Math.min(allStartZooms[0].x, allStartZooms[1].x),
@@ -37,8 +50,7 @@ export default (getSecond, demo, allStartZooms = getAllStartZooms(demo.rotation,
 	
 	const [firstSide, firstBase] = startZooms.map((z) => ({x: 0, y: 0, z}));
 	
-	const cornerSide = {x: isEvenQuadrant ? -0.5 : 0.5, y: 0.5};
-	const cornerBase = {x: isEvenQuadrant ? 0.5 : -0.5, y: 0.5};
+	const [cornerSide, cornerBase] = isEvenQuadrant ? [CORNERS.TOP_LEFT, CORNERS.TOP_RIGHT] : [CORNERS.TOP_RIGHT, CORNERS.TOP_LEFT];
 	
 	const [secondSide, secondBase] = getSecond({
 		...demo, cornerSide, cornerBase, startZooms, quadrantAngle, isEvenQuadrant,

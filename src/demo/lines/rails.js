@@ -22,14 +22,6 @@ class Rail extends Connection {
 		}
 	};
 	
-	// static template = Line.template.cloneNode();
-	
-	// static {
-	// 	this.template.style.borderColor = 'white';
-	// 	this.template.style.borderStyle = 'solid';
-	// 	this.template.style.borderWidth = '0 1px';
-	// }
-	
 	setProgress(progress) {
 		this.element.style.backgroundImage = getBackgroundImage(progress);
 		

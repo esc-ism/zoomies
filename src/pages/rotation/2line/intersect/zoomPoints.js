@@ -32,7 +32,7 @@ export const replaceVpEnd = (() => {
 		};
 	};
 	
-	const getEnds = (secondSide, secondBase, {isEvenQuadrant, cornerSide, cornerBase}) => {
+	const getEnds = (secondSide, secondBase, {cornerSide, cornerBase, isEvenQuadrant, ratioImage}) => {
 		if (getDistance(secondSide, cornerSide) + getDistance(secondBase, cornerBase) <= Math.SQRT2) {
 			return [cornerSide, cornerBase];
 		}
@@ -42,7 +42,9 @@ export const replaceVpEnd = (() => {
 				[CORNERS.TOP_RIGHT, CORNERS.BOTTOM_RIGHT, Object.assign(secondBase, getFlipped(secondBase))];
 	};
 	
-	return (secondSide, secondBase, data) => {
+	return (data) => {
+		const secondSide = {...data.yIntersectSide};
+		const secondBase = {...data.yIntersectBase};
 		const [endSide, endBase, flipped] = getEnds(secondSide, secondBase, data);
 		const intersection = getGenericIntersection([secondSide, endSide], [secondBase, endBase]);
 		

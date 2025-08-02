@@ -8,6 +8,7 @@ import SHARED_FUNCTIONS from '../../code';
 import Demo, {getZoomPoints} from './demo';
 import {getSnappedZoom} from '../demo';
 import snapImage from './snapImage';
+import {getRelevantDemo} from '../zoomPoints';
 
 export const getDimensions = (ratio, {width, height}) => {
 	const dimensions = {};
@@ -28,22 +29,7 @@ export const getDimensions = (ratio, {width, height}) => {
 };
 
 export const getVarGetter = (demo, rotation = DEGREES[90], ratio = 1) => () => {
-	const sizesImage = getDimensions(ratio, demo.sizesViewport);
-	const ratioImage = sizesImage.width / sizesImage.height;
-	
-	const {sizesViewport, ratioViewport, ratioViewportInverse} = demo;
-	
-	const zoomPoints = getZoomPoints({
-		sizesViewport,
-		ratioViewport,
-		ratioViewportInverse,
-		rotation,
-		sizesImage,
-		ratioImage,
-		ratioImageInverse: 1 / ratioImage,
-		ratio: demo.ratioViewport / ratioImage,
-		ratioInverse: ratioImage / demo.ratioViewport,
-	});
+	const zoomPoints = getZoomPoints(getRelevantDemo({...demo, rotation, sizesImage: getDimensions(ratio, demo.sizesViewport)}));
 	
 	return {first: zoomPoints[2], second: zoomPoints[3], zoomPoints, rotation, ratio};
 };

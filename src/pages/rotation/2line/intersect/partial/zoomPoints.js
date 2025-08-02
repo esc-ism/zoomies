@@ -1,12 +1,15 @@
-import {getSecond, isPartialTarget} from '../../axisViewport/zoomPoints';
+import {getSecond} from '../../axisViewport/zoomPoints';
 import getZoomPoints from '../../zoomPoints';
 import {replaceVpEnd} from '../zoomPoints';
 
 export default getZoomPoints.bind(null, (data) => {
 	const [secondSide, secondBase] = getSecond(data);
 	
-	if (isPartialTarget(secondSide, secondBase, data)) {
-		return replaceVpEnd(secondSide, secondBase, data, isPartialTarget(secondSide, data.cornerSide), isPartialTarget(secondBase, data.cornerBase));
+	if (
+		(secondSide.y < 0 && secondBase.y < 0)
+		|| (Math.sign(secondSide.x) !== Math.sign(data.cornerSide.x) && Math.sign(secondBase.x) !== Math.sign(data.cornerBase.x))
+	) {
+		return replaceVpEnd(data);
 	}
 	
 	return [secondSide, secondBase];

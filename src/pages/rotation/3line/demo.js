@@ -5,28 +5,34 @@ import {getZoomProgressed, getProgressedLine, getIntersectProgress, getProgress,
 import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
-import {getRelevantDemo} from './zoomPoints';
+import getZoomPoints, {getRelevantDemo} from './zoomPoints';
+import Lines from '@/demo/lines/lines';
 
-export const getBound = (zoom, first, second, isTopLeft) => {
-	if (zoom > second.z) {
-		const progress = zoom / second.z;
-		
-		return {
-			x: isTopLeft ? -0.5 - (-0.5 - second.x) / progress : 0.5 - (0.5 - second.x) / progress,
-			y: 0.5 - (0.5 - second.y) / progress,
-		};
-	}
-	
-	// todo === 0 condition seems unnecessary
-	if (zoom <= first.z || (second.x === 0 && second.y === 0)) {
+export const getBound = (zoom, first, second, third, isTopLeft) => {
+	if (zoom <= first.z) {
 		return false;
 	}
 	
+	if (zoom <= second.z) {
+		return {
+			...getZoomProgressed(first, first.end, zoom),
+			m: first.end.y / first.end.x,
+			c: 0,
+			isFirst: true,
+		};
+	}
+	
+	if (zoom <= third.z) {
+		const {x, y} = getZoomProgressed(second, second.end, zoom);
+		
+		return {x, y, m: y / x, c: 0, isFirst: true};
+	}
+	
+	const progress = zoom / third.z;
+	
 	return {
-		...getZoomProgressed(first, second.vpEnd, zoom),
-		m: second.y / second.x,
-		c: 0,
-		isFirst: true,
+		x: isTopLeft ? -0.5 - (-0.5 - third.x) / progress : 0.5 - (0.5 - third.x) / progress,
+		y: 0.5 - (0.5 - third.y) / progress,
 	};
 };
 
@@ -87,41 +93,61 @@ export const getSnappedZoom = (() => {
 	};
 })();
 
-const getRailProgress = (zoom, first, second) => {
+const getRailProgress = (zoom, first, second, ...thirds) => {
 	if (zoom <= first.z) {
-		return [0, 0];
+		return [0, 0, 0, 0];
 	}
 	
 	if (zoom <= second.z) {
-		return [getProgress(first.z, zoom) * second.p, 0];
+		return [getProgress(first.z, zoom) * second.p, 0, 0, 0];
 	}
 	
-	return [1, getProgress(second.z, zoom)];
+	if (thirds[0].z >= thirds[1].z) {
+		if (zoom <= thirds[1].z) {
+			return [1, getProgress(second.z, zoom) * thirds[0].p, 0, 0];
+		}
+		
+		if (zoom <= thirds[0].z) {
+			return [1, getProgress(second.z, zoom) * thirds[0].p, 0, getProgress(thirds[1].z, zoom)];
+		}
+	} else {
+		if (zoom <= thirds[0].z) {
+			return [1, getProgress(second.z, zoom) * thirds[1].p, 0, 0];
+		}
+		
+		if (zoom <= thirds[1].z) {
+			return [1, getProgress(second.z, zoom) * thirds[1].p, getProgress(thirds[0].z, zoom), 0];
+		}
+	}
+	
+	return [1, 1, ...thirds.map(({z}) => getProgress(z, zoom))];
 };
 
 export default class extends Demo {
+	static getZoomPoints = getZoomPoints;
+	
 	rails = new Rails(4, this, false, false, true);
+	lines = new Lines(1, this, false, false, true);
 	
 	setRails() {
+		const second = this.zoomPoints[2].z >= this.zoomPoints[3].z ? this.zoomPoints[2] : this.zoomPoints[3];
+		
 		this.rails.set(
 			[{x: 0, y: 0}, this.zoomPoints[1]],
-			[this.zoomPoints[1], CORNERS.TOP_LEFT],
-			[{x: 0, y: 0}, this.zoomPoints[3]],
+			[this.zoomPoints[1], second],
+			[this.zoomPoints[2], CORNERS.TOP_LEFT],
 			[this.zoomPoints[3], CORNERS.TOP_RIGHT],
 		);
 	}
 	
 	setRailsProgress() {
-		this.rails.setProgress(
-			...getRailProgress(this.zoom, this.zoomPoints[0], this.zoomPoints[1]),
-			...getRailProgress(this.zoom, this.zoomPoints[2], this.zoomPoints[3]),
-		);
+		this.rails.setProgress(...getRailProgress(this.zoom, ...this.zoomPoints));
 	}
 	
 	getPositionConstrainer() {
 		return getConstrainerFromPoints(
-			this.bound0 = getBound(this.zoom, this.zoomPoints[0], this.zoomPoints[1], true),
-			this.bound1 = getBound(this.zoom, this.zoomPoints[2], this.zoomPoints[3], false),
+			this.bound0 = getBound(this.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2], true),
+			this.bound1 = getBound(this.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[3], false),
 		);
 	}
 	

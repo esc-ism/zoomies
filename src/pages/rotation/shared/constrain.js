@@ -1,21 +1,4 @@
-// logarithmic progress from "low" to infinity
-export const getProgress = (low, target) => 1 - low / target;
-export const getProgressed = (from, to, p) => ({x: p * (to.x - from.x) + from.x, y: p * (to.y - from.y) + from.y, p});
-export const getZoomProgressed = ({z: lowZ, ...from}, to, targetZ) => getProgressed(from, to, getProgress(lowZ, targetZ));
-
-export const getDistance = (from, to) => Math.sqrt(Math.pow(from.x - to.x, 2) + Math.pow(from.y - to.y, 2));
-
-const perfectSlopes = [0, Infinity, -Infinity];
-
-export const getLineY = ({m, c, y}, x) => perfectSlopes.includes(m) ? y : m * x + c; // y = mx + c
-export const getLineX = ({m, c, x}, y) => perfectSlopes.includes(m) ? x : (y - c) / m; // x = (y - c) / m
-
-export const isAbove = (line, {x, y}) => y > getLineY(line, x);
-const isRight = (line, {x, y}) => x > getLineX(line, y);
-
-export const getM = (from, to) => (to.y - from.y) / (to.x - from.x);
-export const getLine = (m, {x, y}) => ({c: (y - m * x), m, x, y});
-export const getFlipped = ({x, y}) => ({x: -x, y: -y});
+import {getFlipped, getLine, getLineX, getLineY, getM, isAbove, isRight} from '.';
 
 const get2DConstrained = (() => {
 	const isBetween = (() => {
@@ -116,8 +99,6 @@ const get1DConstrainer = (() => {
 		return [
 			[point, {line: linePoint, isSide, isHigh: false}, 'line'],
 			[point, {line: linePoint, isSide, isHigh: true}, 'line'],
-			// [flipped, {line: lineFlipped, isSide, isHigh: false}, 'line'],
-			// [flipped, {line: lineFlipped, isSide, isHigh: true}, 'line'],
 		];
 	};
 	
@@ -160,7 +141,7 @@ const get1DConstrainer = (() => {
 	};
 })();
 
-export const getConstrainerFromPoints = (() => {
+const getFrame = (() => {
 	const isHighSide = (lines, high, low) => (lines[high].c < lines[low].c) === (lines[high].m > 0);
 	const isHighTop = (lines, high, low) => lines[high].c > lines[low].c;
 	
@@ -184,7 +165,7 @@ export const getConstrainerFromPoints = (() => {
 		array[i1] = temp;
 	};
 	
-	const getFrame = (point0, point1) => {
+	return (point0, point1) => {
 		const flipped0 = getFlipped(point0);
 		const flipped1 = getFlipped(point1);
 		
@@ -270,45 +251,29 @@ export const getConstrainerFromPoints = (() => {
 		
 		return [points, lines, tangents];
 	};
-	
-	return (point0, point1) => {
-		if (point0 && point1) {
-			if (point0.isFirst && point1.isFirst && point0.m === point1.m) {
-				return get1DConstrainer(point0.p > point1.p ? point0 : point1);
-			}
-			
-			const [points, lines, tangents] = getFrame(point0, point1);
-			
-			return [
-				get2DConstrained.bind(null, points, lines, tangents), Object.values(points), [
-					[points.topLeft, tangents.top, 'left'],
-					[points.topRight, tangents.top, 'right'],
-					// [points.bottomLeft, tangents.bottom, 'left'],
-					// [points.bottomRight, tangents.bottom, 'right'],
-					[points.topLeft, tangents.left, 'top'],
-					// [points.bottomLeft, tangents.left, 'bottom'],
-					[points.topRight, tangents.right, 'top'],
-					// [points.bottomRight, tangents.right, 'bottom'],
-				],
-			];
-		}
-		
-		if (point0 || point1) {
-			return get1DConstrainer(point0 || point1);
-		}
-		
-		return [() => ({x: 0, y: 0}), [], []];
-	};
 })();
 
-// https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point
-export const getIntersectProgress = ({x, y}, [{x: d, y: e}, {x: f, y: g}], [{x: h, y: i}, {x: j, y: k}], doFlip) => {
-	const a = g * j + e * h + k * d + i * f - g * h - j * e - k * f - i * d;
-	const b = g * h + e * x + j * e + k * x + i * d * 2 + f * y + h * y - g * x - e * h * 2 - j * y - k * d - i * x - f * i - d * y;
-	const c = h * e + i * x + d * y - e * x - h * y - d * i;
+export default (point0, point1) => {
+	if (!point0 && !point1) {
+		return [() => ({x: 0, y: 0}), [], []];
+	}
 	
-	return (doFlip ? -b - Math.sqrt(b * b - 4 * a * c) : -b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+	if (!point0 || !point1) {
+		return get1DConstrainer(point0 || point1);
+	}
+	
+	if (point0.isFirst && point1.isFirst && point0.m === point1.m) {
+		return get1DConstrainer(point0.p > point1.p ? point0 : point1);
+	}
+	
+	const [points, lines, tangents] = getFrame(point0, point1);
+	
+	return [
+		get2DConstrained.bind(null, points, lines, tangents), Object.values(points), [
+			[points.topLeft, tangents.top, 'left'],
+			[points.topRight, tangents.top, 'right'],
+			[points.topLeft, tangents.left, 'top'],
+			[points.topRight, tangents.right, 'top'],
+		],
+	];
 };
-
-// line with progressed start point
-export const getProgressedLine = (line, {z}) => [getZoomProgressed(...line, z), line[1]];
