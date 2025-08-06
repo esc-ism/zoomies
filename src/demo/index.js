@@ -32,6 +32,12 @@ const dock = (node) => new Promise((resolve) => {
 	observer.observe(node);
 });
 
+let position = {x: 0, y: 0};
+let rotation = DEGREES[90];
+let zoom = 1;
+let _ratioImage = 1;
+let _ratioViewport = 1;
+
 export default class {
 	static readout = new Readout();
 	static progress = new Progress();
@@ -44,14 +50,14 @@ export default class {
 	sizesImage = {};
 	sizesViewport = {};
 	
-	position = {x: 0, y: 0};
-	rotation = DEGREES[90];
-	zoom = 1;
+	position = position;
+	rotation = rotation;
+	zoom = zoom;
 	
-	_ratioImage = 1;
+	_ratioImage = _ratioImage;
 	ratioImageInverse = 1;
 	
-	_ratioViewport = 1;
+	_ratioViewport = _ratioViewport;
 	ratioViewportInverse = 1;
 	
 	ratio = 1;
@@ -66,7 +72,12 @@ export default class {
 					return;
 				}
 				
-				this.updateSizesViewport();
+				this.ratioImage = _ratioImage;
+				this.position = position;
+				this.ratioViewport = _ratioViewport;
+				this.applyPosition();
+				this.applyRotation();
+				this.applyZoom();
 				
 				resolve();
 			});
@@ -385,6 +396,12 @@ export default class {
 	}
 	
 	remove() {
+		position = this.position;
+		rotation = this.rotation;
+		zoom = this.zoom;
+		_ratioViewport = this._ratioViewport;
+		_ratioImage = this._ratioImage;
+		
 		this.tween?.progress(0).kill();
 	}
 	

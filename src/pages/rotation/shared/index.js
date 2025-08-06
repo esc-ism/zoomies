@@ -15,7 +15,7 @@ export const isRight = (line, {x, y}) => x > getLineX(line, y);
 
 export const getM = (from, to) => (to.y - from.y) / (to.x - from.x);
 export const getLine = (m, {x, y}) => ({c: (y - m * x), m, x, y});
-export const getFlipped = ({x, y}) => ({x: -x, y: -y});
+export const getFlipped = ({x, y, ...data}) => ({...data, x: -x, y: -y});
 
 export const getIntersectProgress = ({x, y}, [{x: d, y: e}, {x: f, y: g}], [{x: h, y: i}, {x: j, y: k}], doFlip) => {
 	const a = g * j + e * h + k * d + i * f - g * h - j * e - k * f - i * d;

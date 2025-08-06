@@ -11,10 +11,11 @@ export default (wrapper) => {
 	registerDemo(demo);
 	
 	demo.init().then(() => {
-		demo.rotation = DEGREES[90] - (35 / 180 * DEGREES[180]);
+		demo.rotation = DEGREES[90] - (33 / 180 * DEGREES[180]);
 		demo.constrainRotation();
 		demo.applyRotation();
-		demo.ratioImage = 1.6;
+		demo.ratioImage = 1.24;
+		demo.ratioViewport = 1.5;
 	});
 	
 	wrapper.append(

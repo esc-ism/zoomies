@@ -6,7 +6,6 @@ import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
 
-// todo tangents & rails are fucked for 1d bounds
 const getBound = (zoom, point, isTopLeft) => {
 	if (zoom <= point.z) {
 		return false;
@@ -47,7 +46,7 @@ const getSnappedZoom = (_point0, point1, {x, y}) => {
 
 const getRailProgresses = [
 	() => [0, 0],
-	({x, y}) => {
+	([{x, y}]) => {
 		const progress = Math.abs(y) / 0.5;
 		
 		return (x > 0) === (y > 0) ? [0, progress] : [progress, 0];

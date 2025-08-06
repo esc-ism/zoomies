@@ -8,33 +8,45 @@ import {CORNERS} from '@/pages/consts';
 import getZoomPoints, {getRelevantDemo} from './zoomPoints';
 import Lines from '@/demo/lines/lines';
 
-export const getBound = (zoom, first, second, third, isTopLeft) => {
-	if (zoom <= first.z) {
-		return false;
-	}
-	
-	if (zoom <= second.z) {
-		return {
-			...getZoomProgressed(first, first.end, zoom),
-			m: first.end.y / first.end.x,
-			c: 0,
-			isFirst: true,
-		};
-	}
-	
-	if (zoom <= third.z) {
-		const {x, y} = getZoomProgressed(second, second.end, zoom);
+export const getBound = (() => {
+	const get = (zoom, first, second, third) => {
+		if (zoom <= first.z) {
+			return false;
+		}
 		
-		return {x, y, m: y / x, c: 0, isFirst: true};
-	}
-	
-	const progress = zoom / third.z;
-	
-	return {
-		x: isTopLeft ? -0.5 - (-0.5 - third.x) / progress : 0.5 - (0.5 - third.x) / progress,
-		y: 0.5 - (0.5 - third.y) / progress,
+		if (zoom <= second.z) {
+			return {
+				...getZoomProgressed(first, first.end, zoom),
+				m: first.end.y / first.end.x,
+				c: 0,
+				isFirst: true,
+			};
+		}
+		
+		if (zoom <= third.z) {
+			const {x, y} = getZoomProgressed(second, second.end, zoom);
+			
+			return {x, y, m: y / x, c: 0, isFirst: true};
+		}
+		
+		const progress = zoom / third.z;
+		
+		return {
+			x: third.end.x - (third.end.x - third.x) / progress,
+			y: third.end.y - (third.end.y - third.y) / progress,
+		};
 	};
-};
+	
+	return (zoom, first, second, third) => {
+		const result = get(zoom, first, second, third);
+		
+		if (result && third.end.y < 0) {
+			return getFlipped(result);
+		}
+		
+		return result;
+	};
+})();
 
 export const getSnappedZoom = (() => {
 	const getDirected = (first, second, flip, cornerX) => {
@@ -86,61 +98,50 @@ export const getSnappedZoom = (() => {
 	};
 })();
 
-const getRailProgress = (zoom, first, second, ...thirds) => {
+const getRailProgress = (zoom, first, second, third) => {
 	if (zoom <= first.z) {
-		return [0, 0, 0, 0];
+		return [0, 0, 0];
 	}
 	
 	if (zoom <= second.z) {
-		return [getProgress(first.z, zoom) * second.p, 0, 0, 0];
+		return [getProgress(first.z, zoom) * second.p, 0, 0];
 	}
 	
-	if (thirds[0].z >= thirds[1].z) {
-		if (zoom <= thirds[1].z) {
-			return [1, getProgress(second.z, zoom) * thirds[0].p, 0, 0];
-		}
-		
-		if (zoom <= thirds[0].z) {
-			return [1, getProgress(second.z, zoom) * thirds[0].p, 0, getProgress(thirds[1].z, zoom)];
-		}
-	} else {
-		if (zoom <= thirds[0].z) {
-			return [1, getProgress(second.z, zoom) * thirds[1].p, 0, 0];
-		}
-		
-		if (zoom <= thirds[1].z) {
-			return [1, getProgress(second.z, zoom) * thirds[1].p, getProgress(thirds[0].z, zoom), 0];
-		}
+	if (zoom <= third.z) {
+		return [1, getProgress(second.z, zoom) * third.p, 0];
 	}
 	
-	return [1, 1, ...thirds.map(({z}) => getProgress(z, zoom))];
+	return [1, 1, getProgress(third.z, zoom)];
 };
 
 export default class extends Demo {
 	static getZoomPoints = getZoomPoints;
 	
-	rails = new Rails(4, this, false, false, true);
+	rails = new Rails(6, this, false, false, true);
 	lines = new Lines(1, this, false, false, true);
 	
 	setRails() {
-		const second = this.zoomPoints[2].z >= this.zoomPoints[3].z ? this.zoomPoints[2] : this.zoomPoints[3];
-		
 		this.rails.set(
 			[{x: 0, y: 0}, this.zoomPoints[1]],
-			[this.zoomPoints[1], second],
+			[this.zoomPoints[1], this.zoomPoints[2]],
 			[this.zoomPoints[2], CORNERS.TOP_LEFT],
-			[this.zoomPoints[3], CORNERS.TOP_RIGHT],
+			[{x: 0, y: 0}, this.zoomPoints[4]],
+			[this.zoomPoints[4], this.zoomPoints[5]],
+			[this.zoomPoints[5], CORNERS.TOP_RIGHT],
 		);
 	}
 	
 	setRailsProgress() {
-		this.rails.setProgress(...getRailProgress(this.zoom, ...this.zoomPoints));
+		this.rails.setProgress(
+			...getRailProgress(this.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2]),
+			...getRailProgress(this.zoom, this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5]),
+		);
 	}
 	
 	getPositionConstrainer() {
 		return getConstrainerFromPoints(
-			this.bound0 = getBound(this.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2], true),
-			this.bound1 = getBound(this.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[3], false),
+			this.bound0 = getBound(this.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2]),
+			this.bound1 = getBound(this.zoom, this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5]),
 		);
 	}
 	

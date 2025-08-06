@@ -39,7 +39,7 @@ const flipPage = (() => {
 	};
 })();
 
-const setIndex = (newIndex) => {
+const setIndex = (newIndex, pushState = true) => {
 	if (newIndex === index) {
 		return;
 	}
@@ -50,10 +50,26 @@ const setIndex = (newIndex) => {
 	
 	params.set('page', index);
 	
-	history.replaceState(null, '', `${location.origin}?${params.toString()}`);
+	if (pushState) {
+		history.pushState({index}, '', `${location.origin}?${params.toString()}`);
+	}
 };
 
+window.addEventListener('popstate', (event) => {
+	if (typeof event.state?.index !== 'number') {
+		return;
+	}
+	
+	setIndex(event.state.index, false);
+	
+	event.preventDefault();
+});
+
 window.addEventListener('keydown', (event) => {
+	if (event.ctrlKey || event.altKey || event.shiftKey) {
+		return;
+	}
+	
 	switch (event.key) {
 		case 'ArrowRight':
 			setIndex(Math.min(pages.length - 1, index + 1));

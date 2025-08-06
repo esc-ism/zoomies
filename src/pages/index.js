@@ -7,12 +7,5 @@ import edge from './edge';
 import origin from './rotation/origin';
 import axisViewport from './rotation/2line/axisViewport';
 import axisTest from './rotation/3line';
-import axisIntersectPartial from './rotation/2line/intersect/partial';
-import axisIntersectComplete from './rotation/2line/intersect/complete';
-import axisImagePartial from './rotation/2line/axisImage/partial';
-import axisImageComplete from './rotation/2line/axisImage/complete';
 
-export default [
-	welcome, unbound, center, edge, origin,
-	axisViewport, axisTest,
-];
+export default [welcome, unbound, center, edge, origin, axisViewport, axisTest];
