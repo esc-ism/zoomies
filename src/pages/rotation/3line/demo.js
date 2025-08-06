@@ -1,12 +1,11 @@
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
-import {getZoomProgressed, getProgressedLine, getIntersectProgress, getProgress, getFlipped, isAbove} from '../shared';
+import {getZoomProgressed, getProgressedLine, getIntersectProgress, getProgress, getFlipped} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
 import getZoomPoints, {getRelevantDemo} from './zoomPoints';
-import Lines from '@/demo/lines/lines';
 
 export const getBound = (() => {
 	const get = (zoom, first, second, third) => {
@@ -73,10 +72,10 @@ export const getSnappedZoom = (() => {
 	const getZoom = (pair0, pair1, position, doFlip) => getZoomPairSecond(pair1, position, doFlip)
 		|| getZoomPairSecond(pair0, position, doFlip, getProgress(pair0[0], pair1[0]));
 	
-	return (second, third0, third1, position) => {
+	return (second0, third0, second1, third1, position) => {
 		const getPairings = (flip0, flip1) => {
-			const [lineFirst0, lineSecond0] = getDirected(second, third0, flip0, -0.5);
-			const [lineFirst1, lineSecond1] = getDirected(second, third1, flip1, 0.5);
+			const [lineFirst0, lineSecond0] = getDirected(second0, third0, flip0, -0.5);
+			const [lineFirst1, lineSecond1] = getDirected(second1, third1, flip1, 0.5);
 			
 			return third0.z >= third1.z ?
 					[
@@ -118,7 +117,6 @@ export default class extends Demo {
 	static getZoomPoints = getZoomPoints;
 	
 	rails = new Rails(6, this, false, false, true);
-	lines = new Lines(1, this, false, false, true);
 	
 	setRails() {
 		this.rails.set(
@@ -150,6 +148,6 @@ export default class extends Demo {
 	}
 	
 	getSnappedZoom() {
-		return getSnappedZoom(...this.zoomPoints.slice(1), this.position);
+		return getSnappedZoom(this.zoomPoints[1], this.zoomPoints[2], this.zoomPoints[4], this.zoomPoints[5], this.position);
 	}
 }

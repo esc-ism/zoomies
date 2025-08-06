@@ -4,13 +4,13 @@ import {getAllStartZooms} from '../demo';
 import {DEGREES} from '@/shared';
 
 // the angle from 0,0 to the center of the image edge angled towards the viewport's upper-right corner
-const getQuadrantAngle = (rotation, isEvenQuadrant) => {
+export const getQuadrantAngle = (rotation, isEvenQuadrant) => {
 	const angle = (rotation + DEGREES[360]) % DEGREES[90];
 	
 	return isEvenQuadrant ? angle : DEGREES[90] - angle;
 };
 
-const getProgressAngles = (quadrantAngle, viewportRatio, viewportRatioInverse) => {
+export const getProgressAngles = (quadrantAngle, viewportRatio, viewportRatioInverse) => {
 	const progress = quadrantAngle / DEGREES[90] * -2 + 1;
 	
 	return {
@@ -19,7 +19,7 @@ const getProgressAngles = (quadrantAngle, viewportRatio, viewportRatioInverse) =
 	};
 };
 
-const getYIntersect = (image, viewportSize, cornerAngle, progressAngle) => ({
+export const getYIntersect = (image, viewportSize, cornerAngle, progressAngle) => ({
 	x: 0,
 	y: (image.halfHeight - image.halfWidth * Math.tan(cornerAngle)) / image.height,
 	z: viewportSize / (Math.cos(progressAngle) * Math.abs(image.halfWidth / Math.cos(cornerAngle))),

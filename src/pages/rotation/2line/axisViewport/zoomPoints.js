@@ -2,7 +2,7 @@ import {DEGREES} from '@/shared';
 
 import getZoomPoints from '../zoomPoints';
 
-const getPoints = ({rotation, sizesImage, sizesViewport, startZooms, quadrantAngle}) => {
+export const getPoints = ({rotation, sizesImage, sizesViewport, startZooms, quadrantAngle}) => {
 	const [axisRight, axisTop] = quadrantAngle >= DEGREES[45] ? ['y', 'x'] : ['x', 'y'];
 	
 	const xRight = sizesViewport.halfWidth / startZooms[0];
@@ -25,7 +25,7 @@ const getPoints = ({rotation, sizesImage, sizesViewport, startZooms, quadrantAng
 	];
 };
 
-const getGenericIntersection = (line0, line1) => {
+export const getGenericIntersection = (line0, line1) => {
 	const a0 = line0[0].y - line0[1].y;
 	const b0 = line0[1].x - line0[0].x;
 	const c0 = line0[1].x * line0[0].y - line0[0].x * line0[1].y;
