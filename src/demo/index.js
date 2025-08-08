@@ -72,9 +72,9 @@ export default class {
 					return;
 				}
 				
+				this.ratioViewport = _ratioViewport;
 				this.ratioImage = _ratioImage;
 				this.position = position;
-				this.ratioViewport = _ratioViewport;
 				this.applyPosition();
 				this.applyRotation();
 				this.applyZoom();

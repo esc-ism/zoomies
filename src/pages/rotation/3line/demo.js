@@ -7,13 +7,13 @@ import getConstrainerFromPoints from '../shared/constrain';
 import {CORNERS} from '@/pages/consts';
 import getZoomPoints, {getRelevantDemo} from './zoomPoints';
 
-export const getBound = (() => {
-	const get = (zoom, first, second, third) => {
-		if (zoom <= first.z) {
-			return false;
-		}
-		
-		if (zoom <= second.z) {
+export const getBound = (zoom, first, second, third) => {
+	if (zoom <= first.z) {
+		return false;
+	}
+	
+	if (zoom <= third.z) {
+		if (third.isFirstInt || zoom <= second.z) {
 			return {
 				...getZoomProgressed(first, first.end, zoom),
 				m: first.end.y / first.end.x,
@@ -22,30 +22,18 @@ export const getBound = (() => {
 			};
 		}
 		
-		if (zoom <= third.z) {
-			const {x, y} = getZoomProgressed(second, second.end, zoom);
-			
-			return {x, y, m: y / x, c: 0, isFirst: true};
-		}
+		const {x, y} = getZoomProgressed(second, second.end, zoom);
 		
-		const progress = zoom / third.z;
-		
-		return {
-			x: third.end.x - (third.end.x - third.x) / progress,
-			y: third.end.y - (third.end.y - third.y) / progress,
-		};
-	};
+		return {x, y, m: y / x, c: 0, isFirst: true};
+	}
 	
-	return (zoom, first, second, third) => {
-		const result = get(zoom, first, second, third);
-		
-		if (result && third.end.y < 0) {
-			return getFlipped(result);
-		}
-		
-		return result;
+	const progress = zoom / third.z;
+	
+	return {
+		x: third.end.x - (third.end.x - third.x) / progress,
+		y: third.end.y - (third.end.y - third.y) / progress,
 	};
-})();
+};
 
 export const getSnappedZoom = (() => {
 	const getDirected = (first, second, flip, cornerX) => {
@@ -69,15 +57,28 @@ export const getSnappedZoom = (() => {
 		return null;
 	};
 	
-	const getZoom = (pair0, pair1, position, doFlip) => getZoomPairSecond(pair1, position, doFlip)
-		|| getZoomPairSecond(pair0, position, doFlip, getProgress(pair0[0], pair1[0]));
-	
-	return (second0, third0, second1, third1, position) => {
-		const getPairings = (flip0, flip1) => {
-			const [lineFirst0, lineSecond0] = getDirected(second0, third0, flip0, -0.5);
-			const [lineFirst1, lineSecond1] = getDirected(second1, third1, flip1, 0.5);
+	const getZoom = (position, doFlip, ...pairs) => {
+		let maxP;
+		
+		for (let i = pairs.length - 1; i >= 1; i--) {
+			const zoom = getZoomPairSecond(pairs[i], position, doFlip, maxP);
 			
-			return third0.z >= third1.z ?
+			if (zoom) {
+				return zoom;
+			}
+			
+			maxP = getProgress(pairs[i - 1][0], pairs[i][0]);
+		}
+		
+		return getZoomPairSecond(pairs[0], position, doFlip);
+	};
+	
+	return (first0, second0, third0, first1, second1, third1, position) => {
+		const getPairings = (flip0, flip1) => {
+			const [lineFirst0, lineSecond0] = getDirected(third0.isFirstInt ? first0 : second0, third0, flip0, -0.5);
+			const [lineFirst1, lineSecond1] = getDirected(third1.isFirstInt ? first1 : second1, third1, flip1, 0.5);
+			
+			const pairings = third0.z >= third1.z ?
 					[
 						[third1.z, getProgressedLine(lineFirst0, third1), lineSecond1],
 						[third0.z, lineSecond0, getProgressedLine(lineSecond1, third0)],
@@ -86,13 +87,21 @@ export const getSnappedZoom = (() => {
 						[third0.z, lineSecond0, getProgressedLine(lineFirst1, third0)],
 						[third1.z, getProgressedLine(lineSecond0, third1), lineSecond1],
 					];
+			
+			if (third0.isFirstInt || third1.isFirstInt) {
+				pairings.unshift(first0.z >= first1.z ?
+						[first0.z, lineFirst0, getProgressedLine(lineFirst1, first0)] :
+						[first1.z, getProgressedLine(lineFirst0, first1), lineFirst1]);
+			}
+			
+			return pairings;
 		};
 		
 		return Math.max(...[
-			getZoom(...getPairings(false, false), position),
-			getZoom(...getPairings(false, true), position, true),
-			getZoom(...getPairings(true, false), position, true),
-			getZoom(...getPairings(true, true), position),
+			getZoom(position, false, ...getPairings(false, false)),
+			getZoom(position, true, ...getPairings(false, true)),
+			getZoom(position, true, ...getPairings(true, false)),
+			getZoom(position, false, ...getPairings(true, true)),
 		].filter(isValidZoom));
 	};
 })();
@@ -148,6 +157,10 @@ export default class extends Demo {
 	}
 	
 	getSnappedZoom() {
-		return getSnappedZoom(this.zoomPoints[1], this.zoomPoints[2], this.zoomPoints[4], this.zoomPoints[5], this.position);
+		return getSnappedZoom(
+			this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2],
+			this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5],
+			this.position,
+		);
 	}
 }
