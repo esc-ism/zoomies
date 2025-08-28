@@ -3,8 +3,7 @@ import gsap from 'gsap';
 import Demo from './demo';
 
 import {getText} from '../shared';
-import {getZoomProgressed} from '../rotation/shared';
-import {getVarGetter} from '../rotation/2line/axisViewport';
+import {getBound, getRailProgress, getVarGetter} from '../rotation/3line/demo';
 
 import {CLASS_INSTRUCTION} from '../consts';
 import {DEGREES} from '@/shared';
@@ -25,39 +24,45 @@ const tween = async (demo) => {
 	while (isActive) {
 		await wait()
 			.then(() => {
-				const {first, second, rotation, ratio} = getVarGetter(
+				const {zoomPoints, rotation, ratio} = getVarGetter(
 					demo,
-					gsap.utils.random(DEGREES[180], DEGREES[360]),
+					gsap.utils.random(-DEGREES[180], 0),
 					gsap.utils.random(0.5, 2),
-				);
+				)();
 				
-				const getNext = (zoom = 5) => {
-					if (zoom >= second.z) {
-						const {p, ...position} = getZoomProgressed(second, {x: 0.5, y: 0.5}, zoom);
-						
-						return [position, [0, 0, 1, p]];
-					}
-					
-					const {p, ...position} = getZoomProgressed(first, second.vpEnd, zoom);
-					
-					return [position, [0, 0, p * second.p, 0]];
-				};
+				const firstIndex = zoomPoints[5].isFirstInt ? 0 : 3;
+				const [first, second, third] = zoomPoints.slice(firstIndex);
 				
 				demo.setTween(
 					[{ratio}],
 					[{rotation, zoom: first.z}],
 					[{zoom: 5}, {
 						duration: 2,
+						onStart() {
+							demo.constrainPosition({ratio, rotation}, true);
+							
+							demo.rails.hide();
+							
+							demo.rails[firstIndex].show();
+							demo.rails[firstIndex + 1].show();
+							demo.rails[firstIndex + 2].show();
+						},
+						onReverseComplete() {
+							demo.rails.hide();
+						},
 						onUpdate() {
-							const [position, progresses] = getNext(demo.zoom);
+							const position = getBound(demo.zoom, first, second, third) || {x: 0, y: 0};
+							const progresses = [0, 0, 0];
 							
 							demo.position = position;
 							demo.applyPosition();
 							
+							progresses.splice(firstIndex, 0, ...getRailProgress(demo.zoom, first, second, third));
+							
 							demo.rails.setProgress(...progresses);
 						},
 					}],
-					[{position: getNext()[0]}, {duration: 0}],
+					[{position: {x: 0, y: 0}}, {duration: 0}],
 				);
 				
 				return demo.tween;

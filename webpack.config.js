@@ -1,19 +1,24 @@
 const path = require('path');
 const FileCopy = require('copy-webpack-plugin');
 
+const shared = {
+	resolve: {
+		extensions: ['.js'],
+		alias: {
+			'@css': path.resolve(__dirname, 'src/css/'),
+			'@': path.resolve(__dirname, 'src/'),
+		},
+	},
+	entry: './src/index.js',
+	plugins: [new FileCopy({patterns: [{from: './src/index.html'}]})],
+	
+};
+
 module.exports = [
 	{
-		resolve: {
-			extensions: ['.js'],
-			alias: {
-				'@css': path.resolve(__dirname, 'src/css/'),
-				'@': path.resolve(__dirname, 'src/'),
-			},
-		},
-		entry: './src/index.js',
+		...shared,
 		name: 'DEBUG',
 		mode: 'development',
-		plugins: [new FileCopy({patterns: [{from: './src/index.html'}]})],
 		output: {
 			filename: '[name].bundle.js',
 			path: path.resolve(__dirname, 'bin/debug'),
@@ -22,6 +27,15 @@ module.exports = [
 		devServer: {
 			static: {directory: path.join(__dirname, 'bin')},
 			port: 7777,
+		},
+	},
+	{
+		...shared,
+		name: 'RELEASE',
+		mode: 'production',
+		output: {
+			filename: '[name].bundle.js',
+			path: path.resolve(__dirname, 'bin/release'),
 		},
 	},
 ];

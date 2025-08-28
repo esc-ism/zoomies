@@ -127,6 +127,23 @@ export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizes
 		[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] = getAll(data, true);
 	}
 	
+	// if (thirdSide.p < 0) {
+	// 	firstSide = getFullFlipped(firstSide);
+	// 	secondSide = getFullFlipped(secondSide);
+	// }
+	
+	// if (thirdBase.p < 0) {
+	// 	firstBase = getFullFlipped(firstBase);
+	// 	secondBase = getFullFlipped(secondBase);
+	// }
+	
+	// if ((isEvenQuadrant ? thirdBase : thirdSide).p < 0) {
+	// 	debugger;
+	// }
+	
+	thirdSide.p = Math.abs(thirdSide.p);
+	thirdBase.p = Math.abs(thirdBase.p);
+	
 	return isEvenQuadrant ?
 			[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] :
 			[firstBase, secondBase, thirdBase, firstSide, secondSide, thirdSide];

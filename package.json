@@ -10,7 +10,8 @@
 		"webpack-dev-server": "^4.3.0"
 	},
 	"scripts": {
-		"serve": "webpack s --config-name DEBUG"
+		"serve": "webpack s --config-name DEBUG",
+		"build": "webpack b --config-name RELEASE"
 	},
 	"dependencies": {
 		"gsap": "^3.13.0"

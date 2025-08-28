@@ -26,18 +26,18 @@ export default (wrapper) => {
 	// 	demo.ratioViewport = 0.9043357090012468;
 	// });
 	
-	demo.init().then(() => {
-		demo.rotation = -0.41975028989160157;
-		demo.constrainRotation();
-		demo.applyRotation();
-		demo.ratioImage = 1.0748632597755585;
-		demo.ratioViewport = 0.9728458295664878;
-		
-		demo.position = {x: 0.01, y: 0.01};
-		demo.constrainZoom();
-		demo.applyPosition();
-		demo.applyZoom();
-	});
+	// demo.init().then(() => {
+	// 	demo.rotation = -0.41975028989160157;
+	// 	demo.constrainRotation();
+	// 	demo.applyRotation();
+	// 	demo.ratioImage = 1.0748632597755585;
+	// 	demo.ratioViewport = 0.9728458295664878;
+	
+	// 	demo.position = {x: 0.03, y: 0.02};
+	// 	demo.constrainZoom();
+	// 	demo.applyPosition();
+	// 	demo.applyZoom();
+	// });
 	
 	// demo.init().then(() => {
 	// 	demo.rotation = -0.14671727350745445;

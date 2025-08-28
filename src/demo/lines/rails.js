@@ -61,7 +61,7 @@ export default class extends Hideables {
 			addToOrdered(progress * this[i].element.clientHeight, i);
 		}
 		
-		// where rails overlap, show the one that farther progressed
+		// where rails overlap, show the higher progressed
 		for (const [i] of ordered.slice(1)) {
 			this[i].front();
 		}

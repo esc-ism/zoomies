@@ -38,6 +38,7 @@ template.style.display = 'flex';
 template.style.position = 'relative';
 template.style.paddingRight = '20px';
 template.style.overflow = 'hidden';
+template.style.height = '100%';
 
 generate('viewport', paths.wrapper, {
 	backgroundColor: 'black',
@@ -80,7 +81,7 @@ generate('imageWrapper', paths.viewport, {
 	childContainer.append(...[
 		{
 			backgroundImage: 'radial-gradient(at left top, rgb(0 255 0), transparent), radial-gradient(at right top, rgb(0 0 255), transparent), radial-gradient(at left bottom, rgb(255 0 0), transparent), radial-gradient(at right bottom, rgb(179 255 0 / 50%), transparent)',
-			backgroundBlendMode: 'color-dodge',
+			backgroundBlendMode: 'screen',
 		},
 		{
 			backgroundImage: 'radial-gradient(circle, black, black 1.5px, transparent 0)',

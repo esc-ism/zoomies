@@ -6,6 +6,14 @@ import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
 import getZoomPoints, {getRelevantDemo} from './zoomPoints';
+import {DEGREES} from '@/shared';
+import {getDimensions} from '../2line/axisViewport';
+
+export const getVarGetter = (demo, rotation = DEGREES[90], ratio = 1) => () => {
+	const zoomPoints = getZoomPoints(getRelevantDemo({...demo, rotation, sizesImage: getDimensions(ratio, demo.sizesViewport)}));
+	
+	return {zoomPoints, rotation, ratio};
+};
 
 export const getBound = (zoom, first, second, third) => {
 	if (zoom <= first.z) {
@@ -22,9 +30,7 @@ export const getBound = (zoom, first, second, third) => {
 			};
 		}
 		
-		const {x, y} = getZoomProgressed(second, second.end, zoom);
-		
-		return {x, y, m: y / x, c: 0, isFirst: true};
+		return {...getZoomProgressed(second, second.end, zoom), m: (second.y - second.end.y) / second.x - second.end.x, c: 0, isFirst: true};
 	}
 	
 	const progress = zoom / third.z;
@@ -37,9 +43,9 @@ export const getBound = (zoom, first, second, third) => {
 
 export const getSnappedZoom = (() => {
 	const getDirected = (first, second, flip, cornerX) => {
-		const get = flip ? (position) => getFlipped(position) : ({x, y}) => ({x, y});
+		const get = flip ? (position) => getFlipped(position) : ({...position}) => ({...position});
 		
-		return [[first, get(first.end)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
+		return [[get(first), get(first.end)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
 	};
 	
 	const isValidZoom = (zoom) => zoom !== null && !isNaN(zoom);
@@ -70,7 +76,7 @@ export const getSnappedZoom = (() => {
 			maxP = getProgress(pairs[i - 1][0], pairs[i][0]);
 		}
 		
-		return getZoomPairSecond(pairs[0], position, doFlip);
+		return getZoomPairSecond(pairs[0], position, doFlip, maxP);
 	};
 	
 	return (first0, second0, third0, first1, second1, third1, position) => {
@@ -89,9 +95,9 @@ export const getSnappedZoom = (() => {
 					];
 			
 			if (third0.isFirstInt || third1.isFirstInt) {
-				pairings.unshift(first0.z >= first1.z ?
-						[first0.z, lineFirst0, getProgressedLine(lineFirst1, first0)] :
-						[first1.z, getProgressedLine(lineFirst0, first1), lineFirst1]);
+				pairings.unshift(third1.isFirstInt ?
+						[second0.z, lineSecond0, getProgressedLine(lineFirst1, second0)] :
+						[second1.z, getProgressedLine(lineFirst0, second1), lineSecond1]);
 			}
 			
 			return pairings;
@@ -106,7 +112,7 @@ export const getSnappedZoom = (() => {
 	};
 })();
 
-const getRailProgress = (zoom, first, second, third) => {
+export const getRailProgress = (zoom, first, second, third) => {
 	if (zoom <= first.z) {
 		return [0, 0, 0];
 	}
@@ -161,6 +167,7 @@ export default class extends Demo {
 			this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2],
 			this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5],
 			this.position,
+			this.snapLines,
 		);
 	}
 }
