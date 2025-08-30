@@ -293,8 +293,7 @@ export default class {
 		this.applyZoom();
 		this.applyRotation();
 		
-		this.position.x = 0;
-		this.position.y = 0;
+		this.position.x = this.position.y = 0;
 		this.ratioImage = 1;
 	}
 	
@@ -413,8 +412,8 @@ export default class {
 		delete this.tween;
 	}
 	
-	getTweenFrom() {
-		const from = {};
+	getTweenTarget() {
+		const target = {};
 		
 		let effects = {};
 		
@@ -422,9 +421,11 @@ export default class {
 			let willUpdate = false;
 			
 			const update = () => {
-				if (this.position.x !== from.x || this.position.y !== from.y) {
-					this.position.x = from.x;
-					this.position.y = from.y;
+				const ignorePosition = this.tween?.data.ignorePosition;
+				
+				if (!ignorePosition && (this.position.x !== target.x || this.position.y !== target.y)) {
+					this.position.x = target.x;
+					this.position.y = target.y;
 					
 					effects.position = true;
 				}
@@ -432,7 +433,9 @@ export default class {
 				this.constrainPosition(effects);
 				this.applyPosition();
 				
-				this.target.set(from);
+				if (!ignorePosition) {
+					this.target.set(target);
+				}
 				
 				effects = {};
 				willUpdate = false;
@@ -462,18 +465,18 @@ export default class {
 			};
 		})();
 		
-		Object.defineProperty(from, 'x', getDefinition(this.position.x, (x) => {
+		Object.defineProperty(target, 'x', getDefinition(this.position.x, (x) => {
 			doUpdate('position');
 			
 			return this.position.x = x;
 		}));
-		Object.defineProperty(from, 'y', getDefinition(this.position.y, (y) => {
+		Object.defineProperty(target, 'y', getDefinition(this.position.y, (y) => {
 			doUpdate('position');
 			
 			return this.position.y = y;
 		}));
 		
-		Object.defineProperty(from, 'ratio', getDefinition(this.ratio, (ratio) => {
+		Object.defineProperty(target, 'ratio', getDefinition(this.ratio, (ratio) => {
 			doUpdate('ratio');
 			
 			this.ratioImage = this.ratioViewport / ratio;
@@ -481,7 +484,7 @@ export default class {
 			return ratio;
 		}));
 		
-		Object.defineProperty(from, 'ratioImage', getDefinition(this.ratio, (ratio) => {
+		Object.defineProperty(target, 'ratioImage', getDefinition(this.ratioImage, (ratio) => {
 			doUpdate('ratio');
 			
 			this.ratioImage = ratio;
@@ -489,7 +492,7 @@ export default class {
 			return ratio;
 		}));
 		
-		Object.defineProperty(from, 'rotation', getDefinition(this.rotation, (rotation) => {
+		Object.defineProperty(target, 'rotation', getDefinition(this.rotation, (rotation) => {
 			doUpdate('rotation');
 			
 			this.rotation = rotation;
@@ -500,7 +503,7 @@ export default class {
 			return rotation;
 		}));
 		
-		Object.defineProperty(from, 'zoom', getDefinition(this.zoom, (zoom) => {
+		Object.defineProperty(target, 'zoom', getDefinition(this.zoom, (zoom) => {
 			doUpdate('zoom');
 			
 			this.zoom = zoom;
@@ -510,15 +513,13 @@ export default class {
 			return zoom;
 		}));
 		
-		return from;
+		return target;
 	}
 	
 	setTween(...targets) {
 		this.tween?.progress(0).kill();
 		
-		this.tween = gsap.timeline({paused: true, data: {}});
-		
-		const from = this.getTweenFrom();
+		this.tween = gsap.timeline({paused: true, data: {target: this.getTweenTarget()}});
 		
 		const allEffects = {};
 		
@@ -529,7 +530,7 @@ export default class {
 			let hasTween = false;
 			
 			const record = (type, value, label = type) => {
-				if (!allEffects[label] && Math.abs(from[type] - value) < ERROR_ALLOWANCE) {
+				if (!allEffects[label] && Math.abs(this.tween.data.target[type] - value) < ERROR_ALLOWANCE) {
 					return;
 				}
 				
@@ -565,7 +566,7 @@ export default class {
 				continue;
 			}
 			
-			this.tween.add(gsap.to(from, {...TWEEN_DEFAULT, ...to, ...vars}), position);
+			this.tween.add(gsap.to(this.tween.data.target, {...TWEEN_DEFAULT, ...to, ...vars}), position);
 		}
 		
 		this.constructor.progress.reset();

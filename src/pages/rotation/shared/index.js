@@ -27,3 +27,26 @@ export const getIntersectProgress = ({x, y}, [{x: d, y: e}, {x: f, y: g}], [{x: 
 
 // line with progressed start point
 export const getProgressedLine = (line, {z}) => [getZoomProgressed(...line, z), line[1]];
+
+export const getBound = (zoom, first, second, isTopLeft) => {
+	if (zoom > second.z) {
+		const progress = zoom / second.z;
+		
+		return {
+			x: isTopLeft ? -0.5 - (-0.5 - second.x) / progress : 0.5 - (0.5 - second.x) / progress,
+			y: 0.5 - (0.5 - second.y) / progress,
+		};
+	}
+	
+	// todo === 0 condition seems unnecessary
+	if (zoom <= first.z || (second.x === 0 && second.y === 0)) {
+		return false;
+	}
+	
+	return {
+		...getZoomProgressed(first, second.vpEnd, zoom),
+		m: second.y / second.x,
+		c: 0,
+		isFirst: true,
+	};
+};

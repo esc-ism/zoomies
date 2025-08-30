@@ -1,5 +1,5 @@
 import {SVG_NAMESPACE} from '@/shared';
-import {getProgressed} from '../../shared';
+import {getProgressed} from '../shared';
 
 const RADIUS = {X: 30, Y: 20};
 const DIAMETER = {X: RADIUS.X * 2, Y: RADIUS.Y * 2};

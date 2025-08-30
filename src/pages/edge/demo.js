@@ -4,7 +4,7 @@ import Rails from '@/demo/lines/rails';
 import Tangents from '@/demo/lines/tangents';
 
 import {CORNERS} from '../consts';
-import {getBound} from '../rotation/2line/demo';
+import {getBound} from '../rotation/shared';
 
 export default class extends Demo {
 	bounds = new Bounds(this);

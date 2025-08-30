@@ -234,7 +234,7 @@ export default (wrapper) => {
 			},
 			[
 				'From now on, we\'ll only be looking at systems built for rotation.',
-				'Those systems will build on this one, taking two different approaches to replicating its behaviour.',
+				'Those systems will build on this one, taking various approaches to replicating and improving its behaviour.',
 			],
 		),
 	);

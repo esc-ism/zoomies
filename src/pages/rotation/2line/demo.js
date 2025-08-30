@@ -1,34 +1,11 @@
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
-import {getZoomProgressed, getProgressedLine, getIntersectProgress, getProgress, getFlipped} from '../shared';
+import {getBound, getProgressedLine, getIntersectProgress, getProgress, getFlipped} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
-import {getRelevantDemo} from './zoomPoints';
-
-export const getBound = (zoom, first, second, isTopLeft) => {
-	if (zoom > second.z) {
-		const progress = zoom / second.z;
-		
-		return {
-			x: isTopLeft ? -0.5 - (-0.5 - second.x) / progress : 0.5 - (0.5 - second.x) / progress,
-			y: 0.5 - (0.5 - second.y) / progress,
-		};
-	}
-	
-	// todo === 0 condition seems unnecessary
-	if (zoom <= first.z || (second.x === 0 && second.y === 0)) {
-		return false;
-	}
-	
-	return {
-		...getZoomProgressed(first, second.vpEnd, zoom),
-		m: second.y / second.x,
-		c: 0,
-		isFirst: true,
-	};
-};
+import getZoomPoints, {getRelevantDemo} from './zoomPoints';
 
 export const getSnappedZoom = (() => {
 	const getDirected = (first, second, flip, cornerX) => {
@@ -126,7 +103,7 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		return this.constructor.getZoomPoints(getRelevantDemo(this), this.getAllStartZooms());
+		return getZoomPoints(getRelevantDemo(this), this.getAllStartZooms());
 	}
 	
 	getSnappedZoom() {

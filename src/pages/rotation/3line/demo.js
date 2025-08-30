@@ -7,7 +7,7 @@ import getConstrainerFromPoints from '../shared/constrain';
 import {CORNERS} from '@/pages/consts';
 import getZoomPoints, {getRelevantDemo} from './zoomPoints';
 import {DEGREES} from '@/shared';
-import {getDimensions} from '../2line/axisViewport';
+import {getDimensions} from '../2line';
 
 export const getVarGetter = (demo, rotation = DEGREES[90], ratio = 1) => () => {
 	const zoomPoints = getZoomPoints(getRelevantDemo({...demo, rotation, sizesImage: getDimensions(ratio, demo.sizesViewport)}));
@@ -167,7 +167,6 @@ export default class extends Demo {
 			this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2],
 			this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5],
 			this.position,
-			this.snapLines,
 		);
 	}
 }

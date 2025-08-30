@@ -1,14 +1,13 @@
 import {DEGREES} from '@/shared';
 
-import {register as registerFunctions} from '../../../code';
-import {getText, getCode, getButton, registerDemo} from '../../../shared';
-import {badTweens} from '../../origin';
+import {register as registerFunctions} from '../../code';
+import {getText, getCode, getButton, registerDemo} from '../../shared';
+import {badTweens} from '../1line';
 
-import SHARED_FUNCTIONS from '../../code';
-import Demo, {getZoomPoints} from './demo';
-import {getSnappedZoom} from '../demo';
+import SHARED_FUNCTIONS from '../code';
+import Demo, {getSnappedZoom} from './demo';
 import snapImage from './snapImage';
-import {getRelevantDemo} from '../zoomPoints';
+import getZoomPoints, {getRelevantDemo} from './zoomPoints';
 
 export const getDimensions = (ratio, {width, height}) => {
 	const dimensions = {};
@@ -655,9 +654,17 @@ export default (wrapper) => {
 					({second}) => [{position: second.vpEnd}, {duration: 0}],
 				], {getParam: getDirectVars}),
 				' to an offscreen corner.',
-				'On the other, for any image aspect ratio other than 1:1 there are rotation values that cause crossed axis lines.',
+				'On the other, for any image aspect ratio other than 1:1, there are windows of rotation values around ',
+				getButton('45°', [[{rotation: DEGREES[45], ratioImage: 0.8}]]),
+				', ',
+				getButton('135°', [[{rotation: DEGREES[135], ratioImage: 1.2}]]),
+				', ',
+				getButton('225°', [[{rotation: DEGREES[225], ratioImage: 0.5}]]),
+				' and ',
+				getButton('315°', [[{rotation: DEGREES[315], ratioImage: 1.5}]]),
+				' where preferred axes can\'t be used.',
 				'This leads to two issues.',
-				'First is that optimal panning paths are replaced with circuitous routes.',
+				'First is that panning paths become far from optimal.',
 				'Second is that bounds don\'t travel fluidly when rotating, with a breakdown of the linear travel of image corners between viewport corners.',
 				'This behaviour gets ',
 				getButton('increasingly worse', [
@@ -730,7 +737,9 @@ export default (wrapper) => {
 			},
 			[
 				'Besides efficiency, the system\'s only drawback is its spotty pan-limiting when image aspect ratio isn\'t 1:1.',
-				'The upcoming systems will try to solve this issue.',
+				'It\'s possible to solve this problem by ditching viewport axis-based panning paths in favor of, for example, image axis paths.',
+				'This, however, is accepting defeat; not using viewport axes means accepting sub-optimal paths, ergo a worse user experience.',
+				'There must be a way to have our cake and eat it too!',
 			],
 		),
 	);

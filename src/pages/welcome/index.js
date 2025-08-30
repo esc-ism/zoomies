@@ -11,11 +11,19 @@ import {DEGREES} from '@/shared';
 const tween = async (demo) => {
 	const wait = async (delay = 1) => await new Promise((resolve, reject) => {
 		window.setTimeout(() => {
-			if (demo.element.isConnected) {
-				resolve();
-			} else {
+			if (!demo.element.isConnected) {
 				reject();
+				
+				return;
 			}
+			
+			if (document.hidden) {
+				document.addEventListener('visibilitychange', resolve, {once: true});
+				
+				return;
+			}
+			
+			resolve();
 		}, delay * 1000);
 	});
 	
@@ -30,8 +38,21 @@ const tween = async (demo) => {
 					gsap.utils.random(0.5, 2),
 				)();
 				
-				const firstIndex = zoomPoints[5].isFirstInt ? 0 : 3;
-				const [first, second, third] = zoomPoints.slice(firstIndex);
+				let firstIndex = zoomPoints[5].isFirstInt ? 0 : 3;
+				let [first, second, third] = zoomPoints.slice(firstIndex);
+				
+				const setZoomPoints = () => {
+					demo.constrainPosition({ratio}, true);
+					
+					firstIndex = demo.zoomPoints[5].isFirstInt ? 0 : 3;
+					[first, second, third] = demo.zoomPoints.slice(firstIndex);
+					
+					demo.rails.hide();
+					
+					demo.rails[firstIndex].show();
+					demo.rails[firstIndex + 1].show();
+					demo.rails[firstIndex + 2].show();
+				};
 				
 				demo.setTween(
 					[{ratio}],
@@ -39,16 +60,19 @@ const tween = async (demo) => {
 					[{zoom: 5}, {
 						duration: 2,
 						onStart() {
-							demo.constrainPosition({ratio, rotation}, true);
+							setZoomPoints();
 							
-							demo.rails.hide();
-							
-							demo.rails[firstIndex].show();
-							demo.rails[firstIndex + 1].show();
-							demo.rails[firstIndex + 2].show();
+							demo.resizeCallback = setZoomPoints;
+							demo.tween.data.ignorePosition = true;
 						},
 						onReverseComplete() {
 							demo.rails.hide();
+							
+							demo.position.x = demo.position.y = 0;
+							demo.applyPosition();
+							
+							delete demo.resizeCallback;
+							delete demo.tween.data.ignorePosition;
 						},
 						onUpdate() {
 							const position = getBound(demo.zoom, first, second, third) || {x: 0, y: 0};
@@ -62,7 +86,6 @@ const tween = async (demo) => {
 							demo.rails.setProgress(...progresses);
 						},
 					}],
-					[{position: {x: 0, y: 0}}, {duration: 0}],
 				);
 				
 				return demo.tween;
@@ -89,7 +112,7 @@ export default (wrapper) => {
 	demo.element.style.pointerEvents = 'none';
 	demo.elements.resizer.style.pointerEvents = 'all';
 	
-	tween(demo);
+	demo.init().then(() => tween(demo));
 	
 	wrapper.append(
 		demo.element,

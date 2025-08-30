@@ -937,7 +937,7 @@ export default (wrapper) => {
 					[{y: 0.25, zoom: 2}, {duration: 0}],
 				]),
 				' snap pan.',
-				'It doesn\'t make any sense to show the empty space above the image here. ',
+				'It doesn\'t make much sense to show the empty space above the image here. ',
 				getButton('Increasing', [
 					[{ratio: 0.25, rotation: DEGREES[90], position: {x: 0, y: 0.25}, zoom: 2}],
 				]),

@@ -4,8 +4,8 @@ import welcome from './welcome';
 import unbound from './unbound';
 import center from './center';
 import edge from './edge';
-import origin from './rotation/origin';
-import axisViewport from './rotation/2line/axisViewport';
-import axisTest from './rotation/3line';
+import single from './rotation/1line';
+import double from './rotation/2line';
+import triple from './rotation/3line';
 
-export default [welcome, unbound, center, edge, origin, axisViewport, axisTest];
+export default [welcome, unbound, center, edge, single, double, triple];

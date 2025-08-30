@@ -19,7 +19,7 @@ export default class extends Demo {
 		// this.rails[2].element.style.backgroundColor = this.rails[5].element.style.backgroundColor = 'red';
 	}
 	
-	// todo instead of using setZoomPoints, CSS transition from one rail state to the next
+	// todo CSS transition from one rail state to the next
 	applyZoomPoints() {}
 	getConstrainedPosition(position) {
 		return position;
@@ -29,5 +29,11 @@ export default class extends Demo {
 		if (isFinal) {
 			super.constrainPosition(arg);
 		}
+	}
+	
+	updateSizesViewport() {
+		super.updateSizesViewport();
+		
+		this.resizeCallback?.();
 	}
 }
