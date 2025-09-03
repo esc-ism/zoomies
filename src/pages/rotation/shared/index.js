@@ -9,12 +9,13 @@ const perfectSlopes = [0, Infinity, -Infinity];
 
 export const getLineY = ({m, c, y}, x) => perfectSlopes.includes(m) ? y : m * x + c; // y = mx + c
 export const getLineX = ({m, c, x}, y) => perfectSlopes.includes(m) ? x : (y - c) / m; // x = (y - c) / m
+export const getLineC = ({m, x, y}) => perfectSlopes.includes(m) ? y : y - m * x; // c = y - mx
 
 export const isAbove = (line, {x, y}) => y > getLineY(line, x);
 export const isRight = (line, {x, y}) => x > getLineX(line, y);
 
 export const getM = (from, to) => (to.y - from.y) / (to.x - from.x);
-export const getLine = (m, {x, y}) => ({c: (y - m * x), m, x, y});
+export const getLine = (m, {x, y}) => ({c: getLineC({m, x, y}), m, x, y});
 export const getFlipped = ({x, y, ...data}) => ({...data, x: -x, y: -y});
 
 export const getIntersectProgress = ({x, y}, [{x: d, y: e}, {x: f, y: g}], [{x: h, y: i}, {x: j, y: k}], doFlip) => {
@@ -45,8 +46,7 @@ export const getBound = (zoom, first, second, isTopLeft) => {
 	
 	return {
 		...getZoomProgressed(first, second.vpEnd, zoom),
-		m: second.y / second.x,
-		c: 0,
+		axis: first.axis,
 		isFirst: true,
 	};
 };

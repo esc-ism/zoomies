@@ -219,13 +219,13 @@ export default (wrapper) => {
 			],
 			[
 				'Consider ',
-				getButton('this', [[badTweens]]),
+				getButton('this', [[{ratio: badTweens.ratio}], [badTweens]]),
 				' demo state.',
 				'Imagine that you want to see the entirety of the image\'s top-right corner.',
 				'You\'ll find that it\'s ',
 				getButton('impossible', [
 					[badTweens],
-					[{position: {x: 0.5, y: 0.1}}],
+					[{position: {x: 0.5, y: 0.1}}, {duration: 2, ease: 'power2.out'}],
 				]),
 				' to achieve this without ',
 				getButton('rotating', [

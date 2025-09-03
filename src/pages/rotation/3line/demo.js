@@ -24,13 +24,12 @@ export const getBound = (zoom, first, second, third) => {
 		if (third.isFirstInt || zoom <= second.z) {
 			return {
 				...getZoomProgressed(first, first.end, zoom),
-				m: first.end.y / first.end.x,
-				c: 0,
+				m: first.m,
 				isFirst: true,
 			};
 		}
 		
-		return {...getZoomProgressed(second, second.end, zoom), m: (second.y - second.end.y) / second.x - second.end.x, c: 0, isFirst: true};
+		return {...getZoomProgressed(second, second.end, zoom), m: second.m, isFirst: true};
 	}
 	
 	const progress = zoom / third.z;

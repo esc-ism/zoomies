@@ -51,7 +51,7 @@ const setIndex = (newIndex, pushState = true) => {
 	params.set('page', index);
 	
 	if (pushState) {
-		history.pushState({index}, '', `${location.origin}?${params.toString()}`);
+		history.pushState({index}, '', `${location.origin}${location.pathname}?${params.toString()}`);
 	}
 };
 

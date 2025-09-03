@@ -4,7 +4,7 @@ import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
 import {badTweens} from '../1line';
 
-import SHARED_FUNCTIONS from '../code';
+import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 import Demo, {getSnappedZoom} from './demo';
 import snapImage from './snapImage';
 import getZoomPoints, {getRelevantDemo} from './zoomPoints';
@@ -60,82 +60,6 @@ export const getSnapTweens = (demo, getRatio) => [
 
 const functions = [
 	...SHARED_FUNCTIONS,
-	{op: 'func', id: 'getStartZooms', type: ['zoom', 'zoom'], and: [
-		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], and: {
-			op: 'call', id: 'getAllStartZooms',
-		}},
-		'',
-		{op: 'return', multiline: true, and: [
-			{op: 'min', and: ['topLeftX', 'topRightX']},
-			{op: 'min', and: ['topLeftY', 'topRightY']},
-		]},
-	]},
-	{op: 'func', id: 'getViewportPoints', args: ['zoomSide', 'zoomBase'], type: ['xvp', 'yvp', 'xvp', 'yvp'], pair: [1, 0, 3, 2], and: [
-		{op: '=', id: 'rightX', isPercent: false, type: 'xvp', and: {
-			op: '/', and: ['½viewportWidth', 'zoomSide'],
-		}},
-		{op: '=', id: 'topY', isPercent: false, type: 'yvp', and: {
-			op: '/', and: ['½viewportHeight', 'zoomBase'],
-		}},
-		'',
-		{op: '=', id: 'rightTheta', type: 'angle', and: {
-			op: '-', and: ['½π', 'rotation'],
-		}},
-		{op: '=', id: 'topTheta', type: 'angle', and: {
-			op: '+', and: ['rightTheta', '½π'],
-		}},
-		'',
-		{op: 'return', multiline: true, and: [
-			{op: '/', and: [
-				{op: '*', and: [
-					'rightX',
-					{op: 'cos', and: 'rightTheta'},
-				]},
-				'imageWidth',
-			]},
-			{op: '/', and: [
-				{op: '*', and: [
-					'rightX',
-					{op: 'sin', and: 'rightTheta'},
-				]},
-				'imageHeight',
-			]},
-			{op: '/', and: [
-				{op: '*', and: [
-					'topY',
-					{op: 'cos', and: 'topTheta'},
-				]},
-				'imageWidth',
-			]},
-			{op: '/', and: [
-				{op: '*', and: [
-					'topY',
-					{op: 'sin', and: 'topTheta'},
-				]},
-				'imageHeight',
-			]},
-		]},
-	]},
-	{op: 'func', id: 'getQuadrantAngle', args: ['isEvenQuadrant'], type: 'angle', and: [
-		{op: '=', id: 'angle', type: 'angle', and: {
-			op: '%', and: [
-				{op: '+', and: [
-					'rotation',
-					{op: '*', and: ['π', 2]},
-				]},
-				'½π',
-			],
-		}},
-		'',
-		{op: 'if', and: [
-			'isEvenQuadrant',
-			{op: 'return', and: 'angle'},
-		]},
-		'',
-		{op: 'return', and: {
-			op: '-', and: ['½π', 'angle'],
-		}},
-	]},
 	{op: 'func', id: 'getIntersection', args: ['viewportX', 'viewportY', 'axisY', 'cornerX', 'axisZoom'], type: ['x', 'y', 'zoom'], pair: [1, 0], and: [
 		{op: '=', id: 'c', and: {
 			op: '*', and: ['cornerX', 'axisY'],
@@ -321,31 +245,6 @@ const functions = [
 		]},
 		'',
 		{op: 'return', multiline: 2, and: ['zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY', 'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY']},
-	]},
-	{op: 'func', id: 'getProgressed', args: ['fromX', 'fromY', 'toX', 'toY', 'lowZoom', 'highZoom'], pair: [1, 0], and: [
-		{op: '=', id: 'p', and: {
-			op: '-', and: [
-				1,
-				{op: '/', and: ['lowZoom', 'highZoom']},
-			],
-		}},
-		'',
-		{op: 'return', and: [
-			{op: '+', and: [
-				'fromX',
-				{op: '*', and: [
-					'p',
-					{op: '-', and: ['toX', 'fromX']},
-				]},
-			]},
-			{op: '+', and: [
-				'fromY',
-				{op: '*', and: [
-					'p',
-					{op: '-', and: ['toY', 'fromY']},
-				]},
-			]},
-		]},
 	]},
 	{op: 'func', id: 'getBound', args: ['originZoom', 'midX', 'midY', 'midZoom', 'endX', 'endY', 'isLeft'], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [

@@ -1,4 +1,4 @@
-export default [
+const SINGLE_LINE = [
 	{op: 'func', id: 'getIntersectRatio', args: ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'isInverse'], and: [
 		{op: '=', id: 'a', and: {
 			op: '-', and: [
@@ -138,6 +138,114 @@ export default [
 						{op: 'sin', and: 'topRightAngle'},
 					],
 				}},
+			]},
+		]},
+	]},
+];
+
+export default SINGLE_LINE;
+
+export const MULTI_LINE = [
+	...SINGLE_LINE,
+	{op: 'func', id: 'getStartZooms', type: ['zoom', 'zoom'], and: [
+		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], and: {
+			op: 'call', id: 'getAllStartZooms',
+		}},
+		'',
+		{op: 'return', multiline: true, and: [
+			{op: 'min', and: ['topLeftX', 'topRightX']},
+			{op: 'min', and: ['topLeftY', 'topRightY']},
+		]},
+	]},
+	{op: 'func', id: 'getViewportPoints', args: ['zoomSide', 'zoomBase'], type: ['xvp', 'yvp', 'xvp', 'yvp'], pair: [1, 0, 3, 2], and: [
+		{op: '=', id: 'rightX', isPercent: false, type: 'xvp', and: {
+			op: '/', and: ['½viewportWidth', 'zoomSide'],
+		}},
+		{op: '=', id: 'topY', isPercent: false, type: 'yvp', and: {
+			op: '/', and: ['½viewportHeight', 'zoomBase'],
+		}},
+		'',
+		{op: '=', id: 'rightTheta', type: 'angle', and: {
+			op: '-', and: ['½π', 'rotation'],
+		}},
+		{op: '=', id: 'topTheta', type: 'angle', and: {
+			op: '+', and: ['rightTheta', '½π'],
+		}},
+		'',
+		{op: 'return', multiline: true, and: [
+			{op: '/', and: [
+				{op: '*', and: [
+					'rightX',
+					{op: 'cos', and: 'rightTheta'},
+				]},
+				'imageWidth',
+			]},
+			{op: '/', and: [
+				{op: '*', and: [
+					'rightX',
+					{op: 'sin', and: 'rightTheta'},
+				]},
+				'imageHeight',
+			]},
+			{op: '/', and: [
+				{op: '*', and: [
+					'topY',
+					{op: 'cos', and: 'topTheta'},
+				]},
+				'imageWidth',
+			]},
+			{op: '/', and: [
+				{op: '*', and: [
+					'topY',
+					{op: 'sin', and: 'topTheta'},
+				]},
+				'imageHeight',
+			]},
+		]},
+	]},
+	{op: 'func', id: 'getQuadrantAngle', args: ['isEvenQuadrant'], type: 'angle', and: [
+		{op: '=', id: 'angle', type: 'angle', and: {
+			op: '%', and: [
+				{op: '+', and: [
+					'rotation',
+					{op: '*', and: ['π', 2]},
+				]},
+				'½π',
+			],
+		}},
+		'',
+		{op: 'if', and: [
+			'isEvenQuadrant',
+			{op: 'return', and: 'angle'},
+		]},
+		'',
+		{op: 'return', and: {
+			op: '-', and: ['½π', 'angle'],
+		}},
+	]},
+	// todo no return type?
+	{op: 'func', id: 'getProgressed', args: ['fromX', 'fromY', 'toX', 'toY', 'lowZoom', 'highZoom'], pair: [1, 0], and: [
+		{op: '=', id: 'p', and: {
+			op: '-', and: [
+				1,
+				{op: '/', and: ['lowZoom', 'highZoom']},
+			],
+		}},
+		'',
+		{op: 'return', and: [
+			{op: '+', and: [
+				'fromX',
+				{op: '*', and: [
+					'p',
+					{op: '-', and: ['toX', 'fromX']},
+				]},
+			]},
+			{op: '+', and: [
+				'fromY',
+				{op: '*', and: [
+					'p',
+					{op: '-', and: ['toY', 'fromY']},
+				]},
 			]},
 		]},
 	]},

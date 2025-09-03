@@ -38,13 +38,13 @@ const tween = async (demo) => {
 					gsap.utils.random(0.5, 2),
 				)();
 				
-				let firstIndex = zoomPoints[5].isFirstInt ? 0 : 3;
+				let firstIndex = zoomPoints[2].z > zoomPoints[5].z ? 0 : 3;
 				let [first, second, third] = zoomPoints.slice(firstIndex);
 				
 				const setZoomPoints = () => {
 					demo.constrainPosition({ratio}, true);
 					
-					firstIndex = demo.zoomPoints[5].isFirstInt ? 0 : 3;
+					firstIndex = demo.zoomPoints[2].z > demo.zoomPoints[5].z ? 0 : 3;
 					[first, second, third] = demo.zoomPoints.slice(firstIndex);
 					
 					demo.rails.hide();

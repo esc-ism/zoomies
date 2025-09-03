@@ -262,7 +262,7 @@ export default (point0, point1) => {
 		return get1DConstrainer(point0 || point1);
 	}
 	
-	if (point0.isFirst && point1.isFirst && point0.m === point1.m) {
+	if (point0.isFirst && point1.isFirst && point0.axis === point1.axis) {
 		return get1DConstrainer(point0.p > point1.p ? point0 : point1);
 	}
 	

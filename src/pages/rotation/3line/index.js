@@ -1,14 +1,107 @@
 import {DEGREES} from '@/shared';
 
+import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
 
 import Demo from './demo';
 
+const functions = [
+	...SHARED_FUNCTIONS,
+	{op: 'func', id: 'getIntersection', args: ['from0X', 'from0Y', 'to0X', 'to0Y', 'from1X', 'from1Y', 'to1X', 'to1Y', 'zoom1'], type: ['x', 'y', 'zoom'], pair: [1, 0], and: [
+		{op: '=', id: 'a0', and: {
+			op: '-', and: ['from0Y', 'to0Y'],
+		}},
+		{op: '=', id: 'b0', and: {
+			op: '-', and: ['to0X', 'from0X'],
+		}},
+		{op: '=', id: 'c0', and: {
+			op: '-', and: [
+				{op: '*', and: ['from0Y', 'to0X']},
+				{op: '*', and: ['from0X', 'to0Y']},
+			],
+		}},
+		'',
+		{op: '=', id: 'a1', and: {
+			op: '-', and: ['from1Y', 'to1Y'],
+		}},
+		{op: '=', id: 'b1', and: {
+			op: '-', and: ['to1X', 'from1X'],
+		}},
+		{op: '=', id: 'c1', and: {
+			op: '-', and: [
+				{op: '*', and: ['from1Y', 'to1X']},
+				{op: '*', and: ['from1X', 'to1Y']},
+			],
+		}},
+		'',
+		{op: '=', id: 'd', and: {
+			op: '-', and: [
+				{op: '*', and: ['a0', 'b1']},
+				{op: '*', and: ['b0', 'a1']},
+			],
+		}},
+		'',
+		{op: '=', id: 'intersectX', type: 'x', pair: 'intersectY', and: {
+			op: '/', and: [
+				{op: '-', and: [
+					{op: '*', and: ['c0', 'b1']},
+					{op: '*', and: ['b0', 'c1']},
+				]},
+				'd',
+			],
+		}},
+		{op: '=', id: 'intersectY', type: 'y', pair: 'intersectX', and: {
+			op: '/', and: [
+				{op: '-', and: [
+					{op: '*', and: ['a0', 'c1']},
+					{op: '*', and: ['c0', 'a1']},
+				]},
+				'd',
+			],
+		}},
+		'',
+		{op: '=', id: 'progress', and: {
+			op: '/', and: [
+				{op: '-', and: ['intersectY', 'from1Y']},
+				{op: '-', and: ['to1Y', 'from1Y']},
+			],
+		}},
+		'',
+		{op: 'return', and: [
+			'intersectX',
+			'intersectY',
+			{op: '/', and: [
+				'zoom1',
+				{op: '-', and: [1, 'progress']},
+			]},
+		]},
+		
+	]},
+	{op: 'func', id: 'getIntersection', args: ['x', 'y', 'zoom0', 'zoom1'], type: ['x', 'y'], pair: [1, 0], and: [
+		{op: '=', id: 'mult', and: {
+			op: '/', and: ['zoom0', 'zoom1'],
+		}},
+		'',
+		{op: 'return', and: [
+			{op: '*', and: ['x', 'mult']},
+			{op: '*', and: ['y', 'mult']},
+		]},
+	]},
+];
+
 export default (wrapper) => {
 	const demo = new Demo();
 	
 	registerDemo(demo);
+	registerFunctions(demo, functions);
+	
+	demo.init().then(() => {
+		demo.rotation = -4.711332852094488;
+		demo.applyRotation();
+		demo.ratioImage = 1.938749508327397;
+		// demo.ratioViewport = 2.2382249136532053;
+	});
 	
 	wrapper.append(
 		demo.element,
@@ -49,6 +142,11 @@ export default (wrapper) => {
 				content: 'Snap-Pan Maths',
 				style: {textAlign: 'center'},
 			},
+			// getCode([
+			// 	{op: '=', multiline: 2, id: ['originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0', 'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1'], and: {
+			// 		op: 'call', id: 'getZoomPoints',
+			// 	}},
+			// ]),
 			{
 				tag: 'h2',
 				content: 'Snap-Pan Effectiveness',
