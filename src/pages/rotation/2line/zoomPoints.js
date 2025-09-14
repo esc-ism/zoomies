@@ -126,17 +126,16 @@ export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizes
 	
 	const progressAngles = getProgressAngles(quadrantAngle, demo.ratioViewport, demo.ratioViewportInverse);
 	
+	// todo replace the vpEnd stuff with 3line format
+	//  also needs to be done for edge pan-limiting
 	const [firstSide, firstBase] = startZooms.map((z) => ({x: 0, y: 0, z}));
 	
 	const [cornerSide, cornerBase] = isEvenQuadrant ? [CORNERS.TOP_LEFT, CORNERS.TOP_RIGHT] : [CORNERS.TOP_RIGHT, CORNERS.TOP_LEFT];
 	
 	const [secondSide, secondBase] = getSecond({
 		...demo, cornerSide, cornerBase, startZooms, quadrantAngle, isEvenQuadrant,
-		// todo
-		// yIntersectSide: getYIntersect(demo.sizesImage, demo.sizesViewport.halfWidth, quadrantAngle + progressAngles.side, progressAngles.side),
-		// yIntersectBase: getYIntersect(demo.sizesImage, demo.sizesViewport.halfHeight, DEGREES[90] - quadrantAngle - progressAngles.base, progressAngles.base),
-		yIntersectSide: getXIntersect(demo.sizesImage, demo.sizesViewport.halfWidth, DEGREES[90] - quadrantAngle - progressAngles.side, progressAngles.side),
-		yIntersectBase: getXIntersect(demo.sizesImage, demo.sizesViewport.halfHeight, quadrantAngle + progressAngles.base, progressAngles.base),
+		yIntersectSide: getYIntersect(demo.sizesImage, demo.sizesViewport.halfWidth, quadrantAngle + progressAngles.side, progressAngles.side),
+		yIntersectBase: getYIntersect(demo.sizesImage, demo.sizesViewport.halfHeight, DEGREES[90] - quadrantAngle - progressAngles.base, progressAngles.base),
 	});
 	
 	return isEvenQuadrant ?

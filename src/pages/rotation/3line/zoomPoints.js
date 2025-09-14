@@ -94,13 +94,17 @@ const mod = (first, second, third, firstFlipped, secondFlipped, yIntersect) => {
 		return;
 	}
 	
-	Object.assign(third, getIntersection([first, first.end], yIntersect));
+	Object.assign(third, getIntersection([secondFlipped, secondFlipped.end], yIntersect));
 	
-	if (!(third.isFirstInt = Math.abs(third.y) <= Math.abs(second.y))) {
+	if (Math.abs(third.z) >= Math.abs(second.z)) {
 		Object.assign(first, firstFlipped);
 		Object.assign(second, secondFlipped, {axis: true});
-		Object.assign(third, getIntersection([second, second.end], yIntersect));
+		
+		return;
 	}
+	
+	Object.assign(third, getIntersection([first, first.end], yIntersect));
+	third.isFirstInt = true;
 };
 
 const getAll = (data) => {
@@ -112,15 +116,29 @@ const getAll = (data) => {
 	const thirdSide = getIntersection([secondSide, secondSide.end], [data.yIntersectSide, data.cornerSide]);
 	const thirdBase = getIntersection([secondBase, secondBase.end], [data.yIntersectBase, data.cornerBase]);
 	
-	if (thirdBase.z <= thirdSide.z) {
+	// deal with rounding errors
+	if (thirdSide.z <= secondSide.z && thirdBase.z <= secondBase.z) {
+		// true if 90n multiple, false if 90n+45 multiple
+		if (Math.abs(data.quadrantAngle - DEGREES[45]) > DEGREES['45_2']) {
+			Object.assign(thirdSide, getIntersection([firstSide, firstSide.end], [data.yIntersectSide, data.cornerSide]));
+			Object.assign(thirdBase, getIntersection([firstBase, firstBase.end], [data.yIntersectBase, data.cornerBase]));
+			
+			thirdSide.isFirstInt = thirdBase.isFirstInt = true;
+		} else {
+			Object.assign(firstSide, firstSideFlipped);
+			Object.assign(firstBase, firstBaseFlipped);
+			
+			Object.assign(secondSide, secondSideFlipped);
+			Object.assign(secondBase, secondBaseFlipped);
+			
+			Object.assign(thirdSide, getIntersection([secondSideFlipped, secondSideFlipped.end], [data.yIntersectSide, data.cornerSide]));
+			Object.assign(thirdBase, getIntersection([secondBaseFlipped, secondBaseFlipped.end], [data.yIntersectBase, data.cornerBase]));
+		}
+	} else if (thirdBase.z <= thirdSide.z) {
 		mod(firstBase, secondBase, thirdBase, firstBaseFlipped, secondBaseFlipped, [data.yIntersectBase, data.cornerBase]);
 	} else {
 		mod(firstSide, secondSide, thirdSide, firstSideFlipped, secondSideFlipped, [data.yIntersectSide, data.cornerSide]);
 	}
-	
-	// todo necessary?
-	thirdSide.p = Math.abs(thirdSide.p);
-	thirdBase.p = Math.abs(thirdBase.p);
 	
 	return [firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase];
 };
@@ -210,13 +228,7 @@ export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizes
 	
 	let firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase;
 	
-	// mitigates bugginess from rounding errors
-	if (data.intersectsMatch && (Math.abs(quadrantAngle - DEGREES[45]) > 0.1 || Math.abs(startZooms[0] - startZooms[1]) < 0.01)) {
-		[firstSide, secondSide, thirdSide] = getImageAxis(data.yIntersectSide, data.cornerSide, startZooms[0], data.isXIntersect);
-		[firstBase, secondBase, thirdBase] = getImageAxis(data.yIntersectBase, data.cornerBase, startZooms[1], data.isXIntersect);
-	} else {
-		[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] = getAll(data);
-	}
+	[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] = getAll(data);
 	
 	return isEvenQuadrant ?
 			[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] :

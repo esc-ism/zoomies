@@ -46,7 +46,7 @@ export const getBound = (zoom, first, second, isTopLeft) => {
 	
 	return {
 		...getZoomProgressed(first, second.vpEnd, zoom),
-		axis: first.axis,
+		axis: second.vpEnd.axis,
 		isFirst: true,
 	};
 };

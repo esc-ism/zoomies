@@ -1,4 +1,5 @@
 export const DEGREES = {
+	'45_2': Math.PI / 8,
 	45: Math.PI / 4,
 	90: Math.PI / 2,
 	135: Math.PI / 4 * 3,

@@ -125,7 +125,8 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'This system\'s best-case is slightly inferior to that of the prior system, with fewer opportunities to take optimal panning paths.',
+				'Tradeoffs have been made regarding the system\'s best-case;',
+				'Opportunities to take optimal panning paths to individual corners are rarer, but viewing adjacent corners simultaneously is now possible at higher zooms.',
 				'Its worse-case, on the other hand, is leagues ahead, always expanding bounds sensibly and excelling on extreme aspect ratios.',
 			],
 			[
@@ -161,7 +162,7 @@ export default (wrapper) => {
 			[
 				'I think this is close to a flawless system.',
 				'Like I mentioned at the start of our rotation odyssey, however, it\'s much harder to identify "perfect" behaviour here than with the earlier systems.',
-				'No doubt a different approach could produce a better system, but finding that approach is beyond my current capabilities.',
+				'No doubt a different approach could produce a better system, but this is the best I\'ve found.',
 			],
 			[
 				'In handling rotation, we sacrifice code efficiency and intuitive bounds relative to those "perfect" systems.',
