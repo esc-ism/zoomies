@@ -96,13 +96,6 @@ export default (wrapper) => {
 	registerDemo(demo);
 	registerFunctions(demo, functions);
 	
-	demo.init().then(() => {
-		demo.rotation = -0.3139451184915161;
-		demo.applyRotation();
-		demo.ratioImage = 1.2987012987012987;
-		demo.ratioViewport = 0.8025786657894359;
-	});
-	
 	wrapper.append(
 		demo.element,
 		getText(
@@ -134,8 +127,9 @@ export default (wrapper) => {
 			[
 				'This system\'s best-case is slightly inferior to that of the prior system, with fewer opportunities to take optimal panning paths.',
 				'Its worse-case, on the other hand, is leagues ahead, always expanding bounds sensibly and excelling on extreme aspect ratios.',
-				'Its consistency also facilitates more fluid changes to bounds.',
-				'This fluidity does falter when image and viewport aspect ratios are both around 1:1, but choppiness here is far less noticeable than in the prior system.',
+			],
+			[
+				'Bound changes are now perfectly fluid, providing a more consistent and reliable experience.',
 			],
 			{
 				tag: 'h2',
@@ -153,11 +147,10 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'This system is no worse nor better at snap-panning than the prior.',
+				'This system is not significantly worse nor better at snap-panning than the prior.',
 				'If you try a snap-pan here and then hit your left arrow key, you\'ll see that differences are negligible.',
 				'If we\'re picking nits, however, the choppiness of the prior system\'s pan limits do lead to some slight inconsistency in span pans.',
-				'This system has much less of that inconsistency.',
-				'The only other objective difference is that this one has less efficient code.',
+				'This system excises that inconsistency at the expense of less efficient code.',
 			],
 			'The balance of consistency and efficiency must be weighed to judge a victor.',
 			{
@@ -166,12 +159,7 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'I think that the system could be improved to further reduce this choppiness.',
-				'This may come at the cost of increased complexity, but it may also be my own unnecessary complications that keep the system from its ideal form.',
-				'This is the system that I\'m least confident is perfectly described by its code, making it the most promising prospect for improvements to both behaviour and efficiency.',
-			],
-			[
-				'Despite my misgivings, I think this is close to a flawless system.',
+				'I think this is close to a flawless system.',
 				'Like I mentioned at the start of our rotation odyssey, however, it\'s much harder to identify "perfect" behaviour here than with the earlier systems.',
 				'No doubt a different approach could produce a better system, but finding that approach is beyond my current capabilities.',
 			],

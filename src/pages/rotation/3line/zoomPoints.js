@@ -1,8 +1,8 @@
 import {CORNERS} from '@/pages/consts';
 import {getAllStartZooms} from '../demo';
 
-import {DEGREES, ERROR_ALLOWANCE} from '@/shared';
-import {getFlipped, getLine, getLineC, getLineX, getM, getProgress, getZoomProgressed} from '../shared';
+import {DEGREES} from '@/shared';
+import {getFlipped, getLineC, getLineX, getM, getProgress, getZoomProgressed} from '../shared';
 
 import {
 	getRelevantDemo, getQuadrantAngle, getProgressAngles,
@@ -18,22 +18,15 @@ const getP = ({end, ...first}, point) => {
 	return (end[axis] - first[axis]) / (point[axis] - first[axis]);
 };
 
-const addP = (first, point) => {
-	point.p = getP(first, point);
+const getIntersection = (lineFirst, lineSecond) => {
+	const point = getGenericIntersection(lineFirst, lineSecond);
+	const progress = (point.y - lineSecond[0].y) / (lineSecond[1].y - lineSecond[0].y);
+	
+	point.p = getP(lineFirst[0], point);
+	point.z = lineSecond[0].z / (1 - progress);
+	point.end = lineSecond[1];
 	
 	return point;
-};
-
-const getIntersection = (lineFirst, lineSecond) => {
-	const {x, y} = getGenericIntersection(lineFirst, lineSecond);
-	const progress = (y - lineSecond[0].y) / (lineSecond[1].y - lineSecond[0].y);
-	
-	return addP(lineFirst[0], {
-		// todo unnecessarily adding a c?
-		...getLine(getM(...lineSecond), {x, y}),
-		z: lineSecond[0].z / (1 - progress),
-		end: lineSecond[1],
-	});
 };
 
 const getProgressedMiddle = (middle, fromZ, toZ) => {
@@ -47,14 +40,12 @@ const getProgressedMiddle = (middle, fromZ, toZ) => {
 
 const getPositionSum = (...positions) => positions.reduce((sum, {x, y}) => ({x: sum.x + x, y: sum.y + y}), {x: 0, y: 0});
 
-const getDoFlip = (firstEnd, second, thirdFar, thirdNear) => {
+const getDoFlip = (firstEnd, second, third) => {
 	const {axis} = firstEnd;
 	
-	const {[axis]: positionFar} = getGenericIntersection([{x: 0, y: 0}, firstEnd], thirdFar);
-	const {[axis]: positionNear} = getGenericIntersection([{x: 0, y: 0}, firstEnd], thirdNear);
+	const {[axis]: positionFar} = getGenericIntersection([{x: 0, y: 0}, firstEnd], third);
 	
-	const [mThird, position] = [getM(...thirdFar), positionFar];
-	// const [mThird, position] = Math.abs(positionFar) < Math.abs(positionNear) ? [getM(...thirdNear), positionNear] : [getM(...thirdFar), positionFar];
+	const [mThird, position] = [getM(...third), positionFar];
 	const mFirst = firstEnd.y / firstEnd.x;
 	
 	return ((mFirst > 0) === (mThird < mFirst)) === ((second[axis] > 0) === (position < second[axis]));
@@ -70,6 +61,8 @@ const getSecond = (first, z, offset) => {
 	return second;
 };
 
+const getFullFlipped = (point) => ({...getFlipped(point), end: getFlipped(point.end)});
+
 const getShared = ({startZooms: [zoomSide, zoomBase], ...data}) => {
 	const isHorizontalFirst = zoomSide <= zoomBase;
 	const isVerticalFlip = data.rotation < 0 && data.rotation > -DEGREES[180];
@@ -77,13 +70,12 @@ const getShared = ({startZooms: [zoomSide, zoomBase], ...data}) => {
 	const right = (isVerticalFlip !== data.isEvenQuadrant) ? getFlipped(data.right) : {...data.right};
 	const top = isVerticalFlip ? getFlipped(data.top) : {...data.top};
 	
-	const [firstZoom, secondZoom, firstEnd, secondOffset, thirdFar, thirdNear] = isHorizontalFirst ?
-			[zoomSide, zoomBase, right, top, [data.yIntersectSide, data.cornerSide], [data.yIntersectBase, data.cornerBase]] :
-			[zoomBase, zoomSide, top, right, [data.yIntersectBase, data.cornerBase], [data.yIntersectSide, data.cornerSide]];
+	const [firstZoom, secondZoom, firstEnd, secondOffset, third] = isHorizontalFirst ?
+			[zoomSide, zoomBase, right, top, [data.yIntersectSide, data.cornerSide]] :
+			[zoomBase, zoomSide, top, right, [data.yIntersectBase, data.cornerBase]];
 	
 	const first = {x: 0, y: 0, z: firstZoom, end: {...firstEnd}};
 	const second = getSecond(first, secondZoom, secondOffset);
-	const doFlip = getDoFlip(firstEnd, second, thirdFar, thirdNear);
 	
 	// flip
 	right.x = -right.x;
@@ -92,12 +84,24 @@ const getShared = ({startZooms: [zoomSide, zoomBase], ...data}) => {
 	const firstFlipped = {x: 0, y: 0, z: firstZoom, end: firstEnd};
 	const secondFlipped = getSecond(firstFlipped, secondZoom, secondOffset);
 	
-	return doFlip ?
+	return getDoFlip(first.end, second, third) ?
 			[getFullFlipped(firstFlipped), getFullFlipped(secondFlipped), firstFlipped, secondFlipped, {...first}, {...second}, first, second] :
 			[{...first}, {...second}, first, second, getFullFlipped(firstFlipped), getFullFlipped(secondFlipped), firstFlipped, secondFlipped];
 };
 
-const getFullFlipped = (point) => ({...getFlipped(point), end: getFlipped(point.end)});
+const mod = (first, second, third, firstFlipped, secondFlipped, yIntersect) => {
+	if (third.z >= second.z) {
+		return;
+	}
+	
+	Object.assign(third, getIntersection([first, first.end], yIntersect));
+	
+	if (!(third.isFirstInt = Math.abs(third.y) <= Math.abs(second.y))) {
+		Object.assign(first, firstFlipped);
+		Object.assign(second, secondFlipped, {axis: true});
+		Object.assign(third, getIntersection([second, second.end], yIntersect));
+	}
+};
 
 const getAll = (data) => {
 	const [
@@ -105,37 +109,13 @@ const getAll = (data) => {
 		firstSideFlipped, secondSideFlipped, firstBaseFlipped, secondBaseFlipped,
 	] = getShared(data);
 	
-	let thirdSide = getIntersection([secondSide, secondSide.end], [data.yIntersectSide, data.cornerSide]);
-	let thirdBase = getIntersection([secondBase, secondBase.end], [data.yIntersectBase, data.cornerBase]);
+	const thirdSide = getIntersection([secondSide, secondSide.end], [data.yIntersectSide, data.cornerSide]);
+	const thirdBase = getIntersection([secondBase, secondBase.end], [data.yIntersectBase, data.cornerBase]);
 	
 	if (thirdBase.z <= thirdSide.z) {
-		if (thirdBase.z < secondBase.z) {
-			thirdBase = getIntersection([firstBase, firstBase.end], [data.yIntersectBase, data.cornerBase]);
-			
-			thirdBase.isFirstInt = true;
-		}
+		mod(firstBase, secondBase, thirdBase, firstBaseFlipped, secondBaseFlipped, [data.yIntersectBase, data.cornerBase]);
 	} else {
-		if (thirdSide.z < secondSide.z) {
-			thirdSide = getIntersection([firstSide, firstSide.end], [data.yIntersectSide, data.cornerSide]);
-			
-			thirdSide.isFirstInt = true;
-		}
-	}
-	
-	if (thirdSide.isFirstInt) {
-		if (Math.abs(thirdSide.y) > Math.abs(secondBase.y)) {
-			Object.assign(firstSide, firstSideFlipped);
-			Object.assign(secondSide, secondSideFlipped, {axis: true});
-			
-			thirdSide = getIntersection([secondSide, secondSide.end], [data.yIntersectSide, data.cornerSide]);
-		}
-	} else if (thirdBase.isFirstInt) {
-		if (Math.abs(thirdBase.y) > Math.abs(secondSide.y)) {
-			Object.assign(firstBase, firstBaseFlipped);
-			Object.assign(secondBase, secondBaseFlipped, {axis: true});
-			
-			thirdBase = getIntersection([secondBase, secondBase.end], [data.yIntersectBase, data.cornerBase]);
-		}
+		mod(firstSide, secondSide, thirdSide, firstSideFlipped, secondSideFlipped, [data.yIntersectSide, data.cornerSide]);
 	}
 	
 	// todo necessary?
@@ -231,11 +211,12 @@ export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizes
 	let firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase;
 	
 	// mitigates bugginess from rounding errors
-	// if (data.intersectsMatch && (Math.abs(quadrantAngle - DEGREES[45]) > 0 || Math.abs(startZooms[0] - startZooms[1]) < 0.01)) {
-	// 	[firstSide, secondSide, thirdSide] = getImageAxis(data.yIntersectSide, data.cornerSide, startZooms[0], data.isXIntersect);
-	// 	[firstBase, secondBase, thirdBase] = getImageAxis(data.yIntersectBase, data.cornerBase, startZooms[1], data.isXIntersect);
-	// } else {
-	[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] = getAll(data);
+	if (data.intersectsMatch && (Math.abs(quadrantAngle - DEGREES[45]) > 0.1 || Math.abs(startZooms[0] - startZooms[1]) < 0.01)) {
+		[firstSide, secondSide, thirdSide] = getImageAxis(data.yIntersectSide, data.cornerSide, startZooms[0], data.isXIntersect);
+		[firstBase, secondBase, thirdBase] = getImageAxis(data.yIntersectBase, data.cornerBase, startZooms[1], data.isXIntersect);
+	} else {
+		[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] = getAll(data);
+	}
 	
 	return isEvenQuadrant ?
 			[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] :

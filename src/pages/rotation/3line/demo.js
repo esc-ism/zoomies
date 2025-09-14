@@ -93,10 +93,12 @@ export const getSnappedZoom = (() => {
 						[third1.z, getProgressedLine(lineSecond0, third1), lineSecond1],
 					];
 			
-			if (third0.isFirstInt || third1.isFirstInt) {
-				pairings.unshift(third1.isFirstInt ?
-						[second0.z, lineSecond0, getProgressedLine(lineFirst1, second0)] :
-						[second1.z, getProgressedLine(lineFirst0, second1), lineSecond1]);
+			if (third0.isFirstInt) {
+				pairings.unshift([second1.z, getProgressedLine(lineFirst0, second1), lineSecond1]);
+			} else if (third1.isFirstInt) {
+				pairings.unshift([second0.z, lineSecond0, getProgressedLine(lineFirst1, second0)]);
+			} else if (second0.axis || second1.axis) {
+				pairings.unshift([second1.z, lineFirst0, lineFirst1]);
 			}
 			
 			return pairings;
