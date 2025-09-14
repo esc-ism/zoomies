@@ -395,13 +395,13 @@ export default class {
 	}
 	
 	remove() {
+		this.tween?.progress(0);
+		
 		position = this.position;
 		rotation = this.rotation;
 		zoom = this.zoom;
 		_ratioViewport = this._ratioViewport;
 		_ratioImage = this._ratioImage;
-		
-		this.tween?.progress(0).kill();
 	}
 	
 	deleteTween() {

@@ -4,10 +4,10 @@ import Demo from '../demo';
 import {getZoomProgressed, getProgressedLine, getIntersectProgress, getProgress, getFlipped} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
-import {CORNERS} from '@/pages/consts';
 import getZoomPoints, {getRelevantDemo} from './zoomPoints';
 import {DEGREES} from '@/shared';
 import {getDimensions} from '../2line';
+import {getRailProgress as getFirstIntRailProgress} from '../2line/demo';
 
 export const getVarGetter = (demo, rotation = DEGREES[90], ratio = 1) => () => {
 	const zoomPoints = getZoomPoints(getRelevantDemo({...demo, rotation, sizesImage: getDimensions(ratio, demo.sizesViewport)}));
@@ -24,12 +24,12 @@ export const getBound = (zoom, first, second, third) => {
 		if (third.isFirstInt || zoom <= second.z) {
 			return {
 				...getZoomProgressed(first, first.end, zoom),
-				m: first.m,
+				axis: first.end.axis,
 				isFirst: true,
 			};
 		}
 		
-		return {...getZoomProgressed(second, second.end, zoom), m: second.m, isFirst: true};
+		return {...getZoomProgressed(second, second.end, zoom), axis: second.axis, isFirst: true};
 	}
 	
 	const progress = zoom / third.z;
@@ -112,6 +112,10 @@ export const getSnappedZoom = (() => {
 })();
 
 export const getRailProgress = (zoom, first, second, third) => {
+	if (third.isFirstInt) {
+		return getFirstIntRailProgress(zoom, first, third);
+	}
+	
 	if (zoom <= first.z) {
 		return [0, 0, 0];
 	}
@@ -127,6 +131,14 @@ export const getRailProgress = (zoom, first, second, third) => {
 	return [1, 1, getProgress(third.z, zoom)];
 };
 
+const getRails = (second, third) => {
+	if (third.isFirstInt) {
+		return [[{x: 0, y: 0}, third], [third, third.end]];
+	}
+	
+	return [[{x: 0, y: 0}, second], [second, third], [third, third.end]];
+};
+
 export default class extends Demo {
 	static getZoomPoints = getZoomPoints;
 	
@@ -134,12 +146,8 @@ export default class extends Demo {
 	
 	setRails() {
 		this.rails.set(
-			[{x: 0, y: 0}, this.zoomPoints[1]],
-			[this.zoomPoints[1], this.zoomPoints[2]],
-			[this.zoomPoints[2], CORNERS.TOP_LEFT],
-			[{x: 0, y: 0}, this.zoomPoints[4]],
-			[this.zoomPoints[4], this.zoomPoints[5]],
-			[this.zoomPoints[5], CORNERS.TOP_RIGHT],
+			...getRails(this.zoomPoints[1], this.zoomPoints[2]),
+			...getRails(this.zoomPoints[4], this.zoomPoints[5]),
 		);
 	}
 	

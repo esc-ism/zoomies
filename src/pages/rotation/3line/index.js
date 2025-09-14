@@ -97,10 +97,10 @@ export default (wrapper) => {
 	registerFunctions(demo, functions);
 	
 	demo.init().then(() => {
-		demo.rotation = -4.711332852094488;
+		demo.rotation = -0.3139451184915161;
 		demo.applyRotation();
-		demo.ratioImage = 1.938749508327397;
-		// demo.ratioViewport = 2.2382249136532053;
+		demo.ratioImage = 1.2987012987012987;
+		demo.ratioViewport = 0.8025786657894359;
 	});
 	
 	wrapper.append(

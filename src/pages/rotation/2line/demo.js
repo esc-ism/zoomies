@@ -64,7 +64,7 @@ export const getSnappedZoom = (() => {
 	};
 })();
 
-const getRailProgress = (zoom, first, second) => {
+export const getRailProgress = (zoom, first, second) => {
 	if (zoom <= first.z) {
 		return [0, 0];
 	}
