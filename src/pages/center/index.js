@@ -17,7 +17,7 @@ export default (wrapper) => {
 	registerDemo(demo);
 	
 	wrapper.append(
-		demo.element,
+		demo.constructor.element,
 		
 		getText(
 			{

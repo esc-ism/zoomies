@@ -56,7 +56,7 @@ export class Line {
 	element = (this.constructor.template ?? Line.template).cloneNode();
 	reflections = [];
 	
-	constructor(demo, flipX, flipY, flipBoth, parent = demo.elements.imageWrapper) {
+	constructor(demo, flipX, flipY, flipBoth, parent = demo.constructor.elements.imageWrapper) {
 		this.parent = parent;
 		this.demo = demo;
 		

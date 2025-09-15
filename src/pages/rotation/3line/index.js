@@ -97,7 +97,7 @@ export default (wrapper) => {
 	registerFunctions(demo, functions);
 	
 	wrapper.append(
-		demo.element,
+		demo.constructor.element,
 		getText(
 			{
 				tag: 'h1',

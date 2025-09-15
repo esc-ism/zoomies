@@ -14,7 +14,7 @@ export default (wrapper) => {
 	registerFunctions(demo);
 	
 	wrapper.append(
-		demo.element,
+		demo.constructor.element,
 		
 		getText(
 			{

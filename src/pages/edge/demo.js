@@ -141,4 +141,12 @@ export default class extends Demo {
 		this.setZoomPoints();
 		this.applyZoomPoints();
 	}
+	
+	remove() {
+		this.bounds.remove();
+		this.rails.remove();
+		this.tangents.remove();
+		
+		super.remove();
+	}
 }

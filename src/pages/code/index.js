@@ -98,6 +98,7 @@ export const register = (newDemo, statements = []) => {
 		},
 	]));
 	
+	// todo I don't totally get this
 	init = demo.init().then(() => reset());
 };
 
@@ -327,7 +328,7 @@ const visualisers = {
 		
 		svg.append(path);
 		
-		demo.elements.imageWrapper.appendChild(svg);
+		demo.constructor.elements.imageWrapper.appendChild(svg);
 		
 		return () => svg.remove();
 	},
@@ -804,10 +805,10 @@ const generateButtons = (parent, statements) => {
 	});
 };
 
-export const generateWhenReady = async (parent, statements) => {
-	await init;
-	
-	generateButtons(parent, statements);
-	
-	generate(parent, statements);
-};
+export const generateWhenReady = (parent, statements) => init
+	.then(() => {
+		generateButtons(parent, statements);
+		
+		generate(parent, statements);
+	})
+	.catch(() => {});

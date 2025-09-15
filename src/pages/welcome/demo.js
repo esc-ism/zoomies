@@ -14,6 +14,9 @@ export default class extends Demo {
 		this.rails[4].deactivate(false);
 		this.rails[5].deactivate(false);
 		
+		this.constructor.element.style.pointerEvents = 'none';
+		this.constructor.elements.resizer.style.pointerEvents = 'all';
+		
 		// this.rails[0].element.style.backgroundColor = this.rails[3].element.style.backgroundColor = 'lime';
 		// this.rails[1].element.style.backgroundColor = this.rails[4].element.style.backgroundColor = 'yellow';
 		// this.rails[2].element.style.backgroundColor = this.rails[5].element.style.backgroundColor = 'red';
@@ -35,5 +38,12 @@ export default class extends Demo {
 		super.updateSizesViewport();
 		
 		this.resizeCallback?.();
+	}
+	
+	remove() {
+		this.constructor.element.style.removeProperty('pointer-events');
+		this.constructor.elements.resizer.style.removeProperty('pointer-events');
+		
+		super.remove();
 	}
 }

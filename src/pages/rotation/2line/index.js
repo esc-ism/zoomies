@@ -432,7 +432,7 @@ export default (wrapper) => {
 	const getDirectVars = getVarGetter(demo, DEGREES[90] - 0.4);
 	
 	wrapper.append(
-		demo.element,
+		demo.constructor.element,
 		
 		getText(
 			{
