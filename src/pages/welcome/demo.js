@@ -16,10 +16,6 @@ export default class extends Demo {
 		
 		this.constructor.element.style.pointerEvents = 'none';
 		this.constructor.elements.resizer.style.pointerEvents = 'all';
-		
-		// this.rails[0].element.style.backgroundColor = this.rails[3].element.style.backgroundColor = 'lime';
-		// this.rails[1].element.style.backgroundColor = this.rails[4].element.style.backgroundColor = 'yellow';
-		// this.rails[2].element.style.backgroundColor = this.rails[5].element.style.backgroundColor = 'red';
 	}
 	
 	// todo CSS transition from one rail state to the next

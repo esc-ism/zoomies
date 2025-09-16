@@ -42,10 +42,10 @@ export default class {
 	static elements = getElements();
 	static element = this.elements.wrapper;
 	
-	static readout = new Readout();
+	static readout = new Readout(this);
 	static progress = new Progress();
 	
-	target = new Target(this);
+	static target = new Target(this);
 	
 	sizesImage = {};
 	sizesViewport = {};
@@ -95,7 +95,9 @@ export default class {
 	]);
 	
 	constructor() {
-		const {viewport, image, resizer, imageWrapper} = this.constructor.elements;
+		this.constructor.target.setDemo(this);
+		
+		const {viewport, image, resizer} = this.constructor.elements;
 		
 		this.constructor.readout.setPosition(this);
 		this.constructor.readout.setZoom(this);
@@ -103,8 +105,6 @@ export default class {
 		this.constructor.readout.setRatio(this);
 		
 		viewport.appendChild(this.constructor.progress.element);
-		resizer.parentElement.insertBefore(this.constructor.readout.element, resizer);
-		imageWrapper.append(this.target.element);
 		
 		this.addEventListener(resizer, 'pointerdown', (event) => {
 			const {buttons, offsetX} = event;
@@ -212,7 +212,7 @@ export default class {
 					cancelRightClick();
 				}
 				
-				this.target.hide();
+				this.constructor.target.hide();
 				
 				if (!isClick) {
 					return;
@@ -350,7 +350,7 @@ export default class {
 					this.constrainPosition({position: true});
 				}
 				
-				this.target.set(target);
+				this.constructor.target.set(target);
 				
 				this.applyPosition();
 			}
@@ -385,7 +385,7 @@ export default class {
 			this.constrainRotation();
 			this.constrainPosition({rotation: true});
 			
-			this.target.set(target);
+			this.constructor.target.set(target);
 			
 			this.applyRotation();
 			this.applyPosition();
@@ -444,6 +444,8 @@ export default class {
 		
 		window.clearTimeout(this.#tweenUpdateId);
 		
+		this.constructor.target.hide();
+		
 		position = this.position;
 		rotation = this.rotation;
 		zoom = this.zoom;
@@ -452,7 +454,7 @@ export default class {
 	}
 	
 	deleteTween() {
-		this.target.hide();
+		this.constructor.target.hide();
 		
 		this.tween.kill();
 		
@@ -481,7 +483,7 @@ export default class {
 				this.applyPosition();
 				
 				if (!ignorePosition) {
-					this.target.set(target);
+					this.constructor.target.set(target);
 				}
 				
 				effects = {};

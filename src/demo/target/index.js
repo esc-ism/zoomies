@@ -9,9 +9,9 @@ export default class {
 	crosshair = CROSSHAIR.cloneNode(true);
 	
 	constructor(demo) {
-		this.demo = demo;
-		
-		this.element.style.display = 'contents';
+		this.element.style.width = this.element.style.height = '100%';
+		this.element.style.zIndex = '1';
+		this.element.style.pointerEvents = 'none';
 		
 		this.element.append(this.crosshair);
 		
@@ -24,14 +24,22 @@ export default class {
 		
 		setLineStyle(this.line.element);
 		
+		demo.elements.imageWrapper.append(this.element);
+		
 		this.hide();
+	}
+	
+	setDemo(demo) {
+		this.demo = demo;
+		
+		this.line.demo = demo;
 	}
 	
 	hide() {
 		this.crosshair.style.display = this.line.element.style.display = 'none';
 	}
 	
-	set({x = this.demo.position.x, y = this.demo.position.y}) {
+	set({x, y}) {
 		const {position, zoom, rotation} = this.demo;
 		
 		if (x === position.x && y === position.y) {

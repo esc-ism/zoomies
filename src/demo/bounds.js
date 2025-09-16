@@ -49,7 +49,7 @@ export default class {
 		// 2d
 		this.lines[1] = new BoundLines(2, demo, false, false, true, this.element);
 		
-		demo.constructor.elements.imageWrapper.insertBefore(this.element, demo.target.element);
+		demo.constructor.elements.imageWrapper.insertBefore(this.element, demo.constructor.target.element);
 	}
 	
 	remove() {

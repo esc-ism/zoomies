@@ -216,9 +216,9 @@ export default (wrapper) => {
 			[
 				'You\'ll find that this system works ',
 				getButton('perfectly', [
-					() => [{ratio: demo.ratioViewport, position: {x: -0.5, y: 0.5}}],
-					() => [{rotation: demo.rotation - DEGREES[180] + ERROR_ALLOWANCE}, {duration: 4}],
-					() => [{zoom: demo.zoom * 2}, {duration: 2, ease: 'power3.inOut', yoyo: true, repeat: 1, position: '<'}],
+					[{ratio: 1, rotation: DEGREES[90], zoom: 1, position: {x: -0.5, y: 0.5}}],
+					[{rotation: 0}, {duration: 4}],
+					[{zoom: 2}, {duration: 2, ease: 'power3.inOut', yoyo: true, repeat: 1, position: '<'}],
 				]),
 				' if the viewport and image share an aspect ratio.',
 				'The system\'s flaw is only revealed when the ratios are ',

@@ -23,7 +23,7 @@ addRule(`.${CLASS_CODE} > div`, {
 
 addRule(`.${CLASS_CODE} code`, {
 	'font-family': 'consolas, monospace',
-	'font-size': '0.8em',
+	'font-size': '0.85em',
 	'white-space': 'pre',
 	
 	padding: '10px 1em',

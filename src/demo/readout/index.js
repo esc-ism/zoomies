@@ -6,7 +6,7 @@ export default class {
 	element = document.createElement('table');
 	#valueElements = {};
 	
-	constructor() {
+	constructor(demo) {
 		this.element.id = ID;
 		
 		this.element.style.position = 'absolute';
@@ -18,7 +18,7 @@ export default class {
 		this.element.style.borderCollapse = 'collapse';
 		this.element.style.boxShadow = 'black 0 0 6px 1px';
 		this.element.style.fontFamily = 'courier-new, monospace';
-		this.element.style.fontSize = '0.9em';
+		this.element.style.fontSize = '16px';
 		
 		const body = document.createElement('tbody');
 		
@@ -36,6 +36,8 @@ export default class {
 		}
 		
 		this.element.appendChild(body);
+		
+		demo.elements.resizer.parentElement.insertBefore(this.element, demo.elements.resizer);
 	}
 	
 	#set(label, value) {
