@@ -495,17 +495,16 @@ export default (wrapper) => {
 			[
 				'In the previous system, we only needed to calculate the zoom at which each image corner touched the viewport\'s edge.',
 				'We can see this as defining a line segment from the origin to a corner, progressing from an initial zoom to infinite zoom.',
-				'Since there are now two lines connecting the origin to each corner, the number of line definitions must also double.',
+				'This system has two lines connecting the origin to each corner, necessitating twice as many line definitions.',
 			],
 			[
-				'We\'ll still be focusing on the top-left and top-right image corners, but we must also determine the viewport edge that these corners will touch;',
+				'We\'ll still be focusing on the top-left and top-right image corners, but we must also assign a viewport edge that these corners will touch;',
 				'one will be a "side" corner and the other a "base" corner.',
 				'This assignment will be based off rotation, with corners alternating between "base" and "side" every 90°.',
 			],
 			[
 				'For a given corner, its first line will travel from the origin to the center of a viewport edge (not necessarily the edge that the corner will touch).',
-				'The zoom level at which the corner touches any viewport edge will be used to calculate the viewport\'s dimensions.',
-				'This zoom level will also be used as the line\'s start zoom.',
+				'The zoom level at which the corner touches any viewport edge will be the line\'s start zoom.',
 			],
 			[
 				'The second line will use the corner as its terminus and have the gradient necessary to meet the aforementioned positional constraint relative to its viewport edge.',

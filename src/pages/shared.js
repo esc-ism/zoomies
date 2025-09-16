@@ -93,12 +93,12 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 		tag: 'span',
 		content: text,
 		classList: [CLASS_BUTTON],
-		onpointerover: () => {
+		onpointerover: () => demo.init().then(() => {
 			const param = getParam();
 			
 			demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
-		},
-		onpointerout: () => {
+		}),
+		onpointerout: () => demo.init().then(() => {
 			if (!demo.tween || demo.isRemoved) {
 				return;
 			}
@@ -113,8 +113,8 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 				demo.tween.vars.onUpdate();
 				demo.tween.vars.onReverseComplete();
 			}
-		},
-		onclick: () => {
+		}),
+		onclick: () => demo.init().then(() => {
 			if (!demo.tween) {
 				return;
 			}
@@ -124,7 +124,7 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 			demo.tween.progress(1);
 			
 			demo.deleteTween();
-		},
+		}),
 	};
 };
 
