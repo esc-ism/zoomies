@@ -41,9 +41,9 @@ export default class extends Demo {
 	}
 	
 	remove() {
+		super.remove();
+		
 		this.constructor.element.style.removeProperty('pointer-events');
 		this.constructor.elements.resizer.style.removeProperty('pointer-events');
-		
-		super.remove();
 	}
 }

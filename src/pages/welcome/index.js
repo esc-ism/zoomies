@@ -9,15 +9,15 @@ import {CLASS_INSTRUCTION} from '../consts';
 import {DEGREES} from '@/shared';
 
 const tween = async (demo) => {
-	let isRemoved = false;
+	// keeps corners away from the readout
+	const getRandomRotation = gsap.utils.random(-DEGREES[180] + DEGREES[45], DEGREES[45], undefined, true);
+	const getRandomRatio = gsap.utils.random(0.5, 2, undefined, true);
 	
-	demo.removed.then(() => isRemoved = true);
-	
-	while (!isRemoved) {
+	while (!demo.isRemoved) {
 		const {zoomPoints, rotation, ratio} = getVarGetter(
 			demo,
-			gsap.utils.random(-DEGREES[180], 0),
-			gsap.utils.random(0.5, 2),
+			getRandomRotation(),
+			getRandomRatio(),
 		)();
 		
 		let firstIndex;
@@ -65,9 +65,9 @@ const tween = async (demo) => {
 		};
 		
 		demo.setTween(
-			[{ratio}, {delay: 1}],
+			[{ratio}, {delay: 0.5}],
 			[{rotation, zoom: first.z}],
-			[{zoom: 5}, {
+			[{zoom: first.z * 3}, {
 				duration: 2,
 				onStart() {
 					setZoomPoints();
@@ -100,7 +100,7 @@ const tween = async (demo) => {
 		
 		await Promise.race([demo.removed, demo.tween]);
 		
-		if (isRemoved) {
+		if (demo.isRemoved) {
 			return;
 		}
 		
@@ -131,7 +131,7 @@ export default (wrapper) => {
 					'Hello! I\'m Callum.',
 					'I\'m a front-end developer who has spent the past two years working on panning problems.',
 					'Specifically, I\'ve been working on pan-limiting where zoom, rotation and aspect ratios (for both image and viewport) are variable.',
-					'This website serves as my essay on panning, discussing the problems and demonstrating my solutions.',
+					'This website serves as my essay on panning, discussing problems and demonstrating solutions.',
 				],
 			},
 			{

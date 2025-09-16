@@ -16,16 +16,6 @@ addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(1)`, {'text-align': '-webkit-righ
 addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(1)`, {'text-align': 'right'});
 addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(3)`, {'text-align': 'left'});
 
-// todo delete?
-// header
-// addRule(`.${CLASS_CODE} > div`, {
-// 	'font-size': '1.5em',
-// 	padding: '7px 1em',
-// 	'text-align': 'center',
-// 	'box-shadow': 'inherit',
-// 	'background-color': 'rgb(0 0 0 / 10%)',
-// });
-
 addRule(`.${CLASS_CODE} > div`, {
 	'overflow-x': 'auto',
 	position: 'relative',
@@ -33,6 +23,7 @@ addRule(`.${CLASS_CODE} > div`, {
 
 addRule(`.${CLASS_CODE} code`, {
 	'font-family': 'consolas, monospace',
+	'font-size': '0.8em',
 	'white-space': 'pre',
 	
 	padding: '10px 1em',
@@ -50,6 +41,7 @@ addRule(`.${CLASS_MATH}`, {
 addRule(`.${CLASS_MATH} math`, {
 	'overflow-x': 'auto',
 	'font-family': '"cambria math", math',
+	'font-size': '0.9em',
 	padding: '0.4em',
 	display: 'block',
 });

@@ -143,7 +143,7 @@ const getAll = (data) => {
 	return [firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase];
 };
 
-const getAxisIntersects = ({sizesImage, sizesViewport, ratioViewport, ratioViewportInverse}, quadrantAngle, isEvenQuadrant, allowance = 0.002) => {
+const getAxisIntersects = ({sizesImage, sizesViewport, ratioViewport, ratioViewportInverse}, quadrantAngle, isEvenQuadrant) => {
 	const progressAngles = getProgressAngles(quadrantAngle, ratioViewport, ratioViewportInverse);
 	
 	if (quadrantAngle >= DEGREES[45]) {
@@ -153,7 +153,6 @@ const getAxisIntersects = ({sizesImage, sizesViewport, ratioViewport, ratioViewp
 		return {
 			yIntersectSide,
 			yIntersectBase,
-			intersectsMatch: Math.abs(yIntersectSide.y - yIntersectBase.y) <= allowance,
 		};
 	}
 	
@@ -163,8 +162,6 @@ const getAxisIntersects = ({sizesImage, sizesViewport, ratioViewport, ratioViewp
 		yIntersectBase: getXIntersect(sizesImage, sizesViewport.halfHeight, quadrantAngle + progressAngles.base, progressAngles.base),
 		isXIntersect: true,
 	};
-	
-	intersects.intersectsMatch = Math.abs(intersects.yIntersectSide.x - intersects.yIntersectBase.x) <= allowance;
 	
 	if (isEvenQuadrant) {
 		intersects.yIntersectSide = getFlipped(intersects.yIntersectSide);

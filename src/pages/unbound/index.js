@@ -12,8 +12,8 @@ export default (wrapper) => {
 		getText(
 			{
 				tag: 'h1',
-				content: 'Unbound',
 				style: {textAlign: 'center'},
+				content: 'Unbound',
 			},
 			[
 				'First thing\'s first: why is pan-limiting necessary?',
@@ -27,11 +27,12 @@ export default (wrapper) => {
 			],
 			{
 				tag: 'h2',
-				content: 'Controls',
 				style: {textAlign: 'center'},
+				content: 'Controls',
 			},
 			{
 				tag: 'p',
+				style: {whiteSpace: 'pre', textAlign: 'center', lineHeight: 'normal', fontFamily: 'courier-new, monospace'},
 				content: [
 					'╔════════╦════════════════╦══════════╗', {tag: 'br'},
 					'║ ACTION ║     MOUSE      ║ KEYBOARD ║', {tag: 'br'},
@@ -49,12 +50,11 @@ export default (wrapper) => {
 					'║ Reset  ║ Click ║ Button ║          ║', {tag: 'br'},
 					'╚════════╩═══════╩════════╩══════════╝',
 				],
-				style: {whiteSpace: 'pre', textAlign: 'center', lineHeight: 'normal'},
 			},
 			{
 				tag: 'h2',
-				content: 'Effectiveness',
 				style: {textAlign: 'center'},
+				content: 'Effectiveness',
 			},
 			[
 				'A competent user of this system may ',
@@ -76,13 +76,13 @@ export default (wrapper) => {
 				'Pan-limiting systems prevent this by keeping users from the no man\'s land beyond the confines of the image.',
 			],
 			[
-				'Some pan-limiting systems can also take a position and derive an appropriate zoom level; something that this system is incapable of.',
+				'Some pan-limiting systems can also take a position and derive an appropriate zoom level - something that this system is incapable of.',
 				'This turns out to be a useful feature when span-panning, but that\'s a topic for the next page.',
 			],
 			{
 				tag: 'h2',
-				content: 'Conclusion',
 				style: {textAlign: 'center'},
+				content: 'Conclusion',
 			},
 			[
 				'Some degree of pan limiting is important.',

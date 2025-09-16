@@ -159,19 +159,27 @@ export default (wrapper) => {
 				'Adjacent corners can have different values but opposite corners are always equivalent.',
 				'Knowing this, I only need to calculate a zoom for the top-left and top-right corners.',
 				[
-					'Note that the "rotation" value\'s unit is ', {
+					'Given these zoom values, we can derive pan limits from the user\'s zoom level.',
+					'This is demonstrated below.',
+					'Note that the "rotation" value\'s unit is ',
+					{
 						tag: 'a',
 						content: 'radians',
 						href: 'https://en.wikipedia.org/wiki/Radian',
 					},
 					' and has a default value of ',
-					{tag: 'math', xmlns, content: [
-						{tag: 'mn', xmlns, content: '½'},
-						{tag: 'mi', xmlns, content: 'π'},
-					]},
-					'.',
+					{
+						tag: 'span',
+						style: {'white-space': 'nowrap'},
+						content: [
+							{tag: 'math', xmlns, content: [
+								{tag: 'mn', xmlns, content: '½'},
+								{tag: 'mi', xmlns, content: 'π'},
+							]},
+							'.',
+						],
+					},
 				],
-				'Given these zoom values, we can derive pan limits from the user\'s zoom level.',
 			],
 			getCode([
 				{op: '=', id: ['topLeftZoom', 'topRightZoom'], and: {

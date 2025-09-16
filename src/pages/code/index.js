@@ -278,14 +278,16 @@ const visualisers = {
 		demo.constrainPosition({zoom: true});
 		demo.applyPosition();
 		
-		return () => {
+		return (isRemoval = false) => {
 			demo.zoom = zoom;
 			demo.position.x = x;
 			demo.position.y = y;
 			
-			demo.applyZoom();
-			demo.constrainPosition({zoom: true});
-			demo.applyPosition();
+			if (!isRemoval) {
+				demo.applyZoom();
+				demo.constrainPosition({zoom: true});
+				demo.applyPosition();
+			}
 		};
 	},
 	x: (scope, id) => getLine(scope[id], 0, true),
@@ -419,6 +421,12 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 		
 		visuals.length = 0;
 		hovered.length = 0;
+	});
+	
+	demo.removed.then(() => {
+		for (const visual of visuals) {
+			visual(true);
+		}
 	});
 	
 	return true;

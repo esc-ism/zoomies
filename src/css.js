@@ -23,7 +23,8 @@ addRule(':root', {
 	'--color': '#dddddd',
 	'--background': '#231e25',
 	
-	'font-family': 'courier-new, monospace',
+	'font-family': '"High Tower Text", courier-new, monospace',
+	'font-size': '20px',
 	'font-weight': '400',
 	'background-color': 'var(--background)',
 	color: 'var(--color)',

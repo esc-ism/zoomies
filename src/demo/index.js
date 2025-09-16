@@ -66,20 +66,19 @@ export default class {
 	#listeners = [];
 	#resizeObserver;
 	#removeResolver;
+	#tweenUpdateId;
+	isRemoved = false;
 	removed = new Promise((resolve) => {
 		this.#removeResolver = resolve;
-	});
+	})
+		.then(() => this.isRemoved = true);
 	
 	#init = Promise.race([
 		this.removed,
 		dock(this.constructor.element)
 			.then(() => new Promise((resolve) => {
-				let isRemoved = false;
-				
-				this.removed.then(() => isRemoved = true);
-				
 				this.#resizeObserver = new ResizeObserver(() => {
-					if (!isRemoved) {
+					if (!this.isRemoved) {
 						this.ratioViewport = _ratioViewport;
 						this.ratioImage = _ratioImage;
 						this.position = position;
@@ -430,8 +429,6 @@ export default class {
 	}
 	
 	remove() {
-		this.#removeResolver();
-		
 		for (const [element, type, listener] of this.#listeners) {
 			element.removeEventListener(type, listener);
 		}
@@ -440,7 +437,12 @@ export default class {
 		
 		this.#resizeObserver?.disconnect();
 		
+		// triggers onReverseComplete which calls deleteTween
 		this.tween?.progress(0);
+		
+		this.#removeResolver();
+		
+		window.clearTimeout(this.#tweenUpdateId);
 		
 		position = this.position;
 		rotation = this.rotation;
@@ -495,7 +497,7 @@ export default class {
 				
 				willUpdate = true;
 				
-				window.setTimeout(update, 0);
+				this.#tweenUpdateId = window.setTimeout(update, 0);
 			};
 		})();
 		

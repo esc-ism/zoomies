@@ -104,7 +104,7 @@ export default (wrapper) => {
 				content: 'Triple-Line Rotation',
 				style: {textAlign: 'center'},
 			},
-			'So 1 line doesn\'t work too well, 2 lines has issues... how about 3 lines?!',
+			'So 1 line doesn\'t work too well, 2 lines has issues... is third line the charm?',
 			[
 				'We can solve the 2-line panning issue by always using the preferred axis line, but adding a connector to the corner line.',
 				'In this system, the connecting line keeps two image corners on the viewport\'s edge.',

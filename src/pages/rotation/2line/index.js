@@ -469,7 +469,7 @@ export default (wrapper) => {
 				'.',
 			],
 			[
-				'This is only half of the system, however.',
+				'But this is only half of the system.',
 				'Since points no longer travel directly from the origin towards image corners, we need a smart way to move them from the origin.',
 			],
 			[
@@ -637,7 +637,8 @@ export default (wrapper) => {
 			[
 				'Besides efficiency, the system\'s only drawback is its spotty pan-limiting when image aspect ratio isn\'t 1:1.',
 				'It\'s possible to solve this problem by ditching viewport axis-based panning paths in favor of, for example, image axis paths.',
-				'This, however, is accepting defeat; not using viewport axes means accepting sub-optimal paths, ergo a worse user experience.',
+				'This, however, is accepting defeat;',
+				'not using viewport axes means accepting sub-optimal paths, providing a worse user experience.',
 				'There must be a way to have our cake and eat it too!',
 			],
 		),

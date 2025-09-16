@@ -142,8 +142,12 @@ const get1DConstrainer = (() => {
 })();
 
 const getFrame = (() => {
-	const isHighSide = (lines, high, low) => (lines[high].c < lines[low].c) === (lines[high].m > 0);
-	const isHighTop = (lines, high, low) => lines[high].c > lines[low].c;
+	const isHighSide = (lines, high, low) => Number.isFinite(lines[high].m) ?
+			(lines[high].c < lines[low].c) === (lines[high].m > 0) :
+			(lines[high].y < lines[low].y);
+	const isHighTop = (lines, high, low) => Number.isFinite(lines[high].m) ?
+			(lines[high].c > lines[low].c) :
+			(lines[high].x > lines[low].x);
 	
 	const setHighTangent = (source, a, b, ...copies) => {
 		const isHigh = source.isSide ? isHighTop : isHighSide;

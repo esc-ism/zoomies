@@ -99,7 +99,7 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 			demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
 		},
 		onpointerout: () => {
-			if (!demo.tween) {
+			if (!demo.tween || demo.isRemoved) {
 				return;
 			}
 			
