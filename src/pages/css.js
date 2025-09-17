@@ -61,4 +61,17 @@ addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}:hover`, {
 
 addRule(`.${CLASS_WRAPPER} a`, {color: '#badfdf'});
 
-addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {'font-weight': 'bold'});
+addRule([`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::before`, `.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::after`], {
+	display: 'block',
+	content: '" "',
+	'white-space': 'pre',
+	height: '0',
+});
+
+addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {
+	'font-weight': 'bold',
+	background: 'rgb(87 78 0)',
+	padding: '0 23px',
+	'border-radius': '10px',
+	'text-shadow': '0 0 3px black',
+});

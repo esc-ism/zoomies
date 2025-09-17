@@ -2,7 +2,7 @@ import Demo from './demo';
 import SHARED_FUNCTIONS from '../code';
 
 import {register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, registerDemo} from '../../shared';
+import {getText, getCode, getButton, registerDemo, getInstruction} from '../../shared';
 
 import {DEGREES, ERROR_ALLOWANCE, xmlns} from '@/shared';
 import {CLASS_MATH, CLASS_MATH_EQUATION} from '../../consts';
@@ -181,6 +181,10 @@ export default (wrapper) => {
 					},
 				],
 			],
+			getInstruction([
+				'This code demonstration includes custom functions (e.g. "getStartZooms").',
+				'Click to unfold them and click the "function" text to re-fold.',
+			]),
 			getCode([
 				{op: '=', id: ['topLeftZoom', 'topRightZoom'], and: {
 					op: 'call', id: 'getStartZooms',
@@ -904,7 +908,7 @@ export default (wrapper) => {
 				'We end up with a quadratic expression and solve it with the ',
 				{tag: 'a', content: 'quadratic formula', href: 'https://en.wikipedia.org/wiki/Quadratic_formula'},
 				' to find our ratio.',
-				'From here, it\'s a simple calculation using the highZoom value from earlier to find our final snap zoom.',
+				'From here, it\'s a simple calculation using the un-snipped line\'s start zoom to find our final snap zoom.',
 			],
 			getCode([
 				{op: '=', id: 'ratio', and: {

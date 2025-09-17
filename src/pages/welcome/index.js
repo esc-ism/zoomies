@@ -2,10 +2,9 @@ import gsap from 'gsap';
 
 import Demo from './demo';
 
-import {getText} from '../shared';
+import {getText, getInstruction} from '../shared';
 import {getBound, getRailProgress, getVarGetter} from '../rotation/3line/demo';
 
-import {CLASS_INSTRUCTION} from '../consts';
 import {DEGREES} from '@/shared';
 
 const tween = async (demo) => {
@@ -134,10 +133,7 @@ export default (wrapper) => {
 					'This website serves as my essay on panning, discussing problems and demonstrating solutions.',
 				],
 			},
-			{
-				content: 'Hit your right arrow key to continue.',
-				classList: [CLASS_INSTRUCTION],
-			},
+			getInstruction(['Hit your right arrow key to continue.']),
 		),
 	);
 	

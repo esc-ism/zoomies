@@ -2,7 +2,7 @@ import {DEGREES, xmlns} from '@/shared';
 import {CLASS_MATH, CLASS_MATH_EQUATION} from '../consts';
 
 import {register as registerFunctions} from '../code';
-import {getText, getCode, getButton, registerDemo} from '../shared';
+import {getText, getCode, getButton, registerDemo, getInstruction} from '../shared';
 import {getSnapPosition} from '../center';
 
 import Demo from './demo';
@@ -42,12 +42,28 @@ export default (wrapper) => {
 			[
 				'Notice that the viewport\'s dimensions half as zoom ',
 				getButton('doubles', [
-					[{position: 0.5}],
-					() => [{zoom: demo.zoom * 2}],
+					[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
+					[{position: 0.5, zoom: 2}],
 				]),
 				'.',
 				'This reciprocal relationship between zoom and viewport size gives the following calculation for pan limits along the x & y axes:',
 			],
+			getInstruction(
+				[
+					'Below is our first code demonstration.',
+					'These demonstrate the inner workings of systems.',
+				],
+				[
+					'Mouse over a variable name without moving to see its internal value.',
+					'If the name is green, you\'ll see a visual representation of its value in the playground.',
+				],
+				[
+					'Conditions choose a branch of code to execute.',
+					'They will have a green or red background depending on their truthiness.',
+					'Unexecuted branches will be greyed-out.',
+				],
+				['The two top-right buttons update code to the current playground state and fullscreen the demonstration respectively.'],
+			),
 			getCode([
 				{op: '=', id: 'boundX', type: 'x', and: {
 					op: '?', multiline: true, and: [

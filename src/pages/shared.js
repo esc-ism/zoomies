@@ -2,7 +2,7 @@ import {getIdGetter} from '@css';
 
 import {generateWhenReady as generateCode} from './code';
 
-import {CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET} from './consts';
+import {CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET, CLASS_INSTRUCTION} from './consts';
 
 const getCodeId = getIdGetter('text', 'code');
 
@@ -32,7 +32,7 @@ const getNode = (description) => {
 	
 	const {
 		content = [],
-		classList = [],
+		classList,
 		tag = 'p',
 		style = {},
 		xmlns,
@@ -58,7 +58,9 @@ const getNode = (description) => {
 		node[property] = value;
 	}
 	
-	node.classList.add(...classList);
+	if (classList) {
+		node.classList.add(...classList);
+	}
 	
 	if (callback) {
 		callback(node);
@@ -145,3 +147,6 @@ export const getText = (...children) => {
 	
 	return wrapper;
 };
+
+// todo add minimise/maximise toggle button
+export const getInstruction = (...content) => ({classList: [CLASS_INSTRUCTION], content});

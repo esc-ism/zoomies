@@ -1,4 +1,4 @@
-import {getText, getButton, registerDemo} from '../shared';
+import {getText, getButton, registerDemo, getInstruction} from '../shared';
 
 import Demo from './demo';
 
@@ -15,14 +15,10 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 				content: 'Unbound',
 			},
+			'First thing\'s first: why is pan-limiting necessary?',
 			[
-				'First thing\'s first: why is pan-limiting necessary?',
-				'Well, that question would be easy to answer if we had an image that allows unbound panning...',
-			],
-			'Fortunately, that\'s what we see to our left!',
-			[
-				'This is our first pan-limiting demonstration.',
-				'This particular demonstration neglects to limit panning.',
+				'To the left is our first pan-limiting playground.',
+				'This particular playground neglects to limit panning.',
 				'Try it out!',
 			],
 			{
@@ -35,7 +31,7 @@ export default (wrapper) => {
 				style: {whiteSpace: 'pre', textAlign: 'center', lineHeight: 'normal', fontFamily: 'courier-new, monospace'},
 				content: [
 					'╔════════╦════════════════╦══════════╗', {tag: 'br'},
-					'║ ACTION ║     MOUSE      ║ KEYBOARD ║', {tag: 'br'},
+					'║ ', {tag: 'strong', content: 'ACTION'}, ' ║     ', {tag: 'strong', content: 'MOUSE'}, '      ║ ', {tag: 'strong', content: 'KEYBOARD'}, ' ║', {tag: 'br'},
 					'╠════════╬═══════╦════════╬══════════╣', {tag: 'br'},
 					'║ Pan    ║ Drag  ║ Left   ║          ║', {tag: 'br'},
 					'╠════════╬═══════╣ Mouse  ╠══════════╣', {tag: 'br'},
@@ -56,6 +52,11 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 				content: 'Effectiveness',
 			},
+			getInstruction([
+				'Notice the pink text below?',
+				'Placing your cursor over pink text will demonstrate relevant concepts.',
+				'Clicking this text will skip to the end of demonstrations and set your playground state.',
+			]),
 			[
 				'A competent user of this system may ',
 				getButton('self-impose', [
@@ -76,7 +77,7 @@ export default (wrapper) => {
 				'Pan-limiting systems prevent this by keeping users from the no man\'s land beyond the confines of the image.',
 			],
 			[
-				'Some pan-limiting systems can also take a position and derive an appropriate zoom level - something that this system is incapable of.',
+				'Additionally, more advanced pan-limiting systems can take a position and derive an appropriate zoom level.',
 				'This turns out to be a useful feature when span-panning, but that\'s a topic for the next page.',
 			],
 			{
