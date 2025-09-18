@@ -55,6 +55,7 @@ const getIndents = (depth) => {
 
 export const register = (newDemo, statements = []) => {
 	demo = newDemo;
+	refreshParams.length = 0;
 	
 	functions = Object.fromEntries(statements.map((statement) => [
 		statement.id,
@@ -235,16 +236,12 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 	return {values, elements, unwrapped, shapeData};
 };
 
-const getLine = ({value: length, doCenter = false, isPercent = true}, rotation, isWidth = false) => {
+const getLine = ({value: length, doCenter = false, isPercent = true}, rotation) => {
 	const line = new visualClasses.Line(demo, false, false, doCenter);
 	
 	line.setPosition({x: 0, y: 0});
 	
 	let height = length * 100;
-	
-	if (isWidth) {
-		height *= demo.ratioImage;
-	}
 	
 	if (doCenter) {
 		height /= 2;
@@ -290,10 +287,10 @@ const visualisers = {
 			}
 		};
 	},
-	x: (scope, id) => getLine(scope[id], 0, true),
-	y: (scope, id) => getLine(scope[id], DEGREES[90], false),
-	xvp: (scope, id) => getLine(scope[id], DEGREES[90] - demo.rotation, true),
-	yvp: (scope, id) => getLine(scope[id], DEGREES[180] - demo.rotation, false),
+	x: (scope, id) => getLine(scope[id], 0),
+	y: (scope, id) => getLine(scope[id], DEGREES[90]),
+	xvp: (scope, id) => getLine(scope[id], DEGREES[90] - demo.rotation),
+	yvp: (scope, id) => getLine(scope[id], DEGREES[180] - demo.rotation),
 	position: (scope, id) => getLine(scope[id], scope[id].angle ?? 0),
 	angle: (scope, id) => {
 		const value = scope[id].value;
