@@ -50,7 +50,7 @@ export default class {
 	sizesImage = {};
 	sizesViewport = {};
 	
-	position = position;
+	position = {...position};
 	rotation = rotation;
 	zoom = zoom;
 	
