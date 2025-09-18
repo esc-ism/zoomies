@@ -58,6 +58,12 @@ export const getSnapTweens = (demo, getRatio) => [
 	{getParam: getSnapVars.bind(null, demo, getRatio)},
 ];
 
+const get45Button = (demo, rotation, ratioImage) => getButton(
+	`${rotation}°`,
+	[({zoomPoints}) => [{zoom: Math.max(zoomPoints[0].z, zoomPoints[3].z), position: 0, rotation: DEGREES[rotation], ratioImage}]],
+	{getParam: () => getVarGetter(demo, DEGREES[rotation], demo.ratioViewport / ratioImage)()},
+);
+
 const functions = [
 	...SHARED_FUNCTIONS,
 	{op: 'func', id: 'getIntersection', args: ['viewportX', 'viewportY', 'axisY', 'cornerX', 'axisZoom'], type: ['x', 'y', 'zoom'], pair: [1, 0], and: [
@@ -443,7 +449,7 @@ export default (wrapper) => {
 			[
 				'Let\'s start by seeing how that ',
 				getButton('problematic demo state', [[badTweens]]),
-				' looks on this new system',
+				' looks on this new system.',
 			],
 			[
 				'Much better!',
@@ -553,25 +559,28 @@ export default (wrapper) => {
 				], {getParam: getDirectVars}),
 				' to an offscreen corner.',
 				'On the other, for any image aspect ratio other than 1:1, there are windows of rotation values around ',
-				getButton('45°', [[{rotation: DEGREES[45], ratioImage: 0.8}]]),
+				get45Button(demo, 45, 0.8),
 				', ',
-				getButton('135°', [[{rotation: DEGREES[135], ratioImage: 1.2}]]),
+				get45Button(demo, 135, 1.2),
 				', ',
-				getButton('225°', [[{rotation: DEGREES[225], ratioImage: 0.5}]]),
+				get45Button(demo, 225, 0.5),
 				' and ',
-				getButton('315°', [[{rotation: DEGREES[315], ratioImage: 1.5}]]),
+				get45Button(demo, 315, 1.5),
 				' where preferred axes can\'t be used.',
-				'This leads to two issues.',
-				'First is that panning paths become far from optimal.',
-				'Second is that bounds don\'t travel fluidly when rotating, with a breakdown of the linear travel of image corners between viewport corners.',
-				'This behaviour gets ',
-				getButton('increasingly worse', [
+			],
+			[
+				'Bounds jump around when rotating into and out of these windows.',
+				'Within them, at low zooms, the system forces sub-optimal panning paths while providing insufficiently restrictive pan limits.',
+			],
+			[
+				'As image aspect ratio gets more extreme, these windows get increasingly wide and the issues get ',
+				getButton('increasingly severe', [
 					[{position: 0.5}, {duration: 0}],
 					[{ratioImage: 2, zoom: 1}],
 					[{rotation: DEGREES[90]}, {duration: 2, delay: 0.2}],
 					[{rotation: 0}, {ease: 'none', duration: 5}],
 				], {getParam: getDirectVars}),
-				' as image aspect ratio gets more extreme.',
+				'.',
 			],
 			{
 				tag: 'h2',

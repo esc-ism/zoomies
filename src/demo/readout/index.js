@@ -16,10 +16,10 @@ export default class {
 		this.element.style.whiteSpace = 'nowrap';
 		this.element.style.backgroundColor = '#000000a0';
 		this.element.style.borderCollapse = 'collapse';
-		this.element.style.fontFamily = 'courier-new, monospace';
-		this.element.style.fontSize = '16px';
+		// perpetua
+		this.element.style.font = 'bold 16px "courier new", monospace';
 		this.element.style.boxShadow = 'black 0 0 6px 1px';
-		this.element.style.textShadow = '0px 0px 2px #00ff7e;';
+		this.element.style.textShadow = '0px 0px 1px #00ff7e';
 		
 		const body = document.createElement('tbody');
 		

@@ -51,7 +51,7 @@ export default (wrapper) => {
 			getInstruction(
 				[
 					'Below is our first code demonstration.',
-					'These demonstrate the inner workings of systems.',
+					'These demonstrate systems\' inner workings.',
 				],
 				[
 					'Mouse over a variable name without moving to see its internal value.',

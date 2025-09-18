@@ -127,10 +127,14 @@ export default (wrapper) => {
 		getText(
 			{
 				content: [
-					'Hello! I\'m Callum.',
-					'I\'m a front-end developer who has spent the past two years working on panning problems.',
-					'Specifically, I\'ve been working on pan-limiting where zoom, rotation and aspect ratios (for both image and viewport) are variable.',
-					'This website serves as my essay on panning, discussing problems and demonstrating solutions.',
+					[
+						'Hello! I\'m Callum.',
+						'I\'m a front-end developer who has spent the past two years working on panning problems.',
+					],
+					[
+						'Specifically, I\'ve been working on pan-limiting where zoom, rotation and aspect ratios (for both image and viewport) are variable.',
+						'This website serves as my essay on the subject, discussing problems and demonstrating solutions.',
+					],
 				],
 			},
 			getInstruction(['Hit your right arrow key to continue.']),

@@ -96,7 +96,7 @@ export default (wrapper) => {
 			[
 				'It\'s hard to beat this system for pan-limiting; it can\'t be improved without also making concessions.',
 				'As a snap-panning system, however, it\'s useless.',
-				'If an image can be rotated, I\'d advocate for using this system for pan-limiting and an upcoming system for snap-panning.',
+				'I\'d advocate for using this system for pan-limiting and an upcoming system for snap-panning.',
 				'If your image can\'t be rotated, I\'d recommend the next system up.',
 			],
 		),

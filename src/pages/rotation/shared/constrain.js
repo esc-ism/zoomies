@@ -1,3 +1,4 @@
+import {DEGREES} from '@/shared';
 import {getFlipped, getLine, getLineX, getLineY, getM, isAbove, isRight} from '.';
 
 const get2DConstrained = (() => {
@@ -91,14 +92,14 @@ const get2DConstrained = (() => {
 })();
 
 const get1DConstrainer = (() => {
-	const getTangents = (m, point) => {
+	const getTangents = (m, point, ratioImage) => {
 		const isSide = Math.abs(m) < 1;
-		
-		const linePoint = getLine(m, point);
+		const line = getLine(m, point);
+		const rotation = Math.atan(m / ratioImage);
 		
 		return [
-			[point, {line: linePoint, isSide, isHigh: false}, 'line'],
-			[point, {line: linePoint, isSide, isHigh: true}, 'line'],
+			[point, {line, rotation: rotation - Math.PI, isSide, isHigh: false}, 'line'],
+			[point, {line, rotation, isSide, isHigh: true}, 'line'],
 		];
 	};
 	
@@ -108,7 +109,7 @@ const get1DConstrainer = (() => {
 		return ({[main]: value}) => ({[main]: Math.max(-limit, Math.min(limit, value)), [sub]: 0});
 	};
 	
-	return (point) => {
+	return (point, ratioImage) => {
 		const flipped = getFlipped(point);
 		const line = {
 			...(point.x < 0 ? flipped : point),
@@ -116,7 +117,7 @@ const get1DConstrainer = (() => {
 			c: 0,
 		};
 		
-		const tangentM = -1 / line.m;
+		const tangentM = -Math.pow(ratioImage, 2) / line.m;
 		
 		return [
 			(() => {
@@ -136,7 +137,7 @@ const get1DConstrainer = (() => {
 					return {x, y: getLineY(line, x)};
 				};
 			})(),
-			[point, flipped], getTangents(tangentM, point),
+			[point, flipped], getTangents(tangentM, point, ratioImage),
 		];
 	};
 })();
@@ -149,9 +150,11 @@ const getFrame = (() => {
 			(lines[high].c > lines[low].c) :
 			(lines[high].x > lines[low].x);
 	
-	const setHighTangent = (source, a, b, ...copies) => {
+	const setHighTangent = (rotation, source, a, b, ...copies) => {
 		const isHigh = source.isSide ? isHighTop : isHighSide;
 		const [low, high] = isHigh(source, a, b) ? [b, a] : [a, b];
+		
+		const rotationIsHigh = source.isSide ? (Math.abs(rotation) < DEGREES[90]) : (rotation > 0);
 		
 		for (const tangent of [source, ...copies]) {
 			tangent.low = tangent[low];
@@ -159,6 +162,8 @@ const getFrame = (() => {
 			
 			tangent[low].isHigh = false;
 			tangent[high].isHigh = true;
+			
+			tangent.rotation = (rotationIsHigh !== tangent.isHigh) ? (rotation - Math.PI) : rotation;
 		}
 	};
 	
@@ -169,15 +174,17 @@ const getFrame = (() => {
 		array[i1] = temp;
 	};
 	
-	return (point0, point1) => {
+	// todo pass imageRatio and adjust tangent gradients accordingly
+	//  same for 1d
+	return (point0, point1, ratioImage) => {
 		const flipped0 = getFlipped(point0);
 		const flipped1 = getFlipped(point1);
 		
 		const m0 = getM(point0, point1);
 		const m1 = getM(flipped0, point1);
 		
-		const tangentM0 = -1 / m0;
-		const tangentM1 = -1 / m1;
+		const tangentM0 = -Math.pow(ratioImage, 2) / m0;
+		const tangentM1 = -Math.pow(ratioImage, 2) / m1;
 		
 		const lines = {
 			top: getLine(m0, point0),
@@ -225,8 +232,8 @@ const getFrame = (() => {
 		tangents.right.isHigh = (tangents.right.isSide ? isHighSide : isHighTop)(lines, 'right', 'left');
 		tangents.left.isHigh = !tangents.right.isHigh;
 		
-		setHighTangent(tangents.top, 'left', 'right', tangents.bottom);
-		setHighTangent(tangents.right, 'bottom', 'top', tangents.left);
+		setHighTangent(Math.atan(tangentM0 / ratioImage), tangents.top, 'left', 'right', tangents.bottom);
+		setHighTangent(Math.atan(tangentM1 / ratioImage), tangents.right, 'bottom', 'top', tangents.left);
 		
 		// checking for flips in complete viewport-axis
 		// maybe doesn't work in crazy edge cases?
@@ -257,20 +264,20 @@ const getFrame = (() => {
 	};
 })();
 
-export default (point0, point1) => {
+export default (point0, point1, ratioImage) => {
 	if (!point0 && !point1) {
 		return [() => ({x: 0, y: 0}), [], []];
 	}
 	
 	if (!point0 || !point1) {
-		return get1DConstrainer(point0 || point1);
+		return get1DConstrainer(point0 || point1, ratioImage);
 	}
 	
 	if (point0.isFirst && point1.isFirst && point0.axis === point1.axis) {
-		return get1DConstrainer(point0.p > point1.p ? point0 : point1);
+		return get1DConstrainer(point0.p > point1.p ? point0 : point1, ratioImage);
 	}
 	
-	const [points, lines, tangents] = getFrame(point0, point1);
+	const [points, lines, tangents] = getFrame(point0, point1, ratioImage);
 	
 	return [
 		get2DConstrained.bind(null, points, lines, tangents), Object.values(points), [

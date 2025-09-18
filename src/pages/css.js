@@ -46,7 +46,7 @@ addRule(`.${CLASS_MATH} math`, {
 	display: 'block',
 });
 
-const buttonColour = '#d4acfd';
+const buttonColour = '#eaacfd';
 
 addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}`, {
 	color: buttonColour,
@@ -70,6 +70,7 @@ addRule([`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::before`, `.${CLASS_WRAPPER} .
 
 addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {
 	'font-weight': 'bold',
+	'font-size': '0.9em',
 	background: 'rgb(87 78 0)',
 	padding: '0 23px',
 	'border-radius': '10px',

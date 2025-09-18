@@ -82,6 +82,7 @@ export default class extends Demo {
 		return getConstrainerFromPoints(
 			getBound(this.zoom, this.zoomPoints[0], true),
 			getBound(this.zoom, this.zoomPoints[1], false),
+			this.ratioImage,
 		);
 	}
 	

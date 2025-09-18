@@ -30,30 +30,26 @@ class BoundLines extends Hideables {
 }
 
 export default class {
-	element = document.createElement('div');
 	background = document.createElement('div');
 	lines = [];
 	
 	constructor(demo) {
-		this.element.style.height = this.element.style.width = '100%';
-		this.element.style.pointerEvents = 'none';
+		const containers = demo.constructor.elements;
 		
 		this.background.style.height = this.background.style.width = '100%';
 		this.background.style.position = 'absolute';
 		this.background.style.backgroundColor = '#00000050';
 		
-		this.element.appendChild(this.background);
+		containers.boundLimit.appendChild(this.background);
 		
 		// 1d
-		this.lines[0] = new BoundLine(demo, false, false, false, this.element);
+		this.lines[0] = new BoundLine(demo, false, false, false, containers.boundLine);
 		// 2d
-		this.lines[1] = new BoundLines(2, demo, false, false, true, this.element);
-		
-		demo.constructor.elements.imageWrapper.insertBefore(this.element, demo.constructor.target.element);
+		this.lines[1] = new BoundLines(2, demo, false, false, true, containers.boundLine);
 	}
 	
 	remove() {
-		this.element.remove();
+		this.background.remove();
 		
 		this.lines[0].remove();
 		this.lines[1].remove();

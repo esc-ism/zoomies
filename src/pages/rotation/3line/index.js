@@ -166,7 +166,7 @@ export default (wrapper) => {
 			],
 			[
 				'In handling rotation, we sacrifice code efficiency and intuitive bounds relative to those "perfect" systems.',
-				'To reiterate, I recommend using the "Viewport Center" system for pan-limiting, since it\'s unbeatable on those two fronts.',
+				'To reiterate, I recommend using the "Viewport Center" system for pan-limiting since it\'s unbeatable on those two fronts.',
 				'Furthermore, the difference between this system and the prior as a snap-pan facilitator is negligible;',
 				'If pan-limiting isn\'t a concern, both have valid candidacy for implementation.',
 			],

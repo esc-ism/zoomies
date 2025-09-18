@@ -31,6 +31,7 @@ const functions = [
 			]},
 			{op: 'return', and: [0, 0]},
 		]},
+		'',
 		{op: '=', id: 'progress', and: {
 			op: '/', and: [
 				'zoom',
@@ -140,7 +141,7 @@ export default (wrapper) => {
 			},
 			[
 				'Because the last system was so simple, it\'s obvious that there\'s no way to improve its behaviour for un-rotated images.',
-				'This won\'t be case for rotated images;',
+				'This won\'t be the case for rotated images;',
 				'there are myriad approaches to pan-limiting, some more effective than others, but no clear "perfect" solution.',
 				'Here, I\'ll again start with the most simple.',
 			],

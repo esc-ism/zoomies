@@ -28,7 +28,7 @@ export default (wrapper) => {
 			},
 			{
 				tag: 'p',
-				style: {whiteSpace: 'pre', textAlign: 'center', lineHeight: 'normal', fontFamily: 'courier-new, monospace'},
+				style: {whiteSpace: 'pre', textAlign: 'center', lineHeight: 'normal', fontFamily: 'consolas, monospace'},
 				content: [
 					'╔════════╦════════════════╦══════════╗', {tag: 'br'},
 					'║ ', {tag: 'strong', content: 'ACTION'}, ' ║     ', {tag: 'strong', content: 'MOUSE'}, '      ║ ', {tag: 'strong', content: 'KEYBOARD'}, ' ║', {tag: 'br'},
@@ -55,7 +55,7 @@ export default (wrapper) => {
 			getInstruction([
 				'Notice the pink text below?',
 				'Placing your cursor over pink text will demonstrate relevant concepts.',
-				'Clicking this text will skip to the end of demonstrations and set your playground state.',
+				'Click pink text to skip to the end of demonstrations and set your playground state.',
 			]),
 			[
 				'A competent user of this system may ',

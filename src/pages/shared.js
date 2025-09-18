@@ -139,7 +139,7 @@ export const getText = (...children) => {
 	wrapper.style.overflow = 'auto';
 	wrapper.style.scrollbarColor = 'var(--color) transparent';
 	wrapper.style.flexGrow = '1';
-	wrapper.style.lineHeight = '1.3';
+	wrapper.style.lineHeight = '1.25';
 	
 	wrapper.classList.add(CLASS_WRAPPER);
 	

@@ -9,9 +9,7 @@ export default class {
 	crosshair = CROSSHAIR.cloneNode(true);
 	
 	constructor(demo) {
-		this.element.style.width = this.element.style.height = '100%';
-		this.element.style.zIndex = '1';
-		this.element.style.pointerEvents = 'none';
+		this.element.style.display = 'contents';
 		
 		this.element.append(this.crosshair);
 		
@@ -24,7 +22,7 @@ export default class {
 		
 		setLineStyle(this.line.element);
 		
-		demo.elements.imageWrapper.append(this.element);
+		demo.elements.imageWrapper.appendChild(this.element);
 		
 		this.hide();
 	}

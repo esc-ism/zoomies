@@ -112,6 +112,11 @@ generate('imageWrapper', paths.viewport, {
 	image.classList.add(CLASS_IMAGE);
 })();
 
+export const CONTAINER_BOUND_LIMIT = generate('boundLimit', paths.imageWrapper, {display: 'contents'});
+export const CONTAINER_RAIL = generate('rail', paths.imageWrapper, {display: 'contents'});
+export const CONTAINER_BOUND_LINE = generate('boundLine', paths.imageWrapper, {display: 'contents'});
+export const CONTAINER_TANGENTS = generate('tangents', paths.imageWrapper, {display: 'contents'});
+
 export const CROSSHAIR = generate('crosshair', paths.viewport, {
 	position: 'absolute',
 	top: '50%',

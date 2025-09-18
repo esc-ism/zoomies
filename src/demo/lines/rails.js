@@ -32,11 +32,13 @@ class Rail extends Connection {
 }
 
 export default class extends Hideables {
-	constructor(count, ...args) {
+	constructor(count, demo, flipX, flipY, flipBoth) {
 		super();
 		
+		const container = demo.constructor.elements.rail;
+		
 		for (let i = 0; i < count; ++i) {
-			this[i] = new Rail(...args);
+			this[i] = new Rail(demo, flipX, flipY, flipBoth, container);
 		}
 	}
 	

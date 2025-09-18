@@ -5,6 +5,7 @@ import Tangents from '@/demo/lines/tangents';
 
 import {CORNERS} from '../consts';
 import {getBound} from '../rotation/shared';
+import {DEGREES} from '@/shared';
 
 export default class extends Demo {
 	bounds = new Bounds(this);
@@ -15,47 +16,27 @@ export default class extends Demo {
 	setRailsProgress() {
 		if (!this.bound) {
 			this.rails.setProgress(0, 0);
-		} else if ('c' in this.bound) {
+		} else if (this.bound.isFirst) {
 			this.rails.setProgress(this.bound[this.lowAxis] / this.zoomPoints[1][this.lowAxis], 0);
 		} else {
 			this.rails.setProgress(1, 1 - this.zoomPoints[1].z / this.zoom);
 		}
 	}
 	
-	getXTangents(topLeft, topRight) {
-		if (!this.bound || this.bound.x <= 0) {
-			return [];
+	setTangents(topRight) {
+		const tangents = [];
+		
+		if (this.bound) {
+			if (this.bound.x > 0) {
+				tangents.push([topRight, {rotation: DEGREES[90]}]);
+			}
+			
+			if (this.bound.y > 0) {
+				tangents.push([topRight, {rotation: 0}]);
+			}
 		}
 		
-		return [
-			[
-				topRight, {
-					value: {c: this.bound.y, m: Infinity, ...topRight},
-					isHigh: true,
-					isSide: false,
-				}, 'value',
-			],
-		];
-	}
-	
-	getYTangents(topLeft, topRight) {
-		if (!this.bound || this.bound.y <= 0) {
-			return [];
-		}
-		
-		return [
-			[
-				topRight, {
-					value: {c: this.bound.y, m: 0, ...topRight},
-					isHigh: true,
-					isSide: true,
-				}, 'value',
-			],
-		];
-	}
-	
-	setTangents(...args) {
-		this.tangents.set(...this.getXTangents(...args), ...this.getYTangents(...args));
+		this.tangents.set(...tangents);
 	}
 	
 	setZoomPoints() {
@@ -97,7 +78,7 @@ export default class extends Demo {
 			const bottomRight = {x: this.bound.x, y: -this.bound.y};
 			
 			this.bounds.set(topLeft, topRight, bottomRight, bottomLeft);
-			this.setTangents(topLeft, topRight, bottomLeft, bottomRight);
+			this.setTangents(topRight);
 		}
 	}
 	
