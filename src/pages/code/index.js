@@ -54,6 +54,13 @@ const getIndents = (depth) => {
 };
 
 export const register = (newDemo, statements = []) => {
+	init = newDemo.init().then(() => {
+		reset();
+		
+		if (newDemo.isRemoved) {
+			return Promise.reject();
+		}
+	});
 	demo = newDemo;
 	refreshParams.length = 0;
 	
@@ -98,9 +105,6 @@ export const register = (newDemo, statements = []) => {
 			return {wrapper: funcWrapper, target: funcElement};
 		},
 	]));
-	
-	// todo I don't totally get this
-	init = demo.init().then(() => reset());
 };
 
 const getElement = (...classes) => {
@@ -372,8 +376,6 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 	if (doShowVisuals) {
 		element.style.color = '#9fd49f';
 	}
-	
-	element.style.cursor = 'pointer';
 	
 	if (id && 'value' in scope[id]) {
 		element.setAttribute('title', getTitle(scope[id].value, scope[id].type));

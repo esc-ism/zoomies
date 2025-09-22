@@ -1,6 +1,7 @@
 import {addRule} from '@css';
 
-import {CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION, CLASS_MATH, CLASS_MATH_EQUATION} from './consts';
+import {CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION,
+	CLASS_MATH, CLASS_MATH_EQUATION, CLASS_EXPAND_OFF, CLASS_EXPANDABLE} from './consts';
 
 addRule([`.${CLASS_CODE}`, `.${CLASS_MATH}`], {
 	'box-shadow': 'white 0 0 2px',

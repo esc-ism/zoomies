@@ -2,7 +2,10 @@ import {getIdGetter} from '@css';
 
 import {generateWhenReady as generateCode} from './code';
 
-import {CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET, CLASS_INSTRUCTION} from './consts';
+import {
+	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
+	CLASS_INSTRUCTION, CLASS_EXPAND_OFF, CLASS_EXPANDABLE,
+} from './consts';
 
 const getCodeId = getIdGetter('text', 'code');
 
@@ -139,7 +142,7 @@ export const getText = (...children) => {
 	wrapper.style.overflow = 'auto';
 	wrapper.style.scrollbarColor = 'var(--color) transparent';
 	wrapper.style.flexGrow = '1';
-	wrapper.style.lineHeight = '1.25';
+	wrapper.style.lineHeight = '1.2';
 	
 	wrapper.classList.add(CLASS_WRAPPER);
 	

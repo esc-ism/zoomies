@@ -1,6 +1,18 @@
 import {getText, getButton, registerDemo, getInstruction} from '../shared';
 
+import getRestartButton from './restart';
+
 import Demo from './demo';
+
+const instructions = [
+	{text: ['Pan by dragging with the left mouse button.'], key: 'pan'},
+	{text: ['Drag with your right mouse button to rotate.'], key: 'rotate'},
+	{text: ['Use your mouse wheel to zoom in and out.'], key: 'zoom'},
+	{text: ['Zoom while holding the control button on your keyboard to adjust image aspect ratio.'], key: 'resizeImage'},
+	{text: ['Drag the vertical bar to the right of the playground to adjust viewport aspect ratio.'], key: 'resizeViewport'},
+	{text: ['To reset viewport aspect ratio, right click the bar you used to adjust it.'], key: 'resetViewport'},
+	{text: ['Finally, right click on the viewport to reset the image.'], key: 'resetImage'},
+];
 
 export default (wrapper) => {
 	const demo = new Demo();
@@ -15,38 +27,71 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 				content: 'Unbound',
 			},
-			'First thing\'s first: why is pan-limiting necessary?',
 			[
-				'To the left is our first pan-limiting playground.',
-				'This particular playground neglects to limit panning.',
-				'Try it out!',
+				'Firstly, I\'d like to touch on why pan-limiting is necessary.',
 			],
 			{
-				tag: 'h2',
-				style: {textAlign: 'center'},
-				content: 'Controls',
+				style: {fontStyle: 'italic'},
+				content: 'Wait, before that, what\'s the thing to the left?',
 			},
-			{
-				tag: 'p',
-				style: {whiteSpace: 'pre', textAlign: 'center', lineHeight: 'normal', fontFamily: 'consolas, monospace'},
-				content: [
-					'╔════════╦════════════════╦══════════╗', {tag: 'br'},
-					'║ ', {tag: 'strong', content: 'ACTION'}, ' ║     ', {tag: 'strong', content: 'MOUSE'}, '      ║ ', {tag: 'strong', content: 'KEYBOARD'}, ' ║', {tag: 'br'},
-					'╠════════╬═══════╦════════╬══════════╣', {tag: 'br'},
-					'║ Pan    ║ Drag  ║ Left   ║          ║', {tag: 'br'},
-					'╠════════╬═══════╣ Mouse  ╠══════════╣', {tag: 'br'},
-					'║ Snap   ║ Click ║ Button ║          ║', {tag: 'br'},
-					'╠════════╬═══════╩════════╬══════════╣', {tag: 'br'},
-					'║ Zoom   ║                ║          ║', {tag: 'br'},
-					'╠════════╣ Scroll Wheel   ╠══════════╣', {tag: 'br'},
-					'║ Scale  ║                ║ ctrl     ║', {tag: 'br'},
-					'╠════════╬═══════╦════════╬══════════╣', {tag: 'br'},
-					'║ Rotate ║ Drag  ║ Right  ║          ║', {tag: 'br'},
-					'╠════════╬═══════╣ Mouse  ╠══════════╣', {tag: 'br'},
-					'║ Reset  ║ Click ║ Button ║          ║', {tag: 'br'},
-					'╚════════╩═══════╩════════╩══════════╝',
-				],
-			},
+			[
+				'Glad you asked!',
+				'It\'s our first pan-limiting playground.',
+				'The colourful, spotted square is the "image" and it\'s being seen through the "viewport".',
+				'Follow along with the dark-yellow box below to see what you can do with it.',
+			],
+			{...getInstruction([]), callback: async (container) => {
+				const element = container.firstChild;
+				const button = getRestartButton();
+				
+				container.appendChild(button);
+				
+				container.style.position = 'relative';
+				
+				element.style.transition = button.style.transition = 'opacity 0.6s ease-out';
+				
+				while (true) {
+					for (const {text, key} of instructions) {
+						element.style.opacity = '1';
+						element.innerText = text;
+						
+						await new Promise((resolve) => {
+							demo.actionPromises[key] = resolve;
+						});
+						
+						element.style.opacity = '0';
+						
+						await new Promise((resolve) => {
+							element.addEventListener('transitionend', resolve, {once: true});
+						});
+					}
+					
+					element.style.position = 'absolute';
+					
+					button.style.removeProperty('position');
+					button.style.opacity = '1';
+					
+					container.style.cursor = 'pointer';
+					await new Promise((resolve) => {
+						container.addEventListener('click', resolve, {once: true});
+					});
+					
+					container.style.removeProperty('cursor');
+					button.style.opacity = '0';
+					
+					await new Promise((resolve) => {
+						button.addEventListener('transitionend', resolve, {once: true});
+					});
+					
+					element.style.removeProperty('position');
+					button.style.position = 'absolute';
+				}
+			}},
+			[
+				'Each webpage will provide a playground for a unique pan-limiting system.',
+				'To illustrate the value of pan-limiting, I\'m starting with a system that neglects it.',
+				'Let\'s get into its issues.',
+			],
 			{
 				tag: 'h2',
 				style: {textAlign: 'center'},
@@ -54,7 +99,7 @@ export default (wrapper) => {
 			},
 			getInstruction([
 				'Notice the pink text below?',
-				'Placing your cursor over pink text will demonstrate relevant concepts.',
+				'Holding your cursor over pink text will demonstrate relevant concepts.',
 				'Click pink text to skip to the end of demonstrations and set your playground state.',
 			]),
 			[
@@ -78,7 +123,7 @@ export default (wrapper) => {
 			],
 			[
 				'Additionally, more advanced pan-limiting systems can take a position and derive an appropriate zoom level.',
-				'This turns out to be a useful feature when span-panning, but that\'s a topic for the next page.',
+				'This turns out to be a useful feature when span-panning, but that\'s a topic for later.',
 			],
 			{
 				tag: 'h2',
@@ -87,8 +132,9 @@ export default (wrapper) => {
 			},
 			[
 				'Some degree of pan limiting is important.',
-				'Let\'s move on and take a look at the minimum viable product.',
+				'Like how game developers endeavour to keep players in-bounds, a good pan-limiting system keeps the viewport attached to its content.',
 			],
+			'Let\'s move on and take a look at the minimum viable product.',
 		),
 	);
 	

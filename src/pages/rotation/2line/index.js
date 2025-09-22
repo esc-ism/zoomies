@@ -439,7 +439,6 @@ export default (wrapper) => {
 	
 	wrapper.append(
 		demo.constructor.element,
-		
 		getText(
 			{
 				tag: 'h1',

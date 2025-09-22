@@ -1,11 +1,17 @@
 import {DEGREES, xmlns} from '@/shared';
 import {CLASS_MATH, CLASS_MATH_EQUATION} from '../consts';
 
+import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions} from '../code';
 import {getText, getCode, getButton, registerDemo, getInstruction} from '../shared';
 import {getSnapPosition} from '../center';
 
 import Demo from './demo';
+
+const refreshButton = getRefreshButton();
+
+refreshButton.style.height = '1em';
+refreshButton.style.verticalAlign = 'text-top';
 
 export default (wrapper) => {
 	const demo = new Demo();
@@ -15,7 +21,6 @@ export default (wrapper) => {
 	
 	wrapper.append(
 		demo.constructor.element,
-		
 		getText(
 			{
 				tag: 'h1',
@@ -50,19 +55,15 @@ export default (wrapper) => {
 			],
 			getInstruction(
 				[
-					'Below is our first code demonstration.',
-					'These demonstrate systems\' inner workings.',
+					'Below is our first code snippet.',
+					'These are interactive versions of system internals, showing exactly how they work.',
 				],
 				[
-					'Mouse over a variable name without moving to see its internal value.',
-					'If the name is green, you\'ll see a visual representation of its value in the playground.',
+					'Greyed out code is unexecuted.',
+					'Mouse over a variable in executed code without moving to see its value.',
+					'If the variable is green, you\'ll see a visualisation of its value in the playground.',
 				],
-				[
-					'Conditions choose a branch of code to execute.',
-					'They will have a green or red background depending on their truthiness.',
-					'Unexecuted branches will be greyed-out.',
-				],
-				['The two top-right buttons update code to the current playground state and fullscreen the demonstration respectively.'],
+				['After changing playground state, code won\'t be up to date until it\'s rerun via the ', refreshButton, ' button at its top-right corner.'],
 			),
 			getCode([
 				{op: '=', id: 'boundX', type: 'x', and: {

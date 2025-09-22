@@ -77,8 +77,9 @@ for (const [name, color] of [
 
 addRule(`.${CLASS_NAMES.evocation}`, {color: 'rgb(212 188 0)'});
 
-addRule(`.${CLASS_NAMES.branch.accept} > :not(.${CLASS_NAMES.inactive} *)`, {'background-color': 'rgb(0 255 0 / 10%)'});
-addRule(`.${CLASS_NAMES.branch.reject} > :not(.${CLASS_NAMES.inactive} *)`, {'background-color': 'rgb(255 0 0 / 10%)'});
+for (const [name, colour] of [['accept', 'rgb(0 255 0 / 10%)'], ['reject', 'rgb(255 0 0 / 10%)']]) {
+	addRule(`.${CLASS_NAMES.branch[name]} > :not(.${CLASS_NAMES.inactive} *)`, {'background-image': `linear-gradient(${colour}, ${colour})`});
+}
 
 addRule([
 	`.${CLASS_NAMES.hovered}:not(.${CLASS_NAMES.csv})`,

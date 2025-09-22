@@ -47,10 +47,123 @@ export default class {
 	
 	static target = new Target(this);
 	
+	static listeners = {
+		zoom({deltaY, deltaMode}) {
+			const increment = deltaY * MULTIPLIERS_SCROLL[deltaMode] / -1000;
+			
+			if (increment > 0) {
+				this.zoom *= 1 + increment;
+			} else {
+				this.zoom /= 1 - increment;
+			}
+			
+			this.constrainPosition({zoom: true});
+			
+			this.applyPosition();
+			this.applyZoom();
+		},
+		resizeViewport(offsetX, {clientX}) {
+			this.ratioViewport = (clientX - offsetX) / this.sizesViewport.height;
+		},
+		resizeImage({deltaY, deltaMode}) {
+			const increment = deltaY * MULTIPLIERS_SCROLL[deltaMode] / -1000;
+			
+			if (increment > 0) {
+				this.ratioImage *= 1 + increment;
+			} else {
+				this.ratioImage /= 1 - increment;
+			}
+		},
+		resetViewport() {
+			this.ratioViewport = 1;
+		},
+		pan() {
+			let priorEvent;
+			
+			const change = {x: 0, y: 0};
+			
+			return ({offsetX, offsetY, ctrlKey}) => {
+				if (priorEvent) {
+					change.x = priorEvent.offsetX + change.x - offsetX;
+					change.y = change.y + offsetY - priorEvent.offsetY;
+					
+					this.position.x += change.x / this.sizesImage.width;
+					this.position.y += change.y / this.sizesImage.height;
+					
+					const target = {...this.position};
+					
+					if (!ctrlKey) {
+						this.constrainPosition({position: true});
+					}
+					
+					this.constructor.target.set(target);
+					
+					this.applyPosition();
+				}
+				
+				// events in firefox seem to lose their data after finishing propagation
+				// so assigning the whole event doesn't work
+				priorEvent = {offsetX, offsetY};
+			};
+		},
+		rotate() {
+			const {left, top} = this.constructor.elements.viewport.getBoundingClientRect();
+			const middleX = left + this.sizesViewport.halfWidth;
+			const middleY = top + this.sizesViewport.halfHeight;
+			
+			let priorMouseTheta;
+			let startRotation = this.rotation;
+			
+			return (event) => {
+				const mouseTheta = getTheta(event.clientX, event.clientY, middleX, middleY);
+				
+				if (priorMouseTheta === undefined) {
+					priorMouseTheta = mouseTheta;
+					
+					return;
+				}
+				
+				this.rotation = startRotation + (priorMouseTheta - mouseTheta);
+				
+				const target = {...this.position};
+				
+				this.constrainRotation();
+				this.constrainPosition({rotation: true});
+				
+				this.constructor.target.set(target);
+				
+				this.applyRotation();
+				this.applyPosition();
+			};
+		},
+		snap(offsetX, offsetY) {
+			this.position.x = (offsetX / this.sizesImage.width) - 0.5;
+			this.position.y = (-offsetY / this.sizesImage.height) + 0.5;
+			
+			this.constrainZoom();
+			
+			this.applyZoom();
+			this.applyPosition();
+		},
+		resetImage() {
+			this.zoom = 1;
+			this.rotation = DEGREES[90];
+			
+			this.applyZoom();
+			this.applyRotation();
+			
+			this.position.x = this.position.y = 0;
+			this.ratioImage = 1;
+		},
+		
+	};
+	
+	listeners = Object.fromEntries(Object.entries(this.constructor.listeners).map(([key, listener]) => [key, listener.bind(this)]));
+	
 	sizesImage = {};
 	sizesViewport = {};
 	
-	position = {...position};
+	position = position;
 	rotation = rotation;
 	zoom = zoom;
 	
@@ -79,9 +192,9 @@ export default class {
 			.then(() => new Promise((resolve) => {
 				this.#resizeObserver = new ResizeObserver(() => {
 					if (!this.isRemoved) {
+						this.position = position;
 						this.ratioViewport = _ratioViewport;
 						this.ratioImage = _ratioImage;
-						this.position = position;
 						this.applyPosition();
 						this.applyRotation();
 						this.applyZoom();
@@ -107,7 +220,7 @@ export default class {
 		viewport.appendChild(this.constructor.progress.element);
 		
 		this.addEventListener(resizer, 'pointerdown', (event) => {
-			const {buttons, offsetX} = event;
+			const {buttons, pointerId, offsetX} = event;
 			
 			if (buttons !== 1 && buttons !== 2) {
 				return;
@@ -116,21 +229,20 @@ export default class {
 			event.stopPropagation();
 			event.preventDefault();
 			
-			resizer.setPointerCapture(event.pointerId);
+			resizer.setPointerCapture(pointerId);
 			
-			const entry = this.addEventListener(resizer, 'pointermove', (event) => {
-				this.ratioViewport = (event.clientX - offsetX) / this.sizesViewport.height;
-			});
+			const entryMove = this.addEventListener(resizer, 'pointermove', this.listeners.resizeViewport.bind(null, offsetX));
 			
-			resizer.addEventListener('pointerup', () => {
+			const entryStop = this.addEventListener(resizer, 'pointerup', () => {
 				if (buttons === 2) {
 					cancelRightClick();
 					
-					this.ratioViewport = 1;
+					this.listeners.resetViewport();
 				}
 				
-				this.removeEventListener(entry);
-			}, {once: true});
+				this.removeEventListener(entryMove);
+				this.removeEventListener(entryStop);
+			});
 		});
 		
 		this.addEventListener(viewport, 'wheel', (event) => {
@@ -141,30 +253,7 @@ export default class {
 				return;
 			}
 			
-			if (event.ctrlKey) {
-				const increment = event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] / -1000;
-				
-				if (increment > 0) {
-					this.ratioImage *= 1 + increment;
-				} else {
-					this.ratioImage /= 1 - increment;
-				}
-				
-				return;
-			}
-			
-			const increment = event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] / -1000;
-			
-			if (increment > 0) {
-				this.zoom *= 1 + increment;
-			} else {
-				this.zoom /= 1 - increment;
-			}
-			
-			this.constrainPosition({zoom: true});
-			
-			this.applyPosition();
-			this.applyZoom();
+			this.listeners[event.ctrlKey ? 'resizeImage' : 'zoom'](event);
 		});
 		
 		this.addEventListener(viewport, 'pointerdown', (event) => {
@@ -177,7 +266,7 @@ export default class {
 			event.stopPropagation();
 			event.preventDefault();
 			
-			const entryMove = this.addEventListener(viewport, 'pointermove', buttons === 1 ? this.getPanListener() : this.getRotateListener());
+			const entryMove = this.addEventListener(viewport, 'pointermove', this.listeners[buttons === 1 ? 'pan' : 'rotate']());
 			
 			image.style.cursor = 'grabbing';
 			
@@ -219,15 +308,9 @@ export default class {
 				}
 				
 				if (buttons === 1) {
-					this.position.x = (offsetX / this.sizesImage.width) - 0.5;
-					this.position.y = (-offsetY / this.sizesImage.height) + 0.5;
-					
-					this.constrainZoom();
-					
-					this.applyZoom();
-					this.applyPosition();
+					this.listeners.snap(offsetX, offsetY);
 				} else {
-					this.reset();
+					this.listeners.resetImage();
 				}
 			});
 		});
@@ -318,78 +401,6 @@ export default class {
 		
 		this.constrainPosition({ratio: true});
 		this.applyPosition();
-	}
-	
-	reset() {
-		this.zoom = 1;
-		this.rotation = DEGREES[90];
-		
-		this.applyZoom();
-		this.applyRotation();
-		
-		this.position.x = this.position.y = 0;
-		this.ratioImage = 1;
-	}
-	
-	getPanListener() {
-		let priorEvent;
-		
-		const change = {x: 0, y: 0};
-		
-		return ({offsetX, offsetY, ctrlKey}) => {
-			if (priorEvent) {
-				change.x = priorEvent.offsetX + change.x - offsetX;
-				change.y = change.y + offsetY - priorEvent.offsetY;
-				
-				this.position.x += change.x / this.sizesImage.width;
-				this.position.y += change.y / this.sizesImage.height;
-				
-				const target = {...this.position};
-				
-				if (!ctrlKey) {
-					this.constrainPosition({position: true});
-				}
-				
-				this.constructor.target.set(target);
-				
-				this.applyPosition();
-			}
-			
-			// events in firefox seem to lose their data after finishing propagation
-			// so assigning the whole event doesn't work
-			priorEvent = {offsetX, offsetY};
-		};
-	}
-	
-	getRotateListener() {
-		const {left, top} = this.constructor.elements.viewport.getBoundingClientRect();
-		const middleX = left + this.sizesViewport.halfWidth;
-		const middleY = top + this.sizesViewport.halfHeight;
-		
-		let priorMouseTheta;
-		let startRotation = this.rotation;
-		
-		return (event) => {
-			const mouseTheta = getTheta(event.clientX, event.clientY, middleX, middleY);
-			
-			if (priorMouseTheta === undefined) {
-				priorMouseTheta = mouseTheta;
-				
-				return;
-			}
-			
-			this.rotation = startRotation + (priorMouseTheta - mouseTheta);
-			
-			const target = {...this.position};
-			
-			this.constrainRotation();
-			this.constrainPosition({rotation: true});
-			
-			this.constructor.target.set(target);
-			
-			this.applyRotation();
-			this.applyPosition();
-		};
 	}
 	
 	constrainRotation() {

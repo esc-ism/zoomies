@@ -14,7 +14,7 @@ class Tangent extends Line {
 		this.show();
 		
 		// overestimation of √(½imageWidth^2 + ½imageHeight^2)
-		super.setHeight(Math.max(1, this.demo.ratioImage) * 100);
+		super.setHeight(Math.max(1, this.demo.ratioImage) * 100 / this.demo.zoom);
 		
 		this.setRotation(rotation);
 		

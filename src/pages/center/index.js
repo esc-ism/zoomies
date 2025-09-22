@@ -18,7 +18,6 @@ export default (wrapper) => {
 	
 	wrapper.append(
 		demo.constructor.element,
-		
 		getText(
 			{
 				tag: 'h1',
@@ -29,7 +28,11 @@ export default (wrapper) => {
 				'Let\'s start ',
 				getButton('limiting panning', [
 					[{zoom: 1}],
-					[{x: 0.5}, {ease: 'bounce.out', duration: 1.5}],
+					() => {
+						const axis = Math.abs(demo.position.x) >= Math.abs(demo.position.y) ? 'x' : 'y';
+						
+						return [{[axis]: demo.position[axis] <= 0 ? 0.5 : -0.5}, {ease: 'bounce.out', duration: 1.5}];
+					},
 				]),
 				'!',
 				'Here, we have the simplest reasonable system, where the center of the viewport is bound by the image.',

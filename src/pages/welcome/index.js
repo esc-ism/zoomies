@@ -126,18 +126,22 @@ export default (wrapper) => {
 		demo.constructor.element,
 		getText(
 			{
-				content: [
-					[
-						'Hello! I\'m Callum.',
-						'I\'m a front-end developer who has spent the past two years working on panning problems.',
-					],
-					[
-						'Specifically, I\'ve been working on pan-limiting where zoom, rotation and aspect ratios (for both image and viewport) are variable.',
-						'This website serves as my essay on the subject, discussing problems and demonstrating solutions.',
-					],
-				],
+				tag: 'h1',
+				content: 'Zoomies',
+				style: {textAlign: 'center'},
 			},
-			getInstruction(['Hit your right arrow key to continue.']),
+			[
+				'Hello! I\'m Callum, a programmer.',
+			],
+			[
+				'For the past two years, I\'ve been delving into panning (the thing you do to look around after zooming in).',
+				'Specifically, I\'ve been working on pan-limiting where zoom, rotation, image aspect ratio and viewport aspect ratio are all variable.',
+			],
+			[
+				'This website is a little interactive report of my findings.',
+				'It will walk you through the problem space and demonstrate solutions, ranging from trivial to the kind of thing you spend two years on.',
+			],
+			getInstruction(['Hit your right arrow key to continue. The website\'s PC only for now.']),
 		),
 	);
 	
