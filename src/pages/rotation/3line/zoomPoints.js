@@ -29,17 +29,6 @@ const getIntersection = (lineFirst, lineSecond) => {
 	return point;
 };
 
-const getProgressedMiddle = (middle, fromZ, toZ) => {
-	const mult = fromZ / toZ;
-	
-	return {
-		x: middle.x * mult,
-		y: middle.y * mult,
-	};
-};
-
-const getPositionSum = (...positions) => positions.reduce((sum, {x, y}) => ({x: sum.x + x, y: sum.y + y}), {x: 0, y: 0});
-
 const getDoFlip = (firstEnd, second, third) => {
 	const {axis} = firstEnd;
 	
@@ -54,9 +43,14 @@ const getDoFlip = (firstEnd, second, third) => {
 const getSecond = (first, z, offset) => {
 	const second = getZoomProgressed(first, first.end, z);
 	
+	const mult = first.z / z;
+	
 	second.p = getP(first, second);
 	second.z = z;
-	second.end = getPositionSum(getProgressedMiddle(first.end, first.z, z), offset, second);
+	second.end = {
+		x: first.end.x * mult + offset.x + second.x,
+		y: first.end.y * mult + offset.y + second.y,
+	};
 	
 	return second;
 };
@@ -96,7 +90,7 @@ const mod = (first, second, third, firstFlipped, secondFlipped, yIntersect) => {
 	
 	Object.assign(third, getIntersection([secondFlipped, secondFlipped.end], yIntersect));
 	
-	if (Math.abs(third.z) >= Math.abs(second.z)) {
+	if (third.z >= second.z) {
 		Object.assign(first, firstFlipped);
 		Object.assign(second, secondFlipped, {axis: true});
 		
@@ -160,7 +154,6 @@ const getAxisIntersects = ({sizesImage, sizesViewport, ratioViewport, ratioViewp
 	// todo rename
 		yIntersectSide: getXIntersect(sizesImage, sizesViewport.halfWidth, DEGREES[90] - quadrantAngle - progressAngles.side, progressAngles.side),
 		yIntersectBase: getXIntersect(sizesImage, sizesViewport.halfHeight, quadrantAngle + progressAngles.base, progressAngles.base),
-		isXIntersect: true,
 	};
 	
 	if (isEvenQuadrant) {
@@ -170,39 +163,6 @@ const getAxisIntersects = ({sizesImage, sizesViewport, ratioViewport, ratioViewp
 	}
 	
 	return intersects;
-};
-
-const getImageAxis = (intersect, corner, originZoom, isXIntersect = false) => {
-	const first = {x: 0, y: 0, z: originZoom};
-	const third = {...intersect, end: corner, isFirstInt: true};
-	
-	if (isXIntersect) {
-		if ((intersect.x >= 0) !== (corner.x >= 0)) {
-			third.x = 0;
-			third.y = getLineC({m: getM(intersect, corner), ...intersect});
-			third.z = intersect.z / (1 - third.y / corner.y);
-			
-			first.end = {x: 0, y: third.y / getProgress(originZoom, third.z)};
-			third.p = first.end.y / third.y;
-		} else {
-			first.end = {x: intersect.x / getProgress(originZoom, intersect.z), y: 0};
-			third.p = first.end.x / intersect.x;
-		}
-	} else {
-		if (third.y < 0) {
-			third.x = getLineX({m: getM(intersect, corner), c: intersect.y, ...intersect}, 0);
-			third.y = 0;
-			third.z = intersect.z / (1 - third.x / corner.x);
-			
-			first.end = {y: 0, x: third.x / getProgress(originZoom, third.z)};
-			third.p = first.end.x / third.x;
-		} else {
-			first.end = {y: intersect.y / getProgress(originZoom, intersect.z), x: 0};
-			third.p = first.end.y / intersect.y;
-		}
-	}
-	
-	return [first, first, third];
 };
 
 export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage)) => {
@@ -223,9 +183,7 @@ export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizes
 	
 	[data.right, data.top] = getPoints(data);
 	
-	let firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase;
-	
-	[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] = getAll(data);
+	const [firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] = getAll(data);
 	
 	return isEvenQuadrant ?
 			[firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] :

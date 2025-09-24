@@ -223,7 +223,6 @@ export const MULTI_LINE = [
 			op: '-', and: ['½π', 'angle'],
 		}},
 	]},
-	// todo no return type?
 	{op: 'func', id: 'getProgressed', args: ['fromX', 'fromY', 'toX', 'toY', 'lowZoom', 'highZoom'], pair: [1, 0], and: [
 		{op: '=', id: 'p', and: {
 			op: '-', and: [
@@ -245,6 +244,57 @@ export const MULTI_LINE = [
 				{op: '*', and: [
 					'p',
 					{op: '-', and: ['toY', 'fromY']},
+				]},
+			]},
+		]},
+	]},
+	// todo check if isBase works
+	{op: 'func', id: 'getProgressAngles', args: ['quadrantAngle'], type: ['angle', 'angle'], isBase: [false, true], and: [
+		{op: '=', id: 'progress', and: {
+			op: '+', and: [
+				{op: '*', and: [
+					{op: '/', and: ['quadrantAngle', '½π']},
+					-2,
+				]},
+				1,
+			],
+		}},
+		'',
+		{op: '=', id: 'angleSide', type: 'angle', and: {
+			op: 'atan', and: {
+				op: '*', and: [
+					'progress',
+					{op: '/', and: ['viewportHeight', 'viewportWidth']},
+				],
+			},
+		}},
+		{op: '=', id: 'angleBase', type: 'angle', isBase: true, and: {
+			op: 'atan', and: {
+				op: '*', and: [
+					'progress',
+					{op: '/', and: ['viewportWidth', 'viewportHeight']},
+				],
+			},
+		}},
+		'',
+		{op: 'return', and: ['angleSide', 'angleBase']},
+	]},
+	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['y', 'zoom'], and: [
+		{op: 'return', multiline: true, and: [
+			{op: '/', and: [
+				{op: '-', and: [
+					'½imageHeight',
+					{op: '*', and: ['½imageWidth', {op: 'tan', and: 'cornerAngle'}]},
+				]},
+				'imageHeight',
+			]},
+			{op: '/', and: [
+				'viewportSize',
+				{op: '*', and: [
+					{op: 'cos', and: 'progressAngle'},
+					{op: 'abs', and: {
+						op: '/', and: ['½imageWidth', {op: 'cos', and: 'cornerAngle'}],
+					}},
 				]},
 			]},
 		]},

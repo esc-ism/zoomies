@@ -126,12 +126,6 @@ const functions = [
 		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
-		{op: '=', id: 'angle', type: 'angle', and: {
-			op: '%', and: [
-				{op: '-', and: ['½π', 'rotation']},
-				'π',
-			],
-		}},
 		'',
 		{op: '=', id: ['rightX', 'rightY', 'topX', 'topY'], and: {
 			op: 'call', id: 'getViewportPoints', and: ['zoomSide', 'zoomBase'],
@@ -152,89 +146,22 @@ const functions = [
 			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
 		}},
 		'',
-		{op: '=', id: 'progress', and: {
-			op: '+', and: [
-				{op: '*', and: [
-					{op: '/', and: ['quadrantAngle', '½π']},
-					-2,
-				]},
-				1,
-			],
-		}},
-		{op: '=', id: 'angleBase', type: 'angle', isBase: true, and: {
-			op: 'atan', and: {
-				op: '*', and: [
-					'progress',
-					{op: '/', and: ['viewportWidth', 'viewportHeight']},
-				],
-			},
-		}},
-		{op: '=', id: 'angleSide', type: 'angle', and: {
-			op: 'atan', and: {
-				op: '*', and: [
-					'progress',
-					{op: '/', and: ['viewportHeight', 'viewportWidth']},
-				],
-			},
+		{op: '=', id: ['angleBase', 'angleSide'], and: {
+			op: 'call', id: 'getProgressAngles', and: ['quadrantAngle'],
 		}},
 		'',
-		{op: '=', id: 'axisIntersectSideAngle', type: 'angle', and: {
-			op: '+', and: ['quadrantAngle', 'angleSide'],
-		}},
-		{op: '=', id: 'axisIntersectSideY', type: 'y', and: {
-			op: '/', and: [
-				{op: '-', and: [
-					'½imageHeight',
-					{op: '*', and: [
-						'½imageWidth',
-						{op: 'tan', and: 'axisIntersectSideAngle'},
-					]},
-				]},
-				'imageHeight',
-			],
-		}},
-		{op: '=', id: 'axisIntersectSideZoom', type: 'zoom', and: {
-			op: '/', and: [
+		{op: '=', id: ['axisIntersectSideY', 'axisIntersectSideZoom'], and: {
+			op: 'call', id: 'getYIntersect', multiline: true, and: [
 				'½viewportWidth',
-				{op: '*', and: [
-					{op: 'cos', and: 'angleSide'},
-					{op: 'abs', and: {
-						op: '/', and: [
-							'½imageWidth',
-							{op: 'cos', and: 'axisIntersectSideAngle'},
-						],
-					}},
-				]},
+				{op: '+', and: ['quadrantAngle', 'angleSide']},
+				'angleSide',
 			],
 		}},
-		'',
-		{op: '=', id: 'axisIntersectBaseAngle', type: 'angle', and: {
-			op: '-', and: ['½π', 'quadrantAngle', 'angleBase'],
-		}},
-		{op: '=', id: 'axisIntersectBaseY', type: 'y', and: {
-			op: '/', and: [
-				{op: '-', and: [
-					'½imageHeight',
-					{op: '*', and: [
-						'½imageWidth',
-						{op: 'tan', and: 'axisIntersectBaseAngle'},
-					]},
-				]},
-				'imageHeight',
-			],
-		}},
-		{op: '=', id: 'axisIntersectBaseZoom', type: 'zoom', and: {
-			op: '/', and: [
+		{op: '=', id: ['axisIntersectBaseY', 'axisIntersectBaseZoom'], and: {
+			op: 'call', id: 'getYIntersect', multiline: true, and: [
 				'½viewportHeight',
-				{op: '*', and: [
-					{op: 'cos', and: 'angleBase'},
-					{op: 'abs', and: {
-						op: '/', and: [
-							'½imageWidth',
-							{op: 'cos', and: 'axisIntersectBaseAngle'},
-						],
-					}},
-				]},
+				{op: '-', and: ['½π', 'quadrantAngle', 'angleBase']},
+				'angleBase',
 			],
 		}},
 		'',

@@ -4,7 +4,7 @@ import {generateWhenReady as generateCode} from './code';
 
 import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
-	CLASS_INSTRUCTION, CLASS_EXPAND_OFF, CLASS_EXPANDABLE,
+	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
 } from './consts';
 
 const getCodeId = getIdGetter('text', 'code');
@@ -87,7 +87,7 @@ export const getCode = (statements) => {
 				},
 			},
 		},
-		classList: [CLASS_CODE],
+		classList: [CLASS_CODE, CLASS_FLASH_CONTAINER],
 	};
 };
 
@@ -151,5 +151,31 @@ export const getText = (...children) => {
 	return wrapper;
 };
 
-// todo add minimise/maximise toggle button
 export const getInstruction = (...content) => ({classList: [CLASS_INSTRUCTION], content});
+
+export const flash = (target) => {
+	// todo remove
+	if (!target.classList.contains(CLASS_FLASH_CONTAINER)) {
+		console.error('ohno');
+		debugger;
+	}
+	
+	const flash = document.createElement('span');
+	
+	flash.style.position = 'absolute';
+	flash.style.height = '100%';
+	flash.style.width = '100%';
+	flash.style.backgroundColor = '#777';
+	flash.style.top = '0';
+	flash.style.left = '0';
+	flash.style.opacity = '1';
+	flash.style.transition = 'opacity 0.5s ease-out';
+	
+	target.appendChild(flash);
+	
+	window.setTimeout(() => {
+		flash.style.opacity = '0';
+	}, 0);
+	
+	flash.addEventListener('transitionend', () => flash.remove(), {once: true});
+};

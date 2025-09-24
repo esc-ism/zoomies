@@ -29,8 +29,6 @@ svg.style.height = '2em';
 svg.style.verticalAlign = 'middle';
 
 container.style.textAlign = 'center';
-container.style.position = 'absolute';
-container.style.opacity = '0';
 
 svg.append(bar, triangle);
 container.appendChild(svg);

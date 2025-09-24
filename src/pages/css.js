@@ -1,7 +1,15 @@
 import {addRule} from '@css';
 
-import {CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION,
-	CLASS_MATH, CLASS_MATH_EQUATION, CLASS_EXPAND_OFF, CLASS_EXPANDABLE} from './consts';
+import {
+	CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION,
+	CLASS_MATH, CLASS_MATH_EQUATION, CLASS_FLASH_CONTAINER,
+} from './consts';
+
+addRule(`.${CLASS_FLASH_CONTAINER}`, {
+	overflow: 'hidden',
+	'box-sizing': 'border-box',
+	position: 'relative',
+});
 
 addRule([`.${CLASS_CODE}`, `.${CLASS_MATH}`], {
 	'box-shadow': 'white 0 0 2px',
@@ -11,16 +19,15 @@ addRule([`.${CLASS_CODE}`, `.${CLASS_MATH}`], {
 addRule(`.${CLASS_CODE}`, {
 	'line-height': 'normal',
 	'background-color': '#343a45',
+	position: 'relative',
+	overflow: 'hidden',
 });
 
 addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(1)`, {'text-align': '-webkit-right'});
 addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(1)`, {'text-align': 'right'});
 addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(3)`, {'text-align': 'left'});
 
-addRule(`.${CLASS_CODE} > div`, {
-	'overflow-x': 'auto',
-	position: 'relative',
-});
+addRule(`.${CLASS_CODE} > div`, {'overflow-x': 'auto'});
 
 addRule(`.${CLASS_CODE} code`, {
 	'font-family': 'consolas, monospace',
@@ -55,7 +62,6 @@ addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}`, {
 });
 
 addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}:hover`, {
-	// 'text-shadow': '0 0 6px currentcolor',
 	'background-color': buttonColour,
 	color: 'black',
 });
@@ -77,3 +83,5 @@ addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {
 	'border-radius': '10px',
 	'text-shadow': '0 0 3px black',
 });
+
+addRule(`.${CLASS_WRAPPER} svg`, {filter: 'drop-shadow(0 0 1px black)'});

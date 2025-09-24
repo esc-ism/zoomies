@@ -2,6 +2,7 @@ import {Line, Connection} from '@/demo/lines/lines';
 
 import getButtons from './buttons';
 
+import {flash} from '../shared';
 import {DEGREES, SVG_NAMESPACE} from '@/shared';
 import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED} from './consts';
 
@@ -270,24 +271,16 @@ const getLine = ({value: length, doCenter = false, isPercent = true}, rotation) 
 
 const visualisers = {
 	zoom: (scope, id) => {
-		const {zoom, position: {x, y}} = demo;
+		const {zoom} = demo;
 		
 		demo.zoom = scope[id].value;
-		// demo.position.x = demo.position.y = 0;
-		
 		demo.applyZoom();
-		demo.constrainPosition({zoom: true});
-		demo.applyPosition();
 		
 		return (isRemoval = false) => {
 			demo.zoom = zoom;
-			demo.position.x = x;
-			demo.position.y = y;
 			
 			if (!isRemoval) {
 				demo.applyZoom();
-				demo.constrainPosition({zoom: true});
-				demo.applyPosition();
 			}
 		};
 	},
@@ -681,6 +674,7 @@ const interpretters = {
 		
 		const {target, wrapper, ...result} = functions[statement.id](csvs, {...scope}, indent, meta);
 		
+		// todo don't set if unexecuted
 		id.setAttribute('title', Array.isArray(result.value) ?
 			`[${result.value.map((value) => getTitle(value, result.type)).join(', ')}]` :
 				getTitle(result.value, result.type));
@@ -789,6 +783,8 @@ const generateButtons = (parent, statements) => {
 	
 	buttons.refresh.addEventListener('click', () => {
 		reset();
+		
+		flash(parent.parentElement.parentElement);
 		
 		for (const args of refreshParams) {
 			for (let i = args.parent.children.length - 1; i >= 0; --i) {

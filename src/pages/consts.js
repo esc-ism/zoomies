@@ -2,6 +2,8 @@ import {getIdGetter} from '@css';
 
 import {DEGREES} from '@/shared';
 
+export const CLASS_FLASH_CONTAINER = getIdGetter('flash')('container');
+
 const getId = getIdGetter('text');
 
 export const CLASS_WRAPPER = getId('wrapper');

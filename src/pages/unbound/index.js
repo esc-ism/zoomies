@@ -1,17 +1,18 @@
-import {getText, getButton, registerDemo, getInstruction} from '../shared';
+import {CLASS_FLASH_CONTAINER} from '../consts';
+import {getText, getButton, registerDemo, getInstruction, flash} from '../shared';
 
 import getRestartButton from './restart';
 
 import Demo from './demo';
 
 const instructions = [
-	{text: ['Pan by dragging with the left mouse button.'], key: 'pan'},
+	{text: ['Drag with your left mouse button to pan.'], key: 'pan'},
 	{text: ['Drag with your right mouse button to rotate.'], key: 'rotate'},
-	{text: ['Use your mouse wheel to zoom in and out.'], key: 'zoom'},
-	{text: ['Zoom while holding the control button on your keyboard to adjust image aspect ratio.'], key: 'resizeImage'},
-	{text: ['Drag the vertical bar to the right of the playground to adjust viewport aspect ratio.'], key: 'resizeViewport'},
-	{text: ['To reset viewport aspect ratio, right click the bar you used to adjust it.'], key: 'resetViewport'},
-	{text: ['Finally, right click on the viewport to reset the image.'], key: 'resetImage'},
+	{text: ['Use your scroll wheel to zoom in and out.'], key: 'zoom'},
+	{text: ['Use your scroll wheel while holding "ctrl" on your keyboard to adjust image aspect ratio.'], key: 'resizeImage'},
+	{text: ['Drag the vertical bar at the right side of the viewport to adjust its aspect ratio.'], key: 'resizeViewport'},
+	{text: ['Right click the vertical bar to reset viewport aspect ratio.'], key: 'resetViewport'},
+	{text: ['Right click on the viewport to reset everything else.'], key: 'resetImage'},
 ];
 
 export default (wrapper) => {
@@ -44,32 +45,28 @@ export default (wrapper) => {
 				const element = container.firstChild;
 				const button = getRestartButton();
 				
+				container.classList.add(CLASS_FLASH_CONTAINER);
+				
+				button.style.display = 'none';
+				
 				container.appendChild(button);
 				
 				container.style.position = 'relative';
 				
-				element.style.transition = button.style.transition = 'opacity 0.6s ease-out';
-				
 				while (true) {
 					for (const {text, key} of instructions) {
-						element.style.opacity = '1';
 						element.innerText = text;
 						
 						await new Promise((resolve) => {
 							demo.actionPromises[key] = resolve;
 						});
 						
-						element.style.opacity = '0';
-						
-						await new Promise((resolve) => {
-							element.addEventListener('transitionend', resolve, {once: true});
-						});
+						flash(container);
 					}
 					
-					element.style.position = 'absolute';
+					element.style.display = 'none';
 					
-					button.style.removeProperty('position');
-					button.style.opacity = '1';
+					button.style.removeProperty('display');
 					
 					container.style.cursor = 'pointer';
 					await new Promise((resolve) => {
@@ -77,14 +74,11 @@ export default (wrapper) => {
 					});
 					
 					container.style.removeProperty('cursor');
-					button.style.opacity = '0';
 					
-					await new Promise((resolve) => {
-						button.addEventListener('transitionend', resolve, {once: true});
-					});
+					flash(container);
 					
-					element.style.removeProperty('position');
-					button.style.position = 'absolute';
+					element.style.removeProperty('display');
+					button.style.display = 'none';
 				}
 			}},
 			[

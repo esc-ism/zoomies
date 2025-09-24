@@ -31,28 +31,25 @@ class BoundLines extends Hideables {
 
 export default class {
 	background = document.createElement('div');
-	lines = [];
 	
 	constructor(demo) {
 		const containers = demo.constructor.elements;
 		
 		this.background.style.height = this.background.style.width = '100%';
 		this.background.style.position = 'absolute';
-		this.background.style.backgroundColor = '#00000050';
+		this.background.style.backgroundColor = '#00000030';
 		
 		containers.boundLimit.appendChild(this.background);
 		
-		// 1d
-		this.lines[0] = new BoundLine(demo, false, false, false, containers.boundLine);
-		// 2d
-		this.lines[1] = new BoundLines(2, demo, false, false, true, containers.boundLine);
+		this.line1D = new BoundLine(demo, false, false, false, containers.boundLine);
+		this.lines2D = new BoundLines(2, demo, false, false, true, containers.boundLine);
 	}
 	
 	remove() {
 		this.background.remove();
 		
-		this.lines[0].remove();
-		this.lines[1].remove();
+		this.line1D.remove();
+		this.lines2D.remove();
 	}
 	
 	show(doShow = true) {
@@ -69,20 +66,20 @@ export default class {
 			
 			this.background.style.clipPath = `polygon(0 0, 0 100%, 100% 100%, 100% 0, 0 0, ${[...path, path[0]].join(',')})`;
 			
-			this.lines[0].hide();
-			this.lines[1].set([points[0], points[1]], [points[1], points[2]]);
+			this.line1D.hide();
+			this.lines2D.set([points[0], points[1]], [points[1], points[2]]);
 			
 			return;
 		}
 		
-		this.lines[1].hide();
+		this.lines2D.hide();
 		
 		this.background.style.removeProperty('clip-path');
 		
 		if (points.length === 2) {
-			this.lines[0].set(...points);
+			this.line1D.set(...points);
 		} else {
-			this.lines[0].hide();
+			this.line1D.hide();
 		}
 	}
 }

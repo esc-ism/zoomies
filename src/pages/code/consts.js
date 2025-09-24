@@ -17,6 +17,8 @@ export const BUILT_INS = {
 	
 	π: () => ({value: Math.PI, type: 'angle', fight: true}),
 	'½π': () => ({value: Math.PI / 2, type: 'angle', fight: true}),
+	'¼π': () => ({value: Math.PI / 4, type: 'angle', fight: true}),
+	'⅛π': () => ({value: Math.PI / 8, type: 'angle', fight: true}),
 	
 	x: ({position: {x}}) => ({value: x}),
 	y: ({position: {y}}) => ({value: y}),
