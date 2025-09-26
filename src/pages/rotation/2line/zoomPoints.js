@@ -91,13 +91,13 @@ export const getProgressAngles = (quadrantAngle, viewportRatio, viewportRatioInv
 	};
 };
 
-export const getYIntersect = (image, viewportSize, cornerAngle, progressAngle) => ({
+export const getAxisIntersectY = (image, viewportSize, cornerAngle, progressAngle) => ({
 	x: 0,
 	y: (image.halfHeight - image.halfWidth * Math.tan(cornerAngle)) / image.height,
 	z: viewportSize / (Math.cos(progressAngle) * Math.abs(image.halfWidth / Math.cos(cornerAngle))),
 });
 
-export const getXIntersect = (image, viewportSize, cornerAngle, progressAngle) => ({
+export const getAxisIntersectX = (image, viewportSize, cornerAngle, progressAngle) => ({
 	x: (image.halfWidth - image.halfHeight * Math.tan(cornerAngle)) / image.width,
 	y: 0,
 	z: viewportSize / (Math.cos(progressAngle) * Math.abs(image.halfHeight / Math.cos(cornerAngle))),
@@ -134,8 +134,8 @@ export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizes
 	
 	const [secondSide, secondBase] = getSecond({
 		...demo, cornerSide, cornerBase, startZooms, quadrantAngle, isEvenQuadrant,
-		yIntersectSide: getYIntersect(demo.sizesImage, demo.sizesViewport.halfWidth, quadrantAngle + progressAngles.side, progressAngles.side),
-		yIntersectBase: getYIntersect(demo.sizesImage, demo.sizesViewport.halfHeight, DEGREES[90] - quadrantAngle - progressAngles.base, progressAngles.base),
+		yIntersectSide: getAxisIntersectY(demo.sizesImage, demo.sizesViewport.halfWidth, quadrantAngle + progressAngles.side, progressAngles.side),
+		yIntersectBase: getAxisIntersectY(demo.sizesImage, demo.sizesViewport.halfHeight, DEGREES[90] - quadrantAngle - progressAngles.base, progressAngles.base),
 	});
 	
 	return isEvenQuadrant ?

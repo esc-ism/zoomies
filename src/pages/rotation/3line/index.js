@@ -8,7 +8,7 @@ import Demo from './demo';
 
 const functions = [
 	...SHARED_FUNCTIONS,
-	{op: 'func', id: 'getIntersection', args: ['from0X', 'from0Y', 'to0X', 'to0Y', 'from1X', 'from1Y', 'to1X', 'to1Y', 'zoom1'], type: ['x', 'y', 'zoom'], pair: [1, 0], and: [
+	{op: 'func', id: 'getGenericIntersection', args: ['from0X', 'from0Y', 'to0X', 'to0Y', 'from1X', 'from1Y', 'to1X', 'to1Y'], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: '=', id: 'a0', and: {
 			op: '-', and: ['from0Y', 'to0Y'],
 		}},
@@ -42,41 +42,54 @@ const functions = [
 			],
 		}},
 		'',
-		{op: '=', id: 'intersectX', type: 'x', pair: 'intersectY', and: {
-			op: '/', and: [
+		{op: 'return', and: [
+			{op: '/', and: [
 				{op: '-', and: [
 					{op: '*', and: ['c0', 'b1']},
 					{op: '*', and: ['b0', 'c1']},
 				]},
 				'd',
-			],
-		}},
-		{op: '=', id: 'intersectY', type: 'y', pair: 'intersectX', and: {
-			op: '/', and: [
+			]},
+			{op: '/', and: [
 				{op: '-', and: [
 					{op: '*', and: ['a0', 'c1']},
 					{op: '*', and: ['c0', 'a1']},
 				]},
 				'd',
-			],
+			]},
+		]},
+	]},
+	{op: 'func', id: 'getIntersection', args: ['zoom0', 'from0X', 'from0Y', 'to0X', 'to0Y', 'from1X', 'from1Y', 'to1X', 'to1Y'], type: ['zoom', 'x', 'y'], pair: [1, 0], and: [
+		{op: '=', id: ['intersectX', 'intersectY'], and: {
+			op: 'call', id: 'getGenericIntersection', and: ['from0X', 'from0Y', 'to0X', 'to0Y', 'from1X', 'from1Y', 'to1X', 'to1Y'],
+		}},
+		'',
+		{op: '=', id: 'isXAxis', and: {
+			op: '>', and: [{op: 'abs', and: 'to0X'}, {op: 'abs', and: 'to0Y'}],
 		}},
 		'',
 		{op: '=', id: 'progress', and: {
-			op: '/', and: [
-				{op: '-', and: ['intersectY', 'from1Y']},
-				{op: '-', and: ['to1Y', 'from1Y']},
+			op: '?', multiline: true, and: [
+				'isXAxis',
+				{op: '/', and: [
+					{op: '-', and: ['intersectX', 'from0X']},
+					{op: '-', and: ['to0X', 'from0X']},
+				]},
+				{op: '/', and: [
+					{op: '-', and: ['intersectY', 'from0Y']},
+					{op: '-', and: ['to0Y', 'from0Y']},
+				]},
 			],
 		}},
 		'',
 		{op: 'return', and: [
-			'intersectX',
-			'intersectY',
 			{op: '/', and: [
-				'zoom1',
+				'zoom0',
 				{op: '-', and: [1, 'progress']},
 			]},
+			'intersectX',
+			'intersectY',
 		]},
-		
 	]},
 	{op: 'func', id: 'getProgressedMiddle', args: ['x', 'y', 'zoom0', 'zoom1'], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: '=', id: 'mult', and: {
@@ -88,19 +101,18 @@ const functions = [
 			{op: '*', and: ['y', 'mult']},
 		]},
 	]},
-	{op: 'func', id: 'getSecond', args: ['fromX', 'fromY', 'toX', 'toY', 'fromZoom', 'targetZoom', 'offsetX', 'offsetY'], type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
+	{op: 'func', id: 'getSecond', args: ['firstZoom', 'firstEndX', 'firstEndY', 'secondZoom', 'offsetX', 'offsetY'], type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
 		{op: '=', id: ['secondX', 'secondY'], type: ['x', 'y'], and: {
-			op: 'call', id: 'getProgressed', and: ['fromX', 'fromY', 'toX', 'toY', 'fromZoom', 'targetZoom'],
+			op: 'call', id: 'getProgressed', and: [0, 0, 'firstEndX', 'firstEndY', 'firstZoom', 'secondZoom'],
 		}},
-		'',
 		{op: '=', id: 'mult', and: {
-			op: '/', and: ['fromZoom', 'targetZoom'],
+			op: '/', and: ['firstZoom', 'secondZoom'],
 		}},
 		'',
 		{op: 'return', and: [
 			'secondX', 'secondY',
-			{op: '+', and: [{op: '*', and: ['toX', 'mult']}, 'offsetX', 'secondX']},
-			{op: '+', and: [{op: '*', and: ['toY', 'mult']}, 'offsetY', 'secondY']},
+			{op: '+', and: [{op: '*', and: ['firstEndX', 'mult']}, 'offsetX', 'secondX']},
+			{op: '+', and: [{op: '*', and: ['firstEndY', 'mult']}, 'offsetY', 'secondY']},
 		]},
 	]},
 	{op: 'func', id: 'getXIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['x', 'zoom'], and: [
@@ -123,7 +135,7 @@ const functions = [
 			]},
 		]},
 	]},
-	{op: 'func', id: 'getAxisIntersects', args: ['isEvenQuadrant'], and: [
+	{op: 'func', id: 'getAxisIntersects', args: ['isEvenQuadrant'], type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
 		{op: '=', id: 'quadrantAngle', type: 'angle', and: {
 			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
 		}},
@@ -154,14 +166,15 @@ const functions = [
 			]},
 		]},
 		'',
-		{op: '=', id: ['axisIntersectSideX', 'axisIntersectSideZoom'], and: {
+		// todo make functions that don't return zoom
+		{op: '=', id: ['axisIntersectSideX'], and: {
 			op: 'call', id: 'getXIntersect', multiline: true, and: [
 				'½viewportWidth',
 				{op: '-', and: ['½π', 'quadrantAngle', 'angleSide']},
 				'angleSide',
 			],
 		}},
-		{op: '=', id: ['axisIntersectBaseX', 'axisIntersectBaseZoom'], and: {
+		{op: '=', id: ['axisIntersectBaseX'], and: {
 			op: 'call', id: 'getXIntersect', multiline: true, and: [
 				'½viewportHeight',
 				{op: '+', and: ['quadrantAngle', 'angleBase']},
@@ -171,46 +184,176 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			'isEvenQuadrant',
-			{op: 'return', multiline: 3, and: [
-				{op: '-', and: 'axisIntersectSideX'}, 0, 'axisIntersectSideZoom',
-				'axisIntersectBaseX', 0, 'axisIntersectBaseZoom',
+			{op: 'return', multiline: 2, and: [
+				{op: '-', and: 'axisIntersectSideX'}, 0,
+				'axisIntersectBaseX', 0,
 			]},
 		]},
 		'',
-		{op: 'return', multiline: 3, and: [
-			'axisIntersectSideX', 0, 'axisIntersectSideZoom',
-			{op: '-', and: 'axisIntersectBaseX'}, 0, 'axisIntersectBaseZoom',
+		{op: 'return', multiline: 2, and: [
+			'axisIntersectSideX', 0,
+			{op: '-', and: 'axisIntersectBaseX'}, 0,
 		]},
+	]},
+	{op: 'func', id: 'getDoFlip', args: [
+	], and: [
+		{op: '=', id: 'isXAxis', and: {
+			op: '>', and: [{op: 'abs', and: 'firstEndX'}, {op: 'abs', and: 'firstEndY'}],
+		}},
+		'',
+		{op: '=', id: ['farX', 'farY'], and: {
+			op: 'call', id: 'getGenericIntersection', and: [0, 0, 'firstEndX', 'firstEndY', 'thirdX', 'thirdY', 'thirdEndX', 0.5],
+		}},
+		'',
+		{op: '=', id: 'mThird', and: {
+			op: '/', and: [
+				{op: '-', and: [0.5, 'thirdY']},
+				{op: '-', and: ['thirdEndX', 'thirdX']},
+			],
+		}},
+		{op: '=', id: 'mFirst', and: {
+			op: '/', and: ['firstEndY', 'firstEndX'],
+		}},
+		'',
+		{op: 'return', and: {
+			// todo this work?
+			op: '==', multiline: true, and: [
+				{op: '==', and: [
+					{op: '>', and: ['mFirst', 0]},
+					{op: '<', and: ['mThird', 'mFirst']},
+				]},
+				{op: '?', and: [
+					'isXAxis',
+					{op: '==', and: [
+						{op: '>', and: ['secondX', 0]},
+						{op: '<', and: ['farX', 'secondX']},
+					]},
+					{op: '==', and: [
+						{op: '>', and: ['secondY', 0]},
+						{op: '<', and: ['farY', 'secondY']},
+					]},
+				]},
+			],
+		}},
+	]},
+	{op: 'func', id: 'getShared', type: [
+		'zoom', 'zoom',
+		// first
+		'xvp', 'yvp', 'xvp', 'yvp', 'xvp', 'yvp', 'xvp', 'yvp',
+		// second
+		'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
+	], pair: [,,3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24], args: [
+		'isEvenQuadrant', 'zoomSide', 'zoomBase', 'rightXRaw', 'rightYRaw', 'topXRaw', 'topYRaw',
+		'axisIntersectXSide', 'axisIntersectYSide', 'axisIntersectXBase', 'axisIntersectYBase',
+		'cornerXSide', 'cornerXBase',
+	], and: [
+		{op: '=', id: 'isHorizontalFirst', and: {
+			op: '<=', and: ['zoomSide', 'zoomBase'],
+		}},
+		{op: '=', id: 'isVerticalFlip', and: {
+			op: '&&', and: [
+				{op: '<', and: ['rotation', 0]},
+				{op: '>', and: ['rotation', {op: '-', and: 'π'}]},
+			],
+		}},
+		'',
+		{op: '=', id: ['rightX', 'rightY'], and: {
+			op: '?', multiline: true, and: [
+				{op: '!=', and: ['isVerticalFlip', 'isEvenQuadrant']},
+				{op: 'array', and: [{op: '-', and: 'rightXRaw'}, {op: '-', and: 'rightYRaw'}]},
+				{op: 'array', and: ['rightXRaw', 'rightYRaw']},
+			],
+		}},
+		{op: '=', id: ['topX', 'topY'], and: {
+			op: '?', multiline: true, and: [
+				'isVerticalFlip',
+				{op: 'array', and: [{op: '-', and: 'topXRaw'}, {op: '-', and: 'topYRaw'}]},
+				{op: 'array', and: ['topXRaw', 'topYRaw']},
+			],
+		}},
+		'',
+		{op: '=', id: ['firstZoom', 'secondZoom', 'firstEndX', 'firstEndY', 'offsetX', 'offsetY', 'thirdX', 'thirdY', 'thirdEndX'], and: {
+			op: '?', and: [
+				'isHorizontalFirst',
+				{op: 'array', and: ['zoomSide', 'zoomBase', 'rightX', 'rightY', 'topX', 'topY', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide']},
+				{op: 'array', and: ['zoomBase', 'zoomSide', 'topX', 'topY', 'rightX', 'rightY', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase']},
+			],
+		}},
+		'',
+		{op: '=', id: ['secondX', 'secondY', 'secondEndX', 'secondEndY'], and: {
+			op: 'call', id: 'getSecond', and: ['firstZoom', 'firstEndX', 'firstEndY', 'secondZoom', 'offsetX', 'offsetY'],
+		}},
+		'',
+		{op: '=', id: ['firstEndXFlipped', 'firstEndYFlipped', 'offsetXFlipped', 'offsetYFlipped'], and: {
+			op: '?', multiline: true, and: [
+				'isHorizontalFirst',
+				{op: 'array', and: [{op: '-', and: 'rightX'}, {op: '-', and: 'rightY'}, 'topX', 'topY']},
+				{op: 'array', and: ['topX', 'topY', {op: '-', and: 'rightX'}, {op: '-', and: 'rightY'}]},
+			],
+		}},
+		'',
+		{op: '=', id: ['secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped'], and: {
+			op: 'call', id: 'getSecond', and: ['firstZoom', 'firstEndXFlipped', 'firstEndYFlipped', 'secondZoom', 'offsetXFlipped', 'offsetYFlipped'],
+		}},
+		'',
+		{op: 'return', and: {
+			op: '?', multiline: true, and: [
+				{op: 'call', id: 'getDoFlip', and: ['firstEndX', 'firstEndY', 'secondX', 'secondY', 'thirdX', 'thirdY', 'thirdEndX']},
+				{op: 'array', and: [
+					'firstZoom', 'secondZoom',
+					{op: '-', and: 'firstEndXFlipped'}, {op: '-', and: 'firstEndYFlipped'},
+					'firstEndXFlipped', 'firstEndYFlipped',
+					'firstEndX', 'firstEndY',
+					'firstEndX', 'firstEndY',
+					{op: '-', and: 'secondXFlipped'}, {op: '-', and: 'secondYFlipped'}, {op: '-', and: 'secondEndXFlipped'}, {op: '-', and: 'secondEndYFlipped'},
+					'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
+					'secondX', 'secondY', 'secondEndX', 'secondEndY',
+					'secondX', 'secondY', 'secondEndX', 'secondEndY',
+				]},
+				{op: 'array', and: [
+					'firstZoom', 'secondZoom',
+					'firstEndX', 'firstEndY',
+					'firstEndX', 'firstEndY',
+					{op: '-', and: 'firstEndXFlipped'}, {op: '-', and: 'firstEndYFlipped'},
+					'firstEndXFlipped', 'firstEndYFlipped',
+					'secondX', 'secondY', 'secondEndX', 'secondEndY',
+					'secondX', 'secondY', 'secondEndX', 'secondEndY',
+					{op: '-', and: 'secondXFlipped'}, {op: '-', and: 'secondYFlipped'}, {op: '-', and: 'secondEndXFlipped'}, {op: '-', and: 'secondEndYFlipped'},
+					'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
+				]},
+			],
+		}},
 	]},
 	{op: 'func', id: 'getFixed', args: [
 		'thirdZoom', 'thirdX', 'thirdY', 'cornerX',
 		'firstZoom', 'firstEndX', 'firstEndY',
+		'firstEndXFlipped', 'firstEndYFlipped',
 		'secondZoom', 'secondX', 'secondY', 'secondEndX', 'secondEndY',
-		'firstZoomFlipped', 'firstEndXFlipped', 'firstEndYFlipped',
-		'secondZoomFlipped', 'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
-	], and: [
+		'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
+	], type: [
+		'zoom', 'x', 'y', 'xvp', 'yvp',,
+		'x', 'y', 'x', 'y',
+	], pair: [,2, 1, 4, 3,,7, 6, 9, 8], and: [
 		{op: 'if', and: [
 			{op: '>=', and: ['thirdZoom', 'secondZoom']},
 			{op: 'return', and: [
-				'thirdZoom', 'thirdX', 'thirdY',
-				'firstZoom', 'firstEndX', 'firstEndY',
-				true, 'secondZoom', 'secondX', 'secondY', 'secondEndX', 'secondEndY',
+				'thirdZoom', 'thirdX', 'thirdY', 'firstEndX', 'firstEndY',
+				true, 'secondX', 'secondY', 'secondEndX', 'secondEndY',
 			]},
 		]},
 		'',
 		{op: '=', id: ['thirdZoomFlipped', 'thirdXFlipped', 'thirdYFlipped'], and: {
 			op: 'call', id: 'getIntersection', and: [
-				'secondZoomSideFlipped', 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
-				'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+				'secondZoom', 'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
+				'thirdX', 'thirdY', 'cornerX', 0.5,
 			],
 		}},
 		'',
 		{op: 'if', and: [
-			{op: '>=', and: ['thirdZoom', 'secondZoom']},
+			{op: '>=', and: ['thirdZoomFlipped', 'secondZoom']},
 			{op: 'return', and: [
-				'thirdZoomFlipped', 'thirdXFlipped', 'thirdYFlipped',
-				'firstZoomFlipped', 'firstEndXFlipped', 'firstEndYFlipped',
-				true, 'secondZoomSideFlipped', 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
+				'thirdZoomFlipped', 'thirdXFlipped', 'thirdYFlipped', 'firstEndXFlipped', 'firstEndYFlipped',
+				true, 'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
 			]},
 		]},
 		'',
@@ -218,48 +361,77 @@ const functions = [
 			{op: '...', and: {
 				op: 'call', id: 'getIntersection', and: [
 					'firstZoom', 0, 0, 'firstEndX', 'firstEndY',
-					'axisIntersectX', 'axisIntersectY', 'cornerX', 0.5,
+					'thirdX', 'thirdY', 'cornerX', 0.5,
 				],
 			}},
-			'firstZoom', 'firstEndX', 'firstEndY',
+			'firstEndX', 'firstEndY',
 		]},
 	]},
-	{op: 'func', id: 'getAll', args: [
-		'quadrantAngle',
-		// todo you maybe don't need the axisZoom args
-		'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide',
-		'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase',
-	], and: [
-		{op: '=', multiline: 4, id: [
-			'firstZoomSide', 'firstEndXSide', 'firstEndYSide',
-			'secondZoomSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
-			'firstZoomBase', 'firstEndXBase', 'firstEndYBase',
-			'secondZoomBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
-			'firstZoomSideFlipped', 'firstEndXSideFlipped', 'firstEndYSideFlipped',
-			'secondZoomSideFlipped', 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
-			'firstZoomBaseFlipped', 'firstEndXBaseFlipped', 'firstEndYBaseFlipped',
-			'secondZoomBaseFlipped', 'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
+	{op: 'func', id: 'getAll', type: [
+		'zoom', 'x', 'y', 'zoom', 'x', 'y',
+		'zoom', 'xvp', 'yvp', 'xvp', 'yvp',
+		'zoom',,
+		'x', 'y', 'x', 'y',,
+		'x', 'y', 'x', 'y',
+	], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,14, 13, 16, 15,,19, 18, 21, 20], args: ['isEvenQuadrant'], and: [
+		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
+			op: 'call', id: 'getStartZooms',
+		}},
+		'',
+		{op: '=', id: ['rightX', 'rightY', 'topX', 'topY'], and: {
+			op: 'call', id: 'getViewportPoints', and: ['zoomSide', 'zoomBase'],
+		}},
+		'',
+		{op: '=', id: 'quadrantAngle', type: 'angle', and: {
+			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
+		}},
+		'',
+		{op: '=', multiline: 3, id: [
+			'axisIntersectXSide', 'axisIntersectYSide',
+			'axisIntersectXBase', 'axisIntersectYBase',
 		], and: {
-			op: 'call', id: 'getShared', and: [],
+			op: 'call', id: 'getAxisIntersects', and: ['quadrantAngle'],
+		}},
+		'',
+		{op: '=', id: ['cornerXSide', 'cornerXBase'], type: ['x', 'x'], and: {
+			op: '?', and: ['isEvenQuadrant', {op: 'array', and: [-0.5, 0.5]}, {op: 'array', and: [0.5, -0.5]}],
+		}},
+		'',
+		{op: '=', multiline: 18, id: [
+			'firstZoom', 'secondZoom',
+			'firstEndXSide', 'firstEndYSide',
+			'firstEndXBase', 'firstEndYBase',
+			'firstEndXSideFlipped', 'firstEndYSideFlipped',
+			'firstEndXBaseFlipped', 'firstEndYBaseFlipped',
+			'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
+			'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
+			'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
+			'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
+		], and: {
+			op: 'call', id: 'getShared', and: [
+				'isEvenQuadrant', 'zoomSide', 'zoomBase', 'rightX', 'rightY', 'topX', 'topY',
+				'axisIntersectXSide', 'axisIntersectYSide', 'axisIntersectXBase', 'axisIntersectYBase',
+				'cornerXSide', 'cornerXBase',
+			],
 		}},
 		'',
 		{op: '=', id: ['thirdZoomSide', 'thirdXSide', 'thirdYSide'], and: {
 			op: 'call', id: 'getIntersection', multiline: 2, and: [
-				'secondZoomSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
+				'secondZoom', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
 				'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
 			],
 		}},
 		{op: '=', id: ['thirdZoomBase', 'thirdXBase', 'thirdYBase'], and: {
 			op: 'call', id: 'getIntersection', multiline: 2, and: [
-				'secondZoomBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
+				'secondZoom', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
 				'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
 			],
 		}},
 		'',
 		{op: 'if', and: [
 			{op: '&&', and: [
-				{op: '<=', and: ['thirdZoomSide', 'secondZoomSide']},
-				{op: '<=', and: ['thirdZoomBase', 'secondZoomBase']},
+				{op: '<=', and: ['thirdZoomSide', 'secondZoom']},
+				{op: '<=', and: ['thirdZoomBase', 'secondZoom']},
 			]},
 			{op: 'if', and: [
 				{op: '>', and: [
@@ -269,18 +441,17 @@ const functions = [
 				{op: 'return', multiline: 2, and: [
 					{op: '...', and: {
 						op: 'call', id: 'getIntersection', and: [
-							'firstZoomSide', 0, 0, 'firstEndXSide', 'firstEndYSide',
+							'firstZoom', 0, 0, 'firstEndXSide', 'firstEndYSide',
 							'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
 						],
 					}},
-					'firstEndXSide', 'firstEndYSide', 'firstZoomSide',
 					{op: '...', and: {
 						op: 'call', id: 'getIntersection', and: [
-							'firstZoomBase', 0, 0, 'firstEndXBase', 'firstEndYBase',
+							'firstZoom', 0, 0, 'firstEndXBase', 'firstEndYBase',
 							'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
 						],
 					}},
-					'firstEndXBase', 'firstEndYBase', 'firstZoomBase',
+					'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXBase', 'firstEndYBase',
 				]},
 			]},
 			'',
@@ -289,75 +460,75 @@ const functions = [
 			{op: 'return', and: [
 				{op: '...', and: {
 					op: 'call', id: 'getIntersection', and: [
-						'secondZoomSideFlipped', 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
+						'secondZoom', 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
 						'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
 					],
 				}},
-				'firstZoomSideFlipped', 'firstEndXSideFlipped', 'firstEndYSideFlipped',
 				{op: '...', and: {
 					op: 'call', id: 'getIntersection', and: [
-						'secondZoomBaseFlipped', 'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
+						'secondZoom', 'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
 						'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
 					],
 				}},
-				'firstZoomBaseFlipped', 'firstEndXBaseFlipped', 'firstEndYBaseFlipped',
-				true, 'secondZoomSideFlipped', 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
-				true, 'secondZoomBaseFlipped', 'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
+				'firstZoom', 'firstEndXSideFlipped', 'firstEndYSideFlipped', 'firstEndXBaseFlipped', 'firstEndYBaseFlipped',
+				'secondZoom',
+				true, 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
+				true, 'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
 			]},
 		]},
 		'',
 		{op: 'if', and: [
 			{op: '<=', and: ['thirdZoomBase', 'thirdZoomSide']},
 			{op: '=', id: [
-				'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstZoomFixed', 'firstEndXFixed', 'firstEndYFixed',
-				'hasSecondFixed', 'secondZoomFixed', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
+				'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstEndXFixed', 'firstEndYFixed',
+				'hasSecondFixed', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
 			], and: {
 				op: 'call', id: 'getFixed', and: [
 					'thirdZoomBase', 'thirdXBase', 'thirdYBase', 'cornerXBase',
-					'firstZoomBase', 'firstEndXBase', 'firstEndYBase',
-					'secondZoomBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
-					'firstZoomBaseFlipped', 'firstEndXBaseFlipped', 'firstEndYBaseFlipped',
-					'secondZoomBaseFlipped', 'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
+					'firstZoom', 'firstEndXBase', 'firstEndYBase',
+					'firstEndXBaseFlipped', 'firstEndYBaseFlipped',
+					'secondZoom', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
+					'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
 				],
 			}},
 			'',
 			{op: 'return', and: [
-				'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'firstZoomSide', 'firstEndXSide', 'firstEndYSide',
-				'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstZoomFixed', 'firstEndXFixed', 'firstEndYFixed',
-				'hasSecondSide', 'secondZoomSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
-				'hasSecondFixed', 'secondZoomFixed', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
+				'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed',
+				'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXFixed', 'firstEndYFixed',
+				'secondZoom',
+				true, 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
+				'hasSecondFixed', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
 			]},
 		]},
 		'',
 		{op: '=', id: [
-			'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstZoomFixed', 'firstEndXFixed', 'firstEndYFixed',
-			'hasSecondFixed', 'secondZoomFixed', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
+			'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstEndXFixed', 'firstEndYFixed',
+			'hasSecondFixed', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
 		], and: {
 			op: 'call', id: 'getFixed', and: [
 				'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'cornerXSide',
-				'firstZoomSideFlipped', 'firstEndXSideFlipped', 'firstEndYSideFlipped',
-				'firstZoomSide', 'firstEndXSide', 'firstEndYSide',
-				'secondZoomSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
-				'secondZoomSideFlipped', 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
+				'firstZoom', 'firstEndXSide', 'firstEndYSide',
+				'firstEndXSideFlipped', 'firstEndYSideFlipped',
+				'secondZoom', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
+				'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
 			],
 		}},
 		'',
 		{op: 'return', and: [
-			'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstZoomFixed', 'firstEndXFixed', 'firstEndYFixed',
-			'thirdZoomBase', 'thirdXBase', 'thirdYBase', 'firstZoomBase', 'firstEndXBase', 'firstEndYBase',
-			'hasSecondFixed', 'secondZoomFixed', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
-			'hasSecondBase', 'secondZoomBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
+			'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'thirdZoomBase', 'thirdXBase', 'thirdYBase',
+			'firstZoom', 'firstEndXFixed', 'firstEndYFixed', 'firstEndXBase', 'firstEndYBase',
+			'secondZoom',
+			'hasSecondFixed', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
+			true, 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
 		]},
 	]},
-	{op: 'func', id: 'getZoomPoints', and: [
-		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
-			op: 'call', id: 'getStartZooms',
-		}},
-		'',
-		{op: '=', id: ['rightX', 'rightY', 'topX', 'topY'], and: {
-			op: 'call', id: 'getViewportPoints', and: ['zoomSide', 'zoomBase'],
-		}},
-		'',
+	{op: 'func', id: 'getZoomPoints', type: [
+		'zoom', 'x', 'y', 'zoom', 'x', 'y',
+		'zoom', 'xvp', 'yvp', 'xvp', 'yvp',
+		'zoom',,
+		'x', 'y', 'x', 'y',,
+		'x', 'y', 'x', 'y',
+	], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,14, 13, 16, 15,,19, 18, 21, 20], and: [
 		{op: '=', id: 'isEvenQuadrant', and: {
 			op: '!=', and: [
 				{op: '%', and: [
@@ -369,45 +540,32 @@ const functions = [
 				0,
 			],
 		}},
-		{op: '=', id: 'quadrantAngle', type: 'angle', and: {
-			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
-		}},
-		'',
-		{op: '=', multiline: 3, id: [
-			'axisIntersectXSide', 'axisIntersectYSide', 'axisIntersectZoomSide',
-			'axisIntersectXBase', 'axisIntersectYBase', 'axisIntersectZoomBase',
-		], and: {
-			op: 'call', id: 'getAxisIntersects', and: ['quadrantAngle'],
-		}},
-		'',
-		{op: '=', id: ['cornerXSide', 'cornerXBase'], type: 'x', and: {
-			op: '?', and: ['isEvenQuadrant', [-0.5, 0.5], [0.5, -0.5]],
-		}},
 		'',
 		{op: '=', multiline: 4, id: [
-			'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'firstZoomSide', 'firstEndXSide', 'firstEndYSide',
-			'thirdZoomBase', 'thirdXBase', 'thirdYBase', 'firstZoomBase', 'firstEndXBase', 'firstEndYBase',
-			'hasSecondSide', 'secondZoomSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
-			'hasSecondBase', 'secondZoomBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
-		], and: {
-			op: 'call', id: 'getAll', and: [],
-		}},
+			'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'thirdZoomBase', 'thirdXBase', 'thirdYBase',
+			'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXBase', 'firstEndYBase',
+			'secondZoom',
+			'hasSecondSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
+			'hasSecondBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
+		], and: {op: 'call', id: 'getAll', and: ['isEvenQuadrant']}},
 		'',
 		{op: 'if', and: [
 			'isEvenQuadrant',
 			{op: 'return', multiline: 4, and: [
-				'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'firstZoomSide', 'firstEndXSide', 'firstEndYSide',
-				'thirdZoomBase', 'thirdXBase', 'thirdYBase', 'firstZoomBase', 'firstEndXBase', 'firstEndYBase',
-				'hasSecondSide', 'secondZoomSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
-				'hasSecondBase', 'secondZoomBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
+				'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'thirdZoomBase', 'thirdXBase', 'thirdYBase',
+				'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXBase', 'firstEndYBase',
+				'secondZoom',
+				'hasSecondSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
+				'hasSecondBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
 			]},
 		]},
 		'',
 		{op: 'return', multiline: 4, and: [
-			'thirdZoomBase', 'thirdXBase', 'thirdYBase', 'firstZoomBase', 'firstEndXBase', 'firstEndYBase',
-			'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'firstZoomSide', 'firstEndXSide', 'firstEndYSide',
-			'hasSecondBase', 'secondZoomBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
-			'hasSecondSide', 'secondZoomSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
+			'thirdZoomBase', 'thirdXBase', 'thirdYBase', 'thirdZoomSide', 'thirdXSide', 'thirdYSide',
+			'firstZoom', 'firstEndXBase', 'firstEndYBase', 'firstEndXSide', 'firstEndYSide',
+			'secondZoom',
+			'hasSecondBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
+			'hasSecondSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
 		]},
 	]},
 ];
@@ -441,6 +599,17 @@ export default (wrapper) => {
 				content: 'Pan-Limit Maths',
 				style: {textAlign: 'center'},
 			},
+			getCode([
+				{op: '=', multiline: 2, id: [
+					'thirdZoom0', 'thirdX0', 'thirdY0', 'thirdZoom1', 'thirdX1', 'thirdY1',
+					'firstZoom', 'firstEndX0', 'firstEndY0', 'firstEndX1', 'firstEndY1',
+					'secondZoom',
+					'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
+					'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
+				], and: {
+					op: 'call', id: 'getZoomPoints',
+				}},
+			]),
 			{
 				tag: 'h2',
 				content: 'Pan-Limit Effectiveness',
@@ -460,7 +629,13 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			// getCode([
-			// 	{op: '=', multiline: 2, id: ['originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0', 'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1'], and: {
+			// 	{op: '=', multiline: 2, id: [
+			// 		'thirdZoom0', 'thirdX0', 'thirdY0', 'thirdZoom1', 'thirdX1', 'thirdY1',
+			// 		'firstZoom', 'firstEndX0', 'firstEndY0', 'firstEndX1', 'firstEndY1',
+			// 		'secondZoom',
+			// 		'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
+			// 		'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
+			// 	], and: {
 			// 		op: 'call', id: 'getZoomPoints',
 			// 	}},
 			// ]),

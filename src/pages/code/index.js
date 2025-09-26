@@ -27,6 +27,11 @@ const visualClasses = {
 const getRoundedString = (number, pow = 4) => {
 	const mult = Math.pow(10, pow);
 	
+	// Math.round(-0.5) is 0 😲
+	if (number !== 0 && (number < 0 ? (number >= -0.5 / mult) : (number < 0.5 / mult))) {
+		return number.toExponential(0);
+	}
+	
 	return Math.round(number * mult) / mult;
 };
 
@@ -89,7 +94,7 @@ export const register = (newDemo, statements = []) => {
 			
 			const {active} = meta;
 			
-			generate(body, statement.and, scope, indent + 1, meta);
+			generate(body, statement.and, {...scope}, indent + 1, meta);
 			
 			funcWrapper.append(funcElement, argsElement, body, ...getIndents(indent));
 			
@@ -225,8 +230,10 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 		
 		shapeData.push(subShapeData);
 		
-		if (meta.spread && meta.active) {
-			values.push(...value);
+		if (meta.spread) {
+			if (meta.active) {
+				values.push(...value);
+			}
 			
 			delete meta.spread;
 		} else {
@@ -552,6 +559,7 @@ const interpretters = {
 	'&&': getCombiner((a, b) => a && b),
 	'||': getCombiner((a, b) => a || b),
 	'!=': getCombiner((a, b) => a !== b),
+	'==': getCombiner((a, b) => a === b),
 	'%': getCombiner((a, b) => a % b, ['*', '/', '+', '-', '<=', '>=', '<', '>', '!=']),
 	if: (statement, scope, indent, meta) => {
 		const elements = {
@@ -717,6 +725,7 @@ const interpretters = {
 		
 		let value;
 		
+		// todo just return {type:array,and:[...]}?
 		if (Array.isArray(statement.and)) {
 			const array = getElement(CLASS_NAMES.array);
 			const csvs = getCsvs(statement, scope, indent, meta);
@@ -813,5 +822,4 @@ export const generateWhenReady = (parent, statements) => init
 		generateButtons(parent, statements);
 		
 		generate(parent, statements);
-	})
-	.catch(() => {});
+	});

@@ -47,6 +47,7 @@ export const CLASS_NAMES = {
 	'<': getId('l'),
 	'>': getId('g'),
 	'!=': getId('ne'),
+	'==': getId('eq'),
 	'||': getId('or'),
 	'&&': getId('and'),
 	'...': getId('spread'),

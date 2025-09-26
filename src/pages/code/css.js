@@ -16,12 +16,13 @@ for (const [name, content = name] of [
 	['>'],
 	['<=', '⩽'],
 	['>=', '⩾'],
-	['!=', '≠'],
+	['!='],
+	['=='],
 	['+'],
 	['-'],
 	['*', '×'],
 	['/', '÷'],
-	['%', 'mod'],
+	['%'],
 ]) {
 	addPseudoRule(`.${CLASS_NAMES[name]}::after`, ` ${content} `);
 	addPseudoRule([`br + .${CLASS_NAMES[name]}::after`, `.${CLASS_NAMES.indent} + .${CLASS_NAMES[name]}::after`], `${content} `);
