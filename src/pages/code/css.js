@@ -1,6 +1,7 @@
 import {addRule} from '@css';
 
 import {CLASS_NAMES, CLASS_MAXIMISED} from './consts';
+import {CLASS_CODE} from '../consts';
 
 const addPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`});
 const addKeywordPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`, color: 'rgb(219 142 56)'});
@@ -103,4 +104,9 @@ addRule(`p.${CLASS_MAXIMISED}`, {
 addRule(`.${CLASS_MAXIMISED} > *`, {
 	overflow: 'auto',
 	height: '100%',
+});
+
+addRule(`.${CLASS_CODE}:not(.${CLASS_MAXIMISED}) > *`, {
+	'max-height': 'calc(100vh - 2em)',
+	overscroll: 'contain',
 });

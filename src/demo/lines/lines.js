@@ -46,7 +46,7 @@ export class Line {
 	static template = document.createElement('div');
 	
 	static {
-		this.template.style.pointerEvents = 'none';
+		this.template.style.pointerEvents = 'one';
 		this.template.style.position = 'absolute';
 		this.template.style.transformOrigin = 'top center';
 		this.template.style.translate = '-50% 0';

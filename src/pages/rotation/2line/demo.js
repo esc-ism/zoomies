@@ -1,7 +1,7 @@
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
-import {getBound, getProgressedLine, getIntersectProgress, getProgress, getFlipped} from '../shared';
+import {getBound, getProgressedLine, getZoomPairSecond, getProgress, getFlipped} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
@@ -15,19 +15,6 @@ export const getSnappedZoom = (() => {
 	};
 	
 	const isValidZoom = (zoom) => zoom !== null && !isNaN(zoom);
-	
-	const getZoomPairSecond = ([z, ...pair], position, doFlip, maxP = 1) => {
-		if (maxP >= 0) {
-			const p = getIntersectProgress(position, ...pair, doFlip);
-			
-			if (p >= 0 && p <= maxP) {
-				// I don't think the >= 1 check is necessary but best be safe
-				return p >= 1 ? Number.MAX_SAFE_INTEGER : z / (1 - p);
-			}
-		}
-		
-		return null;
-	};
 	
 	const getZoom = (pair0, pair1, pair2, position, doFlip) => getZoomPairSecond(pair2, position, doFlip)
 		|| getZoomPairSecond(pair1, position, doFlip, getProgress(pair1[0], pair2[0]))

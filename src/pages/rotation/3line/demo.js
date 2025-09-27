@@ -1,7 +1,7 @@
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
-import {getZoomProgressed, getProgressedLine, getIntersectProgress, getProgress, getFlipped} from '../shared';
+import {getZoomProgressed, getProgressedLine, getZoomPairSecond, getProgress, getFlipped} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
 import getZoomPoints, {getRelevantDemo} from './zoomPoints';
@@ -41,26 +41,14 @@ export const getBound = (zoom, first, second, third) => {
 };
 
 export const getSnappedZoom = (() => {
-	const getDirected = (first, second, flip, cornerX) => {
+	const getDirected = (first, second, third, flip, cornerX) => {
 		const get = flip ? (position) => getFlipped(position) : ({...position}) => ({...position});
+		const low = third.isFirstInt ? first : second;
 		
-		return [[get(first), get(first.end)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
+		return [[get(low), get(low.end)], [{...get(third), z: third.z}, get({x: cornerX, y: 0.5})]];
 	};
 	
 	const isValidZoom = (zoom) => zoom !== null && !isNaN(zoom);
-	
-	const getZoomPairSecond = ([z, ...pair], position, doFlip, maxP = 1) => {
-		if (maxP >= 0) {
-			const p = getIntersectProgress(position, ...pair, doFlip);
-			
-			if (p >= 0 && p <= maxP) {
-				// I don't think the >= 1 check is necessary but best be safe
-				return p >= 1 ? Number.MAX_SAFE_INTEGER : z / (1 - p);
-			}
-		}
-		
-		return null;
-	};
 	
 	const getZoom = (position, doFlip, ...pairs) => {
 		let maxP;
@@ -80,8 +68,8 @@ export const getSnappedZoom = (() => {
 	
 	return (first0, second0, third0, first1, second1, third1, position) => {
 		const getPairings = (flip0, flip1) => {
-			const [lineFirst0, lineSecond0] = getDirected(third0.isFirstInt ? first0 : second0, third0, flip0, -0.5);
-			const [lineFirst1, lineSecond1] = getDirected(third1.isFirstInt ? first1 : second1, third1, flip1, 0.5);
+			const [lineFirst0, lineSecond0] = getDirected(first0, second0, third0, flip0, -0.5);
+			const [lineFirst1, lineSecond1] = getDirected(first1, second1, third1, flip1, 0.5);
 			
 			const pairings = third0.z >= third1.z ?
 					[

@@ -174,8 +174,6 @@ const getFrame = (() => {
 		array[i1] = temp;
 	};
 	
-	// todo pass imageRatio and adjust tangent gradients accordingly
-	//  same for 1d
 	return (point0, point1, ratioImage) => {
 		const flipped0 = getFlipped(point0);
 		const flipped1 = getFlipped(point1);

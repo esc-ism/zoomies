@@ -147,6 +147,29 @@ export default SINGLE_LINE;
 
 export const MULTI_LINE = [
 	...SINGLE_LINE,
+	{op: 'func', id: 'getIntersectZoom', args: ['startZoom', 'fromX0', 'fromY0', 'toX0', 'toY0', 'fromX1', 'fromY1', 'toX1', 'toY1', 'isInverse', 'maxP'], type: 'zoom', and: [
+		{op: 'if', and: [
+			{op: '>=', and: ['maxP', 0]},
+			{op: '=', id: 'p', and: {
+				op: 'call', id: 'getIntersectRatio', and: ['fromX0', 'fromY0', 'toX0', 'toY0', 'fromX1', 'fromY1', 'toX1', 'toY1', 'isInverse'],
+			}},
+			'',
+			{op: 'if', and: [
+				{op: '&&', and: [
+					{op: '>=', and: ['p', 0]},
+					{op: '<=', and: ['p', 'maxP']},
+				]},
+				{op: 'return', and: {
+					op: '/', and: [
+						'startZoom',
+						{op: '-', and: [1, 'p']},
+					],
+				}},
+			]},
+		]},
+		'',
+		{op: 'return', and: 0},
+	]},
 	{op: 'func', id: 'getStartZooms', type: ['zoom', 'zoom'], and: [
 		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], and: {
 			op: 'call', id: 'getAllStartZooms',
@@ -278,25 +301,5 @@ export const MULTI_LINE = [
 		}},
 		'',
 		{op: 'return', and: ['angleSide', 'angleBase']},
-	]},
-	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['y', 'zoom'], and: [
-		{op: 'return', multiline: true, and: [
-			{op: '/', and: [
-				{op: '-', and: [
-					'½imageHeight',
-					{op: '*', and: ['½imageWidth', {op: 'tan', and: 'cornerAngle'}]},
-				]},
-				'imageHeight',
-			]},
-			{op: '/', and: [
-				'viewportSize',
-				{op: '*', and: [
-					{op: 'cos', and: 'progressAngle'},
-					{op: 'abs', and: {
-						op: '/', and: ['½imageWidth', {op: 'cos', and: 'cornerAngle'}],
-					}},
-				]},
-			]},
-		]},
 	]},
 ];
