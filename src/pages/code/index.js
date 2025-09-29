@@ -307,6 +307,7 @@ const visualisers = {
 	yvp: (scope, id) => getLine(scope[id], DEGREES[180] - demo.rotation),
 	position: (scope, id) => getLine(scope[id], scope[id].angle ?? 0),
 	angle: (scope, id) => {
+		// todo doesn't work correctly with negative angles?
 		const value = scope[id].value;
 		const curveX = ANGLE_RADIUS * Math.cos(value) * Math.max(1, demo.ratioImage);
 		const curveY = -ANGLE_RADIUS * Math.sin(value) * Math.max(1, demo.ratioImageInverse);

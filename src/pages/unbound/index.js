@@ -7,6 +7,7 @@ import Demo from './demo';
 
 const instructions = [
 	{text: ['Drag with your left mouse button to pan.'], key: 'pan'},
+	{text: ['Left click on the image to snap pan.'], key: 'snap'},
 	{text: ['Drag with your right mouse button to rotate.'], key: 'rotate'},
 	{text: ['Use your scroll wheel to zoom in and out.'], key: 'zoom'},
 	{text: ['Use your scroll wheel while holding "ctrl" on your keyboard to adjust image aspect ratio.'], key: 'resizeImage'},

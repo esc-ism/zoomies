@@ -227,9 +227,8 @@ export default (wrapper) => {
 				'.',
 				'Position will even be ',
 				getButton('corrected', [
-					[{ratio: 1, position: 0.5}, {duration: 0}],
-					[{zoom: 1.5}, {position: 0}],
-					[{ratio: 2}],
+					[{ratio: 1, zoom: 1.5, position: 0.5}],
+					[{ratio: 1.5}, {duration: 2.5, ease: 'none'}],
 				]),
 				' if aspect ratios change!',
 			],

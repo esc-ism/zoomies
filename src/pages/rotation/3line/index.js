@@ -121,7 +121,7 @@ const functions = [
 			{op: '+', and: [{op: '*', and: ['firstEndY', 'mult']}, 'offsetY', 'secondY']},
 		]},
 	]},
-	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: 'y', and: [
+	{op: 'func', id: 'getYIntersect', args: ['cornerAngle'], type: 'y', and: [
 		{op: 'return', and: {
 			op: '/', and: [
 				{op: '-', and: [
@@ -132,7 +132,7 @@ const functions = [
 			],
 		}},
 	]},
-	{op: 'func', id: 'getXIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: 'x', and: [
+	{op: 'func', id: 'getXIntersect', args: ['cornerAngle'], type: 'x', and: [
 		{op: 'return', and: {
 			op: '/', and: [
 				{op: '-', and: [
@@ -144,7 +144,7 @@ const functions = [
 		}},
 	]},
 	{op: 'func', id: 'getAxisIntersects', args: ['isEvenQuadrant', 'quadrantAngle'], type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
-		{op: '=', id: ['angleBase', 'angleSide'], and: {
+		{op: '=', id: ['angleSide', 'angleBase'], and: {
 			op: 'call', id: 'getProgressAngles', and: ['quadrantAngle'],
 		}},
 		'',
@@ -153,31 +153,23 @@ const functions = [
 			{op: 'return', multiline: true, and: [
 				0,
 				{op: 'call', id: 'getYIntersect', and: [
-					'½viewportWidth',
 					{op: '+', and: ['quadrantAngle', 'angleSide']},
-					'angleSide',
 				]},
 				0,
 				{op: 'call', id: 'getYIntersect', and: [
-					'½viewportHeight',
 					{op: '-', and: ['½π', 'quadrantAngle', 'angleBase']},
-					'angleBase',
 				]},
 			]},
 		]},
 		'',
 		{op: '=', id: 'axisIntersectSideX', and: {
 			op: 'call', id: 'getXIntersect', and: [
-				'½viewportWidth',
 				{op: '-', and: ['½π', 'quadrantAngle', 'angleSide']},
-				'angleSide',
 			],
 		}},
 		{op: '=', id: 'axisIntersectBaseX', and: {
 			op: 'call', id: 'getXIntersect', and: [
-				'½viewportHeight',
 				{op: '+', and: ['quadrantAngle', 'angleBase']},
-				'angleBase',
 			],
 		}},
 		'',

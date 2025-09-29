@@ -64,7 +64,7 @@ const tween = async (demo) => {
 		};
 		
 		demo.setTween(
-			[{ratio}, {delay: 0.5}],
+			[{ratio, position: 0}, {delay: 0.5}],
 			[{rotation, zoom: first.z}],
 			[{zoom: first.z * 3}, {
 				duration: 2,
