@@ -59,6 +59,30 @@ const getIndents = (depth) => {
 	return elements;
 };
 
+const makeMultiline = (elements, indent, statement, property) => {
+	if (!statement.multiline) {
+		return;
+	}
+	
+	let lineLength = 0;
+	let lineCount = 0;
+	const lineMax = arrayify(getLineLength(statement, property));
+	
+	for (const [i, child] of elements.entries()) {
+		if (statement.multiline && lineLength++ >= lineMax[lineCount % lineMax.length]) {
+			if (i > 0) {
+				lineCount++;
+				lineLength = 1;
+			}
+			
+			child.prepend(document.createElement('br'), ...getIndents(indent + 1));
+		}
+	}
+	
+	elements.unshift(document.createElement('br'), ...getIndents(indent + 1));
+	elements.push(document.createElement('br'), ...getIndents(indent));
+};
+
 export const register = (newDemo, statements = []) => {
 	init = newDemo.init().then(() => {
 		reset();
@@ -72,24 +96,31 @@ export const register = (newDemo, statements = []) => {
 	
 	functions = Object.fromEntries(statements.map((statement) => [
 		statement.id,
-		(args, scope, indent, meta) => {
+		Object.assign((args, scope, indent, meta) => {
 			const funcWrapper = getElement(CLASS_NAMES.clause);
 			const funcElement = getElement(CLASS_NAMES.func);
 			const argsElement = getElement(CLASS_NAMES.params);
 			const body = document.createElement('div');
 			
-			for (const [i, argId] of statement.args?.entries() ?? []) {
-				const wrapper = getElement(CLASS_NAMES.csv);
-				const arg = getElement(CLASS_NAMES.id);
+			if ('args' in statement) {
+				const elements = statement.args.map((argId, i) => {
+					const wrapper = getElement(CLASS_NAMES.csv);
+					const arg = getElement(CLASS_NAMES.id);
+					
+					scope[argId] = {value: args.values[i], ...args.shapeData[i], element: args.elements[i]};
+					
+					makeHoverable(arg, argId, scope, meta, true);
+					
+					arg.innerText = argId;
+					
+					wrapper.appendChild(arg);
+					
+					return wrapper;
+				});
 				
-				scope[argId] = {value: args.values[i], ...args.shapeData[i], element: args.elements[i]};
+				makeMultiline(elements, indent, statement, 'args');
 				
-				makeHoverable(arg, argId, scope, meta, true);
-				
-				arg.innerText = argId;
-				
-				wrapper.appendChild(arg);
-				argsElement.appendChild(wrapper);
+				argsElement.append(...elements);
 			}
 			
 			const {active} = meta;
@@ -98,18 +129,22 @@ export const register = (newDemo, statements = []) => {
 			
 			funcWrapper.append(funcElement, argsElement, body, ...getIndents(indent));
 			
-			if (active) {
-				const value = meta.return;
-				
-				delete meta.return;
-				
-				meta.active = true;
-				
-				return {value, shapeData: getOtherProps(statement, 'op', 'id', 'args', 'and'), wrapper: funcWrapper, target: funcElement};
+			const result = {wrapper: funcWrapper, target: funcElement};
+			
+			if (statement.multilineResult) {
+				result.multilineResult = statement.multilineResult;
 			}
 			
-			return {wrapper: funcWrapper, target: funcElement};
-		},
+			if (active) {
+				result.value = meta.return;
+				result.shapeData = getOtherProps(statement, 'op', 'id', 'args', 'and', 'multiline', 'multilineResult');
+				
+				delete meta.return;
+				meta.active = true;
+			}
+			
+			return result;
+		}, {multiline: statement.multiline ?? false}),
 	]));
 };
 
@@ -164,42 +199,27 @@ const getCombiner = (() => {
 })();
 
 const getFunction = (getValue) => (statement, scope, indent, meta) => {
-	const func = getElement(CLASS_NAMES[statement.op], CLASS_NAMES.evocation);
+	const func = getElement(CLASS_NAMES[statement.op]);
 	const args = getElement(CLASS_NAMES.args);
 	const csvs = getCsvs(statement, scope, indent, meta);
 	
 	args.append(...csvs.elements);
 	
+	// todo make hoverable & add titles
 	return {value: getValue(...csvs.values), elements: [func, args]};
-};
-
-const getInverseFunction = (getValue) => {
-	const getResult = getFunction(getValue);
-	
-	return (...args) => {
-		const result = getResult(...args);
-		const sup = document.createElement('sup');
-		
-		sup.innerText = '-1';
-		
-		result.elements[0].appendChild(sup);
-		
-		return result;
-	};
 };
 
 const getLineLength = (statement, property = 'and') => {
 	const {multiline, [property]: {length}} = statement;
 	
-	if (!multiline) {
-		return Infinity;
+	switch (typeof multiline) {
+		case 'undefined': return Infinity;
+		case 'boolean': return 1;
+		case 'number': return Math.ceil(length / multiline);
 	}
 	
-	if (typeof multiline === 'boolean') {
-		return 1;
-	}
-	
-	return Math.ceil(length / multiline);
+	// array
+	return multiline;
 };
 
 const getCsvs = (statement, scope, indent, meta, property = 'and') => {
@@ -207,23 +227,15 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 		return {elements: []};
 	}
 	
-	const unwrapped = [];
 	const elements = [];
 	const values = [];
 	const shapeData = [];
 	
 	const subIndent = indent + !!statement.multiline;
-	const lineLength = getLineLength(statement, property);
 	
-	for (const [i, subStatement] of arrayify(statement[property]).entries()) {
+	for (const subStatement of arrayify(statement[property])) {
 		const {elements: subElements, value, ...subShapeData} = interpret(subStatement, scope, subIndent, meta);
 		const wrapper = getElement(CLASS_NAMES.csv);
-		
-		if (statement.multiline && i % lineLength === 0) {
-			wrapper.append(document.createElement('br'), ...getIndents(indent + 1));
-		}
-		
-		unwrapped.push(subElements);
 		
 		wrapper.append(...subElements);
 		elements.push(wrapper);
@@ -241,11 +253,9 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 		}
 	}
 	
-	if (statement.multiline) {
-		elements.push(document.createElement('br'), ...getIndents(indent));
-	}
+	makeMultiline(elements, indent, statement, property);
 	
-	return {values, elements, unwrapped, shapeData};
+	return {values, elements, shapeData};
 };
 
 const getLine = ({value: length, doCenter = false, isPercent = true}, rotation) => {
@@ -353,7 +363,7 @@ const visualise = (scope, ...ids) => {
 };
 
 const getTitle = (value, type) => {
-	if (typeof value === 'boolean') {
+	if (typeof value !== 'number') {
 		return value;
 	}
 	
@@ -369,7 +379,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 		return false;
 	}
 	
-	const doShowVisuals = id && 'type' in scope[id];
+	const doShowVisuals = id && 'type' in scope[id] && typeof scope[id].value !== 'undefined';
 	const visuals = [];
 	let hovered = [];
 	
@@ -483,6 +493,7 @@ const interpretters = {
 		
 		return {value: csvs.values, elements: [wrapper]};
 	},
+	// todo get shapeData stuff from {op:'array'} values
 	'=': (statement, scope, indent, meta) => {
 		const {value, elements: operand, ...call} = interpret(statement.and, scope, indent, meta);
 		const values = arrayify(value);
@@ -511,7 +522,7 @@ const interpretters = {
 			}
 		}
 		
-		const csvs = getCsvs(statement, scope, indent, meta, 'id');
+		const csvs = getCsvs({multiline: call.multilineResult ?? false, ...statement}, scope, indent, meta, 'id');
 		
 		if (!Array.isArray(statement.id)) {
 			return {elements: [...csvs.elements, getElement(CLASS_NAMES['=']), ...operand]};
@@ -638,7 +649,7 @@ const interpretters = {
 	sin: getFunction(Math.sin),
 	cos: getFunction(Math.cos),
 	tan: getFunction(Math.tan),
-	atan: getInverseFunction(Math.atan),
+	atan: getFunction(Math.atan),
 	root: (statement, scope, indent, meta) => {
 		const element = getElement(CLASS_NAMES.root);
 		const {value, elements} = interpret(statement.and, scope, indent, meta);
@@ -676,24 +687,26 @@ const interpretters = {
 		
 		id.innerText = statement.id;
 		
-		const csvs = getCsvs(statement, scope, indent, meta);
+		const csvs = getCsvs({multiline: functions[statement.id].multiline, ...statement}, scope, indent, meta);
 		
 		args.append(...csvs.elements);
 		
 		const {target, wrapper, ...result} = functions[statement.id](csvs, {...scope}, indent, meta);
 		
-		// todo don't set if unexecuted
-		id.setAttribute('title', Array.isArray(result.value) ?
-			`[${result.value.map((value) => getTitle(value, result.type)).join(', ')}]` :
-				getTitle(result.value, result.type));
-		
 		if (makeHoverable(id, undefined, scope, meta)) {
+			id.setAttribute('title', Array.isArray(result.value) ?
+				`[${result.value.map((value) => getTitle(value, result.type)).join(', ')}]` :
+					getTitle(result.value, result.type));
+			
 			makeHoverable(target, undefined, scope, meta);
 			
 			const newline = document.createElement('span');
+			// todo doesn't work correctly
 			const {multiline} = meta.branch[meta.branch.length - 2];
 			
 			newline.append(document.createElement('br'), ...getIndents(indent));
+			
+			id.style.cursor = 'pointer';
 			
 			id.addEventListener('click', () => {
 				id.replaceWith(wrapper);

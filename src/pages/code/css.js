@@ -3,7 +3,7 @@ import {addRule} from '@css';
 import {CLASS_NAMES, CLASS_MAXIMISED} from './consts';
 import {CLASS_CODE} from '../consts';
 
-const addPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`});
+const addPseudoRule = (selector, content, {display = 'inline', ...styles} = {}) => addRule(selector, {display, ...styles, content: `"${content}"`});
 const addKeywordPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`, color: 'rgb(219 142 56)'});
 
 // infix binary ops
@@ -37,6 +37,8 @@ addPseudoRule(`.${CLASS_NAMES.csv}:has(+ .${CLASS_NAMES.csv})::after`, ', ');
 addKeywordPseudoRule(`.${CLASS_NAMES.return}::after`, 'return ');
 addKeywordPseudoRule(`.${CLASS_NAMES.func}::after`, 'function');
 
+addRule(`.${CLASS_NAMES.func}`, {cursor: 'pointer'});
+
 // wrappers
 for (const [name, before, after = before] of [
 	['abs', '|'],
@@ -57,6 +59,10 @@ for (const name of ['floor', 'min', 'max', 'sin', 'cos', 'tan']) {
 // inverse functions
 for (const name of [/* 'asin', 'acos', */'atan']) {
 	addPseudoRule(`.${CLASS_NAMES[name]}::before`, `${name.slice(1)}`);
+	addPseudoRule(`.${CLASS_NAMES[name]}::after`, '-1', {
+		'vertical-align': 'super',
+		'font-size': 'smaller',
+	});
 }
 
 addPseudoRule(`.${CLASS_NAMES.root}::before`, '√');
@@ -70,9 +76,8 @@ addRule(`.${CLASS_NAMES['=']} > :last-child::after`, {display: 'block'});
 
 // dynamic ops
 for (const [name, color] of [
-	// ['id', 'rgb(200 228 217)'],
-	// ['number', 'rgb(167 216 230)'],
-	['number', 'rgb(125 159 255)'],
+	['bool', '#90b0f9'],
+	['number', '#90b0f9'],
 ]) {
 	addRule(`.${CLASS_NAMES[name]}`, {color});
 }

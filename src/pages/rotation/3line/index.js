@@ -8,7 +8,10 @@ import Demo from './demo';
 
 const functions = [
 	...SHARED_FUNCTIONS,
-	{op: 'func', id: 'getGenericIntersection', args: ['from0X', 'from0Y', 'to0X', 'to0Y', 'from1X', 'from1Y', 'to1X', 'to1Y'], type: ['x', 'y'], pair: [1, 0], and: [
+	{op: 'func', id: 'getGenericIntersection', multiline: 2, args: [
+		'from0X', 'from0Y', 'to0X', 'to0Y',
+		'from1X', 'from1Y', 'to1X', 'to1Y',
+	], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: '=', id: 'a0', and: {
 			op: '-', and: ['from0Y', 'to0Y'],
 		}},
@@ -59,7 +62,10 @@ const functions = [
 			]},
 		]},
 	]},
-	{op: 'func', id: 'getIntersection', args: ['zoom0', 'from0X', 'from0Y', 'to0X', 'to0Y', 'from1X', 'from1Y', 'to1X', 'to1Y'], type: ['zoom', 'x', 'y'], pair: [1, 0], and: [
+	{op: 'func', id: 'getIntersection', args: [
+		'zoom0', 'from0X', 'from0Y', 'to0X', 'to0Y',
+		'from1X', 'from1Y', 'to1X', 'to1Y',
+	], multiline: 2, type: ['zoom', 'x', 'y'], pair: [,2, 1], and: [
 		{op: '=', id: ['intersectX', 'intersectY'], and: {
 			op: 'call', id: 'getGenericIntersection', and: ['from0X', 'from0Y', 'to0X', 'to0Y', 'from1X', 'from1Y', 'to1X', 'to1Y'],
 		}},
@@ -101,7 +107,7 @@ const functions = [
 			{op: '*', and: ['y', 'mult']},
 		]},
 	]},
-	{op: 'func', id: 'getSecond', args: ['firstZoom', 'firstEndX', 'firstEndY', 'secondZoom', 'offsetX', 'offsetY'], type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
+	{op: 'func', id: 'getSecond', args: ['firstZoom', 'firstEndX', 'firstEndY', 'secondZoom', 'offsetX', 'offsetY'], multiline: 2, type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
 		{op: '=', id: ['secondX', 'secondY'], type: ['x', 'y'], and: {
 			op: 'call', id: 'getProgressed', and: [0, 0, 'firstEndX', 'firstEndY', 'firstZoom', 'secondZoom'],
 		}},
@@ -116,26 +122,26 @@ const functions = [
 		]},
 	]},
 	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: 'y', and: [
-		{op: 'return', multiline: true, and: [
-			{op: '/', and: [
+		{op: 'return', and: {
+			op: '/', and: [
 				{op: '-', and: [
 					'½imageHeight',
 					{op: '*', and: ['½imageWidth', {op: 'tan', and: 'cornerAngle'}]},
 				]},
 				'imageHeight',
-			]},
-		]},
+			],
+		}},
 	]},
 	{op: 'func', id: 'getXIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: 'x', and: [
-		{op: 'return', multiline: true, and: [
-			{op: '/', and: [
+		{op: 'return', and: {
+			op: '/', and: [
 				{op: '-', and: [
 					'½imageWidth',
 					{op: '*', and: ['½imageHeight', {op: 'tan', and: 'cornerAngle'}]},
 				]},
 				'imageWidth',
-			]},
-		]},
+			],
+		}},
 	]},
 	{op: 'func', id: 'getAxisIntersects', args: ['isEvenQuadrant', 'quadrantAngle'], type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
 		{op: '=', id: ['angleBase', 'angleSide'], and: {
@@ -146,13 +152,13 @@ const functions = [
 			{op: '>=', and: ['isEvenQuadrant', '¼π']},
 			{op: 'return', multiline: true, and: [
 				0,
-				{op: 'call', id: 'getYIntersect', multiline: true, and: [
+				{op: 'call', id: 'getYIntersect', and: [
 					'½viewportWidth',
 					{op: '+', and: ['quadrantAngle', 'angleSide']},
 					'angleSide',
 				]},
 				0,
-				{op: 'call', id: 'getYIntersect', multiline: true, and: [
+				{op: 'call', id: 'getYIntersect', and: [
 					'½viewportHeight',
 					{op: '-', and: ['½π', 'quadrantAngle', 'angleBase']},
 					'angleBase',
@@ -161,14 +167,14 @@ const functions = [
 		]},
 		'',
 		{op: '=', id: 'axisIntersectSideX', and: {
-			op: 'call', id: 'getXIntersect', multiline: true, and: [
+			op: 'call', id: 'getXIntersect', and: [
 				'½viewportWidth',
 				{op: '-', and: ['½π', 'quadrantAngle', 'angleSide']},
 				'angleSide',
 			],
 		}},
 		{op: '=', id: 'axisIntersectBaseX', and: {
-			op: 'call', id: 'getXIntersect', multiline: true, and: [
+			op: 'call', id: 'getXIntersect', and: [
 				'½viewportHeight',
 				{op: '+', and: ['quadrantAngle', 'angleBase']},
 				'angleBase',
@@ -235,11 +241,11 @@ const functions = [
 		'xvp', 'yvp', 'xvp', 'yvp', 'xvp', 'yvp', 'xvp', 'yvp',
 		// second
 		'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
-	], pair: [,,3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24], args: [
+	], multilineResult: [2, 4, 4, 8, 8], pair: [,,3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24], args: [
 		'isEvenQuadrant', 'zoomSide', 'zoomBase', 'rightXRaw', 'rightYRaw', 'topXRaw', 'topYRaw',
 		'axisIntersectXSide', 'axisIntersectYSide', 'axisIntersectXBase', 'axisIntersectYBase',
 		'cornerXSide', 'cornerXBase',
-	], and: [
+	], multiline: [7, 4, 2], and: [
 		{op: '=', id: 'isHorizontalFirst', and: {
 			op: '<=', and: ['zoomSide', 'zoomBase'],
 		}},
@@ -265,11 +271,20 @@ const functions = [
 			],
 		}},
 		'',
-		{op: '=', id: ['firstZoom', 'secondZoom', 'firstEndX', 'firstEndY', 'offsetX', 'offsetY', 'thirdX', 'thirdY', 'thirdEndX'], and: {
+		{op: '=', id: [
+			'firstZoom', 'secondZoom', 'firstEndX', 'firstEndY',
+			'offsetX', 'offsetY', 'thirdX', 'thirdY', 'thirdEndX',
+		], multiline: [6, 3], and: {
 			op: '?', multiline: true, and: [
 				'isHorizontalFirst',
-				{op: 'array', and: ['zoomSide', 'zoomBase', 'rightX', 'rightY', 'topX', 'topY', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide']},
-				{op: 'array', and: ['zoomBase', 'zoomSide', 'topX', 'topY', 'rightX', 'rightY', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase']},
+				{op: 'array', multiline: [6, 3], and: [
+					'zoomSide', 'zoomBase', 'rightX', 'rightY',
+					'topX', 'topY', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide',
+				]},
+				{op: 'array', multiline: [6, 3], and: [
+					'zoomBase', 'zoomSide', 'topX', 'topY',
+					'rightX', 'rightY', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase',
+				]},
 			],
 		}},
 		'',
@@ -292,7 +307,7 @@ const functions = [
 		{op: 'return', and: {
 			op: '?', multiline: true, and: [
 				{op: 'call', id: 'getDoFlip', and: ['firstEndX', 'firstEndY', 'secondX', 'secondY', 'thirdX', 'thirdY', 'thirdEndX']},
-				{op: 'array', and: [
+				{op: 'array', multiline: [2, 4, 4, 8, 8], and: [
 					'firstZoom', 'secondZoom',
 					{op: '-', and: 'firstEndXFlipped'}, {op: '-', and: 'firstEndYFlipped'},
 					'firstEndXFlipped', 'firstEndYFlipped',
@@ -303,7 +318,7 @@ const functions = [
 					'secondX', 'secondY', 'secondEndX', 'secondEndY',
 					'secondX', 'secondY', 'secondEndX', 'secondEndY',
 				]},
-				{op: 'array', and: [
+				{op: 'array', multiline: [2, 4, 4, 8, 8], and: [
 					'firstZoom', 'secondZoom',
 					'firstEndX', 'firstEndY',
 					'firstEndX', 'firstEndY',
@@ -319,14 +334,13 @@ const functions = [
 	]},
 	{op: 'func', id: 'getFixed', args: [
 		'thirdZoom', 'thirdX', 'thirdY', 'cornerX',
-		'firstZoom', 'firstEndX', 'firstEndY',
-		'firstEndXFlipped', 'firstEndYFlipped',
+		'firstZoom', 'firstEndX', 'firstEndY', 'firstEndXFlipped', 'firstEndYFlipped',
 		'secondZoom', 'secondX', 'secondY', 'secondEndX', 'secondEndY',
 		'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
-	], type: [
+	], multiline: [4, 5, 5, 4], type: [
 		'zoom', 'x', 'y', 'xvp', 'yvp',,,
 		'x', 'y', 'x', 'y',
-	], pair: [,2, 1, 4, 3,,7, 6, 9, 8], and: [
+	], multilineResult: [4, 5, 5, 4], pair: [,2, 1, 4, 3,,,8, 7, 10, 9], and: [
 		{op: 'if', and: [
 			{op: '>=', and: ['thirdZoom', 'secondZoom']},
 			{op: 'return', and: [
@@ -366,7 +380,7 @@ const functions = [
 		'zoom',,,
 		'x', 'y', 'x', 'y',,
 		'x', 'y', 'x', 'y',
-	], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,14, 13, 16, 15,,19, 18, 21, 20], args: ['isEvenQuadrant'], and: [
+	], multilineResult: [3, 3, 5, 2, 5, 5], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,14, 13, 16, 15,,19, 18, 21, 20], args: ['isEvenQuadrant'], and: [
 		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
@@ -390,10 +404,13 @@ const functions = [
 			op: '?', and: ['isEvenQuadrant', {op: 'array', and: [-0.5, 0.5]}, {op: 'array', and: [0.5, -0.5]}],
 		}},
 		'',
-		{op: '=', multiline: 18, id: [
+		{op: '=', id: [
 			'firstZoom', 'secondZoom',
 			'firstEndXSide', 'firstEndYSide',
 			'firstEndXBase', 'firstEndYBase',
+			// todo shorten names by using symbols
+			//  maybe there's some math symbol you can use for mirror images
+			//  top & right can just be arrows
 			'firstEndXSideFlipped', 'firstEndYSideFlipped',
 			'firstEndXBaseFlipped', 'firstEndYBaseFlipped',
 			'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
@@ -409,13 +426,13 @@ const functions = [
 		}},
 		'',
 		{op: '=', id: ['thirdZoomSide', 'thirdXSide', 'thirdYSide'], and: {
-			op: 'call', id: 'getIntersection', multiline: 2, and: [
+			op: 'call', id: 'getIntersection', and: [
 				'secondZoom', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
 				'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
 			],
 		}},
 		{op: '=', id: ['thirdZoomBase', 'thirdXBase', 'thirdYBase'], and: {
-			op: 'call', id: 'getIntersection', multiline: 2, and: [
+			op: 'call', id: 'getIntersection', and: [
 				'secondZoom', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
 				'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
 			],
@@ -431,7 +448,7 @@ const functions = [
 					{op: 'abs', and: {op: '-', and: ['quadrantAngle', '¼π']}},
 					'⅛π',
 				]},
-				{op: 'return', multiline: 2, and: [
+				{op: 'return', multiline: [1, 1, 5], and: [
 					{op: '...', and: {
 						op: 'call', id: 'getIntersection', and: [
 							'firstZoom', 0, 0, 'firstEndXSide', 'firstEndYSide',
@@ -448,17 +465,15 @@ const functions = [
 				]},
 			]},
 			'',
-			// todo you need to implement bespoke multiline groups
-			//  maybe via empty strings
-			{op: 'return', and: [
+			{op: 'return', multiline: [1, 1, 5, 2, 5, 5], and: [
 				{op: '...', and: {
-					op: 'call', id: 'getIntersection', and: [
+					op: 'call', id: 'getIntersection', multiline: 5, and: [
 						'secondZoom', 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
 						'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
 					],
 				}},
 				{op: '...', and: {
-					op: 'call', id: 'getIntersection', and: [
+					op: 'call', id: 'getIntersection', multiline: 5, and: [
 						'secondZoom', 'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
 						'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
 					],
@@ -472,7 +487,7 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			{op: '<=', and: ['thirdZoomBase', 'thirdZoomSide']},
-			{op: '=', id: [
+			{op: '=', multiline: [5, 6], id: [
 				'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstEndXFixed', 'firstEndYFixed',
 				'hasSecondFixed', 'secondIsFlipped', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
 			], and: {
@@ -485,8 +500,9 @@ const functions = [
 				],
 			}},
 			'',
-			{op: 'return', and: [
-				'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed',
+			{op: 'return', multiline: [3, 3, 5, 2, 5, 5], and: [
+				'thirdZoomSide', 'thirdXSide', 'thirdYSide',
+				'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed',
 				'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXFixed', 'firstEndYFixed',
 				'secondZoom', 'secondIsFlipped',
 				true, 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
@@ -507,8 +523,9 @@ const functions = [
 			],
 		}},
 		'',
-		{op: 'return', and: [
-			'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'thirdZoomBase', 'thirdXBase', 'thirdYBase',
+		{op: 'return', multiline: [3, 3, 5, 2, 5, 5], and: [
+			'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed',
+			'thirdZoomBase', 'thirdXBase', 'thirdYBase',
 			'firstZoom', 'firstEndXFixed', 'firstEndYFixed', 'firstEndXBase', 'firstEndYBase',
 			'secondZoom', 'secondIsFlipped',
 			'hasSecondFixed', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
@@ -521,7 +538,7 @@ const functions = [
 		'zoom',,,
 		'x', 'y', 'x', 'y',,
 		'x', 'y', 'x', 'y',
-	], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,14, 13, 16, 15,,19, 18, 21, 20], and: [
+	], multilineResult: [3, 3, 5, 2, 5, 5], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,,15, 14, 17, 18,,20, 19, 22, 21], and: [
 		{op: '=', id: 'isEvenQuadrant', and: {
 			op: '!=', and: [
 				{op: '%', and: [
@@ -534,7 +551,7 @@ const functions = [
 			],
 		}},
 		'',
-		{op: '=', multiline: 4, id: [
+		{op: '=', id: [
 			'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'thirdZoomBase', 'thirdXBase', 'thirdYBase',
 			'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXBase', 'firstEndYBase',
 			'secondZoom', 'secondIsFlipped',
@@ -544,8 +561,9 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			'isEvenQuadrant',
-			{op: 'return', multiline: 4, and: [
-				'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'thirdZoomBase', 'thirdXBase', 'thirdYBase',
+			{op: 'return', multiline: [3, 3, 5, 2, 5, 5], and: [
+				'thirdZoomSide', 'thirdXSide', 'thirdYSide',
+				'thirdZoomBase', 'thirdXBase', 'thirdYBase',
 				'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXBase', 'firstEndYBase',
 				'secondZoom', 'secondIsFlipped',
 				'hasSecondSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
@@ -553,7 +571,7 @@ const functions = [
 			]},
 		]},
 		'',
-		{op: 'return', multiline: 4, and: [
+		{op: 'return', multiline: [3, 3, 5, 2, 5, 5], and: [
 			'thirdZoomBase', 'thirdXBase', 'thirdYBase', 'thirdZoomSide', 'thirdXSide', 'thirdYSide',
 			'firstZoom', 'firstEndXBase', 'firstEndYBase', 'firstEndXSide', 'firstEndYSide',
 			'secondZoom', 'secondIsFlipped',
@@ -561,7 +579,7 @@ const functions = [
 			'hasSecondSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
 		]},
 	]},
-	{op: 'func', id: 'getBound', type: ['x', 'y'], pair: [1, 0], args: [
+	{op: 'func', id: 'getBound', multiline: [4, 3, 6], type: ['x', 'y'], pair: [1, 0], args: [
 		'thirdZoom', 'thirdX', 'thirdY', 'thirdEndX',
 		'firstZoom', 'firstEndX', 'firstEndY',
 		'secondZoom', 'hasSecond', 'secondX', 'secondY', 'secondEndX', 'secondEndY',
@@ -612,12 +630,12 @@ const functions = [
 	{op: 'func', id: 'getDirected', type: [
 		'zoom', 'x', 'y', 'x', 'y',
 		'zoom', 'x', 'y', 'x', 'y',
-	], args: [
+	], pair: [,2, 1, 4, 3,,7, 6, 9, 8], args: [
 		'flip',
 		'thirdZoom', 'thirdX', 'thirdY', 'thirdEndX',
 		'firstZoom', 'firstEndX', 'firstEndY',
 		'secondZoom', 'hasSecond', 'secondX', 'secondY', 'secondEndX', 'secondEndY',
-	], and: [
+	], multiline: [1, 4, 3, 6], and: [
 		{op: '=', id: ['zoom0', 'fromX0', 'fromY0', 'toX0', 'toY0'], and: {
 			op: '?', multiline: true, and: [
 				'hasSecond',
@@ -629,11 +647,11 @@ const functions = [
 		{op: 'return', and: {
 			op: '?', multiline: true, and: [
 				'flip',
-				{op: 'array', and: [
+				{op: 'array', multiline: 5, and: [
 					'zoom0', {op: '-', and: 'fromX0'}, {op: '-', and: 'fromY0'}, {op: '-', and: 'toX0'}, {op: '-', and: 'toY0'},
 					'thirdZoom', {op: '-', and: 'thirdX'}, {op: '-', and: 'thirdY'}, {op: '-', and: 'thirdEndX'}, -0.5,
 				]},
-				{op: 'array', and: [
+				{op: 'array', multiline: 5, and: [
 					'zoom0', 'fromX0', 'fromY0', 'toX0', 'toY0',
 					'thirdZoom', 'thirdX', 'thirdY', 'thirdEndX', 0.5,
 				]},
@@ -644,7 +662,7 @@ const functions = [
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',,
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
-	], args: ['flip0', 'flip1'], and: [
+	], pair: [,2, 1, 4, 3, 6, 5, 8, 7,,11, 10, 13, 12, 15, 14, 17, 16,,,21, 20, 23, 22, 25, 24, 27, 26], args: ['flip0', 'flip1'], and: [
 		{op: '=', multiline: 2, id: [
 			'zoomLow0', 'fromXLow0', 'fromYLow0', 'toXLow0', 'toYLow0',
 			'zoomHigh0', 'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0',
@@ -674,7 +692,7 @@ const functions = [
 		], and: {
 			op: '?', multiline: true, and: [
 				{op: '>=', and: ['thirdZoom0', 'thirdZoom1']},
-				{op: 'array', and: [
+				{op: 'array', multiline: [1, 4, 3, 1, 3, 4], and: [
 					'thirdZoom0',
 					'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0',
 					{op: '...', and: {op: 'call', id: 'getProgressed', and: [
@@ -688,7 +706,7 @@ const functions = [
 					'toXLow0', 'toYLow0',
 					'fromXHigh1', 'fromYHigh1', 'toXHigh1', 'toYHigh1',
 				]},
-				{op: 'array', and: [
+				{op: 'array', multiline: [1, 3, 4, 1, 4, 3], and: [
 					'thirdZoom1',
 					{op: '...', and: {op: 'call', id: 'getProgressed', and: [
 						'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0', 'zoomHigh0', 'thirdZoom1',
@@ -707,11 +725,10 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			{op: '!', and: 'hasSecond0'},
-			{op: 'return', and: [
+			{op: 'return', multiline: [9, 9, 2, 3, 4], and: [
 				'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
 				'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
-				true,
-				'secondZoom',
+				true, 'secondZoom',
 				{op: '...', and: {op: 'call', id: 'getProgressed', and: [
 					'fromXLow0', 'fromYLow0', 'toXLow0', 'toYLow0', 'zoomLow0', 'secondZoom',
 				]}},
@@ -722,11 +739,10 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			{op: '!', and: 'hasSecond1'},
-			{op: 'return', and: [
+			{op: 'return', multiline: [9, 9, 2, 4, 3], and: [
 				'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
 				'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
-				true,
-				'secondZoom',
+				true, 'secondZoom',
 				'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0',
 				{op: '...', and: {op: 'call', id: 'getProgressed', and: [
 					'fromXLow1', 'fromYLow1', 'toXLow1', 'toYLow1', 'zoomLow1', 'secondZoom',
@@ -737,23 +753,22 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			'secondIsFlipped',
-			{op: 'return', and: [
+			{op: 'return', multiline: [9, 9, 2, 4, 4], and: [
 				'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
 				'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
-				true,
-				'secondZoom',
+				true, 'secondZoom',
 				'fromXLow0', 'fromYLow0', 'toXLow0', 'toYLow0',
 				'fromXLow1', 'fromYLow1', 'toXLow1', 'toYLow1',
 			]},
 		]},
 		'',
-		{op: 'return', and: [
+		{op: 'return', multiline: 9, and: [
 			'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
 			'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
 		]},
 	]},
 	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], type: 'zoom', and: [
-		{op: '=', multiline: 3, id: [
+		{op: '=', multiline: [9, 9, 10], id: [
 			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C',
 			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B',
 			'hasA', 'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A',
@@ -819,7 +834,7 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			getCode([
-				{op: '=', multiline: 2, id: [
+				{op: '=', id: [
 					'thirdZoom0', 'thirdX0', 'thirdY0', 'thirdZoom1', 'thirdX1', 'thirdY1',
 					'firstZoom', 'firstEndX0', 'firstEndY0', 'firstEndX1', 'firstEndY1',
 					'secondZoom', 'secondIsFlipped',
@@ -895,7 +910,7 @@ export default (wrapper) => {
 			[
 				'This system is not significantly worse nor better at snap-panning than the prior.',
 				'If you try a snap-pan here and then hit your left arrow key, you\'ll see that differences are negligible.',
-				'If we\'re picking nits, however, the choppiness of the prior system\'s pan limits do lead to some slight inconsistency in span pans.',
+				'If we\'re picking nits, however, the choppiness of the prior system\'s pan limits do lead to some slight inconsistency in snap pans.',
 				'This system excises that inconsistency at the expense of less efficient code.',
 			],
 			'The balance of consistency and efficiency must be weighed to judge a victor.',
