@@ -97,9 +97,15 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'It\'s hard to beat this system for pan-limiting; it can\'t be improved without also making concessions.',
-				'As a snap-panning system, however, it\'s useless.',
-				'I\'d advocate for using this system for pan-limiting and an upcoming system for snap-panning.',
+				'This is a perfect pan-limiting system; it can\'t be improved without also making concessions.',
+				'As a snap-panning system, however, its inability to derive zooms makes it useless.',
+			],
+			[
+				'We\'ll call this system\'s snap panning "zoomless", as opposed to "zoomful".',
+				'All future systems will have zoomful snap panning.',
+			],
+			[
+				'A sensible implementation of these systems might use this one to limit panning and an upcoming system for snap pans.',
 				'If your image can\'t be rotated, I\'d recommend the next system up.',
 			],
 		),

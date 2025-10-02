@@ -4,16 +4,11 @@ import Demo from '../demo';
 import {getZoomProgressed, getProgressedLine, getZoomPairSecond, getProgress, getFlipped} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
-import getZoomPoints, {getRelevantDemo} from './zoomPoints';
-import {DEGREES} from '@/shared';
-import {getDimensions} from '../2line';
+import getZoomPoints from './zoomPoints';
 import {getRailProgress as getFirstIntRailProgress} from '../2line/demo';
+import * as mock from '../mock';
 
-export const getVarGetter = (demo, rotation = DEGREES[90], ratio = 1) => () => {
-	const zoomPoints = getZoomPoints(getRelevantDemo({...demo, rotation, sizesImage: getDimensions(ratio, demo.sizesViewport)}));
-	
-	return {zoomPoints, rotation, ratio};
-};
+export const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
 export const getBound = (zoom, first, second, third) => {
 	if (zoom <= first.z) {
@@ -157,7 +152,7 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		return this.constructor.getZoomPoints(getRelevantDemo(this), this.getAllStartZooms());
+		return this.constructor.getZoomPoints(this, this.getAllStartZooms());
 	}
 	
 	getSnappedZoom() {

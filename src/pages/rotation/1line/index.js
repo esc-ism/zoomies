@@ -1,11 +1,15 @@
-import Demo from './demo';
+import Demo, {getBound, getZoomPoints} from './demo';
 import SHARED_FUNCTIONS from '../code';
 
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo, getInstruction} from '../../shared';
 
-import {DEGREES, ERROR_ALLOWANCE, xmlns} from '@/shared';
-import {CLASS_MATH, CLASS_MATH_EQUATION} from '../../consts';
+import {DEGREES, xmlns} from '@/shared';
+import {CLASS_MATH, CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
+
+import * as mock from '../mock';
+
+const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
 export const badTweens = {
 	ratio: 0.6,
@@ -39,7 +43,7 @@ const functions = [
 			],
 		}},
 		'',
-		{op: 'return', and: [
+		{op: 'return', multiline: true, and: [
 			{op: '-', and: [
 				'cornerX',
 				{op: '/', and: [
@@ -72,7 +76,7 @@ const functions = [
 			],
 		}},
 		'',
-		{op: 'return', and: [
+		{op: 'return', multiline: true, and: [
 			{op: '*', and: [
 				'proportion',
 				'cornerX',
@@ -131,6 +135,8 @@ export default (wrapper) => {
 	registerDemo(demo);
 	registerFunctions(demo, functions);
 	
+	const keeper = getVarGetter(demo, -DEGREES['270'] + 0.5, 0.6);
+	
 	wrapper.append(
 		demo.constructor.element,
 		getText(
@@ -143,11 +149,33 @@ export default (wrapper) => {
 				'Because the last system was so simple, it\'s obvious that there\'s no way to improve its behaviour for un-rotated images.',
 				'This won\'t be the case for rotated images;',
 				'there are myriad approaches to pan-limiting, some more effective than others, but no clear "perfect" solution.',
-				'Here, I\'ll again start with the most simple.',
+				'This is the simplest possible zoomful system that can handle image rotation.',
 			],
 			[
-				'This demo has pan-limit points travel from the image\'s center directly towards their corresponding corners.',
-				'Again, corners are kept at the edge of the viewport where possible.',
+				'The rail to each image corner is a direct, single line (hence the page\'s title) from the image\'s origin.',
+				'Consequently, when the viewport is centered on a specific bound corner, the image corner that it\'s paired with is ',
+				getButton('kept', [
+					({zoomPoints, rotation, ratio}) => [{zoom: zoomPoints[1].z, rotation, ratio, position: 0}],
+					({zoomPoints}) => [{zoom: zoomPoints[1].z * 1.5}, {
+						onUpdate() {
+							demo.tweenUpdate.then(() => {
+								demo.position = getBound(demo.zoom, zoomPoints[1], false) || demo.position;
+								
+								demo.applyPosition();
+							});
+						},
+						onStart() {
+							demo.tween.data.ignorePosition = true;
+						},
+						onReverseComplete() {
+							demo.position.x = demo.position.y = 0;
+							
+							demo.applyPosition();
+						},
+						duration: 2.5, ease: 'none',
+					}],
+				], {getParam: keeper}),
+				' at the same point on the viewport\'s edge regardless of zoom.',
 			],
 			{
 				tag: 'h2',
@@ -155,13 +183,12 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'The maths here aren\'t yet too esoteric.',
-				'First, I calculate the maximum zoom at which corners are visible from the origin.',
-				'Adjacent corners can have different values but opposite corners are always equivalent.',
-				'Knowing this, I only need to calculate a zoom for the top-left and top-right corners.',
+				'To know when pan limits must start expanding, we need to find the maximum zoom at which image corners are visible from the origin.',
+				'Adjacent corners can differ, but opposite corners always share this maximum zoom value.',
+				'Knowing this, only the top-left and top-right corners need be considered.',
 				[
-					'Given these zoom values, we can derive pan limits from the user\'s zoom level.',
-					'This is demonstrated below.',
+					'Given these zoom values, deriving pan limits is straightforward.',
+					'The calculation is demonstrated below.',
 					'Note that the "rotation" value\'s unit is ',
 					{
 						tag: 'a',
@@ -220,7 +247,7 @@ export default (wrapper) => {
 			},
 			[
 				'You\'ll find that this system works ',
-				getButton('perfectly', [
+				getButton('well', [
 					[{ratio: 1, rotation: DEGREES[90], zoom: 1, position: {x: -0.5, y: 0.5}}],
 					[{rotation: 0}, {duration: 4}],
 					[{zoom: 2}, {duration: 2, ease: 'power3.inOut', yoyo: true, repeat: 1, position: '<'}],
@@ -258,10 +285,11 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			'The maths for snap panning will take a little longer to run through.',
+			'For brevity, I\'ll refer to image positions used in snap panning as "snap points".',
 			[
-				'First, I split the image into four segments using lines from the origin to each corner.',
-				'The snap position will fall into one of these segments; I disregard the two lines that don\'t contribute to the position\'s segment.',
-				'If the zoom value that I\'ve calculated for one of the relevant corners is lower than the other, I snip off the start of its line.',
+				'Observe how the rails split the image into four segments.',
+				'Any snap point will fall into one of these segments, bordered by two rails (any point exactly between two segments may be assigned to either).',
+				'If one rail\'s start zoom is lower than the other, we can snip off its start to make them match.',
 			],
 			getCode([
 				{op: '=', id: ['toX0', 'toY0', 'toX1', 'toY1'], and: {
@@ -286,21 +314,28 @@ export default (wrapper) => {
 				}},
 			]),
 			[
-				'The resulting start position is where the corner\'s bound would lie at the other corner\'s zoom.',
-				'From here, I need to find a line that intersects the snap point and ',
+				'That\'s the first part of the snap zoom calculation done.',
+				'Next, we need to find a ratio "', {tag: 'i', content: 't'}, '" such that a line segment with endpoints ', {tag: 'i', content: 't'}, ' on both rails also passes through the snap point.',
+				'When I talk about a point\'s "ratio" on its rail, I mean its distance from the rail\'s start point divided by the rail\'s total length.',
+				'It\'s a percentage measurement of how far along the point is, but between 0 and 1 instead of 0 and 100.',
+			],
+			[
+				'A kindred spirit outlines the problem ',
 				{
 					tag: 'a',
 					href: 'https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point',
-					content: 'both lines at the same ratio',
+					content: 'here',
 				},
-				'.',
-				'Solving this requires the ',
+				', including an excellent diagram that may help you to visualise the problem.',
+			],
+			[
+				'We can write out a definition of rail points at ', {tag: 'i', content: 't'}, ' using the ',
 				{
 					tag: 'a',
 					href: 'https://en.wikipedia.org/wiki/Linear_interpolation',
 					content: 'linear interpolation',
 				},
-				' formula, replacing slope with a variable (r) to be solved.',
+				' formula.',
 			],
 			{tag: 'p', classList: [CLASS_MATH], content: [
 				{tag: 'math', xmlns, content: [
@@ -308,7 +343,7 @@ export default (wrapper) => {
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'intersect'},
+									{tag: 'mi', xmlns, content: 'point'},
 									{tag: 'mi', xmlns, content: 'x'},
 								]},
 								{tag: 'mo', xmlns, content: '='},
@@ -317,7 +352,7 @@ export default (wrapper) => {
 									{tag: 'mi', xmlns, content: 'x'},
 								]},
 								{tag: 'mo', xmlns, content: '+'},
-								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mi', xmlns, content: 't'},
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'end'},
@@ -334,7 +369,7 @@ export default (wrapper) => {
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'intersect'},
+									{tag: 'mi', xmlns, content: 'point'},
 									{tag: 'mi', xmlns, content: 'y'},
 								]},
 								{tag: 'mo', xmlns, content: '='},
@@ -343,7 +378,7 @@ export default (wrapper) => {
 									{tag: 'mi', xmlns, content: 'y'},
 								]},
 								{tag: 'mo', xmlns, content: '+'},
-								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mi', xmlns, content: 't'},
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'end'},
@@ -361,26 +396,45 @@ export default (wrapper) => {
 				]},
 			]},
 			[
-				'We can use the point as a separator, splitting the intersecting line into two smaller lines.',
-				'Knowing that these sub-lines must share a gradient, we can use ',
+				'Now that we can define points at ', {tag: 'i', content: 't'}, ', we can define the line segment that passes through the snap point.',
+				'Using the snap point as a separator, we can split it in two.',
+				'Knowing that these derived line segments must share a gradient, we can use ',
 				{tag: 'span', content: '"m = dY / dX"', style: {whiteSpace: 'nowrap'}},
 				' to write the equation we\'re trying to solve.',
 			],
 			{tag: 'p', classList: [CLASS_MATH], content: [
 				{tag: 'math', xmlns, content: [
-					{tag: 'mtable', xmlns, content: [
+					{tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the lines be '},
+								{tag: 'mtext', xmlns, content: 'let the rails be '},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								getOverlined('AB'),
-							]},
-							{tag: 'mtd', xmlns, content: [
+								opSpace,
 								{tag: 'mtext', xmlns, content: ' and '},
+								opSpace,
+								getOverlined('CD'),
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: 'let the snap point be '},
 							]},
 							{tag: 'mtd', xmlns, content: [
-								getOverlined('CD'),
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mi', xmlns, content: 'x'},
+								{tag: 'mtext', xmlns, style: {whiteSpace: 'pre'}, content: ', '},
+								{tag: 'mi', xmlns, content: 'y'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: 'let the target line segment be '},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								getOverlined('EF'),
 							]},
 						]},
 					]},
@@ -399,7 +453,7 @@ export default (wrapper) => {
 									{tag: 'mi', xmlns, content: 'y'},
 								]},
 								{tag: 'mo', xmlns, content: '+'},
-								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mi', xmlns, content: 't'},
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'B'},
@@ -424,7 +478,7 @@ export default (wrapper) => {
 									{tag: 'mi', xmlns, content: 'y'},
 								]},
 								{tag: 'mo', xmlns, content: '+'},
-								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mi', xmlns, content: 't'},
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'D'},
@@ -450,7 +504,7 @@ export default (wrapper) => {
 									{tag: 'mi', xmlns, content: 'x'},
 								]},
 								{tag: 'mo', xmlns, content: '+'},
-								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mi', xmlns, content: 't'},
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'B'},
@@ -475,7 +529,7 @@ export default (wrapper) => {
 									{tag: 'mi', xmlns, content: 'x'},
 								]},
 								{tag: 'mo', xmlns, content: '+'},
-								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mi', xmlns, content: 't'},
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'D'},
@@ -547,7 +601,7 @@ export default (wrapper) => {
 											{tag: 'mi', xmlns, content: 'y'},
 										]},
 										{tag: 'mo', xmlns, content: '+'},
-										{tag: 'mi', xmlns, content: 'r'},
+										{tag: 'mi', xmlns, content: 't'},
 										{tag: 'mo', xmlns, content: '('},
 										{tag: 'msub', xmlns, content: [
 											{tag: 'mi', xmlns, content: 'B'},
@@ -568,7 +622,7 @@ export default (wrapper) => {
 											{tag: 'mi', xmlns, content: 'x'},
 										]},
 										{tag: 'mo', xmlns, content: '+'},
-										{tag: 'mi', xmlns, content: 'r'},
+										{tag: 'mi', xmlns, content: 't'},
 										{tag: 'mo', xmlns, content: '('},
 										{tag: 'msub', xmlns, content: [
 											{tag: 'mi', xmlns, content: 'B'},
@@ -596,7 +650,7 @@ export default (wrapper) => {
 											{tag: 'mi', xmlns, content: 'y'},
 										]},
 										{tag: 'mo', xmlns, content: '+'},
-										{tag: 'mi', xmlns, content: 'r'},
+										{tag: 'mi', xmlns, content: 't'},
 										{tag: 'mo', xmlns, content: '('},
 										{tag: 'msub', xmlns, content: [
 											{tag: 'mi', xmlns, content: 'D'},
@@ -617,7 +671,7 @@ export default (wrapper) => {
 											{tag: 'mi', xmlns, content: 'x'},
 										]},
 										{tag: 'mo', xmlns, content: '+'},
-										{tag: 'mi', xmlns, content: 'r'},
+										{tag: 'mi', xmlns, content: 't'},
 										{tag: 'mo', xmlns, content: '('},
 										{tag: 'msub', xmlns, content: [
 											{tag: 'mi', xmlns, content: 'D'},
@@ -649,7 +703,7 @@ export default (wrapper) => {
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msup', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'r'},
+									{tag: 'mi', xmlns, content: 't'},
 									{tag: 'mn', xmlns, content: '2'},
 								]},
 								{tag: 'mo', xmlns, content: '('},
@@ -733,7 +787,7 @@ export default (wrapper) => {
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '+'},
 								opSpace,
-								{tag: 'mi', xmlns, content: 'r'},
+								{tag: 'mi', xmlns, content: 't'},
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'mrow', xmlns, content: [
 									{tag: 'mtable', xmlns, content: [
@@ -908,20 +962,14 @@ export default (wrapper) => {
 			[
 				'We end up with a quadratic expression and solve it with the ',
 				{tag: 'a', content: 'quadratic formula', href: 'https://en.wikipedia.org/wiki/Quadratic_formula'},
-				' to find our ratio.',
-				'From here, it\'s a simple calculation using the un-snipped line\'s start zoom to find our final snap zoom.',
+				' to find ', {tag: 'i', content: 't'}, '.',
+				'From here, it\'s a simple calculation using the un-snipped rail\'s start zoom to find our final snap zoom.',
 			],
 			getCode([
 				{op: '=', id: 'ratio', and: {
-					op: 'call', id: 'getIntersectRatio', and: [
-						'fromX0',
-						'fromY0',
-						'toX0',
-						'toY0',
-						'fromX1',
-						'fromY1',
-						'toX1',
-						'toY1',
+					op: 'call', id: 'getIntersectRatio', multiline: [4, 4, 1], and: [
+						'fromX0', 'fromY0', 'toX0', 'toY0',
+						'fromX1', 'fromY1', 'toX1', 'toY1',
 						{op: '!=', and: ['toY0', 'toY1']},
 					],
 				}},
@@ -942,8 +990,8 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Okay! So how does the system perform as a medium for snap-panning?',
-				'Again, it\'s perfect until we decouple aspect ratios.',
+				'Okay! Now that we\'ve gone through how snap-panning works, how useful is it in practise?',
+				'Like with pan-limiting, it\'s perfect until we decouple aspect ratios.',
 				'Specifically, consider ',
 				getButton('this', [
 					[{ratio: 0.5, rotation: DEGREES[90], position: 0, zoom: 1}],
@@ -962,7 +1010,7 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'This laissez-faire approach to pan limit point expansion doesn\'t work.',
+				'Unfortunately, fixed rail gradients don\'t result in satisfactory behaviour.',
 				'An improved system will require more deliberate placement of image corners on viewport edges.',
 			],
 		),

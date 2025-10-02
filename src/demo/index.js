@@ -180,6 +180,7 @@ export default class {
 	#resizeObserver;
 	#removeResolver;
 	#tweenUpdateId;
+	tweenUpdate = Promise.resolve();
 	isRemoved = false;
 	removed = new Promise((resolve) => {
 		this.#removeResolver = resolve;
@@ -219,99 +220,101 @@ export default class {
 		
 		viewport.appendChild(this.constructor.progress.element);
 		
-		this.addEventListener(resizer, 'pointerdown', (event) => {
-			const {buttons, pointerId, offsetX} = event;
-			
-			if (buttons !== 1 && buttons !== 2) {
-				return;
-			}
-			
-			event.stopPropagation();
-			event.preventDefault();
-			
-			resizer.setPointerCapture(pointerId);
-			
-			const entryMove = this.addEventListener(resizer, 'pointermove', this.listeners.resizeViewport.bind(null, offsetX));
-			
-			const entryStop = this.addEventListener(resizer, 'pointerup', () => {
-				if (buttons === 2) {
-					cancelRightClick();
-					
-					this.listeners.resetViewport();
-				}
+		this.init().then(() => {
+			this.addEventListener(resizer, 'pointerdown', (event) => {
+				const {buttons, pointerId, offsetX} = event;
 				
-				this.removeEventListener(entryMove);
-				this.removeEventListener(entryStop);
-			});
-		});
-		
-		this.addEventListener(viewport, 'wheel', (event) => {
-			event.stopPropagation();
-			event.preventDefault();
-			
-			if (event.deltaY === 0) {
-				return;
-			}
-			
-			this.listeners[event.ctrlKey ? 'resizeImage' : 'zoom'](event);
-		});
-		
-		this.addEventListener(viewport, 'pointerdown', (event) => {
-			const {offsetX, offsetY, buttons, clientX, clientY} = event;
-			
-			if (buttons !== 1 && buttons !== 2) {
-				return;
-			}
-			
-			event.stopPropagation();
-			event.preventDefault();
-			
-			const entryMove = this.addEventListener(viewport, 'pointermove', this.listeners[buttons === 1 ? 'pan' : 'rotate']());
-			
-			image.style.cursor = 'grabbing';
-			
-			let isClick = buttons !== 1 || image.isSameNode(event.target);
-			
-			image.setPointerCapture(event.pointerId);
-			
-			let entryClickNegater;
-			
-			if (isClick) {
-				entryClickNegater = this.addEventListener(image, 'pointermove', (event) => {
-					if (Math.abs(event.clientX - clientX) > ALLOWANCE_CLICK || Math.abs(event.clientY - clientY) > ALLOWANCE_CLICK) {
-						isClick = false;
-						
-						this.removeEventListener(entryClickNegater);
-					}
-				});
-			}
-			
-			const entryStop = this.addEventListener(image, 'pointerup', () => {
-				this.removeEventListener(entryStop);
-				
-				if (entryClickNegater) {
-					this.removeEventListener(entryClickNegater);
-				}
-				
-				image.style.removeProperty('cursor');
-				
-				this.removeEventListener(entryMove);
-				
-				if (buttons === 2) {
-					cancelRightClick();
-				}
-				
-				this.constructor.target.hide();
-				
-				if (!isClick) {
+				if (buttons !== 1 && buttons !== 2) {
 					return;
 				}
 				
-				if (buttons === 1) {
-					this.listeners.snap(offsetX, offsetY);
-				} else {
-					this.listeners.resetImage();
+				event.stopPropagation();
+				event.preventDefault();
+				
+				resizer.setPointerCapture(pointerId);
+				
+				const entryMove = this.addEventListener(resizer, 'pointermove', this.listeners.resizeViewport.bind(null, offsetX));
+				
+				const entryStop = this.addEventListener(resizer, 'pointerup', () => {
+					if (buttons === 2) {
+						cancelRightClick();
+						
+						this.listeners.resetViewport();
+					}
+					
+					this.removeEventListener(entryMove);
+					this.removeEventListener(entryStop);
+				});
+			});
+			
+			this.addEventListener(viewport, 'wheel', (event) => {
+				event.stopPropagation();
+				event.preventDefault();
+				
+				if (event.deltaY === 0) {
+					return;
 				}
+				
+				this.listeners[event.ctrlKey ? 'resizeImage' : 'zoom'](event);
+			});
+			
+			this.addEventListener(viewport, 'pointerdown', (event) => {
+				const {offsetX, offsetY, buttons, clientX, clientY} = event;
+				
+				if (buttons !== 1 && buttons !== 2) {
+					return;
+				}
+				
+				event.stopPropagation();
+				event.preventDefault();
+				
+				const entryMove = this.addEventListener(viewport, 'pointermove', this.listeners[buttons === 1 ? 'pan' : 'rotate']());
+				
+				image.style.cursor = 'grabbing';
+				
+				let isClick = buttons !== 1 || image.isSameNode(event.target);
+				
+				image.setPointerCapture(event.pointerId);
+				
+				let entryClickNegater;
+				
+				if (isClick) {
+					entryClickNegater = this.addEventListener(image, 'pointermove', (event) => {
+						if (Math.abs(event.clientX - clientX) > ALLOWANCE_CLICK || Math.abs(event.clientY - clientY) > ALLOWANCE_CLICK) {
+							isClick = false;
+							
+							this.removeEventListener(entryClickNegater);
+						}
+					});
+				}
+				
+				const entryStop = this.addEventListener(image, 'pointerup', () => {
+					this.removeEventListener(entryStop);
+					
+					if (entryClickNegater) {
+						this.removeEventListener(entryClickNegater);
+					}
+					
+					image.style.removeProperty('cursor');
+					
+					this.removeEventListener(entryMove);
+					
+					if (buttons === 2) {
+						cancelRightClick();
+					}
+					
+					this.constructor.target.hide();
+					
+					if (!isClick) {
+						return;
+					}
+					
+					if (buttons === 1) {
+						this.listeners.snap(offsetX, offsetY);
+					} else {
+						this.listeners.resetImage();
+					}
+				});
 			});
 		});
 	}
@@ -455,6 +458,8 @@ export default class {
 		
 		window.clearTimeout(this.#tweenUpdateId);
 		
+		this.tweenUpdate = Promise.resolve();
+		
 		this.constructor.target.hide();
 		
 		position = this.position;
@@ -472,7 +477,7 @@ export default class {
 		delete this.tween;
 	}
 	
-	getTweenTarget() {
+	getTweenTarget(tween) {
 		const target = {};
 		
 		let effects = {};
@@ -481,7 +486,7 @@ export default class {
 			let willUpdate = false;
 			
 			const update = () => {
-				const ignorePosition = this.tween?.data.ignorePosition;
+				const {ignorePosition} = tween.data;
 				
 				if (!ignorePosition && (this.position.x !== target.x || this.position.y !== target.y)) {
 					this.position.x = target.x;
@@ -510,7 +515,13 @@ export default class {
 				
 				willUpdate = true;
 				
-				this.#tweenUpdateId = window.setTimeout(update, 0);
+				this.tweenUpdate = new Promise((resolve) => {
+					this.#tweenUpdateId = window.setTimeout(() => {
+						update();
+						
+						resolve();
+					});
+				}, 0);
 			};
 		})();
 		
@@ -579,23 +590,24 @@ export default class {
 	setTween(...targets) {
 		this.tween?.progress(0).kill();
 		
-		this.tween = gsap.timeline({paused: true, data: {target: this.getTweenTarget()}});
+		this.tween = gsap.timeline({paused: true, data: {}});
 		
-		const allEffects = {};
+		this.tween.data.target = this.getTweenTarget(this.tween);
+		
+		const effects = {};
 		
 		for (const [target, {position, ...vars} = {}] of targets) {
 			const to = {};
-			const effects = {};
 			
 			let hasTween = false;
 			
 			const record = (type, value, label = type) => {
-				if (!allEffects[label] && Math.abs(this.tween.data.target[type] - value) < ERROR_ALLOWANCE) {
+				if (!effects[label] && Math.abs(this.tween.data.target[type] - value) < ERROR_ALLOWANCE) {
 					return;
 				}
 				
 				to[type] = value;
-				allEffects[label] = effects[label] = true;
+				effects[label] = true;
 				
 				hasTween = true;
 			};

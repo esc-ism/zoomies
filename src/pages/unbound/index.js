@@ -1,4 +1,5 @@
-import {CLASS_FLASH_CONTAINER} from '../consts';
+import {xmlns} from '@/shared';
+import {CLASS_FLASH_CONTAINER, CLASS_MATH} from '../consts';
 import {getText, getButton, registerDemo, getInstruction, flash} from '../shared';
 
 import getRestartButton from './restart';
@@ -84,14 +85,39 @@ export default (wrapper) => {
 			}},
 			[
 				'Each webpage will provide a playground for a unique pan-limiting system.',
-				'To illustrate the value of pan-limiting, I\'m starting with a system that neglects it.',
-				'Let\'s get into its issues.',
+				'To help elucidate the value of pan-limiting, I\'m starting with a system that neglects it.',
+				'It may be described like:',
 			],
+			{tag: 'p', classList: [CLASS_MATH], content: [
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '-∞'},
+								{tag: 'mo', xmlns, content: '<'},
+								{tag: 'mi', xmlns, content: 'x'},
+								{tag: 'mo', xmlns, content: '<'},
+								{tag: 'mn', xmlns, content: '∞'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '-∞'},
+								{tag: 'mo', xmlns, content: '<'},
+								{tag: 'mi', xmlns, content: 'y'},
+								{tag: 'mo', xmlns, content: '<'},
+								{tag: 'mn', xmlns, content: '∞'},
+							]},
+						]},
+					]},
+				]},
+			]},
 			{
 				tag: 'h2',
 				style: {textAlign: 'center'},
 				content: 'Effectiveness',
 			},
+			'Let\'s get into its issues.',
 			getInstruction([
 				'Notice the pink text below?',
 				'Holding your cursor over pink text will demonstrate relevant concepts.',
@@ -117,8 +143,9 @@ export default (wrapper) => {
 				'Pan-limiting systems prevent this by keeping users from the no man\'s land beyond the confines of the image.',
 			],
 			[
-				'Additionally, more advanced pan-limiting systems can take a position and derive an appropriate zoom level.',
-				'This turns out to be a useful feature when span-panning, but that\'s a topic for later.',
+				'Pan limits here are fixed, regardless of zoom.',
+				'More advanced systems can take a position and derive an appropriate zoom level, which is useful when span-panning.',
+				'I\'ll talk more about that later.',
 			],
 			{
 				tag: 'h2',

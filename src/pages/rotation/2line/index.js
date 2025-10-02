@@ -7,31 +7,10 @@ import {badTweens} from '../1line';
 import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 import Demo, {getSnappedZoom} from './demo';
 import snapImage from './snapImage';
-import getZoomPoints, {getRelevantDemo} from './zoomPoints';
+import * as mock from '../mock';
+import getZoomPoints from './zoomPoints';
 
-export const getDimensions = (ratio, {width, height}) => {
-	const dimensions = {};
-	
-	if (ratio < 1) {
-		dimensions.width = width;
-		dimensions.height = height * ratio;
-	} else {
-		dimensions.width = width / ratio;
-		dimensions.height = height;
-	}
-	
-	return {
-		...dimensions,
-		halfWidth: dimensions.width / 2,
-		halfHeight: dimensions.height / 2,
-	};
-};
-
-export const getVarGetter = (demo, rotation = DEGREES[90], ratio = 1) => () => {
-	const zoomPoints = getZoomPoints(getRelevantDemo({...demo, rotation, sizesImage: getDimensions(ratio, demo.sizesViewport)}));
-	
-	return {first: zoomPoints[2], second: zoomPoints[3], zoomPoints, rotation, ratio};
-};
+const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
 const getCornerProgressTweens = (rotation) => [
 	[{ratio: 1, zoom: 1, position: 0.5}],

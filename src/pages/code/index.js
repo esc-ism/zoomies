@@ -64,18 +64,22 @@ const makeMultiline = (elements, indent, statement, property) => {
 		return;
 	}
 	
-	let lineLength = 0;
+	let lineLength = 1;
 	let lineCount = 0;
 	const lineMax = arrayify(getLineLength(statement, property));
 	
-	for (const [i, child] of elements.entries()) {
+	for (let i = 1; i < elements.length; i++) {
 		if (statement.multiline && lineLength++ >= lineMax[lineCount % lineMax.length]) {
 			if (i > 0) {
 				lineCount++;
 				lineLength = 1;
 			}
 			
-			child.prepend(document.createElement('br'), ...getIndents(indent + 1));
+			const whitespace = [document.createElement('br'), ...getIndents(indent + 1)];
+			
+			elements.splice(i, 0, ...whitespace);
+			
+			i += whitespace.length;
 		}
 	}
 	
@@ -107,7 +111,7 @@ export const register = (newDemo, statements = []) => {
 					const wrapper = getElement(CLASS_NAMES.csv);
 					const arg = getElement(CLASS_NAMES.id);
 					
-					scope[argId] = {value: args.values[i], ...args.shapeData[i], element: args.elements[i]};
+					scope[argId] = {value: args.values[i], ...args.shapeData[i], element: args.unbroken[i]};
 					
 					makeHoverable(arg, argId, scope, meta, true);
 					
@@ -253,9 +257,11 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 		}
 	}
 	
+	const unbroken = [...elements];
+	
 	makeMultiline(elements, indent, statement, property);
 	
-	return {values, elements, shapeData};
+	return {values, elements, unbroken, shapeData};
 };
 
 const getLine = ({value: length, doCenter = false, isPercent = true}, rotation) => {

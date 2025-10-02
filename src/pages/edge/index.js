@@ -28,16 +28,38 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'To solve this snap panning problem, we need a pan-limiting system that\'s affected by the viewport\'s dimensions.',
-				'To keep things simple, let\'s avoid considering rotation for now.',
+				'Zoomful snap panning requires a pan-limiting system that\'s affected by zoom.',
+				'In the interest of building complexity slowly, this first zoomful system neglects to consider rotation.',
 			],
 			[
-				'When possible, our new system keeps the viewport wholly within the image.',
+				'When possible, this system keeps the viewport wholly within the image.',
 				'Panning is prevented along axes where the viewport is ',
 				getButton('larger', [
 					[{rotation: DEGREES[90], zoom: 0.8}],
 				]),
 				' than the image.',
+			],
+			[
+				'Whereas the prior system had fixed pan limits, from now on bounds will ',
+				getButton('grow', [
+					[{zoom: 1, position: 0}, {duration: 0}],
+					[{zoom: 1.5}],
+				]),
+				' and ',
+				getButton('shrink', [
+					[{zoom: 1.5, position: 0}, {duration: 0}],
+					[{zoom: 1}],
+				]),
+				' alongside zoom.',
+				'Bounds may be a point at the image\'s origin, a ',
+				{tag: 'a', content: 'line segment', href: 'https://en.wikipedia.org/wiki/Line_segment'},
+				' or a ',
+				{tag: 'a', content: 'parallelogram', href: 'https://en.wikipedia.org/wiki/Parallelogram'},
+				' (they can be a ',
+				{tag: 'a', content: 'rhombus', href: 'https://en.wikipedia.org/wiki/Rhombus'},
+				' in upcoming systems, but not this one).',
+				'The effect of zooming on bounds can be modelled by plotting the paths taken by line segment endpoints and parallelogram corners.',
+				'This model is given form by the new playground lines that connect the image\'s origin to its corners, which I will refer to as "rails".',
 			],
 			{
 				tag: 'h2',
@@ -60,7 +82,7 @@ export default (wrapper) => {
 				],
 				[
 					'Greyed out code is unexecuted.',
-					'Mouse over a variable in executed code without moving to see its value.',
+					'Steady your mouse over a variable in executed code to see its value.',
 					'If the variable is green, you\'ll see a visualisation of its value in the playground.',
 				],
 				['After changing playground state, code won\'t be up to date until it\'s rerun via the ', refreshButton, ' button at its top-right corner.'],
@@ -88,6 +110,20 @@ export default (wrapper) => {
 					],
 				}},
 			]),
+			[
+				{tag: 'i', content: 'boundX'}, ' is derived from widths, whereas ', {tag: 'i', content: 'boundY'}, ' is derived from heights.',
+				'Aspect ratio dictates the zooms at which each starts growing, with ratios ',
+				getButton('over 1', [
+					[{ratio: 1, zoom: 1}],
+					[{ratio: 2}, {ease: 'none', duration: 2.5}],
+				]),
+				' affecting ', {tag: 'i', content: 'boundX'}, '\'s minimum zoom and ratios ',
+				getButton('below 1', [
+					[{ratio: 1, zoom: 1}],
+					[{ratio: 0.5}, {ease: 'none', duration: 2.5}],
+				]),
+				' affecting ', {tag: 'i', content: 'boundY'}, '\'s.',
+			],
 			{
 				tag: 'h2',
 				content: 'Snap-Pan Maths',
@@ -95,18 +131,12 @@ export default (wrapper) => {
 			},
 			[
 				'Snap panning now requires an accommodating zoom adjustment.',
-				'We can derive the calculation by solving the pan limiting calculation for zoom.',
+				'We can derive the formula by solving the pan limiting calculation for zoom.',
 			],
 			{tag: 'p', classList: [CLASS_MATH], content: [
 				{tag: 'math', xmlns, content: [
 					{tag: 'mtable', classList: [CLASS_MATH_EQUATION], xmlns, content: [
 						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mi', xmlns, content: 'r'},
-							]},
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mo', xmlns, content: '='},
-							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mfrac', xmlns, content: [
 									{tag: 'mrow', xmlns, content: [
@@ -117,6 +147,12 @@ export default (wrapper) => {
 										{tag: 'mi', xmlns, content: 'imageSize'},
 									]},
 								]},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'r'},
 							]},
 						]},
 					]},
@@ -219,6 +255,7 @@ export default (wrapper) => {
 				content: 'Effectiveness',
 				style: {textAlign: 'center'},
 			},
+			// todo expand
 			[
 				'Zoom is now adjusted for us automatically when ',
 				getButton('snap panning', [
@@ -248,6 +285,10 @@ export default (wrapper) => {
 				content: 'Conclusion',
 				style: {textAlign: 'center'},
 			},
+			[
+				'That\'s all for our first zoomful system!',
+				'Hopefully you can see its advantages for snap panning, even if its pan limiting isn\'t as universally preferable.',
+			],
 			[
 				'From now on, we\'ll only be looking at systems built for rotation.',
 				'Those systems will build on this one, taking various approaches to replicating and improving its behaviour.',

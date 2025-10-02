@@ -5,11 +5,9 @@ import {DEGREES} from '@/shared';
 import {getFlipped, getM, getZoomProgressed} from '../shared';
 
 import {
-	getRelevantDemo, getQuadrantAngle, getProgressAngles,
+	getQuadrantAngle, getProgressAngles,
 	getAxisIntersectY, getPoints, getGenericIntersection, getAxisIntersectX,
 } from '../2line/zoomPoints';
-
-export {getRelevantDemo};
 
 const getP = ({end, ...first}, point) => {
 	const axis = Math.abs(end.x) > Math.abs(end.y) ? 'x' : 'y';
@@ -154,7 +152,7 @@ const getAxisIntersects = ({sizesImage, sizesViewport, ratioViewport, ratioViewp
 	}
 	
 	const intersects = {
-	// todo rename
+		// todo rename
 		yIntersectSide: getAxisIntersectX(sizesImage, sizesViewport.halfWidth, DEGREES[90] - quadrantAngle - progressAngles.side, progressAngles.side),
 		yIntersectBase: getAxisIntersectX(sizesImage, sizesViewport.halfHeight, quadrantAngle + progressAngles.base, progressAngles.base),
 	};

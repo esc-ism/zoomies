@@ -3,6 +3,7 @@ import {addRule} from '@css';
 import {
 	CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION,
 	CLASS_MATH, CLASS_MATH_EQUATION, CLASS_FLASH_CONTAINER,
+	CLASS_MATH_ASSERTION,
 } from './consts';
 
 addRule(`.${CLASS_FLASH_CONTAINER}`, {
@@ -26,6 +27,10 @@ addRule(`.${CLASS_CODE}`, {
 addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(1)`, {'text-align': '-webkit-right'});
 addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(1)`, {'text-align': 'right'});
 addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(3)`, {'text-align': 'left'});
+
+addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(1)`, {'text-align': '-webkit-right'});
+addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(1)`, {'text-align': 'right'});
+addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2)`, {'text-align': 'left'});
 
 addRule(`.${CLASS_CODE} > div`, {'overflow-x': 'auto'});
 

@@ -103,18 +103,6 @@ export const getAxisIntersectX = (image, viewportSize, cornerAngle, progressAngl
 	z: viewportSize / (Math.cos(progressAngle) * Math.abs(image.halfHeight / Math.cos(cornerAngle))),
 });
 
-export const getRelevantDemo = ({
-	rotation,
-	sizesViewport,
-	sizesImage,
-	ratioViewport = sizesViewport.width / sizesViewport.height,
-	ratioViewportInverse = 1 / ratioViewport,
-	ratioImage = sizesImage.width / sizesImage.height,
-	ratioImageInverse = 1 / ratioImage,
-	ratio = ratioViewport / ratioImage,
-	ratioInverse = 1 / ratio,
-}) => ({sizesViewport, ratioViewport, ratioViewportInverse, rotation, sizesImage, ratioImage, ratioImageInverse, ratio, ratioInverse});
-
 export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage)) => {
 	const startZooms = [
 		Math.min(allStartZooms[0].x, allStartZooms[1].x),

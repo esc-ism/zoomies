@@ -5,7 +5,7 @@ import {getBound, getProgressedLine, getZoomPairSecond, getProgress, getFlipped}
 import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
-import getZoomPoints, {getRelevantDemo} from './zoomPoints';
+import getZoomPoints from './zoomPoints';
 
 export const getSnappedZoom = (() => {
 	const getDirected = (first, second, flip, cornerX) => {
@@ -91,7 +91,7 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		return getZoomPoints(getRelevantDemo(this), this.getAllStartZooms());
+		return getZoomPoints(this, this.getAllStartZooms());
 	}
 	
 	getSnappedZoom() {

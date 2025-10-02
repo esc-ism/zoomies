@@ -64,6 +64,7 @@ const SINGLE_LINE = [
 				],
 			}},
 		]},
+		'',
 		{op: 'return', and: {
 			op: '/', and: [
 				{op: '+', and: [
