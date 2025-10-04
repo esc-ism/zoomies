@@ -11,11 +11,18 @@ import * as mock from '../mock';
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
-export const badTweens = {
+export const restrictiveTweens = {
 	ratio: 0.6,
 	position: 0.5,
 	rotation: -4.467,
 	zoom: 2,
+};
+
+export const permissiveTweens = {
+	rotation: DEGREES[90],
+	ratio: 0.6,
+	zoom: 1.2,
+	position: 0,
 };
 
 const opSpace = {tag: 'mspace', style: {width: '0.8em'}, xmlns};
@@ -33,7 +40,7 @@ const functions = [
 				'zoom',
 				'cornerZoom',
 			]},
-			{op: 'return', and: [0, 0]},
+			{op: 'return', and: {op: 'array', and: [0, 0]}},
 		]},
 		'',
 		{op: '=', id: 'progress', and: {
@@ -43,7 +50,7 @@ const functions = [
 			],
 		}},
 		'',
-		{op: 'return', multiline: true, and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '-', and: [
 				'cornerX',
 				{op: '/', and: [
@@ -58,12 +65,12 @@ const functions = [
 					'progress',
 				]},
 			]},
-		]},
+		]}},
 	]},
 	{op: 'func', id: 'getSnippedStart', args: ['cornerX', 'cornerY', 'cornerZoom', 'otherZoom'], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '>=', and: ['cornerZoom', 'otherZoom']},
-			{op: 'return', and: [0, 0]},
+			{op: 'return', and: {op: 'array', and: [0, 0]}},
 		]},
 		'',
 		{op: '=', id: 'proportion', and: {
@@ -76,7 +83,7 @@ const functions = [
 			],
 		}},
 		'',
-		{op: 'return', multiline: true, and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '*', and: [
 				'proportion',
 				'cornerX',
@@ -85,7 +92,7 @@ const functions = [
 				'proportion',
 				'cornerY',
 			]},
-		]},
+		]}},
 	]},
 	{op: 'func', id: 'getCorners', type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
 		{op: 'if', and: [
@@ -98,25 +105,25 @@ const functions = [
 					'x',
 					'y',
 				]},
-				{op: 'return', and: [-0.5, 0.5, 0.5, 0.5]},
+				{op: 'return', and: {op: 'array', and: [-0.5, 0.5, 0.5, 0.5]}},
 			]},
-			{op: 'return', and: [0.5, -0.5, 0.5, 0.5]},
+			{op: 'return', and: {op: 'array', and: [0.5, -0.5, 0.5, 0.5]}},
 		]},
 		{op: 'if', and: [
 			{op: '<=', and: [
 				'x',
 				'y',
 			]},
-			{op: 'return', and: [-0.5, 0.5, -0.5, -0.5]},
+			{op: 'return', and: {op: 'array', and: [-0.5, 0.5, -0.5, -0.5]}},
 		]},
-		{op: 'return', and: [0.5, -0.5, -0.5, -0.5]},
+		{op: 'return', and: {op: 'array', and: [0.5, -0.5, -0.5, -0.5]}},
 	]},
 	{op: 'func', id: 'getStartZooms', type: ['zoom', 'zoom'], and: [
 		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], type: ['zoom', 'zoom', 'zoom', 'zoom'], and: {
 			op: 'call', id: 'getAllStartZooms',
 		}},
 		'',
-		{op: 'return', multiline: true, and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: 'min', and: [
 				'topLeftX',
 				'topLeftY',
@@ -125,7 +132,7 @@ const functions = [
 				'topRightX',
 				'topRightY',
 			]},
-		]},
+		]}},
 	]},
 ];
 
@@ -153,8 +160,8 @@ export default (wrapper) => {
 			],
 			[
 				'The rail to each image corner is a direct, single line (hence the page\'s title) from the image\'s origin.',
-				'Consequently, when the viewport is centered on a specific bound corner, the image corner that it\'s paired with is ',
-				getButton('kept', [
+				'Consequently, image corners are ',
+				getButton('locked', [
 					({zoomPoints, rotation, ratio}) => [{zoom: zoomPoints[1].z, rotation, ratio, position: 0}],
 					({zoomPoints}) => [{zoom: zoomPoints[1].z * 1.5}, {
 						onUpdate() {
@@ -175,7 +182,8 @@ export default (wrapper) => {
 						duration: 2.5, ease: 'none',
 					}],
 				], {getParam: keeper}),
-				' at the same point on the viewport\'s edge regardless of zoom.',
+				' to the position on the viewport\'s rim that they first contact, regardless of zoom.',
+				'I\'ll refer to this as the corner\'s "lock point".',
 			],
 			{
 				tag: 'h2',
@@ -183,12 +191,13 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'To know when pan limits must start expanding, we need to find the maximum zoom at which image corners are visible from the origin.',
-				'Adjacent corners can differ, but opposite corners always share this maximum zoom value.',
+				'We\'ll call the zoom at which bounds start progressing along a rail its "start zoom".',
+				'To know each rail\'s start zoom, we need to find the maximum zoom at which image corners are visible from the origin.',
+				'Adjacent rails can differ, but opposite rails always share a start zoom.',
 				'Knowing this, only the top-left and top-right corners need be considered.',
-				[
-					'Given these zoom values, deriving pan limits is straightforward.',
-					'The calculation is demonstrated below.',
+				getInstruction([
+					'This code snippet includes custom functions.',
+					'Click "getStartZooms" to unfold it and click the "function" text to re-fold.',
 					'Note that the "rotation" value\'s unit is ',
 					{
 						tag: 'a',
@@ -207,17 +216,18 @@ export default (wrapper) => {
 							'.',
 						],
 					},
+				]),
+				getCode([
+					{op: '=', id: ['topLeftZoom', 'topRightZoom'], and: {
+						op: 'call', id: 'getStartZooms',
+					}},
+				]),
+				[
+					'Given these zoom values, deriving pan limits is straightforward.',
+					'The calculation is demonstrated below.',
 				],
 			],
-			getInstruction([
-				'This code demonstration includes custom functions (e.g. "getStartZooms").',
-				'Click to unfold them and click the "function" text to re-fold.',
-			]),
 			getCode([
-				{op: '=', id: ['topLeftZoom', 'topRightZoom'], and: {
-					op: 'call', id: 'getStartZooms',
-				}},
-				'',
 				{op: '=', id: ['topLeftX', 'topLeftY'], and: {
 					op: 'call', id: 'getBound', and: [-0.5, 0.5, 'topLeftZoom'],
 				}},
@@ -254,38 +264,47 @@ export default (wrapper) => {
 				]),
 				' if the viewport and image share an aspect ratio.',
 				'The system\'s flaw is only revealed when the ratios are ',
-				getButton('decoupled', [[{ratio: badTweens.ratio}]]),
+				getButton('decoupled', [[{ratio: restrictiveTweens.ratio}]]),
 				'.',
 			],
 			[
 				'Consider ',
-				getButton('this', [[{ratio: badTweens.ratio}], [badTweens]]),
+				getButton('this', [[{ratio: restrictiveTweens.ratio}], [restrictiveTweens]]),
 				' demo state.',
 				'Imagine that you want to see the entirety of the image\'s top-right corner.',
 				'You\'ll find that it\'s ',
 				getButton('impossible', [
-					[badTweens],
+					[restrictiveTweens],
 					[{position: {x: 0.5, y: 0.1}}, {duration: 2, ease: 'power2.out'}],
 				]),
 				' to achieve this without ',
 				getButton('rotating', [
-					[badTweens],
-					[{rotation: Math.round(badTweens.rotation / DEGREES[90]) * DEGREES[90]}],
+					[restrictiveTweens],
+					[{rotation: Math.round(restrictiveTweens.rotation / DEGREES[90]) * DEGREES[90]}],
 				]),
 				' or ',
 				getButton('zooming', [
-					[badTweens],
+					[restrictiveTweens],
 					[{zoom: 1}],
 				]),
 				' out past the point that pan limits become one-dimensional.',
+				'This is a problem for any state some rotation and a lock point close to a viewport corner',
+			],
+			[
+				'There, the system was too restrictive, but at other times it isn\'t restrictive enough!',
+				'For example, consider ',
+				getButton('this', [[permissiveTweens]]),
+				' simple, un-rotated state.',
+				'Pans along the y axis shouldn\'t be allowed here.',
+				'Unfortunately, it\'s impossible to allows pans along only one axis with single-line rails.',
 			],
 			{
 				tag: 'h2',
 				content: 'Snap-Pan Maths',
 				style: {textAlign: 'center'},
 			},
-			'The maths for snap panning will take a little longer to run through.',
-			'For brevity, I\'ll refer to image positions used in snap panning as "snap points".',
+			'The maths for snap-panning will take a little longer to run through.',
+			'For brevity, I\'ll refer to image positions used in snap-panning as "snap points".',
 			[
 				'Observe how the rails split the image into four segments.',
 				'Any snap point will fall into one of these segments, bordered by two rails (any point exactly between two segments may be assigned to either).',
@@ -989,18 +1008,20 @@ export default (wrapper) => {
 				content: 'Pan-Limit Effectiveness',
 				style: {textAlign: 'center'},
 			},
+			'Okay! Now that we\'ve gone through how snap-panning works, how useful is it in practise?',
 			[
-				'Okay! Now that we\'ve gone through how snap-panning works, how useful is it in practise?',
 				'Like with pan-limiting, it\'s perfect until we decouple aspect ratios.',
-				'Specifically, consider ',
+				'Being too restrictive isn\'t as much of an issue here, but being too permissive isn\'t ideal.',
+				'Consider ',
 				getButton('this', [
 					[{ratio: 0.5, rotation: DEGREES[90], position: 0, zoom: 1}],
 					[{y: 0.25, zoom: 2}, {duration: 0}],
 				]),
-				' snap pan.',
-				'It doesn\'t make much sense to show the empty space above the image here. ',
+				' snap-pan.',
+				'Not zooming in enough to hide the empty space above the image doesn\'t make much sense. ',
 				getButton('Increasing', [
-					[{ratio: 0.25, rotation: DEGREES[90], position: {x: 0, y: 0.25}, zoom: 2}],
+					[{ratio: 0.25, rotation: DEGREES[90], position: 0}],
+					[{y: 0.25, zoom: 2}, {duration: 0}],
 				]),
 				' the differential makes it even less sensible, with empty space appearing below too.',
 			],
@@ -1010,8 +1031,8 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Unfortunately, fixed rail gradients don\'t result in satisfactory behaviour.',
-				'An improved system will require more deliberate placement of image corners on viewport edges.',
+				'Unfortunately, a system with single-line rails doesn\'t produce satisfactory behaviour;',
+				'its pan limits can be too restrictive and, when image and viewport don\'t share an aspect ratio, it fails to reproduce the prior system\'s behaviour for un-rotated images.',
 			],
 		),
 	);

@@ -1,4 +1,4 @@
-import {Line, Connection} from '@/demo/lines/lines';
+import {Line} from '@/demo/lines/lines';
 
 import getButtons from './buttons';
 
@@ -129,7 +129,7 @@ export const register = (newDemo, statements = []) => {
 			
 			const {active} = meta;
 			
-			generate(body, statement.and, {...scope}, indent + 1, meta);
+			generate(body, statement.and, {...scope}, meta, indent + 1);
 			
 			funcWrapper.append(funcElement, argsElement, body, ...getIndents(indent));
 			
@@ -161,13 +161,13 @@ const getElement = (...classes) => {
 };
 
 const getCombiner = (() => {
-	const getCombined = (statement, scope, indent, meta, combiner) => {
+	const getCombined = (statement, scope, meta, indent, combiner) => {
 		const elements = [];
 		let value;
 		
 		for (const subStatement of statement.and) {
 			const subIndent = elements.length === 0 || !statement.multiline ? indent : indent + 1;
-			const result = interpret(subStatement, scope, subIndent, meta);
+			const result = interpret(subStatement, scope, meta, subIndent);
 			
 			if (elements.length === 0) {
 				value = result.value;
@@ -187,14 +187,14 @@ const getCombiner = (() => {
 		return {value, elements};
 	};
 	
-	return (combiner, clauseForcers = []) => (statement, scope, indent, meta) => {
+	return (combiner, clauseForcers = []) => (statement, scope, meta, indent) => {
 		if (!clauseForcers.includes(meta.branch[meta.branch.length - 2].op)) {
-			return getCombined(statement, scope, indent, meta, combiner);
+			return getCombined(statement, scope, meta, indent, combiner);
 		}
 		
 		const wrapper = getElement(CLASS_NAMES.clause);
 		
-		const {value, elements} = getCombined(statement, scope, indent, meta, combiner);
+		const {value, elements} = getCombined(statement, scope, meta, indent, combiner);
 		
 		wrapper.append(...elements);
 		
@@ -202,10 +202,10 @@ const getCombiner = (() => {
 	};
 })();
 
-const getFunction = (getValue) => (statement, scope, indent, meta) => {
+const getFunction = (getValue) => (statement, scope, meta, indent) => {
 	const func = getElement(CLASS_NAMES[statement.op]);
 	const args = getElement(CLASS_NAMES.args);
-	const csvs = getCsvs(statement, scope, indent, meta);
+	const csvs = getCsvs(statement, scope, meta, indent);
 	
 	args.append(...csvs.elements);
 	
@@ -226,7 +226,7 @@ const getLineLength = (statement, property = 'and') => {
 	return multiline;
 };
 
-const getCsvs = (statement, scope, indent, meta, property = 'and') => {
+const getCsvs = (statement, scope, meta, indent, property = 'and') => {
 	if (!(property in statement)) {
 		return {elements: []};
 	}
@@ -238,7 +238,7 @@ const getCsvs = (statement, scope, indent, meta, property = 'and') => {
 	const subIndent = indent + !!statement.multiline;
 	
 	for (const subStatement of arrayify(statement[property])) {
-		const {elements: subElements, value, ...subShapeData} = interpret(subStatement, scope, subIndent, meta);
+		const {elements: subElements, value, ...subShapeData} = interpret(subStatement, scope, meta, subIndent);
 		const wrapper = getElement(CLASS_NAMES.csv);
 		
 		wrapper.append(...subElements);
@@ -459,7 +459,7 @@ const getOtherProps = (object, ...exclusions) => {
 };
 
 const interpretters = {
-	string: (id, scope, indent, meta) => {
+	string: (id, scope, meta) => {
 		if (id === '') {
 			return {elements: []};
 		}
@@ -492,17 +492,17 @@ const interpretters = {
 		
 		return {value, elements: [element]};
 	},
-	array: (statement, scope, indent, meta) => {
+	array: (statement, scope, meta, indent) => {
 		const wrapper = getElement(CLASS_NAMES.array);
-		const csvs = getCsvs(statement, scope, indent, meta);
+		const csvs = getCsvs(statement, scope, meta, indent);
 		
 		wrapper.append(...csvs.elements);
 		
 		return {value: csvs.values, elements: [wrapper]};
 	},
 	// todo get shapeData stuff from {op:'array'} values
-	'=': (statement, scope, indent, meta) => {
-		const {value, elements: operand, ...call} = interpret(statement.and, scope, indent, meta);
+	'=': (statement, scope, meta, indent) => {
+		const {value, elements: operand, ...call} = interpret(statement.and, scope, meta, indent);
 		const values = arrayify(value);
 		
 		const shapeData = {...(call.shapeData ?? {})};
@@ -529,13 +529,8 @@ const interpretters = {
 			}
 		}
 		
-		const csvs = getCsvs({multiline: call.multilineResult ?? false, ...statement}, scope, indent, meta, 'id');
-		
-		if (!Array.isArray(statement.id)) {
-			return {elements: [...csvs.elements, getElement(CLASS_NAMES['=']), ...operand]};
-		}
-		
-		const idWrapper = getElement(CLASS_NAMES.array);
+		const csvs = getCsvs({multiline: call.multilineResult ?? false, ...statement}, scope, meta, indent, 'id');
+		const idWrapper = getElement(CLASS_NAMES[Array.isArray(statement.id) ? 'array' : 'wrapper']);
 		
 		idWrapper.append(...csvs.elements);
 		
@@ -545,24 +540,24 @@ const interpretters = {
 	'-': (() => {
 		const combiner = getCombiner((a, b) => a - b, ['%', '*', '/']);
 		
-		return (statement, scope, indent, meta) => {
+		return (statement, scope, meta, indent) => {
 			if (!Array.isArray(statement.and)) {
 				const element = getElement(CLASS_NAMES.negative);
 				
-				const {value, elements: operand} = interpret(statement.and, scope, indent, meta);
+				const {value, elements: operand} = interpret(statement.and, scope, meta, indent);
 				
 				element.append(...operand);
 				
 				return {value: -value, elements: [element]};
 			}
 			
-			return combiner(statement, scope, indent, meta);
+			return combiner(statement, scope, meta, indent);
 		};
 	})(),
-	'!': (statement, scope, indent, meta) => {
+	'!': (statement, scope, meta, indent) => {
 		const element = getElement(CLASS_NAMES['!']);
 		
-		const {value, elements: operand} = interpret(statement.and, scope, indent, meta);
+		const {value, elements: operand} = interpret(statement.and, scope, meta, indent);
 		
 		element.append(...operand);
 		
@@ -579,13 +574,13 @@ const interpretters = {
 	'!=': getCombiner((a, b) => a !== b),
 	'==': getCombiner((a, b) => a === b),
 	'%': getCombiner((a, b) => a % b, ['*', '/', '+', '-', '<=', '>=', '<', '>', '!=']),
-	if: (statement, scope, indent, meta) => {
+	if: (statement, scope, meta, indent) => {
 		const elements = {
 			condition: getElement(CLASS_NAMES.if),
 			body: document.createElement('span'),
 		};
 		
-		const {value, elements: conditionElements} = interpret(statement.and[0], scope, indent, meta);
+		const {value, elements: conditionElements} = interpret(statement.and[0], scope, meta, indent);
 		
 		elements.condition.append(...conditionElements);
 		
@@ -595,7 +590,7 @@ const interpretters = {
 			meta.active = false;
 		}
 		
-		generate(elements.body, statement.and.slice(1), {...scope}, indent + 1, meta);
+		generate(elements.body, statement.and.slice(1), {...scope}, meta, indent + 1);
 		
 		if (active && !('return' in meta)) {
 			meta.active = true;
@@ -605,12 +600,12 @@ const interpretters = {
 		
 		return {value, elements: [elements.condition, document.createElement('br'), elements.body]};
 	},
-	'?': (statement, scope, indent, meta) => {
+	'?': (statement, scope, meta, indent) => {
 		const subIndent = indent + !!statement.multiline;
 		
-		const {value: conditionValue, elements: conditionElements} = interpret(statement.and[0], scope, indent, meta);
-		const {value: truthyValue, elements: truthyElements} = interpret(statement.and[1], scope, subIndent, {...meta, active: meta.active && conditionValue});
-		const {value: falsyValue, elements: falsyElements} = interpret(statement.and[2], scope, subIndent, {...meta, active: meta.active && !conditionValue});
+		const {value: conditionValue, elements: conditionElements} = interpret(statement.and[0], scope, meta, indent);
+		const {value: truthyValue, elements: truthyElements} = interpret(statement.and[1], scope, {...meta, active: meta.active && conditionValue}, subIndent);
+		const {value: falsyValue, elements: falsyElements} = interpret(statement.and[2], scope, {...meta, active: meta.active && !conditionValue}, subIndent);
 		
 		const conditionWrapper = getElement(CLASS_NAMES.branch[conditionValue ? 'accept' : 'reject']);
 		
@@ -632,19 +627,19 @@ const interpretters = {
 			...falsyElements,
 		]};
 	},
-	'...': (statement, scope, indent, meta) => {
+	'...': (statement, scope, meta, indent) => {
 		const element = getElement(CLASS_NAMES['...']);
 		
-		const {value, elements: operand} = interpret(statement.and, scope, indent, meta);
+		const {value, elements: operand} = interpret(statement.and, scope, meta, indent);
 		
 		meta.spread = true;
 		
 		return {value, elements: [element, ...operand]};
 	},
-	abs: (statement, scope, indent, meta) => {
+	abs: (statement, scope, meta, indent) => {
 		const element = getElement(CLASS_NAMES.abs);
 		
-		const {value, elements: subElements} = interpret(statement.and, scope, indent, meta);
+		const {value, elements: subElements} = interpret(statement.and, scope, meta, indent);
 		
 		element.append(...subElements);
 		
@@ -657,9 +652,9 @@ const interpretters = {
 	cos: getFunction(Math.cos),
 	tan: getFunction(Math.tan),
 	atan: getFunction(Math.atan),
-	root: (statement, scope, indent, meta) => {
+	root: (statement, scope, meta, indent) => {
 		const element = getElement(CLASS_NAMES.root);
-		const {value, elements} = interpret(statement.and, scope, indent, meta);
+		const {value, elements} = interpret(statement.and, scope, meta, indent);
 		
 		if (typeof statement.and !== 'object') {
 			return {value: Math.sqrt(value), elements: [element, ...elements]};
@@ -671,9 +666,9 @@ const interpretters = {
 		
 		return {value: Math.sqrt(value), elements: [element, wrapper]};
 	},
-	pow: (statement, scope, indent, meta) => {
+	pow: (statement, scope, meta, indent) => {
 		const element = document.createElement('sup');
-		const {value, elements} = interpret(statement.and, scope, indent, meta);
+		const {value, elements} = interpret(statement.and, scope, meta, indent);
 		const power = statement.power ?? '2';
 		
 		element.innerText = power;
@@ -688,13 +683,13 @@ const interpretters = {
 		
 		return {value: Math.pow(value, power), elements: [wrapper, element]};
 	},
-	call: (statement, scope, indent, meta) => {
+	call: (statement, scope, meta, indent) => {
 		const id = getElement(CLASS_NAMES.id, CLASS_NAMES.evocation);
 		const args = getElement(CLASS_NAMES.args);
 		
 		id.innerText = statement.id;
 		
-		const csvs = getCsvs({multiline: functions[statement.id].multiline, ...statement}, scope, indent, meta);
+		const csvs = getCsvs({multiline: functions[statement.id].multiline, ...statement}, scope, meta, indent);
 		
 		args.append(...csvs.elements);
 		
@@ -707,60 +702,27 @@ const interpretters = {
 			
 			makeHoverable(target, undefined, scope, meta);
 			
-			const newline = document.createElement('span');
-			// todo doesn't work correctly
-			const {multiline} = meta.branch[meta.branch.length - 2];
-			
-			newline.append(document.createElement('br'), ...getIndents(indent));
-			
 			id.style.cursor = 'pointer';
 			
 			id.addEventListener('click', () => {
 				id.replaceWith(wrapper);
-				
-				if (multiline) {
-					return;
-				}
-				
-				if (args.parentElement.classList.contains(CLASS_NAMES.csv)) {
-					const {nextSibling} = args.parentElement;
-					
-					nextSibling.insertBefore(newline, nextSibling.firstChild);
-				} else {
-					args.insertAdjacentElement('afterend', newline);
-				}
 			});
 			
 			target.addEventListener('click', () => {
 				wrapper.replaceWith(id);
-				
-				newline.remove();
 			});
 		}
 		
 		return {...result, elements: [id, args]};
 	},
-	return: (statement, scope, indent, meta) => {
+	return: (statement, scope, meta, indent) => {
 		const elements = [getElement(CLASS_NAMES.return)];
 		
-		let value;
+		const result = interpret(statement.and, scope, meta, indent);
 		
-		// todo just return {type:array,and:[...]}?
-		if (Array.isArray(statement.and)) {
-			const array = getElement(CLASS_NAMES.array);
-			const csvs = getCsvs(statement, scope, indent, meta);
-			
-			value = csvs.values;
-			
-			array.append(...csvs.elements);
-			elements.push(array);
-		} else {
-			const result = interpret(statement.and, scope, indent, meta);
-			
-			elements.push(...result.elements);
-			
-			value = result.value;
-		}
+		elements.push(...result.elements);
+		
+		const value = result.value;
 		
 		if (meta.active) {
 			meta.return = value;
@@ -772,20 +734,20 @@ const interpretters = {
 	},
 };
 
-const interpret = (statement, scope, indent, meta) => {
+const interpret = (statement, scope, meta, indent) => {
 	meta.branch.push(statement);
 	
-	const result = interpretters[statement?.op ?? typeof statement](statement, scope, indent, meta);
+	const result = interpretters[statement?.op ?? typeof statement](statement, scope, meta, indent);
 	
 	meta.branch.pop();
 	
 	return result;
 };
 
-const generate = (parent, snippet, scope = globalScope, indent = 0, meta = {branch: [], active: true}) => {
+const generate = (parent, snippet, scope = globalScope, meta = {branch: [], active: true}, indent = 0) => {
 	for (const statement of snippet) {
 		const {active} = meta;
-		const {elements} = interpret(statement, scope, indent, meta);
+		const {elements} = interpret(statement, scope, meta, indent);
 		
 		if (!active) {
 			for (const element of elements) {
@@ -837,9 +799,14 @@ const generateButtons = (parent, statements) => {
 	});
 };
 
-export const generateWhenReady = (parent, statements) => init
-	.then(() => {
-		generateButtons(parent, statements);
-		
-		generate(parent, statements);
-	});
+export const generateWhenReady = async (parent, statements) => {
+	try {
+		await init;
+	} catch {
+		return;
+	}
+	
+	generateButtons(parent, statements);
+	
+	generate(parent, statements);
+};

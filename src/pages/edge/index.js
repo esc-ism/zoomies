@@ -28,7 +28,7 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Zoomful snap panning requires a pan-limiting system that\'s affected by zoom.',
+				'Zoomful snap-panning requires a pan-limiting system that\'s affected by zoom.',
 				'In the interest of building complexity slowly, this first zoomful system neglects to consider rotation.',
 			],
 			[
@@ -130,7 +130,7 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Snap panning now requires an accommodating zoom adjustment.',
+				'snap-panning now requires an accommodating zoom adjustment.',
 				'We can derive the formula by solving the pan limiting calculation for zoom.',
 			],
 			{tag: 'p', classList: [CLASS_MATH], content: [
@@ -258,7 +258,7 @@ export default (wrapper) => {
 			// todo expand
 			[
 				'Zoom is now adjusted for us automatically when ',
-				getButton('snap panning', [
+				getButton('snap-panning', [
 					[{position: 0.5, zoom: 2}, {duration: 0}],
 				]),
 				'.',
@@ -287,7 +287,7 @@ export default (wrapper) => {
 			},
 			[
 				'That\'s all for our first zoomful system!',
-				'Hopefully you can see its advantages for snap panning, even if its pan limiting isn\'t as universally preferable.',
+				'Hopefully you can see its advantages for snap-panning, even if its pan limiting isn\'t as universally preferable.',
 			],
 			[
 				'From now on, we\'ll only be looking at systems built for rotation.',

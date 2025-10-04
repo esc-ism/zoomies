@@ -8,7 +8,7 @@ import Demo from './demo';
 
 const instructions = [
 	{text: ['Drag with your left mouse button to pan.'], key: 'pan'},
-	{text: ['Left click on the image to snap pan.'], key: 'snap'},
+	{text: ['Left click on the image to snap-pan.'], key: 'snap'},
 	{text: ['Drag with your right mouse button to rotate.'], key: 'rotate'},
 	{text: ['Use your scroll wheel to zoom in and out.'], key: 'zoom'},
 	{text: ['Use your scroll wheel while holding "ctrl" on your keyboard to adjust image aspect ratio.'], key: 'resizeImage'},
@@ -31,7 +31,7 @@ export default (wrapper) => {
 				content: 'Unbound',
 			},
 			[
-				'Firstly, I\'d like to touch on why pan-limiting is necessary.',
+				'To start, I\'d like to touch on why pan-limiting is necessary.',
 			],
 			{
 				style: {fontStyle: 'italic'},
@@ -41,7 +41,8 @@ export default (wrapper) => {
 				'Glad you asked!',
 				'It\'s our first pan-limiting playground.',
 				'The colourful, spotted square is the "image" and it\'s being seen through the "viewport".',
-				'Follow along with the dark-yellow box below to see what you can do with it.',
+				'To the viewport\'s top-left is a readout of the playground\'s state.',
+				'Follow the instructions below to see what you can do with it.',
 			],
 			{...getInstruction([]), callback: async (container) => {
 				const element = container.firstChild;
@@ -85,7 +86,7 @@ export default (wrapper) => {
 			}},
 			[
 				'Each webpage will provide a playground for a unique pan-limiting system.',
-				'To help elucidate the value of pan-limiting, I\'m starting with a system that neglects it.',
+				'To demonstrate the value of pan-limiting, I\'m starting with a system that neglects it.',
 				'It may be described like:',
 			],
 			{tag: 'p', classList: [CLASS_MATH], content: [

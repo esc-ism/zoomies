@@ -131,15 +131,15 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Hello! I\'m Callum, a programmer.',
+				'Hello! I\'m Callum — a programmer.',
 			],
 			[
-				'For the past two years, I\'ve been delving into panning (the thing you do to look around after zooming in).',
+				'For the past two years or so, I\'ve been delving into panning (the thing you do to look around after zooming in).',
 				'Specifically, I\'ve been working on pan-limiting where zoom, rotation, image aspect ratio and viewport aspect ratio are all variable.',
 			],
 			[
 				'This website is a little interactive report of my findings.',
-				'It will walk you through the problem space and demonstrate solutions, ranging from trivial to the kind of thing you spend two years on.',
+				'It will walk you through the problem space and demonstrate solutions, ranging from trivial to the kind of thing that a non-mathematician might spend two years on.',
 			],
 			getInstruction(['Hit your right arrow key to continue. The website\'s PC only for now.']),
 		),

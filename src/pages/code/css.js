@@ -32,7 +32,7 @@ for (const [name, content = name] of [
 addPseudoRule(`.${CLASS_NAMES.negative}::before`, '-');
 addPseudoRule(`.${CLASS_NAMES['!']}::before`, '!');
 addPseudoRule(`.${CLASS_NAMES['...']}::before`, '...');
-addPseudoRule(`.${CLASS_NAMES.csv}:has(+ .${CLASS_NAMES.csv})::after`, ', ');
+addPseudoRule(`.${CLASS_NAMES.csv}:has(~ .${CLASS_NAMES.csv})::after`, ', ');
 
 addKeywordPseudoRule(`.${CLASS_NAMES.return}::after`, 'return ');
 addKeywordPseudoRule(`.${CLASS_NAMES.func}::after`, 'function');

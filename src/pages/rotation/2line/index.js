@@ -2,7 +2,7 @@ import {DEGREES} from '@/shared';
 
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
-import {badTweens} from '../1line';
+import {permissiveTweens, restrictiveTweens} from '../1line';
 
 import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 import Demo, {getSnappedZoom} from './demo';
@@ -46,7 +46,7 @@ const get45Button = (demo, rotation, ratioImage) => getButton(
 const functions = [
 	...SHARED_FUNCTIONS,
 	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['y', 'zoom'], and: [
-		{op: 'return', multiline: true, and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '/', and: [
 				{op: '-', and: [
 					'½imageHeight',
@@ -63,7 +63,7 @@ const functions = [
 					}},
 				]},
 			]},
-		]},
+		]}},
 	]},
 	{op: 'func', id: 'getIntersection', args: ['viewportX', 'viewportY', 'axisY', 'cornerX', 'axisZoom'], type: ['x', 'y', 'zoom'], pair: [1, 0], and: [
 		{op: '=', id: 'c', and: {
@@ -93,14 +93,14 @@ const functions = [
 			op: '/', and: ['intersectX', 'cornerX'],
 		}},
 		'',
-		{op: 'return', and: [
+		{op: 'return', and: {op: 'array', and: [
 			'intersectX',
 			'intersectY',
 			{op: '/', and: [
 				'axisZoom',
 				{op: '-', and: [1, 'progress']},
 			]},
-		]},
+		]}},
 	]},
 	{op: 'func', id: 'getCloseIntersection', args: ['rightX', 'rightY', 'topX', 'topY', 'axisY', 'axisZoom', 'isLeft'], type: ['x', 'y', 'zoom', 'xvp', 'yvp'], pair: [1, 0,,4, 3], and: [
 		{op: '=', id: 'cornerX', type: 'x', and: {
@@ -116,12 +116,12 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			{op: '>', and: ['intersectRightZoom', 'intersectTopZoom']},
-			{op: 'return', and: ['intersectRightX', 'intersectRightY', 'intersectRightZoom', 'rightX', 'rightY']},
+			{op: 'return', and: {op: 'array', and: ['intersectRightX', 'intersectRightY', 'intersectRightZoom', 'rightX', 'rightY']}},
 		]},
 		'',
-		{op: 'return', and: ['intersectTopX', 'intersectTopY', 'intersectTopZoom', 'topX', 'topY']},
+		{op: 'return', and: {op: 'array', and: ['intersectTopX', 'intersectTopY', 'intersectTopZoom', 'topX', 'topY']}},
 	]},
-	{op: 'func', id: 'getZoomPoints', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], and: [
+	{op: 'func', id: 'getZoomPoints', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: 2, and: [
 		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
@@ -173,10 +173,16 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			'isEvenQuadrant',
-			{op: 'return', multiline: 2, and: ['zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY', 'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY']},
+			{op: 'return', and: {op: 'array', multiline: 2, and: [
+				'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY',
+				'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY',
+			]}},
 		]},
 		'',
-		{op: 'return', multiline: 2, and: ['zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY', 'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY']},
+		{op: 'return', and: {op: 'array', multiline: 2, and: [
+			'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY',
+			'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY',
+		]}},
 	]},
 	{op: 'func', id: 'getBound', args: ['originZoom', 'midX', 'midY', 'midZoom', 'endX', 'endY', 'isLeft'], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
@@ -188,7 +194,8 @@ const functions = [
 				op: '?', and: ['isLeft', -0.5, 0.5],
 			}},
 			'',
-			{op: 'return', and: [
+			// todo multiline?
+			{op: 'return', and: {op: 'array', and: [
 				{op: '-', and: [
 					'cornerX',
 					{op: '/', and: [
@@ -203,19 +210,19 @@ const functions = [
 						'progress',
 					]},
 				]},
-			]},
+			]}},
 		]},
 		'',
 		{op: 'if', and: [
 			{op: '<=', and: ['zoom', 'originZoom']},
-			{op: 'return', and: [0, 0]},
+			{op: 'return', and: {op: 'array', and: [0, 0]}},
 		]},
 		'',
 		{op: '=', id: ['boundX', 'boundY'], type: ['x', 'y'], and: {
 			op: 'call', id: 'getProgressed', and: [0, 0, 'endX', 'endY', 'originZoom', 'zoom'],
 		}},
 		'',
-		{op: 'return', and: ['boundX', 'boundY']},
+		{op: 'return', and: {op: 'array', and: ['boundX', 'boundY']}},
 	]},
 	{op: 'func', id: 'getDirected', args: ['endX', 'endY', 'midX', 'midY', 'flip', 'cX'], type: ['x', 'y', 'x', 'y', 'x', 'y'], pair: [1, 0, 3, 2, 5, 4], and: [
 		{op: 'return', and: {
@@ -251,7 +258,7 @@ const functions = [
 			op: 'call', id: 'getDirected', and: ['endX1', 'endY1', 'x1', 'y1', 'flip1', 0.5],
 		}},
 		'',
-		{op: 'return', multiline: true, and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '...', and: {op: '?', multiline: true, and: [
 				{op: '>=', and: ['originZoom0', 'originZoom1']},
 				{op: 'array', and: [
@@ -296,7 +303,7 @@ const functions = [
 					'dCX1', 'dCY1',
 				]},
 			]}},
-		]},
+		]}},
 	]},
 	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], type: 'zoom', and: [
 		{op: '=', multiline: 3, id: [
@@ -349,27 +356,31 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Let\'s start by seeing how that ',
-				getButton('problematic demo state', [[badTweens]]),
-				' looks on this new system.',
+				'In the prior system, there were two playground states that revealed issues.',
+				'Let\'s start by seeing how they look here.',
 			],
 			[
-				'Much better!',
-				'This system is equivalent to the prior with shared aspect ratio, but handles ',
-				getButton('decoupling', [
-					[{...badTweens, ratio: 2, zoom: 1.5}],
-					[{ratio: 0.5}, {duration: 5, ease: 'none'}],
-				]),
-				' much better.',
+				'First, the ',
+				getButton('state', [[restrictiveTweens]]),
+				' that was too restrictive is way better!',
+				'It isn\'t nearly as permissive as the "Viewport Center" system, but in most situations it\'s good enough.',
+				'The unnecessarily permissive ',
+				getButton('state', [[permissiveTweens]]),
+				' is also fixed, accurately replicating the behaviour of the "Viewport Edge" system.',
 			],
 			[
-				'This system keeps each image corner on a different viewport edge.',
-				'The corners\' distance along each edge is a ratio based on rotation angle;',
-				'if an image corner maps to one viewport corner at ',
+				'In the "Single-Line" system, we had no control over rail gradients; they would always be 1 or -1.',
+				'This kept us from choosing lock points.',
+				'Multi-line rails allow us to choose whatever gradients we want, providing much more flexibility.',
+			],
+			[
+				'This system places each lock point on a different viewport edge.',
+				'A point\'s distance along its edge is based on rotation angle.',
+				'For example, it lies on the expected viewport corners at ',
 				getButton('0°', getCornerProgressTweens(DEGREES[90])),
-				' and another at ',
+				' and ',
 				getButton('90°', getCornerProgressTweens(0)),
-				', it travels linearly between them for ',
+				' and travels linearly between them for ',
 				getButton('intermediate angles', [
 					...getCornerProgressTweens(DEGREES[90]),
 					[{rotation: 0}, {ease: 'none', duration: 3}],
@@ -377,23 +388,23 @@ export default (wrapper) => {
 				'.',
 			],
 			[
-				'But this is only half of the system.',
-				'Since points no longer travel directly from the origin towards image corners, we need a smart way to move them from the origin.',
+				'Now that we\'re messing with rail gradients, we need another rail segment to connect back to the origin.',
+				'I\'ll call rail segments that determine lock points "lock rails" and the other segments "origin rails".',
 			],
 			[
-				'This is accomplished here by having them trace along the ',
-				getButton('viewport\'s axes', [
+				'In this system, ',
+				getButton('origin rails', [
 					({rotation, ratio, first}) => [{position: 0, ratio, rotation, zoom: first.z}],
 					[{position: 0.5}, {delay: 0.5}],
 					({second}) => [{zoom: second.z}, {duration: 3, position: '<'}],
 				], {getParam: getTraceVars}),
-				' until they can take a ',
-				getButton('corner-bound', [
+				'  follow viewport axes until they intersect ',
+				getButton('lock rails', [
 					({rotation, ratio, second}) => [{position: second, ratio, rotation, zoom: second.z}],
 					[{position: 0.5}, {delay: 0.5}],
 					({second}) => [{zoom: second.z * 2}, {duration: 3, position: '<'}],
 				], {getParam: getTraceVars}),
-				'  path.',
+				'.',
 			],
 			{
 				tag: 'h2',
@@ -401,26 +412,23 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'In the previous system, we only needed to calculate the zoom at which each image corner touched the viewport\'s edge.',
-				'We can see this as defining a line segment from the origin to a corner, progressing from an initial zoom to infinite zoom.',
-				'This system has two lines connecting the origin to each corner, necessitating twice as many line definitions.',
-			],
-			[
-				'We\'ll still be focusing on the top-left and top-right image corners, but we must also assign a viewport edge that these corners will touch;',
-				'one will be a "side" corner and the other a "base" corner.',
+				'Each lock point must be on a different viewport edge, and adjacent corners will have lock points on adjacent edges.',
+				'Since we\'re focusing on the top-left and top-right image corners, we can say that one will be a "side" (left or right viewport edge) corner and the other a "base" (top or bottom viewport edge) corner.',
 				'This assignment will be based off rotation, with corners alternating between "base" and "side" every 90°.',
 			],
 			[
-				'For a given corner, its first line will travel from the origin to the center of a viewport edge (not necessarily the edge that the corner will touch).',
-				'The zoom level at which the corner touches any viewport edge will be the line\'s start zoom.',
+				'Each origin rail\'s start zoom will be the zoom at which its image corner touches a viewport edge.',
+				'If we know the lock rail\'s gradient, and we know which image corner it will end at, we can derive its start zoom from its origin rail intersection.',
 			],
 			[
-				'The second line will use the corner as its terminus and have the gradient necessary to meet the aforementioned positional constraint relative to its viewport edge.',
-				'Its start point will be the intersection between this line and the first.',
-				'In practise, I calculate whether to use a viewport "side" or "base" line as the first by finding the intersect for both and choosing the one that intersects closest to the corner.',
+				'Whichever origin rail direction minimises lock rail length is preferred.',
+				'If a direction gives an intersect with a y coordinate over 0.5, it\'s disqualified.',
 			],
 			getCode([
-				{op: '=', multiline: 2, id: ['originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0', 'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1'], and: {
+				{op: '=', id: [
+					'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',
+					'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1',
+				], and: {
 					op: 'call', id: 'getZoomPoints',
 				}},
 				'',
@@ -452,15 +460,8 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'This latter part of the system has upsides and downsides.',
-				'On one hand, users can take the most direct possible path when ',
-				getButton('panning', [
-					({rotation, ratio, second}) => [{rotation, ratio, zoom: second.z, position: 0}],
-					({second}) => [{position: second}, {delay: 0.5}],
-					({second}) => [{position: second.vpEnd}, {duration: 0}],
-				], {getParam: getDirectVars}),
-				' to an offscreen corner.',
-				'On the other, for any image aspect ratio other than 1:1, there are windows of rotation values around ',
+				'There\'s an issue with the way that I\'ve defined origin rails;',
+				'for any image aspect ratio other than 1:1, there are windows of rotation values around ',
 				get45Button(demo, 45, 0.8),
 				', ',
 				get45Button(demo, 135, 1.2),
@@ -491,8 +492,10 @@ export default (wrapper) => {
 			},
 			[
 				'The maths here build upon those of the single-line system.',
-				'As before, a line is snipped to achieve matching start zooms.',
-				'Now, however, another snip is necessary to match zooms for the later lines.',
+				'As before, a lock rail is snipped to achieve matching start zooms.',
+				'Now, however, the snipped part of the lock rail must be paired with the end of the un-snipped lock rail\'s origin rail.',
+				'Finally, one more snip is necessary to match zooms for origin rails.',
+				'A diagram of the final product is provided below.',
 			],
 			{
 				tag: 'div',
@@ -500,21 +503,14 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'The final lines look something like what\'s shown above.',
-				'One pair of green lines starts at the origin and the other is snipped to start later.',
-				'One pair of orange lines ends at the gradient change and the other starts there.',
-				'The red lines span the remaining distance from the end of the orange lines to the corners',
-			],
-			[
-				'Before, I needed to find a line that intersects the snap point and any two adjacent lines.',
-				'Now, the intersected lines must share a colour.',
-				'Thus, the number of checks required to find the correct snap zoom is tripled.',
+				'In the prior system, I needed to find a line that intersects the snap point and two adjacent rails.',
+				'Now, with the adjacent rails split into a trio of segment pairs, the number of checks required to find a snap zoom is tripled.',
 			],
 			[
 				'On top of this, the region in which the position lies is no longer obvious.',
-				'For simplicity, I simply check every region, further quadrupling checks for a total of 12x complexity.',
+				'For simplicity, I check every region, further quadrupling checks for a total of 12x complexity.',
 			],
-			'If a snap zoom may be derived from more than one of the 12 pairs, the highest zoom value is used.',
+			'If there\'s more than one possible snap zoom, the higher value is used.',
 			getCode([
 				{op: '=', id: 'snapZoom', type: 'zoom', and: {
 					op: 'max', multiline: true, and: [
@@ -546,10 +542,18 @@ export default (wrapper) => {
 			},
 			[
 				'Besides efficiency, the system\'s only drawback is its spotty pan-limiting when image aspect ratio isn\'t 1:1.',
-				'It\'s possible to solve this problem by ditching viewport axis-based panning paths in favor of, for example, image axis paths.',
-				'This, however, is accepting defeat;',
-				'not using viewport axes means accepting sub-optimal paths, providing a worse user experience.',
-				'There must be a way to have our cake and eat it too!',
+				'It\'s possible to solve this problem by approaching origin tracks differently.',
+				'For example, basing their gradients on image axes instead of viewport axes.',
+				'This, however, is accepting defeat!',
+				'Viewport axis-based origin rails allow users to take the most direct possible path when ',
+				getButton('panning', [
+					({rotation, ratio, second}) => [{rotation, ratio, zoom: second.z, position: 0}],
+					({second}) => [{position: second}, {delay: 0.5}],
+					({second}) => [{position: second.vpEnd}, {duration: 0}],
+				], {getParam: getDirectVars}),
+				' to an offscreen corner.',
+				'A different approach means accepting sub-optimal paths, providing a worse user experience.',
+				'There must be a way to make it work!',
 			],
 		),
 	);

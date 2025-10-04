@@ -103,7 +103,7 @@ const SINGLE_LINE = [
 			},
 		}},
 		'',
-		{op: 'return', multiline: true, and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '/', and: [
 				'½viewportWidth',
 				{op: 'abs', and: {
@@ -140,7 +140,7 @@ const SINGLE_LINE = [
 					],
 				}},
 			]},
-		]},
+		]}},
 	]},
 ];
 
@@ -176,10 +176,10 @@ export const MULTI_LINE = [
 			op: 'call', id: 'getAllStartZooms',
 		}},
 		'',
-		{op: 'return', multiline: true, and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: 'min', and: ['topLeftX', 'topRightX']},
 			{op: 'min', and: ['topLeftY', 'topRightY']},
-		]},
+		]}},
 	]},
 	{op: 'func', id: 'getViewportPoints', args: ['zoomSide', 'zoomBase'], type: ['xvp', 'yvp', 'xvp', 'yvp'], pair: [1, 0, 3, 2], and: [
 		{op: '=', id: 'rightX', isPercent: false, type: 'xvp', and: {
@@ -196,7 +196,7 @@ export const MULTI_LINE = [
 			op: '+', and: ['rightTheta', '½π'],
 		}},
 		'',
-		{op: 'return', multiline: true, and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '/', and: [
 				{op: '*', and: [
 					'rightX',
@@ -225,7 +225,7 @@ export const MULTI_LINE = [
 				]},
 				'imageHeight',
 			]},
-		]},
+		]}},
 	]},
 	{op: 'func', id: 'getQuadrantAngle', args: ['isEvenQuadrant'], type: 'angle', and: [
 		{op: '=', id: 'angle', type: 'angle', and: {
@@ -255,7 +255,7 @@ export const MULTI_LINE = [
 			],
 		}},
 		'',
-		{op: 'return', and: [
+		{op: 'return', and: {op: 'array', and: [
 			{op: '+', and: [
 				'fromX',
 				{op: '*', and: [
@@ -270,7 +270,7 @@ export const MULTI_LINE = [
 					{op: '-', and: ['toY', 'fromY']},
 				]},
 			]},
-		]},
+		]}},
 	]},
 	// todo check if isBase works
 	{op: 'func', id: 'getProgressAngles', args: ['quadrantAngle'], type: ['angle', 'angle'], isBase: [false, true], and: [
@@ -301,6 +301,6 @@ export const MULTI_LINE = [
 			},
 		}},
 		'',
-		{op: 'return', and: ['angleSide', 'angleBase']},
+		{op: 'return', and: {op: 'array', and: ['angleSide', 'angleBase']}},
 	]},
 ];

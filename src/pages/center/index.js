@@ -69,9 +69,9 @@ export default (wrapper) => {
 			},
 			[
 				'Despite its simplicity, this system actually works wonderfully.',
-				'In most cases, I think it\'s the best solution.',
-				'The user can always intuit pan limits, every part of the image is viewable and the code is hyper-efficient.',
-				'The only real issue with this system is with snap panning.',
+				'In most cases, I think it\'s the best solution;',
+				'its intuitive, unrestrictive pan limits provide an excellent user experience, and the code is hyper-efficient.',
+				'The only real issue with this system is with snap-panning.',
 			],
 			[
 				'Say we want to ',
@@ -80,7 +80,7 @@ export default (wrapper) => {
 				]),
 				' our screens with the top-right quadrant of the image.',
 				'We can ',
-				getButton('snap pan', [
+				getButton('snap-pan', [
 					() => [{position: getSnapPosition(demo)}, {duration: 0}],
 				]),
 				' to the spot we want, but a ',
@@ -98,15 +98,15 @@ export default (wrapper) => {
 			},
 			[
 				'This is a perfect pan-limiting system; it can\'t be improved without also making concessions.',
-				'As a snap-panning system, however, its inability to derive zooms makes it useless.',
+				'Its only shortcoming is its lousy snap-panning behaviour.',
 			],
 			[
-				'We\'ll call this system\'s snap panning "zoomless", as opposed to "zoomful".',
-				'All future systems will have zoomful snap panning.',
+				'We\'ll call this system\'s snap-panning "zoomless", as opposed to "zoomful".',
+				'All future systems will have zoomful snap-panning.',
 			],
 			[
-				'A sensible implementation of these systems might use this one to limit panning and an upcoming system for snap pans.',
-				'If your image can\'t be rotated, I\'d recommend the next system up.',
+				'A sensible way to apply these systems is to pair this one with an upcoming system, using the other system solely for snap-pans.',
+				'If your image can\'t be rotated, its ideal partner is the next system up.',
 			],
 		),
 	);
