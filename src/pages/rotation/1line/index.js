@@ -223,7 +223,7 @@ export default (wrapper) => {
 					}},
 				]),
 				[
-					'Given these zoom values, deriving pan limits is straightforward.',
+					'Given these zoom values, deriving pan-limits is straightforward.',
 					'The calculation is demonstrated below.',
 				],
 			],
@@ -287,7 +287,7 @@ export default (wrapper) => {
 					[restrictiveTweens],
 					[{zoom: 1}],
 				]),
-				' out past the point that pan limits become one-dimensional.',
+				' out past the point that pan-limits become one-dimensional.',
 				'This is a problem for any state some rotation and a lock point close to a viewport corner',
 			],
 			[
@@ -1032,7 +1032,7 @@ export default (wrapper) => {
 			},
 			[
 				'Unfortunately, a system with single-line rails doesn\'t produce satisfactory behaviour;',
-				'its pan limits can be too restrictive and, when image and viewport don\'t share an aspect ratio, it fails to reproduce the prior system\'s behaviour for un-rotated images.',
+				'its pan-limits can be too restrictive and, when image and viewport don\'t share an aspect ratio, it fails to reproduce the prior system\'s behaviour for un-rotated images.',
 			],
 		),
 	);

@@ -42,15 +42,15 @@ export default class extends Demo {
 	setZoomPoints() {
 		if (this.ratio < 1) {
 			this.zoomPoints = [
-				{x: 0, y: 0, z: 1},
-				{x: 0.5 - 0.5 / this.ratioInverse, y: 0, z: this.ratioInverse, vpEnd: {x: 0.5, y: 0}},
+				{x: 0, y: 0, z: 1, end: {x: 0.5, y: 0}},
+				{x: 0.5 - 0.5 / this.ratioInverse, y: 0, z: this.ratioInverse},
 			];
 			
 			this.lowAxis = 'x';
 		} else {
 			this.zoomPoints = [
-				{x: 0, y: 0, z: 1},
-				{x: 0, y: 0.5 - 0.5 / this.ratio, z: this.ratio, vpEnd: {x: 0, y: 0.5}},
+				{x: 0, y: 0, z: 1, end: {x: 0, y: 0.5}},
+				{x: 0, y: 0.5 - 0.5 / this.ratio, z: this.ratio},
 			];
 			
 			this.lowAxis = 'y';

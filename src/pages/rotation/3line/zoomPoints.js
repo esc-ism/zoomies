@@ -1,13 +1,11 @@
 import {CORNERS} from '@/pages/consts';
-import {getAllStartZooms} from '../demo';
-
 import {DEGREES} from '@/shared';
-import {getFlipped, getM, getZoomProgressed} from '../shared';
 
 import {
-	getQuadrantAngle, getProgressAngles,
+	getFlipped, getM, getZoomProgressed, getQuadrantAngle, getProgressAngles,
 	getAxisIntersectY, getPoints, getGenericIntersection, getAxisIntersectX,
-} from '../2line/zoomPoints';
+} from '../shared';
+import {getAllStartZooms} from '../demo';
 
 const getP = ({end, ...first}, point) => {
 	const axis = Math.abs(end.x) > Math.abs(end.y) ? 'x' : 'y';

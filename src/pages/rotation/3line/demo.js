@@ -1,7 +1,8 @@
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
-import {getZoomProgressed, getProgressedLine, getZoomPairSecond, getProgress, getFlipped} from '../shared';
+import {getZoomProgressed, getProgressedLine, getProgress, getFlipped} from '../shared';
+import {getDirected as getDirectedDuo, getSecondPairings, getZoom, isValidZoom} from '../shared/snapZoom';
 import getConstrainerFromPoints from '../shared/constrain';
 
 import getZoomPoints from './zoomPoints';
@@ -36,45 +37,14 @@ export const getBound = (zoom, first, second, third) => {
 };
 
 export const getSnappedZoom = (() => {
-	const getDirected = (first, second, third, flip, cornerX) => {
-		const get = flip ? (position) => getFlipped(position) : ({...position}) => ({...position});
-		const low = third.isFirstInt ? first : second;
-		
-		return [[get(low), get(low.end)], [{...get(third), z: third.z}, get({x: cornerX, y: 0.5})]];
-	};
-	
-	const isValidZoom = (zoom) => zoom !== null && !isNaN(zoom);
-	
-	const getZoom = (position, doFlip, ...pairs) => {
-		let maxP;
-		
-		for (let i = pairs.length - 1; i >= 1; i--) {
-			const zoom = getZoomPairSecond(pairs[i], position, doFlip, maxP);
-			
-			if (zoom) {
-				return zoom;
-			}
-			
-			maxP = getProgress(pairs[i - 1][0], pairs[i][0]);
-		}
-		
-		return getZoomPairSecond(pairs[0], position, doFlip, maxP);
-	};
+	const getDirected = (first, second, third, flip, cornerX) => getDirectedDuo(third.isFirstInt ? first : second, third, flip, cornerX);
 	
 	return (first0, second0, third0, first1, second1, third1, position) => {
 		const getPairings = (flip0, flip1) => {
 			const [lineFirst0, lineSecond0] = getDirected(first0, second0, third0, flip0, -0.5);
 			const [lineFirst1, lineSecond1] = getDirected(first1, second1, third1, flip1, 0.5);
 			
-			const pairings = third0.z >= third1.z ?
-					[
-						[third1.z, getProgressedLine(lineFirst0, third1), lineSecond1],
-						[third0.z, lineSecond0, getProgressedLine(lineSecond1, third0)],
-					] :
-					[
-						[third0.z, lineSecond0, getProgressedLine(lineFirst1, third0)],
-						[third1.z, getProgressedLine(lineSecond0, third1), lineSecond1],
-					];
+			const pairings = getSecondPairings(third0, third1, lineFirst0, lineFirst1, lineSecond0, lineSecond1);
 			
 			if (third0.isFirstInt) {
 				pairings.unshift([second1.z, getProgressedLine(lineFirst0, second1), lineSecond1]);

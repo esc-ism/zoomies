@@ -906,7 +906,7 @@ export default (wrapper) => {
 			[
 				'This system is not significantly worse nor better at snap-panning than the prior.',
 				'If you try a snap-pan here and then hit your left arrow key, you\'ll see that differences are negligible.',
-				'If we\'re picking nits, however, the choppiness of the prior system\'s pan limits do lead to some slight inconsistency in snap-pans.',
+				'If we\'re picking nits, however, the choppiness of the prior system\'s pan-limits do lead to some slight inconsistency in snap-pans.',
 				'This system excises that inconsistency at the expense of code efficiency.',
 			],
 			'The balance of consistency and efficiency must be weighed to judge a victor.',

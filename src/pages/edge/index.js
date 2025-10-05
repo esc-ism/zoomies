@@ -28,11 +28,10 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Zoomful snap-panning requires a pan-limiting system that\'s affected by zoom.',
-				'In the interest of building complexity slowly, this first zoomful system neglects to consider rotation.',
+				'In the interest of building complexity slowly, this first zoomful system doesn\'t consider rotation.',
 			],
 			[
-				'When possible, this system keeps the viewport wholly within the image.',
+				'When possible, the viewport is kept wholly within the image.',
 				'Panning is prevented along axes where the viewport is ',
 				getButton('larger', [
 					[{rotation: DEGREES[90], zoom: 0.8}],
@@ -40,7 +39,7 @@ export default (wrapper) => {
 				' than the image.',
 			],
 			[
-				'Whereas the prior system had fixed pan limits, from now on bounds will ',
+				'Whereas the prior system had fixed pan-limits, from now on bounds will ',
 				getButton('grow', [
 					[{zoom: 1, position: 0}, {duration: 0}],
 					[{zoom: 1.5}],
@@ -58,8 +57,8 @@ export default (wrapper) => {
 				' (they can be a ',
 				{tag: 'a', content: 'rhombus', href: 'https://en.wikipedia.org/wiki/Rhombus'},
 				' in upcoming systems, but not this one).',
-				'The effect of zooming on bounds can be modelled by plotting the paths taken by line segment endpoints and parallelogram corners.',
-				'This model is given form by the new playground lines that connect the image\'s origin to its corners, which I will refer to as "rails".',
+				'The new playground lines plot all possible positions of line segment endpoints and parallelogram corners.',
+				'I will refer to them as "rails", since bounds appear to travel along them.',
 			],
 			{
 				tag: 'h2',
@@ -73,7 +72,7 @@ export default (wrapper) => {
 					[{position: 0.5, zoom: 2}],
 				]),
 				'.',
-				'This reciprocal relationship between zoom and viewport size gives the following calculation for pan limits along the x & y axes:',
+				'This reciprocal relationship between zoom and viewport size gives the following calculation for pan-limits along the x & y axes:',
 			],
 			getInstruction(
 				[
@@ -111,7 +110,7 @@ export default (wrapper) => {
 				}},
 			]),
 			[
-				{tag: 'i', content: 'boundX'}, ' is derived from widths, whereas ', {tag: 'i', content: 'boundY'}, ' is derived from heights.',
+				{tag: 'i', content: 'boundX'}, ' is derived from widths and ', {tag: 'i', content: 'boundY'}, ' is derived from heights.',
 				'Aspect ratio dictates the zooms at which each starts growing, with ratios ',
 				getButton('over 1', [
 					[{ratio: 1, zoom: 1}],
@@ -130,8 +129,8 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'snap-panning now requires an accommodating zoom adjustment.',
-				'We can derive the formula by solving the pan limiting calculation for zoom.',
+				'Snap-panning now requires an accommodating zoom adjustment.',
+				'We can derive the formula by solving the pan-limiting calculation for zoom.',
 			],
 			{tag: 'p', classList: [CLASS_MATH], content: [
 				{tag: 'math', xmlns, content: [
@@ -287,7 +286,7 @@ export default (wrapper) => {
 			},
 			[
 				'That\'s all for our first zoomful system!',
-				'Hopefully you can see its advantages for snap-panning, even if its pan limiting isn\'t as universally preferable.',
+				'Hopefully you can see its advantages for snap-panning, even if its pan-limiting isn\'t as universally preferable.',
 			],
 			[
 				'From now on, we\'ll only be looking at systems built for rotation.',

@@ -221,6 +221,10 @@ export default class {
 		viewport.appendChild(this.constructor.progress.element);
 		
 		this.init().then(() => {
+			if (this.isRemoved) {
+				return;
+			}
+			
 			this.addEventListener(resizer, 'pointerdown', (event) => {
 				const {buttons, pointerId, offsetX} = event;
 				

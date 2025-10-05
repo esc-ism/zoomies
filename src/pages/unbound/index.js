@@ -144,7 +144,7 @@ export default (wrapper) => {
 				'Pan-limiting systems prevent this by keeping users from the no man\'s land beyond the confines of the image.',
 			],
 			[
-				'Pan limits here are fixed, regardless of zoom.',
+				'Pan-limits here are fixed, regardless of zoom.',
 				'More advanced systems can take a position and derive an appropriate zoom level, which is useful when span-panning.',
 				'I\'ll talk more about that later.',
 			],
@@ -154,7 +154,7 @@ export default (wrapper) => {
 				content: 'Conclusion',
 			},
 			[
-				'Some degree of pan limiting is important.',
+				'Some degree of pan-limiting is important.',
 				'Like how game developers endeavour to keep players in-bounds, a good pan-limiting system keeps the viewport attached to its content.',
 			],
 			'Let\'s move on and take a look at the minimum viable product.',

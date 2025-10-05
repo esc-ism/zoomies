@@ -48,29 +48,9 @@ const getSplit = (from, to, ratio) => {
 	return [from, [x, y], to];
 };
 
-const crosshair = document.createElementNS(SVG_NAMESPACE, 'g');
-
-crosshair.setAttribute('stroke-width', 0.2);
-
-crosshair.append(...[[0, 1], [1, 0]].map(([xMult, yMult]) => {
-	const line = document.createElementNS(SVG_NAMESPACE, 'line');
-	
-	const x = RADIUS.X + STROKE_RADIUS;
-	const y = RADIUS.Y + STROKE_RADIUS;
-	
-	line.setAttribute('x1', x * -xMult);
-	line.setAttribute('y1', y * -yMult);
-	line.setAttribute('x2', x * xMult);
-	line.setAttribute('y2', y * yMult);
-	
-	return line;
-}));
-
-svg.appendChild(crosshair);
-
 const POINTS = [
-	[[0, 0], ...getSplit([0, RADIUS.Y * -0.2], TOP_LEFT, 0.5)],
-	[...getSplit([RADIUS.X * 0.2, 0], [RADIUS.X * 0.5, 0], 0.5), TOP_RIGHT],
+	[[0, 0], ...getSplit([RADIUS.X * 0.035, RADIUS.Y * -0.2], TOP_LEFT, 0.5)],
+	[...getSplit([RADIUS.X * 0.2, RADIUS.Y * 0.08], [RADIUS.X * 0.5, RADIUS.Y * 0.22], 0.5), TOP_RIGHT],
 ];
 
 const colours = ['#374', '#962', '#722'];

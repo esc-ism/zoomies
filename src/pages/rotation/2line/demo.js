@@ -1,55 +1,34 @@
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
-import {getBound, getProgressedLine, getZoomPairSecond, getProgress, getFlipped} from '../shared';
+import {getBound, getProgressedLine, getProgress} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
 import getZoomPoints from './zoomPoints';
+import {getDirected, getFirstPairing, getSecondPairings, getZoom, isValidZoom} from '../shared/snapZoom';
 
-export const getSnappedZoom = (() => {
-	const getDirected = (first, second, flip, cornerX) => {
-		const get = flip ? (position) => getFlipped(position) : ({x, y}) => ({x, y});
+export const getSnappedZoom = (first0, second0, first1, second1, position) => {
+	const getPairings = (flip0, flip1) => {
+		const [lineFirst0, lineSecond0] = getDirected(first0, second0, flip0, -0.5);
+		const [lineFirst1, lineSecond1] = getDirected(first1, second1, flip1, 0.5);
 		
-		return [[first, get(second.vpEnd)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
+		const pairings = getSecondPairings(second0, second1, lineFirst0, lineFirst1, lineSecond0, lineSecond1);
+		
+		if (first0.end.axis !== first1.end.axis) {
+			pairings.unshift(getFirstPairing(first0, first1, lineFirst0, lineFirst1));
+		}
+		
+		return pairings;
 	};
 	
-	const isValidZoom = (zoom) => zoom !== null && !isNaN(zoom);
-	
-	const getZoom = (pair0, pair1, pair2, position, doFlip) => getZoomPairSecond(pair2, position, doFlip)
-		|| getZoomPairSecond(pair1, position, doFlip, getProgress(pair1[0], pair2[0]))
-		|| getZoomPairSecond(pair0, position, doFlip, getProgress(pair0[0], pair1[0]));
-	
-	return (first0, second0, first1, second1, position) => {
-		const getPairings = (flip0, flip1) => {
-			const [lineFirst0, lineSecond0] = getDirected(first0, second0, flip0, -0.5);
-			const [lineFirst1, lineSecond1] = getDirected(first1, second1, flip1, 0.5);
-			
-			return [
-				first0.z >= first1.z ?
-						[first0.z, lineFirst0, getProgressedLine(lineFirst1, first0)] :
-						[first1.z, getProgressedLine(lineFirst0, first1), lineFirst1],
-				
-				...second0.z >= second1.z ?
-						[
-							[second1.z, getProgressedLine(lineFirst0, second1), lineSecond1],
-							[second0.z, lineSecond0, getProgressedLine(lineSecond1, second0)],
-						] :
-						[
-							[second0.z, lineSecond0, getProgressedLine(lineFirst1, second0)],
-							[second1.z, getProgressedLine(lineSecond0, second1), lineSecond1],
-						],
-			];
-		};
-		
-		return Math.max(...[
-			getZoom(...getPairings(false, false), position),
-			getZoom(...getPairings(false, true), position, true),
-			getZoom(...getPairings(true, false), position, true),
-			getZoom(...getPairings(true, true), position),
-		].filter(isValidZoom));
-	};
-})();
+	return Math.max(...[
+		getZoom(position, false, ...getPairings(false, false)),
+		getZoom(position, true, ...getPairings(false, true)),
+		getZoom(position, true, ...getPairings(true, false)),
+		getZoom(position, false, ...getPairings(true, true)),
+	].filter(isValidZoom));
+};
 
 export const getRailProgress = (zoom, first, second) => {
 	if (zoom <= first.z) {

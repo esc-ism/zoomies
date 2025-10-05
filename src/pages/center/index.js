@@ -69,9 +69,9 @@ export default (wrapper) => {
 			},
 			[
 				'Despite its simplicity, this system actually works wonderfully.',
-				'In most cases, I think it\'s the best solution;',
-				'its intuitive, unrestrictive pan limits provide an excellent user experience, and the code is hyper-efficient.',
-				'The only real issue with this system is with snap-panning.',
+				'Its intuitive, unrestrictive pan-limits provide a frictionless user experience, and the code is hyper-efficient.',
+				'In most cases, I think it\'s the best solution.',
+				'Its only real issue arises when we consider snap-panning.',
 			],
 			[
 				'Say we want to ',
@@ -98,11 +98,11 @@ export default (wrapper) => {
 			},
 			[
 				'This is a perfect pan-limiting system; it can\'t be improved without also making concessions.',
-				'Its only shortcoming is its lousy snap-panning behaviour.',
+				'Unfortunately, the disregard for zoom that helps it to excel as a pan-limiter makes it a lousy snap-panner.',
 			],
 			[
-				'We\'ll call this system\'s snap-panning "zoomless", as opposed to "zoomful".',
-				'All future systems will have zoomful snap-panning.',
+				'I\'ll refer to systems with pan-limits affected by zoom as "zoomful".',
+				'All future systems will be zoomful.',
 			],
 			[
 				'A sensible way to apply these systems is to pair this one with an upcoming system, using the other system solely for snap-pans.',
