@@ -49,7 +49,7 @@ const getSplit = (from, to, ratio) => {
 };
 
 const POINTS = [
-	[[0, 0], ...getSplit([RADIUS.X * 0.035, RADIUS.Y * -0.2], TOP_LEFT, 0.5)],
+	[[0, 0], ...getSplit([RADIUS.X * 0.04, RADIUS.Y * -0.2], TOP_LEFT, 0.5)],
 	[...getSplit([RADIUS.X * 0.2, RADIUS.Y * 0.08], [RADIUS.X * 0.5, RADIUS.Y * 0.22], 0.5), TOP_RIGHT],
 ];
 

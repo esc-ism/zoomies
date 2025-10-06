@@ -99,7 +99,7 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 		content: text,
 		classList: [CLASS_BUTTON],
 		onpointerover: () => demo.init().then(async () => {
-			const param = (await getParam)();
+			const param = await getParam();
 			
 			demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
 		}),

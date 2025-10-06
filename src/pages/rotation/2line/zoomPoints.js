@@ -2,7 +2,7 @@ import {CORNERS} from '@/pages/consts';
 import {getAllStartZooms} from '../demo';
 
 import {DEGREES} from '@/shared';
-import {getAxisIntersectY, getGenericIntersection, getPoints, getProgressAngles, getQuadrantAngle} from '../shared';
+import {getAxisIntersectY, getGenericIntersection, getM, getPoints, getProgressAngles, getQuadrantAngle} from '../shared';
 
 const getIntersection = (line, corner, middle) => {
 	const {x, y} = getGenericIntersection([{x: 0, y: 0}, middle], [line, corner]);
@@ -11,11 +11,9 @@ const getIntersection = (line, corner, middle) => {
 	return {x, y, z: line.z / (1 - progress), c: line.y};
 };
 
-const getIntersect = (z, yIntersect, corner, right, top) => {
-	const point0 = getIntersection(yIntersect, corner, right);
-	const point1 = getIntersection(yIntersect, corner, top);
-	
-	const [point, end] = point0.z > point1.z ? [point0, {...right}] : [point1, {...top}];
+const getIntersect = (z, yIntersect, corner, target, backup) => {
+	const end = {...((Math.abs(getM(yIntersect, corner)) < 1) !== (Math.abs(target.y / target.x) < 1)) ? target : backup};
+	const point = getIntersection(yIntersect, corner, end);
 	
 	if (Math.sign(point[end.axis]) !== Math.sign(end[end.axis])) {
 		end.x = -end.x;
@@ -30,12 +28,17 @@ const getIntersect = (z, yIntersect, corner, right, top) => {
 	];
 };
 
-const getSecond = (data) => {
-	const points = getPoints(data);
+const getSecond = (demo, cornerSide, cornerBase, startZooms, quadrantAngle) => {
+	const progressAngles = getProgressAngles(quadrantAngle, demo.ratioViewport, demo.ratioViewportInverse);
+	
+	const yIntersectSide = getAxisIntersectY(demo.sizesImage, demo.sizesViewport.halfWidth, quadrantAngle + progressAngles.side, progressAngles.side);
+	const yIntersectBase = getAxisIntersectY(demo.sizesImage, demo.sizesViewport.halfHeight, DEGREES[90] - quadrantAngle - progressAngles.base, progressAngles.base);
+	
+	const points = getPoints(demo, startZooms, quadrantAngle);
 	
 	return [
-		...getIntersect(data.startZooms[0], data.yIntersectSide, data.cornerSide, ...points),
-		...getIntersect(data.startZooms[1], data.yIntersectBase, data.cornerBase, ...points),
+		...getIntersect(startZooms[0], yIntersectSide, cornerSide, points[0], points[1]),
+		...getIntersect(startZooms[1], yIntersectBase, cornerBase, points[1], points[0]),
 	];
 };
 
@@ -48,15 +51,9 @@ export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizes
 	const isEvenQuadrant = Math.floor(demo.rotation / DEGREES[90]) % 2 !== 0;
 	const quadrantAngle = getQuadrantAngle(demo.rotation, isEvenQuadrant);
 	
-	const progressAngles = getProgressAngles(quadrantAngle, demo.ratioViewport, demo.ratioViewportInverse);
-	
 	const [cornerSide, cornerBase] = isEvenQuadrant ? [CORNERS.TOP_LEFT, CORNERS.TOP_RIGHT] : [CORNERS.TOP_RIGHT, CORNERS.TOP_LEFT];
 	
-	const [firstSide, secondSide, firstBase, secondBase] = getSecond({
-		...demo, cornerSide, cornerBase, startZooms, quadrantAngle, isEvenQuadrant,
-		yIntersectSide: getAxisIntersectY(demo.sizesImage, demo.sizesViewport.halfWidth, quadrantAngle + progressAngles.side, progressAngles.side),
-		yIntersectBase: getAxisIntersectY(demo.sizesImage, demo.sizesViewport.halfHeight, DEGREES[90] - quadrantAngle - progressAngles.base, progressAngles.base),
-	});
+	const [firstSide, secondSide, firstBase, secondBase] = getSecond(demo, cornerSide, cornerBase, startZooms, quadrantAngle, isEvenQuadrant);
 	
 	return isEvenQuadrant ?
 			[...[firstSide, secondSide], ...[firstBase, secondBase]] :

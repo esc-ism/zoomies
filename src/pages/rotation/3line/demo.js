@@ -1,7 +1,7 @@
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
-import {getZoomProgressed, getProgressedLine, getProgress, getFlipped} from '../shared';
+import {getZoomProgressed, getProgressedLine, getProgress} from '../shared';
 import {getDirected as getDirectedDuo, getSecondPairings, getZoom, isValidZoom} from '../shared/snapZoom';
 import getConstrainerFromPoints from '../shared/constrain';
 

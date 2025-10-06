@@ -304,3 +304,129 @@ export const MULTI_LINE = [
 		{op: 'return', and: {op: 'array', and: ['angleSide', 'angleBase']}},
 	]},
 ];
+
+export const DOUBLE_LINE = [
+	...MULTI_LINE,
+	{op: 'func', id: 'getBound', args: ['originZoom', 'midX', 'midY', 'midZoom', 'endX', 'endY', 'isLeft'], type: ['x', 'y'], pair: [1, 0], and: [
+		{op: 'if', and: [
+			{op: '>', and: ['zoom', 'midZoom']},
+			{op: '=', id: 'progress', and: {
+				op: '/', and: ['zoom', 'midZoom'],
+			}},
+			{op: '=', id: 'cornerX', type: 'x', and: {
+				op: '?', and: ['isLeft', -0.5, 0.5],
+			}},
+			'',
+			// todo multiline?
+			{op: 'return', and: {op: 'array', and: [
+				{op: '-', and: [
+					'cornerX',
+					{op: '/', and: [
+						{op: '-', and: ['cornerX', 'midX']},
+						'progress',
+					]},
+				]},
+				{op: '-', and: [
+					0.5,
+					{op: '/', and: [
+						{op: '-', and: [0.5, 'midY']},
+						'progress',
+					]},
+				]},
+			]}},
+		]},
+		'',
+		{op: 'if', and: [
+			{op: '<=', and: ['zoom', 'originZoom']},
+			{op: 'return', and: {op: 'array', and: [0, 0]}},
+		]},
+		'',
+		{op: '=', id: ['boundX', 'boundY'], type: ['x', 'y'], and: {
+			op: 'call', id: 'getProgressed', and: [0, 0, 'endX', 'endY', 'originZoom', 'zoom'],
+		}},
+		'',
+		{op: 'return', and: {op: 'array', and: ['boundX', 'boundY']}},
+	]},
+	{op: 'func', id: 'getDirected', args: ['endX', 'endY', 'midX', 'midY', 'flip', 'cX'], type: ['x', 'y', 'x', 'y', 'x', 'y'], pair: [1, 0, 3, 2, 5, 4], and: [
+		{op: 'return', and: {
+			op: '?', multiline: true, and: [
+				'flip',
+				{op: 'array', and: [
+					{op: '-', and: 'endX'}, {op: '-', and: 'endY'},
+					{op: '-', and: 'midX'}, {op: '-', and: 'midY'},
+					{op: '-', and: 'cX'}, -0.5,
+				]},
+				{op: 'array', and: [
+					'endX', 'endY',
+					'midX', 'midY',
+					'cX', 0.5,
+				]},
+			],
+		}},
+	]},
+	{op: 'func', id: 'getPairings', args: ['flip0', 'flip1'], type: [
+		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
+		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
+		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
+	], pair: [
+		,
+		2, 1, 4, 3, 6, 5, 8, 7,,
+		11, 10, 13, 12, 15, 14, 17, 16,,
+		20, 19, 22, 21, 24, 23, 26, 25,
+	], and: [
+		{op: '=', id: ['dEndX0', 'dEndY0', 'dMidX0', 'dMidY0', 'dCX0', 'dCY0'], and: {
+			op: 'call', id: 'getDirected', and: ['endX0', 'endY0', 'x0', 'y0', 'flip0', -0.5],
+		}},
+		{op: '=', id: ['dEndX1', 'dEndY1', 'dMidX1', 'dMidY1', 'dCX1', 'dCY1'], and: {
+			op: 'call', id: 'getDirected', and: ['endX1', 'endY1', 'x1', 'y1', 'flip1', 0.5],
+		}},
+		'',
+		{op: 'return', and: {op: 'array', multiline: true, and: [
+			// todo unshift conditionally
+			{op: '...', and: {op: '?', multiline: true, and: [
+				{op: '>=', and: ['originZoom0', 'originZoom1']},
+				{op: 'array', and: [
+					'originZoom0',
+					0, 0,
+					'dEndX0', 'dEndY0',
+					{op: '...', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'dEndX1', 'dEndY1', 'originZoom1', 'originZoom0']}},
+					'dEndX1', 'dEndY1',
+				]},
+				{op: 'array', and: [
+					'originZoom1',
+					{op: '...', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'dEndX0', 'dEndY0', 'originZoom0', 'originZoom1']}},
+					'dEndX0', 'dEndY0',
+					0, 0,
+					'dEndX1', 'dEndY1',
+				]},
+			]}},
+			{op: '...', and: {op: '?', multiline: true, and: [
+				{op: '>=', and: ['zoom0', 'zoom1']},
+				{op: 'array', multiline: 2, and: [
+					'zoom1',
+					{op: '...', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'dEndX0', 'dEndY0', 'originZoom0', 'zoom1']}},
+					'dEndX0', 'dEndY0',
+					'dMidX1', 'dMidY1',
+					'dCX1', 'dCY1',
+					'zoom0',
+					'dMidX0', 'dMidY0',
+					'dCX0', 'dCY0',
+					{op: '...', and: {op: 'call', id: 'getProgressed', and: ['dMidX1', 'dMidY1', 'dCX1', 'dCY1', 'zoom1', 'zoom0']}},
+					'dCX1', 'dCY1',
+				]},
+				{op: 'array', multiline: 2, and: [
+					'zoom0',
+					'dMidX0', 'dMidY0',
+					'dCX0', 'dCY0',
+					{op: '...', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'dEndX1', 'dEndY1', 'originZoom1', 'zoom0']}},
+					'dEndX1', 'dEndY1',
+					'zoom1',
+					{op: '...', and: {op: 'call', id: 'getProgressed', and: ['dMidX0', 'dMidY0', 'dCX0', 'dCY0', 'zoom0', 'zoom1']}},
+					'dCX0', 'dCY0',
+					'dMidX1', 'dMidY1',
+					'dCX1', 'dCY1',
+				]},
+			]}},
+		]}},
+	]},
+];

@@ -180,7 +180,7 @@ export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizes
 		...demo, ...getAxisIntersects(demo, quadrantAngle, isEvenQuadrant),
 	};
 	
-	[data.right, data.top] = getPoints(data);
+	[data.right, data.top] = getPoints(demo, startZooms, quadrantAngle);
 	
 	const [firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase] = getAll(data);
 	

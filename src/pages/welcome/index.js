@@ -13,11 +13,11 @@ const tween = async (demo) => {
 	const getRandomRatio = gsap.utils.random(0.5, 2, undefined, true);
 	
 	while (!demo.isRemoved) {
-		const {zoomPoints, rotation, ratio} = (await getVarGetter(
+		const {zoomPoints, rotation, ratio} = await getVarGetter(
 			demo,
 			getRandomRotation(),
 			getRandomRatio(),
-		))();
+		)();
 		
 		let firstIndex;
 		let firstIndexRaw;

@@ -113,7 +113,7 @@ export const getGenericIntersection = (line0, line1) => {
 	};
 };
 
-export const getPoints = ({rotation, sizesImage, sizesViewport, startZooms, quadrantAngle}) => {
+export const getPoints = ({rotation, sizesImage, sizesViewport}, startZooms, quadrantAngle) => {
 	const [axisRight, axisTop] = quadrantAngle >= DEGREES[45] ? ['y', 'x'] : ['x', 'y'];
 	
 	const xRight = sizesViewport.halfWidth / startZooms[0];

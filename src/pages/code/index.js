@@ -536,9 +536,9 @@ const interpretters = {
 		
 		return {elements: [idWrapper, getElement(CLASS_NAMES['=']), ...operand]};
 	},
-	'+': getCombiner((a, b) => a + b, ['%', '*', '/']),
+	'+': getCombiner((a, b) => a + b, ['==', '!=', '%', '*', '/']),
 	'-': (() => {
-		const combiner = getCombiner((a, b) => a - b, ['%', '*', '/']);
+		const combiner = getCombiner((a, b) => a - b, ['==', '!=', '%', '*', '/']);
 		
 		return (statement, scope, meta, indent) => {
 			if (!Array.isArray(statement.and)) {
@@ -563,17 +563,17 @@ const interpretters = {
 		
 		return {value: !value, elements: [element]};
 	},
-	'*': getCombiner((a, b) => a * b, ['%', '/']),
-	'/': getCombiner((a, b) => a / b, ['%']),
-	'<=': getCombiner((a, b) => a <= b),
-	'>=': getCombiner((a, b) => a >= b),
-	'<': getCombiner((a, b) => a < b),
-	'>': getCombiner((a, b) => a > b),
-	'&&': getCombiner((a, b) => a && b),
-	'||': getCombiner((a, b) => a || b),
+	'*': getCombiner((a, b) => a * b, ['==', '!=', '%', '/']),
+	'/': getCombiner((a, b) => a / b, ['==', '!=', '%']),
+	'<=': getCombiner((a, b) => a <= b, ['==', '!=']),
+	'>=': getCombiner((a, b) => a >= b, ['==', '!=']),
+	'<': getCombiner((a, b) => a < b, ['==', '!=']),
+	'>': getCombiner((a, b) => a > b, ['==', '!=']),
+	'&&': getCombiner((a, b) => a && b, ['==', '!=']),
+	'||': getCombiner((a, b) => a || b, ['==', '!=']),
 	'!=': getCombiner((a, b) => a !== b),
 	'==': getCombiner((a, b) => a === b),
-	'%': getCombiner((a, b) => a % b, ['*', '/', '+', '-', '<=', '>=', '<', '>', '!=']),
+	'%': getCombiner((a, b) => a % b, ['*', '/', '+', '-', '<=', '>=', '<', '>', '!=', '==']),
 	if: (statement, scope, meta, indent) => {
 		const elements = {
 			condition: getElement(CLASS_NAMES.if),

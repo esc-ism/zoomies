@@ -3,7 +3,7 @@ import {DEGREES} from '@/shared';
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
 
-import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
+import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 import Demo, {getSnappedZoom} from './demo';
 import * as mock from '../mock';
 import getZoomPoints from './zoomPoints';
@@ -12,9 +12,9 @@ const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
 const getLimitedPosition = (limit = 0.4) => Math.max(-limit, Math.min(limit, Math.random() - 0.5));
 
-const getSnapVars = (demo, getRatio) => {
+const getSnapVarGetter = async (demo, getRatio) => {
 	const position = {x: getLimitedPosition(), y: getLimitedPosition()};
-	const {zoomPoints, rotation, ratio} = getVarGetter(demo, Math.random() * DEGREES[180], getRatio())();
+	const {zoomPoints, rotation, ratio} = await getVarGetter(demo, Math.random() * DEGREES[180], getRatio())();
 	
 	const zoom = getSnappedZoom(...zoomPoints, position);
 	
@@ -27,7 +27,7 @@ export const getSnapTweens = (demo, getRatio) => [
 		({position}) => [{position}],
 		({zoom}) => [{zoom}, {duration: 0}],
 	],
-	{getParam: getSnapVars.bind(null, demo, getRatio)},
+	{getParam: getSnapVarGetter.bind(null, demo, getRatio)},
 ];
 
 const get45Button = (demo, rotation, ratioImage) => getButton(
@@ -95,24 +95,43 @@ const functions = [
 			]},
 		]}},
 	]},
-	{op: 'func', id: 'getCloseIntersection', args: ['rightX', 'rightY', 'topX', 'topY', 'axisY', 'axisZoom', 'isLeft'], type: ['x', 'y', 'zoom', 'xvp', 'yvp'], pair: [1, 0,,4, 3], and: [
+	{op: 'func', id: 'getCloseIntersection', args: ['targetX', 'targetY', 'backupX', 'backupY', 'axisY', 'axisZoom', 'isLeft'], type: ['x', 'y', 'zoom', 'xvp', 'yvp'], pair: [1, 0,,4, 3], and: [
 		{op: '=', id: 'cornerX', type: 'x', and: {
 			op: '?', and: ['isLeft', -0.5, 0.5],
 		}},
 		'',
-		{op: '=', multiline: true, id: ['intersectRightX', 'intersectRightY', 'intersectRightZoom'], and: {
-			op: 'call', id: 'getIntersection', and: ['rightX', 'rightY', 'axisY', 'cornerX', 'axisZoom'],
-		}},
-		{op: '=', multiline: true, id: ['intersectTopX', 'intersectTopY', 'intersectTopZoom'], and: {
-			op: 'call', id: 'getIntersection', and: ['topX', 'topY', 'axisY', 'cornerX', 'axisZoom'],
-		}},
-		'',
 		{op: 'if', and: [
-			{op: '>', and: ['intersectRightZoom', 'intersectTopZoom']},
-			{op: 'return', and: {op: 'array', and: ['intersectRightX', 'intersectRightY', 'intersectRightZoom', 'rightX', 'rightY']}},
+			{op: '!=', and: [
+				{op: '<', and: [
+					{op: 'abs', and: {
+						op: '/', and: [
+							{op: '-', and: [0.5, 'axisY']},
+							'cornerX',
+						],
+					}},
+					1,
+				]},
+				{op: '<', and: [
+					{op: 'abs', and: {
+						op: '/', and: ['targetY', 'targetX'],
+					}},
+					1,
+				]},
+			]},
+			{op: 'return', and: {op: 'array', multiline: [1, 2], and: [
+				{op: '...', and: {
+					op: 'call', id: 'getIntersection', and: ['targetX', 'targetY', 'axisY', 'cornerX', 'axisZoom'],
+				}},
+				'targetX', 'targetY',
+			]}},
 		]},
 		'',
-		{op: 'return', and: {op: 'array', and: ['intersectTopX', 'intersectTopY', 'intersectTopZoom', 'topX', 'topY']}},
+		{op: 'return', and: {op: 'array', multiline: [1, 2], and: [
+			{op: '...', and: {
+				op: 'call', id: 'getIntersection', and: ['backupX', 'backupY', 'axisY', 'cornerX', 'axisZoom'],
+			}},
+			'backupX', 'backupY',
+		]}},
 	]},
 	{op: 'func', id: 'getZoomPoints', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: 2, and: [
 		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
@@ -161,7 +180,7 @@ const functions = [
 			op: 'call', id: 'getCloseIntersection', and: ['rightX', 'rightY', 'topX', 'topY', 'axisIntersectSideY', 'axisIntersectSideZoom', 'isEvenQuadrant'],
 		}},
 		{op: '=', multiline: true, id: ['intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY'], and: {
-			op: 'call', id: 'getCloseIntersection', and: ['rightX', 'rightY', 'topX', 'topY', 'axisIntersectBaseY', 'axisIntersectBaseZoom', {op: '!', and: 'isEvenQuadrant'}],
+			op: 'call', id: 'getCloseIntersection', and: ['topX', 'topY', 'rightX', 'rightY', 'axisIntersectBaseY', 'axisIntersectBaseZoom', {op: '!', and: 'isEvenQuadrant'}],
 		}},
 		'',
 		{op: 'if', and: [
@@ -175,127 +194,6 @@ const functions = [
 		{op: 'return', and: {op: 'array', multiline: 2, and: [
 			'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY',
 			'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY',
-		]}},
-	]},
-	{op: 'func', id: 'getBound', args: ['originZoom', 'midX', 'midY', 'midZoom', 'endX', 'endY', 'isLeft'], type: ['x', 'y'], pair: [1, 0], and: [
-		{op: 'if', and: [
-			{op: '>', and: ['zoom', 'midZoom']},
-			{op: '=', id: 'progress', and: {
-				op: '/', and: ['zoom', 'midZoom'],
-			}},
-			{op: '=', id: 'cornerX', type: 'x', and: {
-				op: '?', and: ['isLeft', -0.5, 0.5],
-			}},
-			'',
-			// todo multiline?
-			{op: 'return', and: {op: 'array', and: [
-				{op: '-', and: [
-					'cornerX',
-					{op: '/', and: [
-						{op: '-', and: ['cornerX', 'midX']},
-						'progress',
-					]},
-				]},
-				{op: '-', and: [
-					0.5,
-					{op: '/', and: [
-						{op: '-', and: [0.5, 'midY']},
-						'progress',
-					]},
-				]},
-			]}},
-		]},
-		'',
-		{op: 'if', and: [
-			{op: '<=', and: ['zoom', 'originZoom']},
-			{op: 'return', and: {op: 'array', and: [0, 0]}},
-		]},
-		'',
-		{op: '=', id: ['boundX', 'boundY'], type: ['x', 'y'], and: {
-			op: 'call', id: 'getProgressed', and: [0, 0, 'endX', 'endY', 'originZoom', 'zoom'],
-		}},
-		'',
-		{op: 'return', and: {op: 'array', and: ['boundX', 'boundY']}},
-	]},
-	{op: 'func', id: 'getDirected', args: ['endX', 'endY', 'midX', 'midY', 'flip', 'cX'], type: ['x', 'y', 'x', 'y', 'x', 'y'], pair: [1, 0, 3, 2, 5, 4], and: [
-		{op: 'return', and: {
-			op: '?', multiline: true, and: [
-				'flip',
-				{op: 'array', and: [
-					{op: '-', and: 'endX'}, {op: '-', and: 'endY'},
-					{op: '-', and: 'midX'}, {op: '-', and: 'midY'},
-					{op: '-', and: 'cX'}, -0.5,
-				]},
-				{op: 'array', and: [
-					'endX', 'endY',
-					'midX', 'midY',
-					'cX', 0.5,
-				]},
-			],
-		}},
-	]},
-	{op: 'func', id: 'getPairings', args: ['flip0', 'flip1'], type: [
-		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
-		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
-		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
-	], pair: [
-		,
-		2, 1, 4, 3, 6, 5, 8, 7,,
-		11, 10, 13, 12, 15, 14, 17, 16,,
-		20, 19, 22, 21, 24, 23, 26, 25,
-	], and: [
-		{op: '=', id: ['dEndX0', 'dEndY0', 'dMidX0', 'dMidY0', 'dCX0', 'dCY0'], and: {
-			op: 'call', id: 'getDirected', and: ['endX0', 'endY0', 'x0', 'y0', 'flip0', -0.5],
-		}},
-		{op: '=', id: ['dEndX1', 'dEndY1', 'dMidX1', 'dMidY1', 'dCX1', 'dCY1'], and: {
-			op: 'call', id: 'getDirected', and: ['endX1', 'endY1', 'x1', 'y1', 'flip1', 0.5],
-		}},
-		'',
-		{op: 'return', and: {op: 'array', multiline: true, and: [
-			{op: '...', and: {op: '?', multiline: true, and: [
-				{op: '>=', and: ['originZoom0', 'originZoom1']},
-				{op: 'array', and: [
-					'originZoom0',
-					0, 0,
-					'dEndX0', 'dEndY0',
-					{op: '...', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'dEndX1', 'dEndY1', 'originZoom1', 'originZoom0']}},
-					'dEndX1', 'dEndY1',
-				]},
-				{op: 'array', and: [
-					'originZoom1',
-					{op: '...', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'dEndX0', 'dEndY0', 'originZoom0', 'originZoom1']}},
-					'dEndX0', 'dEndY0',
-					0, 0,
-					'dEndX1', 'dEndY1',
-				]},
-			]}},
-			{op: '...', and: {op: '?', multiline: true, and: [
-				{op: '>=', and: ['zoom0', 'zoom1']},
-				{op: 'array', multiline: 2, and: [
-					'zoom1',
-					{op: '...', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'dEndX0', 'dEndY0', 'originZoom0', 'zoom1']}},
-					'dEndX0', 'dEndY0',
-					'dMidX1', 'dMidY1',
-					'dCX1', 'dCY1',
-					'zoom0',
-					'dMidX0', 'dMidY0',
-					'dCX0', 'dCY0',
-					{op: '...', and: {op: 'call', id: 'getProgressed', and: ['dMidX1', 'dMidY1', 'dCX1', 'dCY1', 'zoom1', 'zoom0']}},
-					'dCX1', 'dCY1',
-				]},
-				{op: 'array', multiline: 2, and: [
-					'zoom0',
-					'dMidX0', 'dMidY0',
-					'dCX0', 'dCY0',
-					{op: '...', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'dEndX1', 'dEndY1', 'originZoom1', 'zoom0']}},
-					'dEndX1', 'dEndY1',
-					'zoom1',
-					{op: '...', and: {op: 'call', id: 'getProgressed', and: ['dMidX0', 'zoom0', 'dCX0', 'dCY0', 'dMidY0', 'zoom1']}},
-					'dCX0', 'dCY0',
-					'dMidX1', 'dMidY1',
-					'dCX1', 'dCY1',
-				]},
-			]}},
 		]}},
 	]},
 	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], type: 'zoom', and: [
@@ -345,9 +243,13 @@ export default (wrapper) => {
 		getText(
 			{
 				tag: 'h1',
-				content: 'Double-Line Rotation',
+				content: 'Doubled Down Rotation',
 				style: {textAlign: 'center'},
 			},
+			[
+				'New idea! Let\'s move the goalposts!',
+				'Can we find a system that handles rotation and succeeds at both pan-limiting ', {tag: 'i', content: 'and'}, ' snap-panning?',
+			],
 			[
 				'In this system, ',
 				getButton('origin rails', [
@@ -362,6 +264,10 @@ export default (wrapper) => {
 					({second}) => [{zoom: second.z * 2}, {duration: 3, position: '<'}],
 				], {getParam: getTraceVars}),
 				'.',
+			],
+			[
+				'Again, whichever origin rail direction minimises lock rail length is preferred.',
+				'If a direction gives an intersect with a y coordinate over 0.5, it\'s disqualified.',
 			],
 			{
 				tag: 'h2',

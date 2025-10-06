@@ -807,7 +807,7 @@ export default (wrapper) => {
 		getText(
 			{
 				tag: 'h1',
-				content: 'Triple-Line Rotation',
+				content: 'Tripled Down Rotation',
 				style: {textAlign: 'center'},
 			},
 			'So single-line rails don\'t work too well, double-line has issues... is third line the charm?',
