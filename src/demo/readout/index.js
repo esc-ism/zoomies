@@ -14,12 +14,10 @@ export default class {
 		this.element.style.userSelect = 'none';
 		this.element.style.pointerEvents = 'none';
 		this.element.style.whiteSpace = 'nowrap';
-		this.element.style.backgroundColor = '#000000a0';
 		this.element.style.borderCollapse = 'collapse';
-		// perpetua
 		this.element.style.font = 'bold 16px "courier new", monospace';
-		this.element.style.boxShadow = 'black 0 0 6px 1px';
-		this.element.style.textShadow = '0px 0px 1px #00ff7e';
+		this.element.style.color = '#e5e5e5';
+		this.element.style.textShadow = '0px 0px 5px black';
 		
 		const body = document.createElement('tbody');
 		

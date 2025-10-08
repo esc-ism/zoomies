@@ -6,8 +6,28 @@ import {permissiveTweens, restrictiveTweens} from '../1line';
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 
 import snapImage from './snapImage';
-import Demo from './demo';
+import Demo, {getSnappedZoom} from './demo';
 import getZoomPoints from './zoomPoints';
+
+const getLimitedPosition = (limit = 0.4) => Math.max(-limit, Math.min(limit, Math.random() - 0.5));
+
+const getSnapVarGetter = async (demo, getRatio) => {
+	const position = {x: getLimitedPosition(), y: getLimitedPosition()};
+	const {zoomPoints, rotation, ratio} = await getVarGetter(demo, Math.random() * DEGREES[180], getRatio())();
+	
+	const zoom = getSnappedZoom(...zoomPoints, position);
+	
+	return {ratio, rotation, startZoom: Math.min(zoomPoints[0].z, zoomPoints[2].z), zoom, position};
+};
+
+const getSnapTweens = (demo, getRatio) => [
+	[
+		({rotation, ratio, startZoom}) => [{rotation, ratio, zoom: startZoom, position: 0}],
+		({position}) => [{position}],
+		({zoom}) => [{zoom}, {duration: 0}],
+	],
+	{getParam: getSnapVarGetter.bind(null, demo, getRatio)},
+];
 
 const getCornerProgressTweens = (rotation) => [
 	[{ratio: 1, zoom: 1, position: 0.5}],
@@ -303,15 +323,11 @@ export default (wrapper) => {
 				'Let\'s start by seeing how they look here.',
 			],
 			[
-				'In the prior system, there were two playground states that revealed issues.',
-				'Let\'s start by seeing how they look here.',
-			],
-			[
 				'First, the ',
 				getButton('state', [[restrictiveTweens]]),
 				' that was too restrictive is way better!',
-				'It isn\'t nearly as permissive as the "Viewport Center" system, but in most situations it\'s good enough.',
-				'The unnecessarily permissive ',
+				'The "Viewport Center" system gives users much more viewfinding flexibility, but in most situations this is good enough.',
+				'The overly permissive ',
 				getButton('state', [[permissiveTweens]]),
 				' is also fixed, accurately replicating the behaviour of the "Viewport Edge" system.',
 			],
@@ -365,10 +381,11 @@ export default (wrapper) => {
 			],
 			[
 				'Each origin rail\'s start zoom will be the zoom at which its image corner touches a viewport edge.',
-				'If we know the lock rail\'s gradient, and we know which image corner it will end at, we can derive its start zoom from its origin rail intersection.',
+				'Lock rail start zooms are found through some clever trigonometry.',
+				// todo insert a diagram?
 			],
 			[
-				'Origin rails trace whichever axis minimises lock rail length.',
+				'Origin rails follow whichever axis minimises lock rail length.',
 			],
 			getCode([
 				{op: '=', id: [
@@ -405,6 +422,11 @@ export default (wrapper) => {
 				content: 'Pan-Limit Effectiveness',
 				style: {textAlign: 'center'},
 			},
+			{
+				tag: 'h2',
+				content: 'Snap-Pan Maths',
+				style: {textAlign: 'center'},
+			},
 			[
 				'The maths here build upon those of the single-line system.',
 				'As before, a lock rail is snipped to achieve matching start zooms.',
@@ -415,7 +437,7 @@ export default (wrapper) => {
 				'The final product might look similar to the image below.',
 				'Segments are coloured to show pairings.',
 			],
-			// todo make an image for single-line?
+			// todo make an image for the single-line system?
 			{
 				tag: 'div',
 				content: snapImage,
@@ -434,6 +456,20 @@ export default (wrapper) => {
 					op: 'call', id: 'getZoom', and: ['flip0', 'flip1', {op: '!=', and: ['flip0', 'flip1']}],
 				}},
 			]),
+			{
+				tag: 'h2',
+				content: 'Snap-Pan Effectiveness',
+				style: {textAlign: 'center'},
+			},
+			[
+				'As a snap-panning facilitator, this system is hard to fault.',
+				'Of course it performs fine on ',
+				getButton('similar', ...getSnapTweens(demo, () => Math.random() / 5 + 0.9)),
+				' aspect ratios,',
+				'but even ',
+				getButton('distant', ...getSnapTweens(demo, () => Math.random() / 10 + 0.2)),
+				' aspect ratios reveal no flaw in its ability to derive sensible zoom levels.',
+			],
 			{
 				tag: 'h2',
 				content: 'Conclusion',

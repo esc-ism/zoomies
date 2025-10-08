@@ -4,7 +4,7 @@ import SHARED_FUNCTIONS from '../code';
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo, getInstruction} from '../../shared';
 
-import {DEGREES, xmlns} from '@/shared';
+import {DEGREES, xmlns, opSpace, getOverlined} from '@/shared';
 import {CLASS_MATH, CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
 
 import * as mock from '../mock';
@@ -24,13 +24,6 @@ export const permissiveTweens = {
 	zoom: 1.2,
 	position: 0,
 };
-
-const opSpace = {tag: 'mspace', style: {width: '0.8em'}, xmlns};
-const getOverlined = (content) => ({
-	tag: 'mrow', xmlns, style: {textDecoration: 'overline', textDecorationThickness: '1px'}, content: content.split('').map((content) => ({
-		tag: 'mi', xmlns, content,
-	})),
-});
 
 const functions = [
 	...SHARED_FUNCTIONS,

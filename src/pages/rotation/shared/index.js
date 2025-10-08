@@ -83,7 +83,7 @@ export const getProgressAngles = (quadrantAngle, viewportRatio, viewportRatioInv
 };
 
 // todo you never need to calculate z; derive z from its intersection with first
-//  also change in interactive code demo
+//  also change in 2line interactive code demo
 export const getAxisIntersectY = (image, viewportSize, cornerAngle, progressAngle) => ({
 	x: 0,
 	y: (image.halfHeight - image.halfWidth * Math.tan(cornerAngle)) / image.height,

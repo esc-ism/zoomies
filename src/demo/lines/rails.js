@@ -3,8 +3,8 @@ import Hideables from './copies';
 import {Connection} from './lines';
 
 const getBackgroundImage = (() => {
-	const lowColour = '#a00';
-	const highColour = '#0a0';
+	const lowColour = '#700';
+	const highColour = '#080';
 	
 	return (progress, doMirror) => `linear-gradient(${doMirror ? 'to top, ' : ''}${lowColour} 0, ${lowColour} ${progress * 100}%, ${highColour} 0, ${highColour} 100%)`;
 })();

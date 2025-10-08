@@ -80,8 +80,8 @@ generate('imageWrapper', paths.viewport, {
 	
 	childContainer.append(...[
 		{
-			backgroundImage: 'radial-gradient(at left top, rgb(0 255 0), transparent), radial-gradient(at right top, rgb(0 0 255), transparent), radial-gradient(at left bottom, rgb(255 0 0), transparent), radial-gradient(at right bottom, rgb(179 255 0 / 50%), transparent)',
-			backgroundBlendMode: 'screen',
+			backgroundImage: 'radial-gradient(at -100% center, rgb(0 200 160), transparent), radial-gradient(at center 300%, rgb(255 0 0), transparent), radial-gradient(at 130% center, rgb(160 200 0), transparent), radial-gradient(at center -200%, rgb(0 0 255), transparent)',
+			backgroundBlendMode: 'overlay',
 		},
 		{
 			backgroundImage: 'radial-gradient(circle, black, black 1.5px, transparent 0)',

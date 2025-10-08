@@ -1,4 +1,4 @@
-import {DEGREES} from '@/shared';
+import {DEGREES, getOverlined, opSpace, xmlns} from '@/shared';
 
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
@@ -7,28 +7,11 @@ import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 import Demo, {getSnappedZoom} from './demo';
 import * as mock from '../mock';
 import getZoomPoints from './zoomPoints';
+import {CLASS_MATH, CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
+
+import pointsImage from './pointsImage';
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
-
-const getLimitedPosition = (limit = 0.4) => Math.max(-limit, Math.min(limit, Math.random() - 0.5));
-
-const getSnapVarGetter = async (demo, getRatio) => {
-	const position = {x: getLimitedPosition(), y: getLimitedPosition()};
-	const {zoomPoints, rotation, ratio} = await getVarGetter(demo, Math.random() * DEGREES[180], getRatio())();
-	
-	const zoom = getSnappedZoom(...zoomPoints, position);
-	
-	return {ratio, rotation, startZoom: Math.min(zoomPoints[0].z, zoomPoints[2].z), zoom, position};
-};
-
-export const getSnapTweens = (demo, getRatio) => [
-	[
-		({rotation, ratio, startZoom}) => [{rotation, ratio, zoom: startZoom, position: 0}],
-		({position}) => [{position}],
-		({zoom}) => [{zoom}, {duration: 0}],
-	],
-	{getParam: getSnapVarGetter.bind(null, demo, getRatio)},
-];
 
 const get45Button = (demo, rotation, ratioImage) => getButton(
 	`${rotation}°`,
@@ -235,7 +218,6 @@ export default (wrapper) => {
 	registerDemo(demo);
 	registerFunctions(demo, functions);
 	
-	const getTraceVars = getVarGetter(demo, DEGREES[90] - 0.4, 0.75);
 	const getDirectVars = getVarGetter(demo, DEGREES[90] - 0.4);
 	
 	wrapper.append(
@@ -243,7 +225,7 @@ export default (wrapper) => {
 		getText(
 			{
 				tag: 'h1',
-				content: 'Doubled Down Rotation',
+				content: 'Doubled Down',
 				style: {textAlign: 'center'},
 			},
 			[
@@ -251,29 +233,191 @@ export default (wrapper) => {
 				'Can we find a system that handles rotation and succeeds at both pan-limiting ', {tag: 'i', content: 'and'}, ' snap-panning?',
 			],
 			[
-				'In this system, ',
-				getButton('origin rails', [
-					({rotation, ratio, first}) => [{position: 0, ratio, rotation, zoom: first.z}],
-					[{position: 0.5}, {delay: 0.5}],
-					({second}) => [{zoom: second.z}, {duration: 3, position: '<'}],
-				], {getParam: getTraceVars}),
-				'  follow viewport axes until they intersect ',
-				getButton('lock rails', [
-					({rotation, ratio, second}) => [{position: second, ratio, rotation, zoom: second.z}],
-					[{position: 0.5}, {delay: 0.5}],
-					({second}) => [{zoom: second.z * 2}, {duration: 3, position: '<'}],
-				], {getParam: getTraceVars}),
+				'The prior system\'s inadequacies stemmed from my approach to origin rails.',
+				'Tracing along image axes allowed for efficient code and passable snap-panning, but provided an unsatisfactory pan-limiting experience.',
+				'The ideal system would always allow users to see what they want in the shortest pan possible.',
+				// todo make this a button
+				'For example, to see the rightmost image corner, travel directly ',
+				getButton('east', [
+					({rotation, ratio, second}) => [{rotation, ratio, zoom: second.z, position: 0}],
+					({second}) => [{position: second}, {delay: 0.5}],
+					({first}) => [{position: first.end}, {duration: 0}],
+				], {getParam: getDirectVars}),
 				'.',
+				'This can be achieved by swapping image axis for viewport axis-based origin rails.',
 			],
 			[
-				'Again, whichever origin rail direction minimises lock rail length is preferred.',
-				'If a direction gives an intersect with a y coordinate over 0.5, it\'s disqualified.',
+				'Again, whichever origin rail direction minimises lock rail length is preferred, but intersects are no longer guaranteed.',
+				'Lock rails are unchanged.',
 			],
 			{
 				tag: 'h2',
 				content: 'Pan-Limit Maths',
 				style: {textAlign: 'center'},
 			},
+			[
+				'Origin rail start zooms are unchanged.',
+				'They travel directly towards viewport edge midpoints.',
+				'These locations on viewport edges need to be defined in terms of image coordinates.',
+				'A diagram of the problem is given below, followed by its solution.',
+			],
+			{
+				tag: 'div',
+				content: pointsImage,
+				style: {textAlign: 'center'},
+			},
+			{tag: 'p', classList: [CLASS_MATH], content: [
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: 'let the red and orange lines meet at '},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'A'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: 'let the orange and green lines meet at '},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'B'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: 'let the green and red lines meet at '},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'C'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: 'let the image\'s angle of rotation be '},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'θ'},
+							]},
+						]},
+					]},
+				]},
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'A'},
+							]},
+							{tag: 'mtext', xmlns, content: 'is'},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mn', xmlns, content: '0'},
+								{tag: 'mo', xmlns, content: ', '},
+								{tag: 'mn', xmlns, content: '0'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '∠'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+							]},
+							{tag: 'mtext', xmlns, content: 'is'},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'θ'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '∠'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mi', xmlns, content: 'C'},
+							]},
+							{tag: 'mtext', xmlns, content: 'is'},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '90'},
+								{tag: 'mo', xmlns, content: '°'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '|'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mo', xmlns, content: '|'},
+							]},
+							{tag: 'mtext', xmlns, content: 'is'},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mtext', xmlns, content: 'viewport height'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mn', xmlns, content: '2'},
+									]},
+								]},
+							]},
+							{tag: 'mtext', xmlns, content: 'at start zoom'},
+						]},
+					]},
+				]},
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '|'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mo', xmlns, content: '|'},
+							]},
+							{tag: 'mtext', xmlns, content: '='},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'sin'},
+									{tag: 'mo', xmlns, content: '('},
+									{tag: 'mi', xmlns, content: 'θ'},
+									{tag: 'mo', xmlns, content: ')'},
+								]},
+								{tag: 'mo', xmlns, content: '×'},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mo', xmlns, content: '|'},
+								]},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '|'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mo', xmlns, content: '|'},
+							]},
+							{tag: 'mtext', xmlns, content: '='},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'cos'},
+									{tag: 'mo', xmlns, content: '('},
+									{tag: 'mi', xmlns, content: 'θ'},
+									{tag: 'mo', xmlns, content: ')'},
+								]},
+								{tag: 'mo', xmlns, content: '×'},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mo', xmlns, content: '|'},
+								]},
+							]},
+						]},
+					]},
+				]},
+			]},
 			getCode([
 				{op: '=', id: [
 					'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',
@@ -361,13 +505,13 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'As a snap-panning facilitator, this system is hard to fault.',
-				'Of course it performs fine on ',
-				getButton('similar', ...getSnapTweens(demo, () => Math.random() / 5 + 0.9)),
-				' aspect ratios,',
-				'but even ',
-				getButton('distant', ...getSnapTweens(demo, () => Math.random() / 10 + 0.2)),
-				' aspect ratios reveal no flaw in its ability to derive sensible zoom levels.',
+				'Despite its pan-limiting flaws, the system\'s a surprisingly good snap-panner!',
+				// todo window borders? define
+				'The only harm done by the strange pan-limiting behaviour is some slight inconsistency in snap-pan outcomes around window borders.',
+			],
+			[
+				'Even inside of windows, however, outcomes are sensible.',
+				'Using the maximum snap zoom possible means that, when rails intersect, the troublesome pre-intersect segments get ignored.',
 			],
 			{
 				tag: 'h2',
@@ -375,19 +519,13 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Besides efficiency, the system\'s only drawback is its spotty pan-limiting when image aspect ratio isn\'t 1:1.',
-				'It\'s possible to solve this problem by approaching origin tracks differently.',
-				'For example, basing their gradients on image axes instead of viewport axes.',
-				'This, however, is accepting defeat!',
-				'Viewport axis-based origin rails allow users to take the most direct possible path when ',
-				getButton('panning', [
-					({rotation, ratio, second}) => [{rotation, ratio, zoom: second.z, position: 0}],
-					({second}) => [{position: second}, {delay: 0.5}],
-					({first}) => [{position: first.end}, {duration: 0}],
-				], {getParam: getDirectVars}),
-				' to an offscreen corner.',
-				'A different approach means accepting sub-optimal paths, providing a worse user experience.',
-				'There must be a way to make it work!',
+				'This system\'s less efficient and even worse at both pan-limiting than the prior.',
+				'Not ideal!',
+			],
+			[
+				'Outside of the problem windows, however, it is exactly what I\'m looking for.',
+				'The system shows that this approach to origin rails has promise, but it needs an innovation.',
+				'Let\'s see if we can find one!',
 			],
 		),
 	);

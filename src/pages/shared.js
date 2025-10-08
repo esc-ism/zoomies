@@ -40,6 +40,7 @@ const getNode = (description) => {
 		style = {},
 		xmlns,
 		callback,
+		setAttributes = {},
 		...attributes
 	} = (typeof description === 'string' || Array.isArray(description)) ? {content: description} : description;
 	
@@ -59,6 +60,10 @@ const getNode = (description) => {
 	
 	for (const [property, value] of Object.entries(attributes)) {
 		node[property] = value;
+	}
+	
+	for (const [property, value] of Object.entries(setAttributes)) {
+		node.setAttribute(property, value);
 	}
 	
 	if (classList) {

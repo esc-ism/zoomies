@@ -1,12 +1,27 @@
+/* <svg width="50" height="50" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <rect id="svg_14" height="24.75" width="42.625" y="13.48014" x="3.85116" stroke="#000" fill="none"/>
+  <line stroke="#000" id="svg_17" y2="31.35514" x2="3.97616" y1="38.23014" x1="16.22616" fill="none"/>
+  <line stroke="#000" id="svg_20" y2="13.60514" x2="14.35116" y1="30.73014" x1="3.97616" fill="none"/>
+  <line stroke="#000" id="svg_22" y2="20.85514" x2="46.22616" y1="37.98014" x1="35.35116" fill="none"/>
+  <line stroke="#000" id="svg_23" y2="13.60514" x2="33.85116" y1="20.48014" x1="46.10116" fill="none"/>
+  <line id="svg_24" y2="25.73014" x2="45.97616" y1="25.60514" x1="25.35116" stroke="#000" fill="none"/>
+  <line id="svg_25" y2="25.60514" x2="25.60116" y1="15.73014" x1="31.60116" stroke="#000" fill="none"/>
+  <line id="svg_26" y2="15.48014" x2="31.22616" y1="25.48014" x1="45.97616" stroke="#000" fill="none"/>
+  <path id="svg_29" d="m25.47616,25.60514c0,0 4,0 4.25,0c-0.625,-2.125 -0.625,-2.125 -2.25,-3l-2,3z" stroke="#000" fill="none"/>
+ </g>
+
+</svg> */
 import {SVG_NAMESPACE} from '@/shared';
 import {getProgressed} from '../shared';
 
-const RADIUS = {X: 30, Y: 20};
+const RADIUS = {X: 25, Y: 20};
 const DIAMETER = {X: RADIUS.X * 2, Y: RADIUS.Y * 2};
 const STROKE_RADIUS = 0.4;
 const STROKE_DIAMETER = STROKE_RADIUS * 2;
-const TOP_LEFT = [-RADIUS.X * 0.7 - STROKE_RADIUS, -RADIUS.Y - STROKE_RADIUS];
-const TOP_RIGHT = [RADIUS.X + STROKE_RADIUS, -RADIUS.Y * 0.3 - STROKE_RADIUS];
+const TOP_LEFT = [-RADIUS.X * 0.8 - STROKE_RADIUS, -RADIUS.Y - STROKE_RADIUS];
+const TOP_RIGHT = [RADIUS.X * 1.15 + STROKE_RADIUS, -RADIUS.Y * 0.2 - STROKE_RADIUS];
 
 const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
 
@@ -33,8 +48,6 @@ const getLine = ([x1, y1], [x2, y2]) => {
 	return line;
 };
 
-const getMirroredLine = (...points) => [getLine(...points), getLine(...points.map(([x, y]) => [-x, -y]))];
-
 const image = document.createElementNS(SVG_NAMESPACE, 'path');
 
 image.setAttribute('d', `M${TOP_LEFT[0]} ${TOP_LEFT[1]}L${TOP_RIGHT[0]} ${TOP_RIGHT[1]}L${-TOP_LEFT[0]} ${-TOP_LEFT[1]}L${-TOP_RIGHT[0]} ${-TOP_RIGHT[1]}Z`);
@@ -49,11 +62,12 @@ const getSplit = (from, to, ratio) => {
 };
 
 const POINTS = [
-	[[0, 0], ...getSplit([RADIUS.X * 0.04, RADIUS.Y * -0.2], TOP_LEFT, 0.5)],
-	[...getSplit([RADIUS.X * 0.2, RADIUS.Y * 0.08], [RADIUS.X * 0.5, RADIUS.Y * 0.22], 0.5), TOP_RIGHT],
+	[0, 0],
+	[0, -RADIUS.Y],
+	[RADIUS.X * 0.24, -RADIUS.Y * 0.9],
 ];
 
-const colours = ['#374', '#962', '#722'];
+const colours = ['#722', '#374', '#962'];
 
 for (let i = 0; i < 3; ++i) {
 	const group = document.createElementNS(SVG_NAMESPACE, 'g');
@@ -62,7 +76,7 @@ for (let i = 0; i < 3; ++i) {
 	
 	group.setAttribute('stroke', colours[i]);
 	
-	group.append(...POINTS.map((points) => getMirroredLine(points[i], points[i + 1])).flat());
+	group.append(getLine(POINTS[i], POINTS[(i + 1) % 3]));
 	
 	svg.appendChild(group);
 }

@@ -807,7 +807,7 @@ export default (wrapper) => {
 		getText(
 			{
 				tag: 'h1',
-				content: 'Tripled Down Rotation',
+				content: 'Tripled Down',
 				style: {textAlign: 'center'},
 			},
 			'So single-line rails don\'t work too well, double-line has issues... is third line the charm?',
@@ -906,6 +906,7 @@ export default (wrapper) => {
 			[
 				'This system is not significantly worse nor better at snap-panning than the prior.',
 				'If you try a snap-pan here and then hit your left arrow key, you\'ll see that differences are negligible.',
+				// todo remove?
 				'If we\'re picking nits, however, the choppiness of the prior system\'s pan-limits do lead to some slight inconsistency in snap-pans.',
 				'This system excises that inconsistency at the expense of code efficiency.',
 			],
@@ -923,11 +924,12 @@ export default (wrapper) => {
 			[
 				'In handling rotation, we sacrifice code efficiency and intuitive bounds relative to those "perfect" systems.',
 				'To reiterate, I recommend using the "Viewport Center" system for pan-limiting since it\'s unbeatable on those two fronts.',
-				'Furthermore, the difference between this system and the prior as a snap-pan facilitator is negligible;',
-				'If pan-limiting isn\'t a concern, both have valid candidacy for implementation.',
+				'Furthermore, the difference between this and the "Double-Line" system as a snap-pan facilitator is negligible;',
+				'If pan-limiting isn\'t a concern, that one\'s probably preferable.',
 			],
 			[
-				'Although the usefulness of my work is limited, I\'m glad to have done it.',
+				'Although this page representents the culmination of my endeavours, its usefulness is doubtful.',
+				'Nevertheless, I\'m glad to have done it.',
 				'This all started from an idea for a userscript and a feeling that I ',
 				{
 					tag: 'i',
