@@ -802,12 +802,6 @@ export default (wrapper) => {
 	registerDemo(demo);
 	registerFunctions(demo, functions);
 	
-	demo.init().then(() => {
-		demo.rotation = 0;
-		demo.ratioImage = 1 / 1.56059;
-		demo.applyRotation();
-	});
-	
 	wrapper.append(
 		demo.constructor.element,
 		getText(
