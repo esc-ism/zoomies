@@ -1,4 +1,4 @@
-import {getIdGetter} from '@css';
+import {getIdGetter} from '@/shared/css';
 
 export const ANGLE_RADIUS = 10;
 

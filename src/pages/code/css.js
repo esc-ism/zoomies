@@ -1,4 +1,4 @@
-import {addRule} from '@css';
+import {addRule} from '@/shared/css';
 
 import {CLASS_NAMES, CLASS_MAXIMISED} from './consts';
 import {CLASS_CODE} from '../consts';

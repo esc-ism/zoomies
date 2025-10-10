@@ -1,23 +1,23 @@
-import {getIdGetter} from '@css';
+import {getId, getIdGetter} from '@/shared/css';
 
 import {DEGREES} from '@/shared';
 
-export const CLASS_FLASH_CONTAINER = getIdGetter('flash')('container');
+export const CLASS_FLASH_CONTAINER = getId('flash', 'container');
 
-const getId = getIdGetter('text');
+const getTextId = getIdGetter('text');
 
-export const CLASS_WRAPPER = getId('wrapper');
+export const CLASS_WRAPPER = getTextId('wrapper');
 
-export const CLASS_CODE = getId('code');
+export const CLASS_CODE = getTextId('code');
 
-export const CLASS_MATH = getId('math');
+export const CLASS_MATH = getTextId('math');
 
-export const CLASS_MATH_EQUATION = getId('math', 'equation');
-export const CLASS_MATH_ASSERTION = getId('math', 'assertion');
+export const CLASS_MATH_EQUATION = getTextId('math', 'equation');
+export const CLASS_MATH_ASSERTION = getTextId('math', 'assertion');
 
-export const CLASS_INSTRUCTION = getId('instruction');
+export const CLASS_INSTRUCTION = getTextId('instruction');
 
-export const CLASS_BUTTON = getId('button');
+export const CLASS_BUTTON = getTextId('button');
 
 export const TWEENS_RESET = [
 	[{rotation: DEGREES[90], position: 0, zoom: 1}, {duration: 0}],

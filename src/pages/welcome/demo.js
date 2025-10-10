@@ -14,8 +14,7 @@ export default class extends Demo {
 		this.rails[4].deactivate(false);
 		this.rails[5].deactivate(false);
 		
-		this.constructor.element.style.pointerEvents = 'none';
-		this.constructor.elements.resizer.style.pointerEvents = 'all';
+		this.constructor.elements.viewport.style.pointerEvents = 'none';
 	}
 	
 	// todo CSS transition from one rail state to the next
@@ -39,7 +38,6 @@ export default class extends Demo {
 	remove() {
 		super.remove();
 		
-		this.constructor.element.style.removeProperty('pointer-events');
-		this.constructor.elements.resizer.style.removeProperty('pointer-events');
+		this.constructor.elements.viewport.style.removeProperty('pointer-events');
 	}
 }

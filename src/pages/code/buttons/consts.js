@@ -1,4 +1,4 @@
-import {getIdGetter} from '@css';
+import {getIdGetter} from '@/shared/css';
 
 const getId = getIdGetter('codegen', 'button');
 

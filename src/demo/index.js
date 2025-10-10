@@ -3,6 +3,7 @@ import {gsap} from 'gsap';
 import './css';
 
 import {getTheta, DEGREES, ERROR_ALLOWANCE} from '@/shared';
+import {TEXT_MIN_HEIGHT, TEXT_MIN_WIDTH} from '@/consts';
 
 import Readout from './readout';
 import Target from './target';
@@ -62,8 +63,34 @@ export default class {
 			this.applyPosition();
 			this.applyZoom();
 		},
-		resizeViewport(offsetX, {clientX}) {
-			this.ratioViewport = (clientX - offsetX) / this.sizesViewport.height;
+		resizeViewport(isHorizontal, offset, event) {
+			let ratio;
+			
+			if (isHorizontal) {
+				const position = event.clientX - offset;
+				
+				if (window.innerWidth - position - event.target.clientWidth >= TEXT_MIN_WIDTH) {
+					this.ratioViewport = (event.clientX - offset) / this.sizesViewport.height;
+					
+					return;
+				}
+				
+				ratio = (window.innerWidth - event.target.clientWidth - TEXT_MIN_WIDTH) / this.sizesViewport.height;
+			} else {
+				const position = event.clientY - offset;
+				
+				if (window.innerHeight - position - event.target.clientHeight >= TEXT_MIN_HEIGHT) {
+					this.ratioViewport = this.sizesViewport.width / (event.clientY - offset);
+					
+					return;
+				}
+				
+				ratio = this.sizesViewport.width / (window.innerHeight - event.target.clientHeight - TEXT_MIN_HEIGHT);
+			}
+			
+			if (this.ratioViewport !== ratio) {
+				this.ratioViewport = ratio;
+			}
 		},
 		resizeImage({deltaY, deltaMode}) {
 			const increment = deltaY * MULTIPLIERS_SCROLL[deltaMode] / -1000;
@@ -201,6 +228,8 @@ export default class {
 						this.applyZoom();
 					}
 					
+					this.#resizeObserver.disconnect();
+					
 					resolve();
 				});
 				
@@ -211,7 +240,7 @@ export default class {
 	constructor() {
 		this.constructor.target.setDemo(this);
 		
-		const {viewport, image, resizer} = this.constructor.elements;
+		const {viewport, image, resizerHorizontal, resizerVertical} = this.constructor.elements;
 		
 		this.constructor.readout.setPosition(this);
 		this.constructor.readout.setZoom(this);
@@ -225,31 +254,44 @@ export default class {
 				return;
 			}
 			
-			this.addEventListener(resizer, 'pointerdown', (event) => {
-				const {buttons, pointerId, offsetX} = event;
+			this.addEventListener(window, 'resize', () => {
+				const ratio = viewport.offsetWidth / viewport.offsetHeight;
 				
-				if (buttons !== 1 && buttons !== 2) {
-					return;
+				if (ratio !== this.ratioViewport) {
+					this.ratioViewport = ratio;
+				} else {
+					console.log('f');
 				}
-				
-				event.stopPropagation();
-				event.preventDefault();
-				
-				resizer.setPointerCapture(pointerId);
-				
-				const entryMove = this.addEventListener(resizer, 'pointermove', this.listeners.resizeViewport.bind(null, offsetX));
-				
-				const entryStop = this.addEventListener(resizer, 'pointerup', () => {
-					if (buttons === 2) {
-						cancelRightClick();
-						
-						this.listeners.resetViewport();
+			});
+			
+			this.ratioViewport = viewport.offsetWidth / viewport.offsetHeight;
+			
+			for (const [resizer, isHorizontal] of [[resizerHorizontal, true], [resizerVertical, false]])
+				this.addEventListener(resizer, 'pointerdown', (event) => {
+					const {buttons, pointerId} = event;
+					
+					if (buttons !== 1 && buttons !== 2) {
+						return;
 					}
 					
-					this.removeEventListener(entryMove);
-					this.removeEventListener(entryStop);
+					event.stopPropagation();
+					event.preventDefault();
+					
+					resizer.setPointerCapture(pointerId);
+					
+					const entryMove = this.addEventListener(resizer, 'pointermove', this.listeners.resizeViewport.bind(null, isHorizontal, event[`offset${isHorizontal ? 'X' : 'Y'}`]));
+					
+					const entryStop = this.addEventListener(resizer, 'pointerup', () => {
+						if (buttons === 2) {
+							cancelRightClick();
+							
+							this.listeners.resetViewport();
+						}
+						
+						this.removeEventListener(entryMove);
+						this.removeEventListener(entryStop);
+					});
 				});
-			});
 			
 			this.addEventListener(viewport, 'wheel', (event) => {
 				event.stopPropagation();
@@ -390,6 +432,7 @@ export default class {
 		this.ratioInverse = 1 / this.ratio;
 		
 		this.constructor.elements.imageWrapper.style.height = `${Math.min(1, this.ratio) * 100}%`;
+		this.constructor.elements.imageWrapper.style.width = `${Math.min(1, this.ratioInverse) * 100}%`;
 		
 		this.setDimensions(this.sizesImage, this.constructor.elements.imageWrapper);
 		

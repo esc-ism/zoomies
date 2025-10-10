@@ -1,6 +1,7 @@
 import './css';
 
 import pages from './pages';
+import {ID_WRAPPER} from './consts';
 import {CLASS_WRAPPER as CLASS_TEXT} from './pages/consts';
 
 const params = new URLSearchParams(location.search);
@@ -13,9 +14,7 @@ const flipPage = (() => {
 	const generate = () => {
 		const wrapper = document.createElement('div');
 		
-		wrapper.style.width = '100%';
-		wrapper.style.height = '100%';
-		wrapper.style.display = 'flex';
+		wrapper.id = ID_WRAPPER;
 		
 		root.appendChild(wrapper);
 		

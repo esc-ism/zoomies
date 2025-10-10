@@ -1,12 +1,13 @@
 import './css';
 
-import {CLASS_WRAPPER, CLASS_WRAPPER_IMAGE, CLASS_IMAGE, CLASS_CROSSHAIR} from './consts';
+import {ID_WRAPPER, ID_WRAPPER_IMAGE, ID_IMAGE, ID_CROSSHAIR, ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL} from './consts';
+import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/css';
 
-const template = document.createElement('div');
+const wrapper = document.createElement('div');
 
 const paths = {wrapper: []};
 
-const getNode = (path, root = template) => {
+const getNode = (path, root = wrapper) => {
 	let node = root;
 	
 	for (const index of path) {
@@ -32,13 +33,11 @@ const generate = (id, parentPath, style) => {
 	return element;
 };
 
-template.classList.add(CLASS_WRAPPER);
+wrapper.id = ID_WRAPPER;
 
-template.style.display = 'flex';
-template.style.position = 'relative';
-template.style.paddingRight = '20px';
-template.style.overflow = 'hidden';
-template.style.height = '100%';
+wrapper.style.display = 'flex';
+wrapper.style.position = 'relative';
+wrapper.style.overflow = 'hidden';
 
 generate('viewport', paths.wrapper, {
 	backgroundColor: 'black',
@@ -47,21 +46,16 @@ generate('viewport', paths.wrapper, {
 	position: 'relative',
 	overflow: 'hidden',
 	display: 'flex',
-	flexFlow: 'column wrap',
+	flexWrap: 'wrap',
 	placeContent: 'center center',
 	cursor: 'grab',
-	
-	width: 'auto',
-	height: '100%',
 	aspectRatio: '1',
 });
 
 generate('imageWrapper', paths.viewport, {
-	height: '100%',
-	width: 'auto',
 	aspectRatio: '1',
 	position: 'relative',
-}).classList.add(CLASS_WRAPPER_IMAGE);
+}).id = ID_WRAPPER_IMAGE;
 
 (() => {
 	const image = generate('image', paths.imageWrapper, {
@@ -109,7 +103,7 @@ generate('imageWrapper', paths.viewport, {
 	
 	image.appendChild(childContainer);
 	
-	image.classList.add(CLASS_IMAGE);
+	image.id = ID_IMAGE;
 })();
 
 export const CONTAINER_BOUND_LIMIT = generate('boundLimit', paths.imageWrapper, {display: 'contents', pointerEvents: 'none'});
@@ -129,21 +123,32 @@ export const CROSSHAIR = generate('crosshair', paths.viewport, {
 	fontSize: '20px',
 });
 
-CROSSHAIR.classList.add(CLASS_CROSSHAIR);
+CROSSHAIR.id = ID_CROSSHAIR;
 
-generate('resizer', paths.wrapper, {
-	cursor: 'col-resize',
+const RESIZER_HORIZONTAL = generate('resizerHorizontal', paths.wrapper, {
+	right: 0,
 	height: '100%',
 	width: '20px',
-	borderRight: '1px solid white',
-	boxSizing: 'border-box',
-	position: 'absolute',
-	right: '0',
-	backgroundColor: 'var(--background)',
+	'border-right': '1px solid white',
+	cursor: 'col-resize',
 });
+
+RESIZER_HORIZONTAL.id = ID_RESIZER_HORIZONTAL;
+RESIZER_HORIZONTAL.classList.add(CLASS_HIDE_VERTICAL);
+
+const RESIZER_VERTICAL = generate('resizerVertical', paths.wrapper, {
+	bottom: 0,
+	width: '100%',
+	height: '20px',
+	'border-bottom': '1px solid white',
+	cursor: 'row-resize',
+});
+
+RESIZER_VERTICAL.id = ID_RESIZER_VERTICAL;
+RESIZER_VERTICAL.classList.add(CLASS_HIDE_HORIZONTAL);
 
 export default () => Object.entries(paths)
 	.reduce(
-		(clones, [id, path]) => ({...clones, [id]: getNode(path, clones.wrapper)}),
-		{wrapper: template.cloneNode(true)},
+		(elements, [id, path]) => ({...elements, [id]: getNode(path, wrapper)}),
+		{wrapper},
 	);

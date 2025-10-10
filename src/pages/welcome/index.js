@@ -23,7 +23,7 @@ const tween = async (demo) => {
 		let firstIndexRaw;
 		let otherProgresses;
 		
-		const setFirstIndex = () => {
+		const setFirstIndex = (zoomPoints) => {
 			if (zoomPoints[2].z > zoomPoints[5].z) {
 				firstIndex = firstIndexRaw = 0;
 				
@@ -43,14 +43,14 @@ const tween = async (demo) => {
 			}
 		};
 		
-		setFirstIndex();
+		setFirstIndex(zoomPoints);
 		
 		let [first, second, third] = zoomPoints.slice(firstIndexRaw);
 		
 		const setZoomPoints = () => {
 			demo.constrainPosition({ratio: true}, true);
 			
-			setFirstIndex();
+			setFirstIndex(demo.zoomPoints);
 			[first, second, third] = demo.zoomPoints.slice(firstIndexRaw);
 			
 			demo.rails.hide();

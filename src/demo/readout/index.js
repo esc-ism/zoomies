@@ -36,7 +36,7 @@ export default class {
 		
 		this.element.appendChild(body);
 		
-		demo.elements.resizer.parentElement.insertBefore(this.element, demo.elements.resizer);
+		demo.elements.viewport.insertAdjacentElement('afterend', this.element);
 	}
 	
 	#set(label, value) {

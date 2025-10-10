@@ -1,14 +1,17 @@
-import {getIdGetter} from '@css';
+import {getIdGetter} from '@/shared/css';
 
 const getId = getIdGetter('demo');
 
-export const CLASS_WRAPPER = getId('wrapper');
+export const ID_WRAPPER = getId('wrapper');
 
-export const CLASS_WRAPPER_IMAGE = getId('wrapper', 'image');
+export const ID_WRAPPER_IMAGE = getId('wrapper', 'image');
 
-export const CLASS_IMAGE = getId('image');
+export const ID_IMAGE = getId('image');
 
-export const CLASS_CROSSHAIR = getId('crosshair');
+export const ID_CROSSHAIR = getId('crosshair');
+
+export const ID_RESIZER_HORIZONTAL = getId('resizer', 'horizontal');
+export const ID_RESIZER_VERTICAL = getId('resizer', 'vertical');
 
 export const ALLOWANCE_CLICK = 1;
 

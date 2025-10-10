@@ -19,6 +19,7 @@ export default class {
 	constructor() {
 		this.element.style.position = 'absolute';
 		this.element.style.bottom = '0';
+		this.element.style.left = '0';
 		this.element.style.height = '5px';
 		this.element.style.width = '0';
 		

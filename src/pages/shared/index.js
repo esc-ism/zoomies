@@ -1,4 +1,4 @@
-import {getIdGetter} from '@css';
+import {getIdGetter} from '@/shared/css';
 
 import {generateWhenReady as generateCode} from '../code';
 
@@ -146,13 +146,14 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 export const getText = (...children) => {
 	const wrapper = document.createElement('div');
 	
-	wrapper.style.height = '100%';
 	wrapper.style.padding = '0 20px';
 	wrapper.style.boxSizing = 'border-box';
 	wrapper.style.overflow = 'auto';
 	wrapper.style.scrollbarColor = 'var(--color) transparent';
 	wrapper.style.flexGrow = '1';
 	wrapper.style.lineHeight = '1.2';
+	// I guess chrome gives outlines to scroll elements
+	wrapper.style.outline = 'none';
 	
 	wrapper.classList.add(CLASS_WRAPPER);
 	

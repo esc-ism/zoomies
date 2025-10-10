@@ -5,6 +5,7 @@ import {getText, getButton, registerDemo, getInstruction, flash} from '../shared
 import getRestartButton from './restart';
 
 import Demo from './demo';
+import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/css';
 
 const instructions = [
 	{text: ['Drag with your left mouse button to pan.'], key: 'pan'},
@@ -12,7 +13,10 @@ const instructions = [
 	{text: ['Drag with your right mouse button to rotate.'], key: 'rotate'},
 	{text: ['Use your scroll wheel to zoom in and out.'], key: 'zoom'},
 	{text: ['Use your scroll wheel while holding "ctrl" on your keyboard to adjust image aspect ratio.'], key: 'resizeImage'},
-	{text: ['Drag the vertical bar at the right side of the viewport to adjust its aspect ratio.'], key: 'resizeViewport'},
+	{text: [
+		['Drag the vertical bar at the right side of the viewport to adjust its aspect ratio.'],
+		['Drag the horizontal bar below the viewport to adjust its aspect ratio.'],
+	], key: 'resizeViewport', hasAlt: true},
 	{text: ['Right click the vertical bar to reset viewport aspect ratio.'], key: 'resetViewport'},
 	{text: ['Right click on the viewport to reset everything else.'], key: 'resetImage'},
 ];
@@ -35,7 +39,12 @@ export default (wrapper) => {
 			],
 			{
 				style: {fontStyle: 'italic'},
-				content: 'Wait, before that, what\'s the thing to the left?',
+				content: [
+					'Wait, before that, what\'s the thing ',
+					{tag: 'span', classList: [CLASS_HIDE_HORIZONTAL], content: 'at the top'},
+					{tag: 'span', classList: [CLASS_HIDE_VERTICAL], content: 'to the left'},
+					'?',
+				],
 			},
 			[
 				'Glad you asked!',
@@ -44,30 +53,31 @@ export default (wrapper) => {
 				'To the viewport\'s top-left is a readout of the playground\'s state.',
 				'Follow the instructions below to see what you can do with it.',
 			],
-			{...getInstruction([]), callback: async (container) => {
-				const element = container.firstChild;
-				const button = getRestartButton();
+			{...getInstruction({classList: [CLASS_HIDE_VERTICAL]}, {classList: [CLASS_HIDE_HORIZONTAL]}, getRestartButton()), callback: async (container) => {
+				const [horizontal, vertical, button] = container.children;
 				
 				container.classList.add(CLASS_FLASH_CONTAINER);
 				
 				button.style.display = 'none';
 				
-				container.appendChild(button);
-				
 				container.style.position = 'relative';
 				
 				while (true) {
-					for (const {text, key} of instructions) {
-						element.innerText = text;
+					for (const instruction of instructions) {
+						if (instruction.hasAlt) {
+							[horizontal.innerText, vertical.innerText] = instruction.text;
+						} else {
+							horizontal.innerText = vertical.innerText = instruction.text;
+						}
 						
 						await new Promise((resolve) => {
-							demo.actionPromises[key] = resolve;
+							demo.actionPromises[instruction.key] = resolve;
 						});
 						
 						flash(container);
 					}
 					
-					element.style.display = 'none';
+					horizontal.style.display = vertical.style.display = 'none';
 					
 					button.style.removeProperty('display');
 					
@@ -80,7 +90,8 @@ export default (wrapper) => {
 					
 					flash(container);
 					
-					element.style.removeProperty('display');
+					horizontal.style.removeProperty('display');
+					vertical.style.removeProperty('display');
 					button.style.display = 'none';
 				}
 			}},

@@ -1,10 +1,14 @@
-import {addRule} from '@css';
+import {addRule, HorizontalRules, VerticalRules} from '@/shared/css';
 
+import {TEXT_MIN_HEIGHT, TEXT_MIN_WIDTH} from '@/consts';
 import {
 	CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION,
 	CLASS_MATH, CLASS_MATH_EQUATION, CLASS_FLASH_CONTAINER,
 	CLASS_MATH_ASSERTION,
 } from './consts';
+
+HorizontalRules.add(`.${CLASS_WRAPPER}`, {height: '100%', 'min-width': `${TEXT_MIN_WIDTH}px`});
+VerticalRules.add(`.${CLASS_WRAPPER}`, {width: '100%', 'min-height': `${TEXT_MIN_HEIGHT}px`});
 
 addRule(`.${CLASS_FLASH_CONTAINER}`, {
 	overflow: 'hidden',
