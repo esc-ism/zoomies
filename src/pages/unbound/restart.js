@@ -1,4 +1,4 @@
-import {SVG_NAMESPACE} from '@/shared';
+import {SVG_NAMESPACE} from '@/pages/shared/svg';
 
 const RADIUS_Y = 10;
 const RADIUS_X = 14;

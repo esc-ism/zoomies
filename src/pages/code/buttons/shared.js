@@ -1,4 +1,4 @@
-import {SVG_NAMESPACE} from '@/shared';
+import {SVG_NAMESPACE} from '@/pages/shared/svg';
 
 const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
 

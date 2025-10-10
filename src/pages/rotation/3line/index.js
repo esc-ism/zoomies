@@ -5,6 +5,8 @@ import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
 
 import Demo from './demo';
+import {xmlns} from '@/pages/shared/svg';
+import {CLASS_MATH} from '@/pages/consts';
 
 const functions = [
 	...SHARED_FUNCTIONS,
@@ -208,12 +210,10 @@ const functions = [
 		'',
 		{op: 'return', and: {
 			// todo this work?
-			op: '==', multiline: true, and: [
-				{op: '==', and: [
-					{op: '>', and: ['mFirst', 0]},
-					{op: '<', and: ['mThird', 'mFirst']},
-				]},
-				{op: '?', and: [
+			op: '==', and: [
+				{op: '>', and: ['mFirst', 0]},
+				{op: '<', and: ['mThird', 'mFirst']},
+				{op: '?', multiline: true, and: [
 					'isXAxis',
 					{op: '==', and: [
 						{op: '>', and: ['secondX', 0]},
@@ -802,6 +802,12 @@ export default (wrapper) => {
 	registerDemo(demo);
 	registerFunctions(demo, functions);
 	
+	demo.init().then(() => {
+		demo.rotation = 0;
+		demo.ratioImage = 1 / 1.56059;
+		demo.applyRotation();
+	});
+	
 	wrapper.append(
 		demo.constructor.element,
 		getText(
@@ -875,12 +881,47 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Tradeoffs have been made regarding the system\'s best-case;',
-				'Opportunities to take optimal panning paths to individual corners are rarer, but viewing adjacent corners simultaneously is now possible at higher zooms.',
-				'Its worse-case, on the other hand, is leagues ahead, always expanding bounds sensibly and excelling on extreme aspect ratios.',
+				'All of the prior system\'s pan-limiting flaws are fixed.',
+				'Bound changes are now perfectly fluid, providing a more consistent and reliable experience.',
+				'Besides patching issues, the connecting rails even enhance the system\'s ability to show two corners simultaneously!',
 			],
 			[
-				'Bound changes are now perfectly fluid, providing a more consistent and reliable experience.',
+				'I find this system to be a satisfactory improvement over "Double-Line" too.',
+				'It provides tighter pan-limits without sacrificing image visibility.',
+				'The changes have been successful in facilitating efficient panning paths.',
+			],
+			[
+				'Zoomful systems have unavoidable drawbacks.',
+				'Bounds are less inheritently less intuitive when they move around, and, especially when handling rotation, users are granted less viewfinding freedom.',
+				'Plus, there\'s obviously a huge efficiency dropoff from the good old days of',
+			],
+			{tag: 'p', classList: [CLASS_MATH], content: [
+				{tag: 'math', xmlns, content: [
+					{tag: 'mtable', xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '-0.5'},
+								{tag: 'mo', xmlns, content: '⩽'},
+								{tag: 'mi', xmlns, content: 'x'},
+								{tag: 'mo', xmlns, content: '⩽'},
+								{tag: 'mn', xmlns, content: '0.5'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '-0.5'},
+								{tag: 'mo', xmlns, content: '⩽'},
+								{tag: 'mi', xmlns, content: 'y'},
+								{tag: 'mo', xmlns, content: '⩽'},
+								{tag: 'mn', xmlns, content: '0.5'},
+							]},
+						]},
+					]},
+				]},
+			]},
+			[
+				'to the monster we have here.',
+				'Because of this, I still prefer "Viewport Center" as a pan-limiter.',
 			],
 			{
 				tag: 'h2',
@@ -904,32 +945,25 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'This system is not significantly worse nor better at snap-panning than the prior.',
-				'If you try a snap-pan here and then hit your left arrow key, you\'ll see that differences are negligible.',
-				// todo remove?
-				'If we\'re picking nits, however, the choppiness of the prior system\'s pan-limits do lead to some slight inconsistency in snap-pans.',
-				'This system excises that inconsistency at the expense of code efficiency.',
+				'This system is fixes the prior system\'s inconsistency;',
+				'I\'d be comfortable calling it an improved snap-panning system.',
+				'"Double-Line", on the other hand, has no obvious flaw to fix.',
+				'Since both exhibit acceptable behaviour, Double-Line\'s efficiency makes the preferable standalone snap-panner.',
 			],
-			'The balance of consistency and efficiency must be weighed to judge a victor.',
 			{
 				tag: 'h2',
 				content: 'Conclusion',
 				style: {textAlign: 'center'},
 			},
 			[
-				'I think this is close to a flawless system.',
-				'Like I mentioned at the start of our rotation odyssey, however, it\'s much harder to identify "perfect" behaviour here than with the earlier systems.',
-				'No doubt a different approach could produce a better system, but this is the best I\'ve found.',
+				'We did it!',
+				'Presented here is a system that succeeds on both fronts.',
+				'Like I mentioned at the start of our rotation odyssey, it\'s much harder to identify "perfect" behaviour here than with the early systems.',
+				'No doubt a different approach could produce a better system, but this one lacks an obvious flaw.',
 			],
 			[
-				'In handling rotation, we sacrifice code efficiency and intuitive bounds relative to those "perfect" systems.',
-				'To reiterate, I recommend using the "Viewport Center" system for pan-limiting since it\'s unbeatable on those two fronts.',
-				'Furthermore, the difference between this and the "Double-Line" system as a snap-pan facilitator is negligible;',
-				'If pan-limiting isn\'t a concern, that one\'s probably preferable.',
-			],
-			[
-				'Although this page representents the culmination of my endeavours, its usefulness is doubtful.',
-				'Nevertheless, I\'m glad to have done it.',
+				'Although this page represents the culmination of my labour, it\'s more conceptually interesting than practically useful.',
+				'Nevertheless, I\'m glad to have done the work.',
 				'This all started from an idea for a userscript and a feeling that I ',
 				{
 					tag: 'i',

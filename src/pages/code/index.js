@@ -3,7 +3,8 @@ import {Line} from '@/demo/lines/lines';
 import getButtons from './buttons';
 
 import {flash} from '../shared';
-import {DEGREES, SVG_NAMESPACE} from '@/shared';
+import {DEGREES} from '@/shared';
+import {SVG_NAMESPACE} from '@/pages/shared/svg';
 import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED} from './consts';
 
 import './css';
@@ -160,6 +161,8 @@ const getElement = (...classes) => {
 	return element;
 };
 
+const parentIs = (meta, ...ops) => ops.includes(meta.branch[meta.branch.length - 2].op);
+
 const getCombiner = (() => {
 	const getCombined = (statement, scope, meta, indent, combiner) => {
 		const elements = [];
@@ -172,13 +175,13 @@ const getCombiner = (() => {
 			if (elements.length === 0) {
 				value = result.value;
 			} else {
-				if (statement.multiline) {
-					elements.push(document.createElement('br'), ...getIndents(indent + 1));
-				}
+				value = combiner(value, result.value);
 				
 				elements.push(getElement(CLASS_NAMES[statement.op]));
 				
-				value = combiner(value, result.value);
+				if (statement.multiline) {
+					elements.push(document.createElement('br'), ...getIndents(indent + 1));
+				}
 			}
 			
 			elements.push(...result.elements);
@@ -188,7 +191,7 @@ const getCombiner = (() => {
 	};
 	
 	return (combiner, clauseForcers = []) => (statement, scope, meta, indent) => {
-		if (!clauseForcers.includes(meta.branch[meta.branch.length - 2].op)) {
+		if (!parentIs(meta, ...clauseForcers)) {
 			return getCombined(statement, scope, meta, indent, combiner);
 		}
 		
@@ -617,7 +620,7 @@ const interpretters = {
 		
 		const getSeperator = statement.multiline ? () => [document.createElement('br'), ...getIndents(indent + 1)] : () => [];
 		
-		return {value: conditionValue ? truthyValue : falsyValue, elements: [
+		let elements = [
 			conditionWrapper,
 			getElement(CLASS_NAMES['?']),
 			...getSeperator(),
@@ -625,7 +628,17 @@ const interpretters = {
 			getElement(CLASS_NAMES[':']),
 			...getSeperator(),
 			...falsyElements,
-		]};
+		];
+		
+		if (parentIs(meta, '+', '-', '*', '/', '<=', '>=', '<', '>', '&&', '||', '!=', '==', '%')) {
+			const wrapper = getElement(CLASS_NAMES.clause);
+			
+			wrapper.append(...elements);
+			
+			elements = [wrapper];
+		}
+		
+		return {value: conditionValue ? truthyValue : falsyValue, elements};
 	},
 	'...': (statement, scope, meta, indent) => {
 		const element = getElement(CLASS_NAMES['...']);

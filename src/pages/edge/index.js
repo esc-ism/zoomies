@@ -1,4 +1,5 @@
-import {DEGREES, xmlns} from '@/shared';
+import {DEGREES} from '@/shared';
+import {xmlns} from '@/pages/shared/svg';
 import {CLASS_MATH, CLASS_MATH_EQUATION} from '../consts';
 
 import getRefreshButton from '../code/buttons/refresh';

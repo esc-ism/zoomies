@@ -1,46 +1,14 @@
-import {SVG_NAMESPACE} from '@/shared';
+import {getDiagram, getLine, SVG_NAMESPACE, COLOURS} from '@/pages/shared/svg';
 import {getProgressed} from '../shared';
 
-const RADIUS = {X: 30, Y: 20};
-const DIAMETER = {X: RADIUS.X * 2, Y: RADIUS.Y * 2};
-const STROKE_RADIUS = 0.4;
-const STROKE_DIAMETER = STROKE_RADIUS * 2;
-const TOP_LEFT = [-RADIUS.X * 0.7 - STROKE_RADIUS, -RADIUS.Y - STROKE_RADIUS];
-const TOP_RIGHT = [RADIUS.X + STROKE_RADIUS, -RADIUS.Y * 0.3 - STROKE_RADIUS];
+const radii = {x: 30, y: 20};
+const strokeRadius = 0.4;
+const topLeft = [-radii.x * 0.7 - strokeRadius, -radii.y - strokeRadius];
+const topRight = [radii.x + strokeRadius, -radii.y * 0.3 - strokeRadius];
 
-const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
-
-svg.setAttribute('viewBox', `${-RADIUS.X - STROKE_RADIUS} ${-RADIUS.Y - STROKE_RADIUS} ${DIAMETER.X + STROKE_DIAMETER} ${DIAMETER.Y + STROKE_DIAMETER}`);
-svg.setAttribute('fill', 'none');
-svg.setAttribute('stroke', 'black');
-// svg.setAttribute('stroke-linecap', 'round');
-// svg.setAttribute('stroke-linejoin', 'round');
-svg.setAttribute('stroke-width', STROKE_DIAMETER);
-
-svg.style.textAlign = 'center';
-svg.style.width = '400px';
-// svg.style.backgroundColor = '#222';
-svg.style.border = '6px solid black';
-
-const getLine = ([x1, y1], [x2, y2]) => {
-	const line = document.createElementNS(SVG_NAMESPACE, 'line');
-	
-	line.setAttribute('x1', x1);
-	line.setAttribute('y1', y1);
-	line.setAttribute('x2', x2);
-	line.setAttribute('y2', y2);
-	
-	return line;
-};
+const svg = getDiagram(radii, strokeRadius, topLeft, topRight);
 
 const getMirroredLine = (...points) => [getLine(...points), getLine(...points.map(([x, y]) => [-x, -y]))];
-
-const image = document.createElementNS(SVG_NAMESPACE, 'path');
-
-image.setAttribute('d', `M${TOP_LEFT[0]} ${TOP_LEFT[1]}L${TOP_RIGHT[0]} ${TOP_RIGHT[1]}L${-TOP_LEFT[0]} ${-TOP_LEFT[1]}L${-TOP_RIGHT[0]} ${-TOP_RIGHT[1]}Z`);
-image.setAttribute('fill', '#2f3450');
-
-svg.append(image);
 
 const getSplit = (from, to, ratio) => {
 	const {x, y} = getProgressed({x: from[0], y: from[1]}, {x: to[0], y: to[1]}, ratio);
@@ -49,18 +17,14 @@ const getSplit = (from, to, ratio) => {
 };
 
 const POINTS = [
-	[[0, 0], ...getSplit([RADIUS.X * 0.04, RADIUS.Y * -0.2], TOP_LEFT, 0.5)],
-	[...getSplit([RADIUS.X * 0.2, RADIUS.Y * 0.08], [RADIUS.X * 0.5, RADIUS.Y * 0.22], 0.5), TOP_RIGHT],
+	[[0, 0], ...getSplit([radii.x * 0.045, radii.y * -0.2], topLeft, 0.5)],
+	[...getSplit([radii.x * 0.2, radii.y * 0.08], [radii.x * 0.5, radii.y * 0.2], 0.5), topRight],
 ];
-
-const colours = ['#374', '#962', '#722'];
 
 for (let i = 0; i < 3; ++i) {
 	const group = document.createElementNS(SVG_NAMESPACE, 'g');
 	
-	group.setAttribute('stroke-linecap', 'round');
-	
-	group.setAttribute('stroke', colours[i]);
+	group.setAttribute('stroke', COLOURS[i]);
 	
 	group.append(...POINTS.map((points) => getMirroredLine(points[i], points[i + 1])).flat());
 	

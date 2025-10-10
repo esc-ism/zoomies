@@ -422,6 +422,21 @@ export default (wrapper) => {
 				content: 'Pan-Limit Effectiveness',
 				style: {textAlign: 'center'},
 			},
+			[
+				'There\'s no huge flaw, but this system\'s user experience is pretty terrible.',
+				'Take ',
+				getButton('this', [
+					[{ratio: 0.5, rotation: DEGREES[90] + 0.5, zoom: 1, position: 0}],
+				]),
+				' state for example — see the panning path necessary to view the offscreen corner?',
+				'There\'s no way anyone would take that path naturally.',
+				'Users naturally try to take the shortest path possible, but this system doesn\'t often allow that.',
+			],
+			[
+				'The ideal pan-limiting system is one that users find so natural and unintrusive that they don\'t consciously notice it.',
+				'Some degree of intrusiveness is necessary with zoomful systems, but there\'s no attempt at mitigation here.',
+				'This system\'s pan-limiting experience is frustrating because users must bend to its will, when it ', {tag: 'i', content: 'should'}, ' bend to the will of its users.',
+			],
 			{
 				tag: 'h2',
 				content: 'Snap-Pan Maths',
@@ -437,7 +452,7 @@ export default (wrapper) => {
 				'The final product might look similar to the image below.',
 				'Segments are coloured to show pairings.',
 			],
-			// todo make an image for the single-line system?
+			// todo give the single-line system an image?
 			{
 				tag: 'div',
 				content: snapImage,
@@ -461,6 +476,7 @@ export default (wrapper) => {
 				content: 'Snap-Pan Effectiveness',
 				style: {textAlign: 'center'},
 			},
+			// todo expand?
 			[
 				'As a snap-panning facilitator, this system is hard to fault.',
 				'Of course it performs fine on ',
@@ -482,6 +498,7 @@ export default (wrapper) => {
 				'This system achieves the goal of finding a zoomful, rotation-handling system to complement "Viewport Center".',
 				'So, uh, let\'s stop here I guess...',
 			],
+			{style: {textAlign: 'right', opacity: 0.4, textShadow: '0 0 2px currentColor'}, content: ' ...unless?'},
 		),
 	);
 	

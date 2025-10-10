@@ -48,7 +48,7 @@ const tween = async (demo) => {
 		let [first, second, third] = zoomPoints.slice(firstIndexRaw);
 		
 		const setZoomPoints = () => {
-			demo.constrainPosition({ratio}, true);
+			demo.constrainPosition({ratio: true}, true);
 			
 			setFirstIndex();
 			[first, second, third] = demo.zoomPoints.slice(firstIndexRaw);

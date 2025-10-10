@@ -54,7 +54,6 @@ export const getBound = (zoom, first, second, isTopLeft) => {
 		};
 	}
 	
-	// todo === 0 condition seems unnecessary
 	if (zoom <= first.z || (second.x === 0 && second.y === 0)) {
 		return false;
 	}
@@ -82,8 +81,6 @@ export const getProgressAngles = (quadrantAngle, viewportRatio, viewportRatioInv
 	};
 };
 
-// todo you never need to calculate z; derive z from its intersection with first
-//  also change in 2line interactive code demo
 export const getAxisIntersectY = (image, viewportSize, cornerAngle, progressAngle) => ({
 	x: 0,
 	y: (image.halfHeight - image.halfWidth * Math.tan(cornerAngle)) / image.height,

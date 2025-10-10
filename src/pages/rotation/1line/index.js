@@ -4,7 +4,9 @@ import SHARED_FUNCTIONS from '../code';
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo, getInstruction} from '../../shared';
 
-import {DEGREES, xmlns, opSpace, getOverlined} from '@/shared';
+import {DEGREES} from '@/shared';
+import {xmlns, opSpace, getOverlined} from '@/pages/shared/svg';
+
 import {CLASS_MATH, CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
 
 import * as mock from '../mock';

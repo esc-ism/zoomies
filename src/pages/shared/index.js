@@ -1,11 +1,11 @@
 import {getIdGetter} from '@css';
 
-import {generateWhenReady as generateCode} from './code';
+import {generateWhenReady as generateCode} from '../code';
 
 import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
 	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
-} from './consts';
+} from '../consts';
 
 const getCodeId = getIdGetter('text', 'code');
 

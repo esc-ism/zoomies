@@ -1,4 +1,4 @@
-import {xmlns} from '@/shared';
+import {xmlns} from '@/pages/shared/svg';
 import {CLASS_FLASH_CONTAINER, CLASS_MATH} from '../consts';
 import {getText, getButton, registerDemo, getInstruction, flash} from '../shared';
 

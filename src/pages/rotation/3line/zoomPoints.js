@@ -113,6 +113,15 @@ const getAll = (data) => {
 	if (thirdSide.z <= secondSide.z && thirdBase.z <= secondBase.z) {
 		// true if 90n multiple, false if 90n+45 multiple
 		if (Math.abs(data.quadrantAngle - DEGREES[45]) > DEGREES['45_2']) {
+			// don't know why this happens 🤷‍♂️
+			if ((firstSide.end[firstSide.end.axis] < 0) !== (data.cornerSide[firstSide.end.axis] < 0)) {
+				Object.assign(firstSide, firstSideFlipped);
+			}
+			
+			if ((firstBase.end[firstBase.end.axis] < 0) !== (data.cornerBase[firstBase.end.axis] < 0)) {
+				Object.assign(firstBase, firstBaseFlipped);
+			}
+			
 			Object.assign(thirdSide, getIntersection([firstSide, firstSide.end], [data.yIntersectSide, data.cornerSide]));
 			Object.assign(thirdBase, getIntersection([firstBase, firstBase.end], [data.yIntersectBase, data.cornerBase]));
 			

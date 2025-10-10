@@ -272,7 +272,11 @@ export default (point0, point1, ratioImage) => {
 	}
 	
 	if (point0.isFirst && point1.isFirst && point0.axis === point1.axis) {
-		return get1DConstrainer(point0.p > point1.p ? point0 : point1, ratioImage);
+		const use0 = Math.abs(point0.x) > Math.abs(point0.y) ?
+			Math.abs(point0.x) > Math.abs(point1.x) :
+			Math.abs(point0.y) > Math.abs(point1.y);
+		
+		return get1DConstrainer(use0 ? point0 : point1, ratioImage);
 	}
 	
 	const [points, lines, tangents] = getFrame(point0, point1, ratioImage);

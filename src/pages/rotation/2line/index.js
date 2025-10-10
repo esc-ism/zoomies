@@ -1,4 +1,5 @@
-import {DEGREES, getOverlined, opSpace, xmlns} from '@/shared';
+import {DEGREES} from '@/shared';
+import {xmlns} from '@/pages/shared/svg';
 
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo} from '../../shared';
@@ -235,8 +236,7 @@ export default (wrapper) => {
 			[
 				'The prior system\'s inadequacies stemmed from my approach to origin rails.',
 				'Tracing along image axes allowed for efficient code and passable snap-panning, but provided an unsatisfactory pan-limiting experience.',
-				'The ideal system would always allow users to see what they want in the shortest pan possible.',
-				// todo make this a button
+				'The ideal system would always allow users to see what they want in the shortest pan possible, since that\'s their natural inclination.',
 				'For example, to see the rightmost image corner, travel directly ',
 				getButton('east', [
 					({rotation, ratio, second}) => [{rotation, ratio, zoom: second.z, position: 0}],
@@ -256,10 +256,9 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'Origin rail start zooms are unchanged.',
-				'They travel directly towards viewport edge midpoints.',
-				'These locations on viewport edges need to be defined in terms of image coordinates.',
-				'A diagram of the problem is given below, followed by its solution.',
+				'Origin rail start zooms are unchanged, but now travel directly towards viewport edge midpoints.',
+				'This requires us to find the coordinates of these midpoints.',
+				'Using the base image corners and the viewport\'s top edge as an example, a diagram of the problem is given below, followed by its solution.',
 			],
 			{
 				tag: 'div',
@@ -299,6 +298,23 @@ export default (wrapper) => {
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mi', xmlns, content: 'θ'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: 'let '},
+								{tag: 'mfrac', xmlns, style: {padding: '0 0.5em'}, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mtext', xmlns, content: 'viewport height'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mn', xmlns, content: '2'},
+									]},
+								]},
+								{tag: 'mtext', xmlns, content: 'at the target start zoom be'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'd'},
 							]},
 						]},
 					]},
@@ -352,16 +368,8 @@ export default (wrapper) => {
 							]},
 							{tag: 'mtext', xmlns, content: 'is'},
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mfrac', xmlns, content: [
-									{tag: 'mrow', xmlns, content: [
-										{tag: 'mtext', xmlns, content: 'viewport height'},
-									]},
-									{tag: 'mrow', xmlns, content: [
-										{tag: 'mn', xmlns, content: '2'},
-									]},
-								]},
+								{tag: 'mi', xmlns, content: 'd'},
 							]},
-							{tag: 'mtext', xmlns, content: 'at start zoom'},
 						]},
 					]},
 				]},
@@ -383,12 +391,7 @@ export default (wrapper) => {
 									{tag: 'mo', xmlns, content: ')'},
 								]},
 								{tag: 'mo', xmlns, content: '×'},
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mo', xmlns, content: '|'},
-									{tag: 'mi', xmlns, content: 'A'},
-									{tag: 'mi', xmlns, content: 'C'},
-									{tag: 'mo', xmlns, content: '|'},
-								]},
+								{tag: 'mi', xmlns, content: 'd'},
 							]},
 						]},
 						{tag: 'mtr', xmlns, content: [
@@ -407,12 +410,7 @@ export default (wrapper) => {
 									{tag: 'mo', xmlns, content: ')'},
 								]},
 								{tag: 'mo', xmlns, content: '×'},
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mo', xmlns, content: '|'},
-									{tag: 'mi', xmlns, content: 'A'},
-									{tag: 'mi', xmlns, content: 'C'},
-									{tag: 'mo', xmlns, content: '|'},
-								]},
+								{tag: 'mi', xmlns, content: 'd'},
 							]},
 						]},
 					]},
@@ -454,26 +452,41 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'There\'s an issue with the way that I\'ve defined origin rails;',
+				'There\'s an issue with this approach;',
 				'for any image aspect ratio other than 1:1, there are windows of rotation values around ',
 				get45Button(demo, 45, 0.8),
 				', ',
-				get45Button(demo, 135, 1.2),
+				get45Button(demo, 135, 0.8),
 				', ',
-				get45Button(demo, 225, 0.5),
+				get45Button(demo, 225, 1.25),
 				' and ',
-				get45Button(demo, 315, 1.5),
-				' where preferred axes can\'t be used.',
+				get45Button(demo, 315, 1.25),
+				' where one origin rail wouldn\'t intersect its lock rail if it used the preferred axis.',
+				'The result is crossed lock rails, with bounds that seem to ',
+				getButton('invert', [
+					({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom: zoom / 1.1}],
+					({zoom}) => [{zoom: zoom * 1.1}, {duration: 0.5, repeat: 3, yoyo: true}],
+				], {getParam: async () => {
+					const data = await getVarGetter(demo, DEGREES[135], demo.ratioViewport / 0.5)();
+					const zoom = getSnappedZoom(...data.zoomPoints, {x: 0, y: 0});
+					
+					return {...data, zoom};
+				}}),
+				' at some point along their path.',
 			],
 			[
 				'Bounds jump around when rotating into and out of these windows.',
-				'Within them, at low zooms, the system forces sub-optimal panning paths while providing insufficiently restrictive pan-limits.',
+				'Within them, at pre-inversion zooms, the system provides ',
+				getButton('insufficiently restrictive', [
+					({ratioImage, rotation, second}) => [{ratioImage, rotation, position: 0, zoom: second.z + 0.01}],
+					({second: {x, y}}) => [{x, y}],
+				], {getParam: getVarGetter(demo, DEGREES[135], 0.6)}),
+				' pan-limits',
 			],
 			[
 				'As image aspect ratio gets more extreme, these windows get increasingly wide and the issues get ',
 				getButton('increasingly severe', [
-					[{position: 0.5}, {duration: 0}],
-					[{ratioImage: 2, zoom: 1}],
+					[{position: 0, ratioImage: 2, zoom: 1}],
 					[{rotation: DEGREES[90]}, {duration: 2, delay: 0.2}],
 					[{rotation: 0}, {ease: 'none', duration: 5}],
 				], {getParam: getDirectVars}),
@@ -485,8 +498,14 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'On top of this, the region in which the position lies is no longer obvious.',
-				'For simplicity, I check every region, further quadrupling checks for a total of 12x complexity.',
+				'In all prior systems, it was straightforward to rule out pairs of rails that didn\'t need checking.',
+				'Here, however, region in which the position lies is no longer obvious.',
+				'Plus even if a snap zoom is found in one region, the bound inversion behaviour means that another valid zoom may exist in another region.',
+				'For simplicity, I neglect to rule out rail pairings and check every region.',
+			],
+			[
+				'The system\'s efficiency per rail pair is similar to that of the prior.',
+				'Given that 4 rail pairs must be checked instead of just one, it ends up running around 4 times slower.',
 			],
 			'If there\'s more than one possible snap zoom, the higher value is used.',
 			getCode([
@@ -506,12 +525,14 @@ export default (wrapper) => {
 			},
 			[
 				'Despite its pan-limiting flaws, the system\'s a surprisingly good snap-panner!',
-				// todo window borders? define
-				'The only harm done by the strange pan-limiting behaviour is some slight inconsistency in snap-pan outcomes around window borders.',
+				'The panning flaws are caused by crossed rails at windows of rotation around (90n+45)°.',
+				'When snap-panning, the only clue to their existence is some slight behavioural inconsistency around the rotation values at window limits.',
 			],
 			[
-				'Even inside of windows, however, outcomes are sensible.',
-				'Using the maximum snap zoom possible means that, when rails intersect, the troublesome pre-intersect segments get ignored.',
+				'Even inside of windows, outcomes are sensible.',
+				'I mentioned that bounds seem to invert at some point inside these windows.',
+				'Specifically, the inversion happens at the snap zoom for position (0, 0).',
+				'Using the maximum snap zoom possible means that the troublesome pre-inversion pan-limits are ignored.',
 			],
 			{
 				tag: 'h2',
@@ -519,7 +540,7 @@ export default (wrapper) => {
 				style: {textAlign: 'center'},
 			},
 			[
-				'This system\'s less efficient and even worse at both pan-limiting than the prior.',
+				'This system\'s less efficient and even worse at pan-limiting than the prior.',
 				'Not ideal!',
 			],
 			[
