@@ -1,5 +1,6 @@
 import {ID_WRAPPER} from './consts';
-import {addRule, VerticalRules} from './shared/css';
+import {addRule} from './shared/css';
+import {addVerticalRule} from './shared/orientation';
 
 addRule(':root', {
 	'--color': '#dddddd',
@@ -18,4 +19,4 @@ addRule(`#${ID_WRAPPER}`, {
 	display: 'flex',
 });
 
-VerticalRules.add(`#${ID_WRAPPER}`, {'flex-direction': 'column'});
+addVerticalRule(`#${ID_WRAPPER}`, {'flex-direction': 'column'});

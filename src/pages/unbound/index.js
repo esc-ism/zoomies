@@ -1,11 +1,11 @@
 import {xmlns} from '@/pages/shared/svg';
+import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 import {CLASS_FLASH_CONTAINER, CLASS_MATH} from '../consts';
 import {getText, getButton, registerDemo, getInstruction, flash} from '../shared';
 
 import getRestartButton from './restart';
 
 import Demo from './demo';
-import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/css';
 
 const instructions = [
 	{text: ['Drag with your left mouse button to pan.'], key: 'pan'},
@@ -152,7 +152,7 @@ export default (wrapper) => {
 			],
 			[
 				'You can imagine how someone might slide away from the image and become lost in the void.',
-				'Pan-limiting systems prevent this by keeping users from the no man\'s land beyond the confines of the image.',
+				'Pan-limiting systems prevent this by keeping users from the no-man\'s land beyond the confines of the image.',
 			],
 			[
 				'Pan-limits here are fixed, regardless of zoom.',

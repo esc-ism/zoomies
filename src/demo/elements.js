@@ -1,7 +1,7 @@
 import './css';
 
 import {ID_WRAPPER, ID_WRAPPER_IMAGE, ID_IMAGE, ID_CROSSHAIR, ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL} from './consts';
-import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/css';
+import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
 const wrapper = document.createElement('div');
 

@@ -3,7 +3,6 @@ import {gsap} from 'gsap';
 import './css';
 
 import {getTheta, DEGREES, ERROR_ALLOWANCE} from '@/shared';
-import {TEXT_MIN_HEIGHT, TEXT_MIN_WIDTH} from '@/consts';
 
 import Readout from './readout';
 import Target from './target';
@@ -12,6 +11,7 @@ import Progress from './progress';
 import getElements from './elements';
 
 import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL, TWEEN_DEFAULT} from './consts';
+import {isVertical, list as orientation} from '@/shared/orientation';
 
 const cancelRightClick = () => {
 	window.addEventListener('contextmenu', (event) => {
@@ -33,11 +33,15 @@ const dock = (node) => new Promise((resolve) => {
 	observer.observe(node);
 });
 
+const getInitialRatio = () => isVertical() ?
+		Math.max(1, window.innerWidth / (window.innerHeight / 2)) :
+		Math.min(1, (window.innerWidth / 2) / window.innerHeight);
+
 let position = {x: 0, y: 0};
 let rotation = DEGREES[90];
 let zoom = 1;
 let _ratioImage = 1;
-let _ratioViewport = 1;
+let _ratioViewport = getInitialRatio();
 
 export default class {
 	static elements = getElements();
@@ -69,23 +73,23 @@ export default class {
 			if (isHorizontal) {
 				const position = event.clientX - offset;
 				
-				if (window.innerWidth - position - event.target.clientWidth >= TEXT_MIN_WIDTH) {
+				if (window.innerWidth > position + event.target.clientWidth) {
 					this.ratioViewport = (event.clientX - offset) / this.sizesViewport.height;
 					
 					return;
 				}
 				
-				ratio = (window.innerWidth - event.target.clientWidth - TEXT_MIN_WIDTH) / this.sizesViewport.height;
+				ratio = (window.innerWidth - event.target.clientWidth) / this.sizesViewport.height;
 			} else {
 				const position = event.clientY - offset;
 				
-				if (window.innerHeight - position - event.target.clientHeight >= TEXT_MIN_HEIGHT) {
+				if (window.innerHeight > position + event.target.clientHeight) {
 					this.ratioViewport = this.sizesViewport.width / (event.clientY - offset);
 					
 					return;
 				}
 				
-				ratio = this.sizesViewport.width / (window.innerHeight - event.target.clientHeight - TEXT_MIN_HEIGHT);
+				ratio = this.sizesViewport.width / (window.innerHeight - event.target.clientHeight);
 			}
 			
 			if (this.ratioViewport !== ratio) {
@@ -254,17 +258,17 @@ export default class {
 				return;
 			}
 			
+			this.addEventListener(orientation, 'change', () => {
+				this.ratioViewport = getInitialRatio();
+			});
+			
 			this.addEventListener(window, 'resize', () => {
 				const ratio = viewport.offsetWidth / viewport.offsetHeight;
 				
 				if (ratio !== this.ratioViewport) {
 					this.ratioViewport = ratio;
-				} else {
-					console.log('f');
 				}
 			});
-			
-			this.ratioViewport = viewport.offsetWidth / viewport.offsetHeight;
 			
 			for (const [resizer, isHorizontal] of [[resizerHorizontal, true], [resizerVertical, false]])
 				this.addEventListener(resizer, 'pointerdown', (event) => {

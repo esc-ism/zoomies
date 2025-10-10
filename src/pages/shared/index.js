@@ -4,7 +4,7 @@ import {generateWhenReady as generateCode} from '../code';
 
 import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
-	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
+	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER, WRAPPER_PADDING_X,
 } from '../consts';
 
 const getCodeId = getIdGetter('text', 'code');
@@ -145,9 +145,8 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 
 export const getText = (...children) => {
 	const wrapper = document.createElement('div');
+	const container = document.createElement('div');
 	
-	wrapper.style.padding = '0 20px';
-	wrapper.style.boxSizing = 'border-box';
 	wrapper.style.overflow = 'auto';
 	wrapper.style.scrollbarColor = 'var(--color) transparent';
 	wrapper.style.flexGrow = '1';
@@ -155,9 +154,13 @@ export const getText = (...children) => {
 	// I guess chrome gives outlines to scroll elements
 	wrapper.style.outline = 'none';
 	
+	container.style.padding = '0 20px';
+	container.style.boxSizing = 'border-box';
+	
 	wrapper.classList.add(CLASS_WRAPPER);
 	
-	wrapper.append(...children.map(getNode));
+	container.append(...children.map(getNode));
+	wrapper.append(container);
 	
 	return wrapper;
 };
