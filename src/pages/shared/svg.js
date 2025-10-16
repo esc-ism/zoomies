@@ -1,4 +1,4 @@
-export const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+import {SVG_NAMESPACE} from '@/shared';
 
 export const xmlns = 'http://www.w3.org/1998/Math/MathML';
 

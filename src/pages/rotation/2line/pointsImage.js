@@ -1,4 +1,5 @@
-import {SVG_NAMESPACE, COLOURS, getDiagram, getLine} from '@/pages/shared/svg';
+import {SVG_NAMESPACE} from '@/shared';
+import {COLOURS, getDiagram, getLine} from '@/pages/shared/svg';
 
 const radii = {x: 25, y: 20};
 const strokeRadius = 0.4;

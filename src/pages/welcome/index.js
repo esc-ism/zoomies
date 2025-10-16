@@ -7,6 +7,10 @@ import {getBound, getRailProgress, getVarGetter} from '../rotation/3line/demo';
 
 import {DEGREES} from '@/shared';
 
+// todo
+//  I'm thinking it'd be cooler to devote a quadrant of the screen to each corner
+//  scale and pan to zoom in on each image corner
+
 const tween = async (demo) => {
 	// keeps corners away from the readout
 	const getRandomRotation = gsap.utils.random(-DEGREES[180] + DEGREES[45], DEGREES[45], undefined, true);

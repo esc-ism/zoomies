@@ -1,6 +1,6 @@
 import {getSvg} from './shared';
 
-import {SVG_NAMESPACE} from '@/pages/shared/svg';
+import {SVG_NAMESPACE} from '@/shared';
 
 const path = document.createElementNS(SVG_NAMESPACE, 'path');
 

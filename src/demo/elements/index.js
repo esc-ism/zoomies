@@ -1,7 +1,8 @@
-import './css';
+import '../css';
 
-import {ID_WRAPPER, ID_WRAPPER_IMAGE, ID_IMAGE, ID_CROSSHAIR, ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL} from './consts';
+import {ID_WRAPPER, ID_WRAPPER_IMAGE, ID_IMAGE, ID_CROSSHAIR, ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL} from '../consts';
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
+import crosshairImage from './crosshair';
 
 const wrapper = document.createElement('div');
 
@@ -17,11 +18,13 @@ const getNode = (path, root = wrapper) => {
 	return node;
 };
 
-const generate = (id, parentPath, style) => {
-	const element = document.createElement('div');
-	
-	for (const [property, value] of Object.entries(style)) {
-		element.style[property] = value;
+const generate = (id, parentPath, style, element) => {
+	if (!element) {
+		element = document.createElement('div');
+		
+		for (const [property, value] of Object.entries(style)) {
+			element.style[property] = value;
+		}
 	}
 	
 	const parent = getNode(parentPath);
@@ -50,6 +53,7 @@ generate('viewport', paths.wrapper, {
 	placeContent: 'center center',
 	cursor: 'grab',
 	aspectRatio: '1',
+	touchAction: 'none',
 });
 
 generate('imageWrapper', paths.viewport, {
@@ -111,17 +115,7 @@ export const CONTAINER_RAIL = generate('rail', paths.imageWrapper, {display: 'co
 export const CONTAINER_BOUND_LINE = generate('boundLine', paths.imageWrapper, {display: 'contents', pointerEvents: 'none'});
 export const CONTAINER_TANGENTS = generate('tangents', paths.imageWrapper, {display: 'contents', pointerEvents: 'none'});
 
-export const CROSSHAIR = generate('crosshair', paths.viewport, {
-	position: 'absolute',
-	top: '50%',
-	left: '50%',
-	translate: '-50% -50%',
-	color: 'black',
-	textShadow: '0.5px 0.5px 0 white, 0.5px -0.5px 0 white, -0.5px -0.5px 0 white, -0.5px 0.5px 0 white',
-	userSelect: 'none',
-	pointerEvents: 'none',
-	fontSize: '20px',
-});
+export const CROSSHAIR = generate('crosshair', paths.viewport, {}, crosshairImage);
 
 CROSSHAIR.id = ID_CROSSHAIR;
 

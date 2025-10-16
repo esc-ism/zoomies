@@ -4,7 +4,7 @@ import getButtons from './buttons';
 
 import {flash} from '../shared';
 import {DEGREES} from '@/shared';
-import {SVG_NAMESPACE} from '@/pages/shared/svg';
+import {SVG_NAMESPACE} from '@/shared';
 import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED} from './consts';
 
 import './css';

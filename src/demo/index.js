@@ -13,6 +13,18 @@ import getElements from './elements';
 import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL, TWEEN_DEFAULT} from './consts';
 import {isVertical, list as orientation} from '@/shared/orientation';
 
+const getAngleDiff = (a, b) => {
+	let diff = a - b;
+	
+	if (diff > DEGREES[180]) {
+		diff = DEGREES[360] - diff;
+	} else if (diff < -DEGREES[180]) {
+		diff = -DEGREES[360] - diff;
+	}
+	
+	return [Math.abs(diff), Math.abs(a - diff / 2)];
+};
+
 const cancelRightClick = () => {
 	window.addEventListener('contextmenu', (event) => {
 		event.stopPropagation();
@@ -53,9 +65,7 @@ export default class {
 	static target = new Target(this);
 	
 	static listeners = {
-		zoom({deltaY, deltaMode}) {
-			const increment = deltaY * MULTIPLIERS_SCROLL[deltaMode] / -1000;
-			
+		zoom(increment) {
 			if (increment > 0) {
 				this.zoom *= 1 + increment;
 			} else {
@@ -96,9 +106,7 @@ export default class {
 				this.ratioViewport = ratio;
 			}
 		},
-		resizeImage({deltaY, deltaMode}) {
-			const increment = deltaY * MULTIPLIERS_SCROLL[deltaMode] / -1000;
-			
+		resizeImage(increment) {
 			if (increment > 0) {
 				this.ratioImage *= 1 + increment;
 			} else {
@@ -109,67 +117,38 @@ export default class {
 			this.ratioViewport = 1;
 		},
 		pan() {
-			let priorEvent;
-			
 			const change = {x: 0, y: 0};
 			
-			return ({offsetX, offsetY, ctrlKey}) => {
-				if (priorEvent) {
-					change.x = priorEvent.offsetX + change.x - offsetX;
-					change.y = change.y + offsetY - priorEvent.offsetY;
-					
-					this.position.x += change.x / this.sizesImage.width;
-					this.position.y += change.y / this.sizesImage.height;
-					
-					const target = {...this.position};
-					
-					if (!ctrlKey) {
-						this.constrainPosition({position: true});
-					}
-					
-					this.constructor.target.set(target);
-					
-					this.applyPosition();
-				}
+			return (x, y) => {
+				change.x += x;
+				change.y += y;
 				
-				// events in firefox seem to lose their data after finishing propagation
-				// so assigning the whole event doesn't work
-				priorEvent = {offsetX, offsetY};
-			};
-		},
-		rotate() {
-			const {left, top} = this.constructor.elements.viewport.getBoundingClientRect();
-			const middleX = left + this.sizesViewport.halfWidth;
-			const middleY = top + this.sizesViewport.halfHeight;
-			
-			let priorMouseTheta;
-			let startRotation = this.rotation;
-			
-			return (event) => {
-				const mouseTheta = getTheta(event.clientX, event.clientY, middleX, middleY);
-				
-				if (priorMouseTheta === undefined) {
-					priorMouseTheta = mouseTheta;
-					
-					return;
-				}
-				
-				this.rotation = startRotation + (priorMouseTheta - mouseTheta);
+				this.position.x += change.x / this.sizesImage.width;
+				this.position.y += change.y / this.sizesImage.height;
 				
 				const target = {...this.position};
 				
-				this.constrainRotation();
-				this.constrainPosition({rotation: true});
+				this.constrainPosition({position: true});
 				
 				this.constructor.target.set(target);
 				
-				this.applyRotation();
 				this.applyPosition();
 			};
 		},
+		rotate() {
+			const target = {...this.position};
+			
+			this.constrainRotation();
+			this.constrainPosition({rotation: true});
+			
+			this.constructor.target.set(target);
+			
+			this.applyRotation();
+			this.applyPosition();
+		},
 		snap(offsetX, offsetY) {
-			this.position.x = (offsetX / this.sizesImage.width) - 0.5;
-			this.position.y = (-offsetY / this.sizesImage.height) + 0.5;
+			this.position.x = offsetX / this.sizesImage.width - 0.5;
+			this.position.y = 0.5 - offsetY / this.sizesImage.height;
 			
 			this.constrainZoom();
 			
@@ -199,13 +178,10 @@ export default class {
 	zoom = zoom;
 	
 	_ratioImage = _ratioImage;
-	ratioImageInverse = 1;
+	ratioImageInverse = 1 / _ratioImage;
 	
 	_ratioViewport = _ratioViewport;
-	ratioViewportInverse = 1;
-	
-	ratio = 1;
-	ratioInverse = 1;
+	ratioViewportInverse = 1 / _ratioViewport;
 	
 	#listeners = [];
 	#resizeObserver;
@@ -224,9 +200,11 @@ export default class {
 			.then(() => new Promise((resolve) => {
 				this.#resizeObserver = new ResizeObserver(() => {
 					if (!this.isRemoved) {
-						this.position = position;
-						this.ratioViewport = _ratioViewport;
-						this.ratioImage = _ratioImage;
+						this.constructor.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
+						this.constructor.elements.viewport.style.aspectRatio = `${this.ratioViewport}`;
+						
+						this.updateSizesViewport();
+						
 						this.applyPosition();
 						this.applyRotation();
 						this.applyZoom();
@@ -270,32 +248,18 @@ export default class {
 				}
 			});
 			
-			for (const [resizer, isHorizontal] of [[resizerHorizontal, true], [resizerVertical, false]])
-				this.addEventListener(resizer, 'pointerdown', (event) => {
-					const {buttons, pointerId} = event;
-					
-					if (buttons !== 1 && buttons !== 2) {
-						return;
-					}
-					
-					event.stopPropagation();
-					event.preventDefault();
-					
-					resizer.setPointerCapture(pointerId);
-					
-					const entryMove = this.addEventListener(resizer, 'pointermove', this.listeners.resizeViewport.bind(null, isHorizontal, event[`offset${isHorizontal ? 'X' : 'Y'}`]));
-					
-					const entryStop = this.addEventListener(resizer, 'pointerup', () => {
-						if (buttons === 2) {
-							cancelRightClick();
+			for (const [resizer, isHorizontal] of [[resizerHorizontal, true], [resizerVertical, false]]) {
+				this.addPointerDownListener(resizer, resizer, {
+					get: (event) => [
+						() => this.listeners.resetViewport(),
+						(() => {
+							const offset = event[`offset${isHorizontal ? 'X' : 'Y'}`];
 							
-							this.listeners.resetViewport();
-						}
-						
-						this.removeEventListener(entryMove);
-						this.removeEventListener(entryStop);
-					});
+							return (event) => this.listeners.resizeViewport(isHorizontal, offset, event);
+						})(),
+					],
 				});
+			}
 			
 			this.addEventListener(viewport, 'wheel', (event) => {
 				event.stopPropagation();
@@ -305,67 +269,170 @@ export default class {
 					return;
 				}
 				
-				this.listeners[event.ctrlKey ? 'resizeImage' : 'zoom'](event);
-			});
-			
-			this.addEventListener(viewport, 'pointerdown', (event) => {
-				const {offsetX, offsetY, buttons, clientX, clientY} = event;
-				
-				if (buttons !== 1 && buttons !== 2) {
+				if (event.ctrlKey) {
+					this.listeners.resizeImage(event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] / -1000);
+					
 					return;
 				}
 				
-				event.stopPropagation();
-				event.preventDefault();
-				
-				const entryMove = this.addEventListener(viewport, 'pointermove', this.listeners[buttons === 1 ? 'pan' : 'rotate']());
-				
-				image.style.cursor = 'grabbing';
-				
-				let isClick = buttons !== 1 || image.isSameNode(event.target);
-				
-				image.setPointerCapture(event.pointerId);
-				
-				let entryClickNegater;
-				
-				if (isClick) {
-					entryClickNegater = this.addEventListener(image, 'pointermove', (event) => {
-						if (Math.abs(event.clientX - clientX) > ALLOWANCE_CLICK || Math.abs(event.clientY - clientY) > ALLOWANCE_CLICK) {
-							isClick = false;
-							
-							this.removeEventListener(entryClickNegater);
-						}
-					});
-				}
-				
-				const entryStop = this.addEventListener(image, 'pointerup', () => {
-					this.removeEventListener(entryStop);
-					
-					if (entryClickNegater) {
-						this.removeEventListener(entryClickNegater);
-					}
-					
-					image.style.removeProperty('cursor');
-					
-					this.removeEventListener(entryMove);
-					
-					if (buttons === 2) {
-						cancelRightClick();
-					}
-					
-					this.constructor.target.hide();
-					
-					if (!isClick) {
-						return;
-					}
-					
-					if (buttons === 1) {
-						this.listeners.snap(offsetX, offsetY);
-					} else {
-						this.listeners.resetImage();
-					}
-				});
+				this.listeners.zoom(event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] / -1000);
 			});
+			
+			this.addPointerDownListener(
+				viewport, image,
+				{
+					isClick: ({buttons, target}) => buttons !== 1 || image.isSameNode(target),
+					onStart: () => {
+						image.style.cursor = 'grabbing';
+					},
+					onFinish: () => {
+						this.constructor.target.hide();
+						
+						image.style.removeProperty('cursor');
+					},
+					get: ({pointerType, offsetX, offsetY, buttons}) => pointerType === 'mouse' ?
+							[
+								() => {
+									if (buttons === 1) {
+										this.listeners.snap(offsetX, offsetY);
+									} else {
+										this.listeners.resetImage();
+									}
+								},
+								buttons === 1 ?
+										(() => {
+											const pan = this.listeners.pan();
+											
+											let priorEvent;
+											
+											return ({offsetX, offsetY}) => {
+												if (priorEvent) {
+													pan(priorEvent.offsetX - offsetX, offsetY - priorEvent.offsetY);
+												}
+												
+												// events in firefox seem to lose their data after finishing propagation
+												// so assigning the whole event doesn't work
+												priorEvent = {offsetX, offsetY};
+											};
+										})() :
+										(() => {
+											const {left, top} = this.constructor.elements.viewport.getBoundingClientRect();
+											const middleX = left + this.sizesViewport.halfWidth;
+											const middleY = top + this.sizesViewport.halfHeight;
+											
+											let priorMouseTheta;
+											let startRotation = this.rotation;
+											
+											return (event) => {
+												const mouseTheta = getTheta(event.clientX, event.clientY, middleX, middleY);
+												
+												if (priorMouseTheta === undefined) {
+													priorMouseTheta = mouseTheta;
+													
+													return;
+												}
+												
+												this.rotation = startRotation + (priorMouseTheta - mouseTheta);
+												
+												this.listeners.rotate();
+											};
+										})(),
+							] :
+							[
+								(clickCount) => {
+									if (clickCount > 1) {
+										this.listeners.resetImage();
+									} else {
+										this.listeners.snap(offsetX, offsetY);
+									}
+								},
+								(() => {
+									const pan = this.listeners.pan();
+									
+									return (event, touches, pointerCount) => {
+										const touch = touches[event.pointerId];
+										let isFirst = !touch.client;
+										
+										if (isFirst) {
+											touch.client = {};
+											touch.offset = {};
+										} else {
+											touch.client.from = touch.client.to;
+											touch.offset.from = touch.offset.to;
+										}
+										
+										touch.client.to = {x: event.clientX, y: event.clientY};
+										touch.offset.to = {x: event.offsetX, y: event.offsetY};
+										
+										if (isFirst) {
+											return;
+										}
+										
+										touch.angle = getTheta(touch.client.to.x, touch.client.to.y, touch.client.from.x, touch.client.from.y);
+										
+										if (pointerCount > 2) {
+											return;
+										}
+										
+										if (pointerCount === 1) {
+											pan(touch.offset.from.x - touch.offset.to.x, touch.offset.to.y - touch.offset.from.y);
+											
+											return;
+										}
+										
+										const other = touches[Object.keys(touches).find((key) => key !== `${event.pointerId}`)];
+										
+										if (!('angle' in other)) {
+											return;
+										}
+										
+										const [angleDiff, angleMean] = getAngleDiff(touch.angle, other.angle);
+										
+										console.log([touch.client, other.client, touch.angle, other.angle, angleDiff, angleMean]);
+										
+										if (angleDiff > DEGREES[90]) {
+											if (angleDiff > DEGREES[270]) {
+												return;
+											}
+											
+											const center = {
+												x: (touch.client.from.x + other.client.to.x) / 2,
+												y: (touch.client.from.y + other.client.to.y) / 2,
+											};
+											
+											const dFrom = Math.sqrt(Math.pow(touch.client.from.x - center.x, 2) + Math.pow(touch.client.from.y - center.y, 2));
+											const dTo = Math.sqrt(Math.pow(touch.client.to.x - center.x, 2) + Math.pow(touch.client.to.y - center.y, 2));
+											
+											this.listeners.zoom((dTo - dFrom) / Math.max(this.sizesViewport.halfWidth, this.sizesViewport.halfHeight));
+											
+											return;
+										}
+										
+										// ignore diagonal swipes
+										if (Math.abs((angleMean % DEGREES[90]) - DEGREES[45]) < DEGREES['45_2']) {
+											return;
+										}
+										
+										if (Math.abs((angleMean % DEGREES[180]) - DEGREES[90]) < DEGREES['45']) {
+											const from = (touch.client.from.y + other.client.to.y) / 2;
+											const to = (touch.client.to.y + other.client.to.y) / 2;
+											
+											this.listeners.resizeImage((to - from) / this.sizesViewport.halfHeight);
+											
+											return;
+										}
+										
+										const from = (touch.client.from.x + other.client.to.x) / 2;
+										const to = (touch.client.to.x + other.client.to.x) / 2;
+										
+										this.rotation += (from - to) / this.sizesViewport.width * DEGREES[360];
+										
+										this.listeners.rotate();
+									};
+								})(),
+							],
+				},
+			);
 		});
 	}
 	
@@ -391,6 +458,106 @@ export default class {
 				return;
 			}
 		}
+	}
+	
+	addPointerDownListener(element, target, {isClick: getIsClick, onStart, onFinish, get}) {
+		const events = {};
+		let pointerCount = 0;
+		let clickCount = 0;
+		let failedClick = false;
+		
+		this.addEventListener(element, 'pointerdown', (event) => {
+			const {buttons, clientX, clientY, pointerId} = event;
+			
+			if (buttons !== 1 && buttons !== 2) {
+				return;
+			}
+			
+			event.stopPropagation();
+			event.preventDefault();
+			
+			const [clickListener, moveListener] = get(event);
+			
+			if (pointerCount === 0) {
+				onStart?.();
+				
+				failedClick = false;
+				clickCount = 0;
+			}
+			
+			pointerCount++;
+			
+			let isClick = getIsClick?.(event) ?? true;
+			
+			target.setPointerCapture(event.pointerId);
+			
+			let entryClickNegater;
+			
+			if (isClick) {
+				entryClickNegater = this.addEventListener(target, 'pointermove', (event) => {
+					if (event.pointerId !== pointerId) {
+						return;
+					}
+					
+					if (Math.abs(event.clientX - clientX) > ALLOWANCE_CLICK || Math.abs(event.clientY - clientY) > ALLOWANCE_CLICK) {
+						isClick = false;
+						
+						this.removeEventListener(entryClickNegater);
+					}
+				});
+			}
+			
+			events[pointerId] = {};
+			
+			const entryMove = this.addEventListener(target, 'pointermove', (event) => {
+				if (event.pointerId !== pointerId) {
+					return;
+				}
+				
+				moveListener(event, events, pointerCount);
+			});
+			
+			const entryStop = this.addEventListener(target, 'pointerup', (event) => {
+				if (event.pointerId !== pointerId) {
+					return;
+				}
+				
+				this.removeEventListener(entryStop);
+				
+				if (entryClickNegater) {
+					this.removeEventListener(entryClickNegater);
+				}
+				
+				this.removeEventListener(entryMove);
+				
+				if (buttons === 2) {
+					cancelRightClick();
+				}
+				
+				delete events[pointerId];
+				pointerCount--;
+				
+				if (pointerCount === 0) {
+					onFinish?.();
+				}
+				
+				if (!isClick) {
+					failedClick = true;
+					
+					return;
+				}
+				
+				if (failedClick) {
+					return;
+				}
+				
+				clickCount++;
+				
+				if (pointerCount === 0) {
+					clickListener(clickCount);
+				}
+			});
+		});
 	}
 	
 	set ratioImage(ratio) {
@@ -443,7 +610,7 @@ export default class {
 		this.constructor.readout.setRatio(this);
 		
 		if (doApply) {
-			this.constrainPosition({ratio: true});
+			this.constrainPosition({ratio: true, ratioImage: true});
 			this.applyPosition();
 		}
 	}

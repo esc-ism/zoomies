@@ -1,10 +1,7 @@
 import {addRule} from '@/shared/css';
 import {addHorizontalRule, addVerticalRule} from '@/shared/orientation';
 
-import {
-	ID_WRAPPER, ID_WRAPPER_IMAGE, ID_CROSSHAIR,
-	ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL,
-} from './consts';
+import {ID_WRAPPER, ID_WRAPPER_IMAGE, ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL} from './consts';
 
 addHorizontalRule(`#${ID_WRAPPER} + *`, {width: 0});
 addVerticalRule(`#${ID_WRAPPER} + *`, {height: 0});
@@ -37,11 +34,9 @@ addVerticalRule(`#${ID_WRAPPER_IMAGE}`, {
 
 addRule(`#${ID_WRAPPER_IMAGE} > *`, {position: 'absolute'});
 
-addRule(`#${ID_CROSSHAIR}`, {'font-family': 'consolas, monospace'});
-addRule(`#${ID_CROSSHAIR}::after`, {content: '"🞣"'});
-
 addRule([`#${ID_RESIZER_HORIZONTAL}`, `#${ID_RESIZER_VERTICAL}`], {
 	'box-sizing': 'border-box',
 	position: 'absolute',
 	'background-color': 'var(--background)',
+	'touch-action': 'none',
 });

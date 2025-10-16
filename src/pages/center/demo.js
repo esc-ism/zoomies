@@ -10,10 +10,14 @@ export default class extends Demo {
 	constructor() {
 		super();
 		
+		this.updateBounds();
+	}
+	
+	updateBounds() {
 		this.bounds.set({x: -0.5, y: 0.5}, {x: 0.5, y: 0.5}, {x: 0.5, y: -0.5}, {x: -0.5, y: -0.5});
 	}
 	
-	constrainPosition({position, zoom, ratio}) {
+	constrainPosition({position, zoom, ratio, ratioImage}) {
 		if (position) {
 			this.position.x = Math.max(-0.5, Math.min(0.5, this.position.x));
 			this.position.y = Math.max(-0.5, Math.min(0.5, this.position.y));
@@ -24,6 +28,10 @@ export default class extends Demo {
 				[{x: 0.5, y: 0.5}, {rotation: DEGREES[90]}],
 				[{x: 0.5, y: 0.5}, {rotation: 0}],
 			);
+			
+			if (ratioImage) {
+				this.updateBounds();
+			}
 		}
 	}
 	
