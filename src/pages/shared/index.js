@@ -1,11 +1,14 @@
 import {getIdGetter} from '@/shared/css';
 
 import {generateWhenReady as generateCode} from '../code';
+import touchIcon from '../input/touch';
+import mouseIcon from '../input/mouse';
 
 import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
-	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER, WRAPPER_PADDING_X,
+	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
 } from '../consts';
+import {InputMethod} from '@/consts';
 
 const getCodeId = getIdGetter('text', 'code');
 
@@ -143,6 +146,70 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 	};
 };
 
+const getFooter = () => {
+	const container = document.createElement('div');
+	
+	container.style.width = '100%';
+	container.style.height = '3em';
+	container.style.display = 'flex';
+	container.style.boxSizing = 'border-box';
+	container.style.position = 'relative';
+	container.style.alignItems = 'center';
+	container.style.borderBottom = '1px solid currentcolor';
+	
+	const email = document.createElement('a');
+	
+	email.innerText = 'callumtylerlatham@gmail.com';
+	email.href = 'mailto:callumtylerlatham@gmail.com';
+	
+	email.style.opacity = '0.8';
+	email.style.flexGrow = '1';
+	email.style.textAlign = 'center';
+	email.style.padding = '0 0.5em';
+	email.style.overflow = 'hidden';
+	email.style.textOverflow = 'ellipsis';
+	
+	const buttonContainer = document.createElement('div');
+	
+	buttonContainer.style.height = '100%';
+	buttonContainer.style.display = 'flex';
+	
+	const update = () => {
+		const [on, off] = InputMethod.isMouse ? [mouseIcon, touchIcon] : [touchIcon, mouseIcon];
+		
+		on.disabled = true;
+		on.style.removeProperty('cursor');
+		
+		off.disabled = false;
+		off.style.cursor = 'pointer';
+	};
+	
+	InputMethod.addListener(update);
+	
+	update();
+	
+	mouseIcon.addEventListener('click', () => {
+		InputMethod.isMouse = true;
+	});
+	
+	touchIcon.addEventListener('click', () => {
+		InputMethod.isMouse = false;
+	});
+	
+	buttonContainer.append(touchIcon, mouseIcon);
+	container.append(buttonContainer, email);
+	
+	return container;
+};
+
+const getPIncluder = (() => {
+	const element = document.createElement('span');
+	
+	element.style.display = 'flex';
+	
+	return () => element.cloneNode();
+})();
+
 export const getText = (...children) => {
 	const wrapper = document.createElement('div');
 	const container = document.createElement('div');
@@ -156,11 +223,20 @@ export const getText = (...children) => {
 	
 	container.style.padding = '0 20px';
 	container.style.boxSizing = 'border-box';
+	container.style.minHeight = '100%';
 	
 	wrapper.classList.add(CLASS_WRAPPER);
 	
-	container.append(...children.map(getNode));
+	container.append(getPIncluder(), ...children.map(getNode), getPIncluder());
 	wrapper.append(container);
+	
+	window.setTimeout(() => {
+		const footer = getFooter();
+		
+		wrapper.insertAdjacentElement('afterbegin', footer);
+		
+		wrapper.scrollTop = footer.offsetHeight;
+	}, 0);
 	
 	return wrapper;
 };

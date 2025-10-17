@@ -4,6 +4,7 @@ import SHARED_FUNCTIONS from '../code';
 import {register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, registerDemo, getInstruction} from '../../shared';
 
+import {InputMethod} from '@/consts';
 import {DEGREES} from '@/shared';
 import {xmlns, opSpace, getOverlined} from '@/pages/shared/svg';
 
@@ -191,8 +192,16 @@ export default (wrapper) => {
 				'Adjacent rails can differ, but opposite rails always share a start zoom.',
 				'Knowing this, only the top-left and top-right corners need be considered.',
 				getInstruction([
-					'This code snippet includes custom functions.',
-					'Click "getStartZooms" to unfold it and click the "function" text to re-fold.',
+					'This code snippet includes custom functions. ',
+					{tag: 'span', callback: (element) => {
+						const update = () => {
+							element.innerText = `Click "getStartZooms" to unfold it and ${InputMethod.isMouse ? 'click' : 'tap'} the "function" text to re-fold.`;
+						};
+						
+						update();
+						
+						InputMethod.addListener(update);
+					}},
 					'Note that the "rotation" value\'s unit is ',
 					{
 						tag: 'a',

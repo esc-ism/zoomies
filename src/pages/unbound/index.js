@@ -1,4 +1,5 @@
 import {xmlns} from '@/pages/shared/svg';
+import {InputMethod} from '@/consts';
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 import {CLASS_FLASH_CONTAINER, CLASS_MATH} from '../consts';
 import {getText, getButton, registerDemo, getInstruction, flash} from '../shared';
@@ -8,17 +9,36 @@ import getRestartButton from './restart';
 import Demo from './demo';
 
 const instructions = [
-	{text: ['Drag with your left mouse button to pan.'], key: 'pan'},
-	{text: ['Left click on the image to snap-pan.'], key: 'snap'},
-	{text: ['Drag with your right mouse button to rotate.'], key: 'rotate'},
-	{text: ['Use your scroll wheel to zoom in and out.'], key: 'zoom'},
-	{text: ['Use your scroll wheel while holding "ctrl" on your keyboard to adjust image aspect ratio.'], key: 'resizeImage'},
-	{text: [
-		['Drag the vertical bar at the right side of the viewport to adjust its aspect ratio.'],
-		['Drag the horizontal bar below the viewport to adjust its aspect ratio.'],
-	], key: 'resizeViewport', hasAlt: true},
-	{text: ['Right click the vertical bar to reset viewport aspect ratio.'], key: 'resetViewport'},
-	{text: ['Right click on the viewport to reset everything else.'], key: 'resetImage'},
+	{mouse: ['Drag the viewport with your left mouse button to pan.'], touch: ['Drag the viewport to pan.'], key: 'pan'},
+	{mouse: ['Left click on the image to snap-pan.'], touch: ['Tap the image to snap-pan.'], key: 'snap'},
+	{mouse: ['Use your scroll wheel to zoom in and out.'], touch: ['Pinch in and out to zoom.'], key: 'zoom'},
+	{mouse: ['Drag with your right mouse button to rotate.'], touch: ['Drag horizontally with two fingers to rotate.'], key: 'rotate'},
+	{mouse: ['Use your scroll wheel while holding "ctrl" on your keyboard to adjust image aspect ratio.'], touch: ['Drag vertically with two fingers to adjust image aspect ratio.'], key: 'resizeImage'},
+	{
+		mouse: [
+			['Drag the vertical bar at the right side of the viewport to adjust its aspect ratio.'],
+			['Drag the horizontal bar below the viewport to adjust its aspect ratio.'],
+		],
+		touch: [
+			['Drag the vertical bar at the right side of the viewport to adjust its aspect ratio.'],
+			['Drag the horizontal bar below the viewport to adjust its aspect ratio.'],
+		],
+		key: 'resizeViewport',
+		hasAlt: true,
+	},
+	{
+		mouse: [
+			['Click the vertical bar to reset viewport aspect ratio.'],
+			['Click the horizontal bar to reset viewport aspect ratio.'],
+		],
+		touch: [
+			['Tap the vertical bar to reset viewport aspect ratio.'],
+			['Tap the horizontal bar to reset viewport aspect ratio.'],
+		],
+		key: 'resetViewport',
+		hasAlt: true,
+	},
+	{mouse: ['Right click on the viewport to reset everything else.'], touch: ['Tap the viewport with two fingers to reset everything else.'], key: 'resetImage'},
 ];
 
 export default (wrapper) => {
@@ -56,6 +76,24 @@ export default (wrapper) => {
 			{...getInstruction({classList: [CLASS_HIDE_VERTICAL]}, {classList: [CLASS_HIDE_HORIZONTAL]}, getRestartButton()), callback: async (container) => {
 				const [horizontal, vertical, button] = container.children;
 				
+				let instruction;
+				
+				const update = () => {
+					if (!instruction) {
+						return;
+					}
+					
+					const text = instruction[InputMethod.isMouse ? 'mouse' : 'touch'];
+					
+					if (instruction.hasAlt) {
+						[horizontal.innerText, vertical.innerText] = text;
+					} else {
+						horizontal.innerText = vertical.innerText = text;
+					}
+				};
+				
+				InputMethod.addListener(update);
+				
 				container.classList.add(CLASS_FLASH_CONTAINER);
 				
 				button.style.display = 'none';
@@ -63,12 +101,8 @@ export default (wrapper) => {
 				container.style.position = 'relative';
 				
 				while (true) {
-					for (const instruction of instructions) {
-						if (instruction.hasAlt) {
-							[horizontal.innerText, vertical.innerText] = instruction.text;
-						} else {
-							horizontal.innerText = vertical.innerText = instruction.text;
-						}
+					for (instruction of instructions) {
+						update();
 						
 						await new Promise((resolve) => {
 							demo.actionPromises[instruction.key] = resolve;
@@ -76,6 +110,8 @@ export default (wrapper) => {
 						
 						flash(container);
 					}
+					
+					instruction = undefined;
 					
 					horizontal.style.display = vertical.style.display = 'none';
 					

@@ -388,8 +388,6 @@ export default class {
 										
 										const [angleDiff, angleMean] = getAngleDiff(touch.angle, other.angle);
 										
-										console.log([touch.client, other.client, touch.angle, other.angle, angleDiff, angleMean]);
-										
 										if (angleDiff > DEGREES[90]) {
 											if (angleDiff > DEGREES[270]) {
 												return;
@@ -476,6 +474,12 @@ export default class {
 			event.stopPropagation();
 			event.preventDefault();
 			
+			const addPointerListener = (type, listener) => this.addEventListener(target, type, (event) => {
+				if (event.pointerId === pointerId) {
+					listener(event);
+				}
+			});
+			
 			const [clickListener, moveListener] = get(event);
 			
 			if (pointerCount === 0) {
@@ -494,11 +498,7 @@ export default class {
 			let entryClickNegater;
 			
 			if (isClick) {
-				entryClickNegater = this.addEventListener(target, 'pointermove', (event) => {
-					if (event.pointerId !== pointerId) {
-						return;
-					}
-					
+				entryClickNegater = addPointerListener('pointermove', (event) => {
 					if (Math.abs(event.clientX - clientX) > ALLOWANCE_CLICK || Math.abs(event.clientY - clientY) > ALLOWANCE_CLICK) {
 						isClick = false;
 						
@@ -509,19 +509,11 @@ export default class {
 			
 			events[pointerId] = {};
 			
-			const entryMove = this.addEventListener(target, 'pointermove', (event) => {
-				if (event.pointerId !== pointerId) {
-					return;
-				}
-				
+			const entryMove = addPointerListener('pointermove', (event) => {
 				moveListener(event, events, pointerCount);
 			});
 			
-			const entryStop = this.addEventListener(target, 'pointerup', (event) => {
-				if (event.pointerId !== pointerId) {
-					return;
-				}
-				
+			const entryStop = addPointerListener('pointerup', () => {
 				this.removeEventListener(entryStop);
 				
 				if (entryClickNegater) {

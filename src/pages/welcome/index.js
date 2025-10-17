@@ -6,6 +6,7 @@ import {getText, getInstruction} from '../shared';
 import {getBound, getRailProgress, getVarGetter} from '../rotation/3line/demo';
 
 import {DEGREES} from '@/shared';
+import {InputMethod} from '@/consts';
 
 // todo
 //  I'm thinking it'd be cooler to devote a quadrant of the screen to each corner
@@ -145,7 +146,18 @@ export default (wrapper) => {
 				'This website is a little interactive report of my findings.',
 				'It will walk you through the problem space and demonstrate solutions, ranging from trivial to the kind of thing that a non-mathematician might spend two years on.',
 			],
-			getInstruction(['Hit your right arrow key to continue. The website\'s PC only for now.']),
+			// todo register swipes to change page
+			getInstruction({callback: (element) => {
+				const update = () => {
+					element.innerText = InputMethod.isMouse ?
+						'Hit your right arrow key to continue. If you\'re not using keyboard and mouse, scroll up to select touchscreen controls.' :
+						'Swipe left to continue. If you\'re using keyboard and mouse, scroll up to select that control scheme.';
+				};
+				
+				update();
+				
+				InputMethod.addListener(update);
+			}}),
 		),
 	);
 	
