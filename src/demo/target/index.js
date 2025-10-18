@@ -1,19 +1,21 @@
+import demo from '@/demo';
+import elements from '../elements';
+
 import {Connection, setPosition} from '../lines/lines';
 import {setLineStyle} from '../bounds';
 
 import {DEGREES} from '@/shared';
-import {CROSSHAIR} from '../elements';
 
 export default class {
 	element = document.createElement('div');
-	crosshair = CROSSHAIR.cloneNode(true);
+	crosshair = elements.crosshair.cloneNode(true);
 	
-	constructor(demo) {
+	constructor() {
 		this.element.style.display = 'contents';
 		
 		this.element.append(this.crosshair);
 		
-		this.line = new Connection(demo, false, false, false, this.element);
+		this.line = new Connection(false, false, false, this.element);
 		
 		this.crosshair.style.opacity = this.line.element.style.opacity = '0.4';
 		this.crosshair.style.position = 'absolute';
@@ -22,15 +24,9 @@ export default class {
 		
 		setLineStyle(this.line.element);
 		
-		demo.elements.imageWrapper.appendChild(this.element);
+		elements.imageWrapper.appendChild(this.element);
 		
 		this.hide();
-	}
-	
-	setDemo(demo) {
-		this.demo = demo;
-		
-		this.line.demo = demo;
 	}
 	
 	hide() {
@@ -38,7 +34,7 @@ export default class {
 	}
 	
 	set({x, y}) {
-		const {position, zoom, rotation} = this.demo;
+		const {position, zoom, rotation} = demo;
 		
 		if (x === position.x && y === position.y) {
 			this.hide();

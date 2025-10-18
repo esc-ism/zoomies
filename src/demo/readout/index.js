@@ -1,12 +1,14 @@
 import './css';
 
+import elements from '../elements';
+
 import {IDS, POSTFIXES, FORMATTERS, ID} from './consts';
 
 export default class {
 	element = document.createElement('table');
 	#valueElements = {};
 	
-	constructor(demo) {
+	constructor() {
 		this.element.id = ID;
 		
 		this.element.style.position = 'absolute';
@@ -36,7 +38,7 @@ export default class {
 		
 		this.element.appendChild(body);
 		
-		demo.elements.viewport.insertAdjacentElement('afterend', this.element);
+		elements.viewport.insertAdjacentElement('afterend', this.element);
 	}
 	
 	#set(label, value) {

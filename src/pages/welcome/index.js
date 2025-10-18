@@ -1,6 +1,8 @@
 import gsap from 'gsap';
 
-import Demo from './demo';
+import demo from '@/demo';
+
+import System from './demo';
 
 import {getText, getInstruction} from '../shared';
 import {getBound, getRailProgress, getVarGetter} from '../rotation/3line/demo';
@@ -12,13 +14,16 @@ import {InputMethod} from '@/consts';
 //  I'm thinking it'd be cooler to devote a quadrant of the screen to each corner
 //  scale and pan to zoom in on each image corner
 
-const tween = async (demo) => {
+let stopResolver;
+let doStop;
+
+const tween = async (stop) => {
 	// keeps corners away from the readout
 	const getRandomRotation = gsap.utils.random(-DEGREES[180] + DEGREES[45], DEGREES[45], undefined, true);
 	const getRandomRatio = gsap.utils.random(0.5, 2, undefined, true);
 	
-	while (!demo.isRemoved) {
-		const {zoomPoints, rotation, ratio} = await getVarGetter(
+	while (!doStop) {
+		const {zoomPoints, rotation, ratio} = getVarGetter(
 			demo,
 			getRandomRotation(),
 			getRandomRatio(),
@@ -53,18 +58,18 @@ const tween = async (demo) => {
 		let [first, second, third] = zoomPoints.slice(firstIndexRaw);
 		
 		const setZoomPoints = () => {
-			demo.constrainPosition({ratio: true}, true);
+			demo.system.constrainPosition({ratio: true}, true);
 			
-			setFirstIndex(demo.zoomPoints);
-			[first, second, third] = demo.zoomPoints.slice(firstIndexRaw);
+			setFirstIndex(demo.system.zoomPoints);
+			[first, second, third] = demo.system.zoomPoints.slice(firstIndexRaw);
 			
-			demo.rails.hide();
+			demo.system.rails.hide();
 			
-			demo.rails[firstIndex].show();
-			demo.rails[firstIndex + 1].show();
+			demo.system.rails[firstIndex].show();
+			demo.system.rails[firstIndex + 1].show();
 			
 			if (!third.isFirstInt) {
-				demo.rails[firstIndex + 2].show();
+				demo.system.rails[firstIndex + 2].show();
 			}
 		};
 		
@@ -80,7 +85,7 @@ const tween = async (demo) => {
 					demo.tween.data.ignorePosition = true;
 				},
 				onReverseComplete() {
-					demo.rails.hide();
+					demo.system.rails.hide();
 					
 					demo.position.x = demo.position.y = 0;
 					demo.applyPosition();
@@ -97,14 +102,14 @@ const tween = async (demo) => {
 					
 					progresses.splice(firstIndex, 0, ...getRailProgress(demo.zoom, first, second, third));
 					
-					demo.rails.setProgress(...progresses);
+					demo.system.rails.setProgress(...progresses);
 				},
 			}],
 		);
 		
-		await Promise.race([demo.removed, demo.tween]);
+		await Promise.race([stop, demo.tween]);
 		
-		if (demo.isRemoved) {
+		if (doStop) {
 			return;
 		}
 		
@@ -112,7 +117,7 @@ const tween = async (demo) => {
 		
 		demo.tween.reverse();
 		
-		await Promise.race([demo.removed, new Promise((resolve) => {
+		await Promise.race([stop, new Promise((resolve) => {
 			demo.tween.eventCallback('onReverseComplete', () => {
 				resolve();
 				
@@ -122,44 +127,49 @@ const tween = async (demo) => {
 	}
 };
 
-export default (wrapper) => {
-	const demo = new Demo();
-	
-	demo.init().then(() => tween(demo));
-	
-	wrapper.append(
-		demo.constructor.element,
-		getText(
-			{
-				tag: 'h1',
-				content: 'Zoomies',
-				style: {textAlign: 'center'},
-			},
-			[
-				'Hello! I\'m Callum — a programmer.',
-			],
-			[
-				'For the past two years or so, I\'ve been delving into panning (the thing you do to look around after zooming in).',
-				'Specifically, I\'ve been working on pan-limiting where zoom, rotation, image aspect ratio and viewport aspect ratio are all variable.',
-			],
-			[
-				'This website is a little interactive report of my findings.',
-				'It will walk you through the problem space and demonstrate solutions, ranging from trivial to the kind of thing that a non-mathematician might spend two years on.',
-			],
-			// todo register swipes to change page
-			getInstruction({callback: (element) => {
-				const update = () => {
-					element.innerText = InputMethod.isMouse ?
-						'Hit your right arrow key to continue. If you\'re not using keyboard and mouse, scroll up to select touchscreen controls.' :
-						'Swipe left to continue. If you\'re using keyboard and mouse, scroll up to select that control scheme.';
-				};
-				
-				update();
-				
-				InputMethod.addListener(update);
-			}}),
-		),
-	);
-	
-	return demo;
+export default {
+	System,
+	start() {
+		doStop = false;
+		
+		tween(new Promise((resolve) => {
+			stopResolver = resolve;
+		}));
+	},
+	end() {
+		doStop = true;
+		
+		stopResolver();
+	},
+	text: getText(
+		{
+			tag: 'h1',
+			content: 'Zoomies',
+			style: {textAlign: 'center'},
+		},
+		[
+			'Hello! I\'m Callum — a programmer.',
+		],
+		[
+			'For the past two years or so, I\'ve been delving into panning (the thing you do to look around after zooming in).',
+			'Specifically, I\'ve been working on pan-limiting where zoom, rotation, image aspect ratio and viewport aspect ratio are all variable.',
+		],
+		[
+			'This website is a little interactive report of my findings.',
+			'It will walk you through the problem space and demonstrate solutions, ranging from trivial to the kind of thing that a non-mathematician might spend two years on.',
+		],
+		// todo register swipes to change page
+		//  todo actually put all text wrappers in a flex container and (snap) scroll to turn page
+		getInstruction({callback: (element) => {
+			const update = () => {
+				element.innerText = InputMethod.isMouse ?
+					'Hit your right arrow key to continue. If you\'re not using keyboard and mouse, scroll up to select touchscreen controls.' :
+					'Swipe left to continue. If you\'re using keyboard and mouse, scroll up to select that control scheme.';
+			};
+			
+			update();
+			
+			InputMethod.addListener(update);
+		}}),
+	),
 };

@@ -1,3 +1,4 @@
+import demo from '@/demo';
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
@@ -122,14 +123,14 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		return this.constructor.getZoomPoints(this, this.getAllStartZooms());
+		return this.constructor.getZoomPoints(demo, this.getAllStartZooms());
 	}
 	
 	getSnappedZoom() {
 		return getSnappedZoom(
 			this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2],
 			this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5],
-			this.position,
+			demo.position,
 		);
 	}
 }

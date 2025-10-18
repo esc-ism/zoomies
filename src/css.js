@@ -1,4 +1,4 @@
-import {ID_WRAPPER} from './consts';
+import {CLASS_WRAPPER} from './consts';
 import {addRule} from './shared/css';
 import {addVerticalRule} from './shared/orientation';
 
@@ -11,12 +11,14 @@ addRule(':root', {
 	'font-weight': '400',
 	'background-color': 'var(--background)',
 	color: 'var(--color)',
+	'scrollbar-color': 'var(--color) transparent',
+	
 });
 
-addRule(`#${ID_WRAPPER}`, {
+addRule(`.${CLASS_WRAPPER}`, {
 	width: '100%',
 	height: '100%',
 	display: 'flex',
 });
 
-addVerticalRule(`#${ID_WRAPPER}`, {'flex-direction': 'column'});
+addVerticalRule(`.${CLASS_WRAPPER}`, {'flex-direction': 'column'});

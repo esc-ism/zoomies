@@ -1,3 +1,6 @@
+import demo from '@/demo';
+import elements from '@/demo/elements';
+
 import {Line} from '@/demo/lines/lines';
 
 import getButtons from './buttons';
@@ -9,8 +12,6 @@ import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED} from './consts';
 
 import './css';
 
-let init;
-let demo;
 let globalScope;
 let functions;
 const visuals = [];
@@ -88,15 +89,9 @@ const makeMultiline = (elements, indent, statement, property) => {
 	elements.push(document.createElement('br'), ...getIndents(indent));
 };
 
-export const register = (newDemo, statements = []) => {
-	init = newDemo.init().then(() => {
-		reset();
-		
-		if (newDemo.isRemoved) {
-			return Promise.reject();
-		}
-	});
-	demo = newDemo;
+export const register = (statements = []) => {
+	reset();
+	
 	refreshParams.length = 0;
 	
 	functions = Object.fromEntries(statements.map((statement) => [
@@ -351,7 +346,7 @@ const visualisers = {
 		
 		svg.append(path);
 		
-		demo.constructor.elements.imageWrapper.appendChild(svg);
+		elements.imageWrapper.appendChild(svg);
 		
 		return () => svg.remove();
 	},
@@ -812,13 +807,7 @@ const generateButtons = (parent, statements) => {
 	});
 };
 
-export const generateWhenReady = async (parent, statements) => {
-	try {
-		await init;
-	} catch {
-		return;
-	}
-	
+export default (parent, statements) => {
 	generateButtons(parent, statements);
 	
 	generate(parent, statements);

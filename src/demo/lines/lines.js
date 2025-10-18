@@ -1,6 +1,8 @@
-import Hideables from './copies';
-
+import demo from '@/demo';
+import elements from '@/demo/elements';
 import {DEGREES, getTheta} from '@/shared';
+
+import Hideables from './copies';
 
 const getLeft = ({x}) => (0.5 + x) * 100;
 const getTop = ({y}) => (0.5 - y) * 100;
@@ -56,9 +58,8 @@ export class Line {
 	element = (this.constructor.template ?? Line.template).cloneNode();
 	reflections = [];
 	
-	constructor(demo, flipX, flipY, flipBoth, parent = demo.constructor.elements.imageWrapper) {
+	constructor(flipX, flipY, flipBoth, parent = elements.imageWrapper) {
 		this.parent = parent;
-		this.demo = demo;
 		
 		const Reflection = this.constructor.Reflection ?? Line.Reflection;
 		
@@ -152,7 +153,7 @@ export class Line {
 
 export class Connection extends Line {
 	setHeight(from, to) {
-		const {ratioImage} = this.demo;
+		const {ratioImage} = demo;
 		
 		const xSquared = to.x ? Math.pow((to.x - from.x) * ratioImage, 2) : 0;
 		const ySquared = to.y ? Math.pow((to.y - from.y), 2) : 0;
@@ -161,7 +162,7 @@ export class Connection extends Line {
 	}
 	
 	setRotation(from, to) {
-		const {ratioImage, ratioImageInverse} = this.demo;
+		const {ratioImage, ratioImageInverse} = demo;
 		
 		const ratioWidth = Math.max(1, ratioImage);
 		const ratioHeight = Math.max(1, ratioImageInverse);

@@ -89,7 +89,7 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		return getZoomPoints(this, this.getAllStartZooms());
+		return getZoomPoints(demo, this.getAllStartZooms());
 	}
 	
 	getSnappedZoom() {

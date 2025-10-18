@@ -8,7 +8,7 @@ import Readout from './readout';
 import Target from './target';
 import Progress from './progress';
 
-import getElements from './elements';
+import elements from './elements';
 
 import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL, TWEEN_DEFAULT} from './consts';
 import {isVertical, list as orientation} from '@/shared/orientation';
@@ -49,35 +49,49 @@ const getInitialRatio = () => isVertical() ?
 		Math.max(1, window.innerWidth / (window.innerHeight / 2)) :
 		Math.min(1, (window.innerWidth / 2) / window.innerHeight);
 
-let position = {x: 0, y: 0};
-let rotation = DEGREES[90];
-let zoom = 1;
-let _ratioImage = 1;
-let _ratioViewport = getInitialRatio();
+class ActionHook {
+	listeners = [];
+	
+	add(listener) {
+		this.listeners.push(listener);
+	}
+	
+	emit() {
+		for (let i = this.listeners.length - 1; i >= 0; --i) {
+			if (this.listeners[i]()) {
+				this.listeners.splice(i, 1);
+			}
+		}
+	}
+	
+	clear() {
+		this.listeners.length = 0;
+	}
+}
 
-export default class {
-	static elements = getElements();
-	static element = this.elements.wrapper;
+export default new class {
+	// todo necessary?
+	elements = elements;
+	element = this.elements.wrapper;
 	
-	static readout = new Readout(this);
-	static progress = new Progress();
+	readout = new Readout();
+	progress = new Progress();
+	target = new Target();
 	
-	static target = new Target(this);
-	
-	static listeners = {
-		zoom(increment) {
+	listeners = {
+		zoom: (increment) => {
 			if (increment > 0) {
 				this.zoom *= 1 + increment;
 			} else {
 				this.zoom /= 1 - increment;
 			}
 			
-			this.constrainPosition({zoom: true});
+			this.system.constrainPosition({zoom: true});
 			
 			this.applyPosition();
 			this.applyZoom();
 		},
-		resizeViewport(isHorizontal, offset, event) {
+		resizeViewport: (isHorizontal, offset, event) => {
 			let ratio;
 			
 			if (isHorizontal) {
@@ -106,17 +120,17 @@ export default class {
 				this.ratioViewport = ratio;
 			}
 		},
-		resizeImage(increment) {
+		resizeImage: (increment) => {
 			if (increment > 0) {
 				this.ratioImage *= 1 + increment;
 			} else {
 				this.ratioImage /= 1 - increment;
 			}
 		},
-		resetViewport() {
+		resetViewport: () => {
 			this.ratioViewport = 1;
 		},
-		pan() {
+		pan: () => {
 			const change = {x: 0, y: 0};
 			
 			return (x, y) => {
@@ -128,34 +142,34 @@ export default class {
 				
 				const target = {...this.position};
 				
-				this.constrainPosition({position: true});
+				this.system.constrainPosition({position: true});
 				
-				this.constructor.target.set(target);
+				this.target.set(target);
 				
 				this.applyPosition();
 			};
 		},
-		rotate() {
+		rotate: () => {
 			const target = {...this.position};
 			
 			this.constrainRotation();
-			this.constrainPosition({rotation: true});
+			this.system.constrainPosition({rotation: true});
 			
-			this.constructor.target.set(target);
+			this.target.set(target);
 			
 			this.applyRotation();
 			this.applyPosition();
 		},
-		snap(offsetX, offsetY) {
+		snap: (offsetX, offsetY) => {
 			this.position.x = offsetX / this.sizesImage.width - 0.5;
 			this.position.y = 0.5 - offsetY / this.sizesImage.height;
 			
-			this.constrainZoom();
+			this.system.constrainZoom();
 			
 			this.applyZoom();
 			this.applyPosition();
 		},
-		resetImage() {
+		resetImage: () => {
 			this.zoom = 1;
 			this.rotation = DEGREES[90];
 			
@@ -165,82 +179,51 @@ export default class {
 			this.position.x = this.position.y = 0;
 			this.ratioImage = 1;
 		},
-		
 	};
 	
-	listeners = Object.fromEntries(Object.entries(this.constructor.listeners).map(([key, listener]) => [key, listener.bind(this)]));
+	hooks = {ratioChange: new ActionHook()};
 	
 	sizesImage = {};
 	sizesViewport = {};
 	
-	position = position;
-	rotation = rotation;
-	zoom = zoom;
+	position = {x: 0, y: 0};
+	rotation = DEGREES[90];
+	zoom = 1;
 	
-	_ratioImage = _ratioImage;
-	ratioImageInverse = 1 / _ratioImage;
+	_ratioImage = 1;
+	ratioImageInverse = 1;
 	
-	_ratioViewport = _ratioViewport;
-	ratioViewportInverse = 1 / _ratioViewport;
+	_ratioViewport = getInitialRatio();
+	ratioViewportInverse = 1 / this._ratioViewport;
 	
-	#listeners = [];
-	#resizeObserver;
-	#removeResolver;
 	#tweenUpdateId;
 	tweenUpdate = Promise.resolve();
-	isRemoved = false;
-	removed = new Promise((resolve) => {
-		this.#removeResolver = resolve;
-	})
-		.then(() => this.isRemoved = true);
 	
-	#init = Promise.race([
-		this.removed,
-		dock(this.constructor.element)
-			.then(() => new Promise((resolve) => {
-				this.#resizeObserver = new ResizeObserver(() => {
-					if (!this.isRemoved) {
-						this.constructor.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
-						this.constructor.elements.viewport.style.aspectRatio = `${this.ratioViewport}`;
-						
-						this.updateSizesViewport();
-						
-						this.applyPosition();
-						this.applyRotation();
-						this.applyZoom();
-					}
+	#init = dock(this.element)
+		.then(() => new Promise((resolve) => {
+			// todo can this be a 0 delay settimeout?
+			const resizeObserver = new ResizeObserver(() => {
+				if (!this.isRemoved) {
+					this.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
+					this.elements.viewport.style.aspectRatio = `${this.ratioViewport}`;
 					
-					this.#resizeObserver.disconnect();
-					
-					resolve();
-				});
+					this.updateSizesViewport();
+				}
 				
-				this.#resizeObserver.observe(this.constructor.element.parentElement);
-			})),
-	]);
-	
-	constructor() {
-		this.constructor.target.setDemo(this);
-		
-		const {viewport, image, resizerHorizontal, resizerVertical} = this.constructor.elements;
-		
-		this.constructor.readout.setPosition(this);
-		this.constructor.readout.setZoom(this);
-		this.constructor.readout.setRotation(this);
-		this.constructor.readout.setRatio(this);
-		
-		viewport.appendChild(this.constructor.progress.element);
-		
-		this.init().then(() => {
-			if (this.isRemoved) {
-				return;
-			}
+				resizeObserver.disconnect();
+				
+				resolve();
+			});
 			
-			this.addEventListener(orientation, 'change', () => {
+			resizeObserver.observe(this.element.parentElement);
+		})).then(() => {
+			const {viewport, image, resizerHorizontal, resizerVertical} = this.elements;
+			
+			orientation.addEventListener('change', () => {
 				this.ratioViewport = getInitialRatio();
 			});
 			
-			this.addEventListener(window, 'resize', () => {
+			window.addEventListener('resize', () => {
 				const ratio = viewport.offsetWidth / viewport.offsetHeight;
 				
 				if (ratio !== this.ratioViewport) {
@@ -261,7 +244,7 @@ export default class {
 				});
 			}
 			
-			this.addEventListener(viewport, 'wheel', (event) => {
+			viewport.addEventListener('wheel', (event) => {
 				event.stopPropagation();
 				event.preventDefault();
 				
@@ -270,6 +253,7 @@ export default class {
 				}
 				
 				if (event.ctrlKey) {
+					debugger;
 					this.listeners.resizeImage(event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] / -1000);
 					
 					return;
@@ -286,7 +270,7 @@ export default class {
 						image.style.cursor = 'grabbing';
 					},
 					onFinish: () => {
-						this.constructor.target.hide();
+						this.target.hide();
 						
 						image.style.removeProperty('cursor');
 					},
@@ -316,7 +300,7 @@ export default class {
 											};
 										})() :
 										(() => {
-											const {left, top} = this.constructor.elements.viewport.getBoundingClientRect();
+											const {left, top} = this.elements.viewport.getBoundingClientRect();
 											const middleX = left + this.sizesViewport.halfWidth;
 											const middleY = top + this.sizesViewport.halfHeight;
 											
@@ -432,30 +416,23 @@ export default class {
 				},
 			);
 		});
-	}
 	
-	addEventListener(element, type, listener) {
-		element.addEventListener(type, listener);
+	constructor() {
+		this.readout.setPosition(this);
+		this.readout.setZoom(this);
+		this.readout.setRotation(this);
+		this.readout.setRatio(this);
 		
-		const entry = [element, type, listener];
-		
-		this.#listeners.push(entry);
-		
-		return entry;
-	}
-	
-	removeEventListener(target) {
-		for (const [i, entry] of this.#listeners.entries()) {
-			if (entry === target) {
-				this.#listeners.splice(i, 1);
-				
-				const [element, type, listener] = entry;
-				
-				element.removeEventListener(type, listener);
-				
-				return;
-			}
+		for (const key of Object.keys(this.listeners)) {
+			this.hooks[key] = new ActionHook();
 		}
+	}
+	
+	setSystem(system) {
+		this.system = system;
+		
+		// todo do you need ratioImage: true?
+		this.system.constrainPosition({ratio: true});
 	}
 	
 	addPointerDownListener(element, target, {isClick: getIsClick, onStart, onFinish, get}) {
@@ -464,7 +441,7 @@ export default class {
 		let clickCount = 0;
 		let failedClick = false;
 		
-		this.addEventListener(element, 'pointerdown', (event) => {
+		element.addEventListener('pointerdown', (event) => {
 			const {buttons, clientX, clientY, pointerId} = event;
 			
 			if (buttons !== 1 && buttons !== 2) {
@@ -474,11 +451,17 @@ export default class {
 			event.stopPropagation();
 			event.preventDefault();
 			
-			const addPointerListener = (type, listener) => this.addEventListener(target, type, (event) => {
-				if (event.pointerId === pointerId) {
-					listener(event);
-				}
-			});
+			const addPointerListener = (type, listener) => {
+				const wrapped = (event) => {
+					if (event.pointerId === pointerId) {
+						listener(event);
+					}
+				};
+				
+				target.addEventListener(type, wrapped);
+				
+				return target.removeEventListener.bind(target, type, wrapped);
+			};
 			
 			const [clickListener, moveListener] = get(event);
 			
@@ -495,32 +478,30 @@ export default class {
 			
 			target.setPointerCapture(event.pointerId);
 			
-			let entryClickNegater;
+			let removeClickNegater;
 			
 			if (isClick) {
-				entryClickNegater = addPointerListener('pointermove', (event) => {
+				removeClickNegater = addPointerListener('pointermove', (event) => {
 					if (Math.abs(event.clientX - clientX) > ALLOWANCE_CLICK || Math.abs(event.clientY - clientY) > ALLOWANCE_CLICK) {
 						isClick = false;
 						
-						this.removeEventListener(entryClickNegater);
+						removeClickNegater();
+						
+						removeClickNegater = undefined;
 					}
 				});
 			}
 			
 			events[pointerId] = {};
 			
-			const entryMove = addPointerListener('pointermove', (event) => {
+			const removeMoveListener = addPointerListener('pointermove', (event) => {
 				moveListener(event, events, pointerCount);
 			});
 			
-			const entryStop = addPointerListener('pointerup', () => {
-				this.removeEventListener(entryStop);
-				
-				if (entryClickNegater) {
-					this.removeEventListener(entryClickNegater);
-				}
-				
-				this.removeEventListener(entryMove);
+			const removeStopListener = addPointerListener('pointerup', () => {
+				removeClickNegater?.();
+				removeMoveListener();
+				removeStopListener();
 				
 				if (buttons === 2) {
 					cancelRightClick();
@@ -556,7 +537,7 @@ export default class {
 		this._ratioImage = ratio;
 		this.ratioImageInverse = 1 / this.ratioImage;
 		
-		this.constructor.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
+		this.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
 		
 		this.updateSizesImage();
 	}
@@ -569,7 +550,7 @@ export default class {
 		this._ratioViewport = ratio;
 		this.ratioViewportInverse = 1 / ratio;
 		
-		this.constructor.elements.viewport.style.aspectRatio = `${ratio}`;
+		this.elements.viewport.style.aspectRatio = `${ratio}`;
 		
 		this.updateSizesViewport();
 	}
@@ -594,15 +575,17 @@ export default class {
 		this.ratio = this.ratioViewport / this.ratioImage;
 		this.ratioInverse = 1 / this.ratio;
 		
-		this.constructor.elements.imageWrapper.style.height = `${Math.min(1, this.ratio) * 100}%`;
-		this.constructor.elements.imageWrapper.style.width = `${Math.min(1, this.ratioInverse) * 100}%`;
+		this.hooks.ratioChange.emit();
 		
-		this.setDimensions(this.sizesImage, this.constructor.elements.imageWrapper);
+		this.elements.imageWrapper.style.height = `${Math.min(1, this.ratio) * 100}%`;
+		this.elements.imageWrapper.style.width = `${Math.min(1, this.ratioInverse) * 100}%`;
 		
-		this.constructor.readout.setRatio(this);
+		this.setDimensions(this.sizesImage, this.elements.imageWrapper);
+		
+		this.readout.setRatio(this);
 		
 		if (doApply) {
-			this.constrainPosition({ratio: true, ratioImage: true});
+			this.system.constrainPosition({ratio: true, ratioImage: true});
 			this.applyPosition();
 		}
 	}
@@ -610,9 +593,9 @@ export default class {
 	updateSizesViewport() {
 		this.updateSizesImage(false);
 		
-		this.setDimensions(this.sizesViewport, this.constructor.elements.viewport);
+		this.setDimensions(this.sizesViewport, this.elements.viewport);
 		
-		this.constrainPosition({ratio: true});
+		this.system.constrainPosition({ratio: true});
 		this.applyPosition();
 	}
 	
@@ -627,22 +610,22 @@ export default class {
 	}
 	
 	applyPosition() {
-		this.constructor.elements.imageWrapper.style.translate = `${-this.position.x * 100}% ${this.position.y * 100}%`;
-		this.constructor.elements.imageWrapper.style.transformOrigin = `${(0.5 + this.position.x) * 100}% ${(0.5 - this.position.y) * 100}%`;
+		this.elements.imageWrapper.style.translate = `${-this.position.x * 100}% ${this.position.y * 100}%`;
+		this.elements.imageWrapper.style.transformOrigin = `${(0.5 + this.position.x) * 100}% ${(0.5 - this.position.y) * 100}%`;
 		
-		this.constructor.readout.setPosition(this);
+		this.readout.setPosition(this);
 	}
 	
 	applyZoom() {
-		this.constructor.elements.imageWrapper.style.scale = `${this.zoom}`;
+		this.elements.imageWrapper.style.scale = `${this.zoom}`;
 		
-		this.constructor.readout.setZoom(this);
+		this.readout.setZoom(this);
 	}
 	
 	applyRotation() {
-		this.constructor.elements.imageWrapper.style.rotate = `${DEGREES[90] - this.rotation}rad`;
+		this.elements.imageWrapper.style.rotate = `${DEGREES[90] - this.rotation}rad`;
 		
-		this.constructor.readout.setRotation(this);
+		this.readout.setRotation(this);
 	}
 	
 	getNearestCorner() {
@@ -653,34 +636,16 @@ export default class {
 	}
 	
 	remove() {
-		for (const [element, type, listener] of this.#listeners) {
-			element.removeEventListener(type, listener);
-		}
-		
-		this.#listeners.length = 0;
-		
-		this.#resizeObserver?.disconnect();
-		
 		// triggers onReverseComplete which calls deleteTween
 		this.tween?.progress(0);
 		
-		this.#removeResolver();
-		
 		window.clearTimeout(this.#tweenUpdateId);
 		
-		this.tweenUpdate = Promise.resolve();
-		
-		this.constructor.target.hide();
-		
-		position = this.position;
-		rotation = this.rotation;
-		zoom = this.zoom;
-		_ratioViewport = this._ratioViewport;
-		_ratioImage = this._ratioImage;
+		this.target.hide();
 	}
 	
 	deleteTween() {
-		this.constructor.target.hide();
+		this.target.hide();
 		
 		this.tween.kill();
 		
@@ -705,11 +670,11 @@ export default class {
 					effects.position = true;
 				}
 				
-				this.constrainPosition(effects);
+				this.system.constrainPosition(effects);
 				this.applyPosition();
 				
 				if (!ignorePosition) {
-					this.constructor.target.set(target);
+					this.target.set(target);
 				}
 				
 				effects = {};
@@ -851,13 +816,13 @@ export default class {
 			this.tween.add(gsap.to(this.tween.data.target, {...TWEEN_DEFAULT, ...to, ...vars}), position);
 		}
 		
-		this.constructor.progress.reset();
+		this.progress.reset();
 		
 		return this.tween
 			.eventCallback('onUpdate', () => {
-				this.constructor.progress.set(this.tween.totalProgress());
+				this.progress.set(this.tween.totalProgress());
 			})
 			.eventCallback('onReverseComplete', () => this.deleteTween())
 			.play();
 	}
-}
+}();

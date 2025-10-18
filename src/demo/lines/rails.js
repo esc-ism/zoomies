@@ -1,5 +1,6 @@
-import Hideables from './copies';
+import elements from '@/demo/elements';
 
+import Hideables from './copies';
 import {Connection} from './lines';
 
 const getBackgroundImage = (() => {
@@ -32,13 +33,11 @@ class Rail extends Connection {
 }
 
 export default class extends Hideables {
-	constructor(count, demo, flipX, flipY, flipBoth) {
+	constructor(count, flipX, flipY, flipBoth) {
 		super();
 		
-		const container = demo.constructor.elements.rail;
-		
 		for (let i = 0; i < count; ++i) {
-			this[i] = new Rail(demo, flipX, flipY, flipBoth, container);
+			this[i] = new Rail(flipX, flipY, flipBoth, elements.rail);
 		}
 	}
 	

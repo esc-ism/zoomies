@@ -1,3 +1,6 @@
+import demo from '@/demo';
+import elements from '@/demo/elements';
+
 import Hideables from './copies';
 
 import {setLineStyle} from '../bounds';
@@ -14,7 +17,7 @@ class Tangent extends Line {
 		this.show();
 		
 		// overestimation of √(½imageWidth^2 + ½imageHeight^2)
-		super.setHeight(Math.max(1, this.demo.ratioImage) * 100 / this.demo.zoom);
+		super.setHeight(Math.max(1, demo.ratioImage) * 100 / demo.zoom);
 		
 		this.setRotation(rotation);
 		
@@ -23,13 +26,13 @@ class Tangent extends Line {
 }
 
 export default class extends Hideables {
-	constructor(count, demo, flipX, flipY, flipBoth) {
+	constructor(count, flipX, flipY, flipBoth) {
 		super();
 		
-		const container = demo.constructor.elements.tangents;
+		const container = elements.tangents;
 		
 		for (let i = 0; i < count; ++i) {
-			this[i] = new Tangent(demo, flipX, flipY, flipBoth, container);
+			this[i] = new Tangent(flipX, flipY, flipBoth, container);
 		}
 	}
 }

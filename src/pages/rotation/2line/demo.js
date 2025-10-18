@@ -1,7 +1,7 @@
 import Rails from '@/demo/lines/rails';
 import Demo from '../demo';
 
-import {getBound, getProgressedLine, getProgress} from '../shared';
+import {getBound, getProgress} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
@@ -70,7 +70,7 @@ export default class extends Demo {
 	}
 	
 	getZoomPoints() {
-		return getZoomPoints(this, this.getAllStartZooms());
+		return getZoomPoints(demo, this.getAllStartZooms());
 	}
 	
 	getSnappedZoom() {

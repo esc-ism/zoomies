@@ -1,5 +1,7 @@
 import {gsap} from 'gsap';
 
+import elements from '../elements';
+
 const getColour = (() => {
 	const low = {threshold: 0.15};
 	const high = {threshold: 0.05};
@@ -36,6 +38,8 @@ export default class {
 				this.element.style.opacity = `${values.opacity}`;
 				this.element.style.filter = `blur(${values.blur}px)`;
 			});
+		
+		elements.viewport.appendChild(this.element);
 	}
 	
 	reset() {

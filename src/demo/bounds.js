@@ -1,3 +1,4 @@
+import elements from '@/demo/elements';
 import Hideables from './lines/copies';
 import {Connection} from './lines/lines';
 
@@ -32,17 +33,15 @@ class BoundLines extends Hideables {
 export default class {
 	background = document.createElement('div');
 	
-	constructor(demo) {
-		const containers = demo.constructor.elements;
-		
+	constructor() {
 		this.background.style.height = this.background.style.width = '100%';
 		this.background.style.position = 'absolute';
 		this.background.style.backgroundColor = '#00000030';
 		
-		containers.boundLimit.appendChild(this.background);
+		elements.boundLimit.appendChild(this.background);
 		
-		this.line1D = new BoundLine(demo, false, false, false, containers.boundLine);
-		this.lines2D = new BoundLines(2, demo, false, false, true, containers.boundLine);
+		this.line1D = new BoundLine(false, false, false, elements.boundLine);
+		this.lines2D = new BoundLines(2, false, false, true, elements.boundLine);
 	}
 	
 	remove() {

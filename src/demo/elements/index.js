@@ -4,72 +4,107 @@ import {ID_WRAPPER, ID_WRAPPER_IMAGE, ID_IMAGE, ID_CROSSHAIR, ID_RESIZER_HORIZON
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 import crosshairImage from './crosshair';
 
-const wrapper = document.createElement('div');
-
-const paths = {wrapper: []};
-
-const getNode = (path, root = wrapper) => {
-	let node = root;
+const generate = ({parent, style, id, classList}) => {
+	const element = document.createElement('div');
 	
-	for (const index of path) {
-		node = node.children[index];
+	for (const [property, value] of Object.entries(style)) {
+		element.style[property] = value;
 	}
 	
-	return node;
-};
-
-const generate = (id, parentPath, style, element) => {
-	if (!element) {
-		element = document.createElement('div');
-		
-		for (const [property, value] of Object.entries(style)) {
-			element.style[property] = value;
-		}
+	if (id) {
+		element.id = id;
 	}
 	
-	const parent = getNode(parentPath);
+	if (classList) {
+		element.classList.add(...classList);
+	}
 	
-	paths[id] = [...parentPath, parent.children.length];
-	
-	parent.appendChild(element);
+	if (parent) {
+		parent.appendChild(element);
+	}
 	
 	return element;
 };
 
-wrapper.id = ID_WRAPPER;
+const elements = {
+	wrapper: generate({
+		id: ID_WRAPPER,
+		style: {
+			display: 'flex',
+			position: 'relative',
+			overflow: 'hidden',
+		},
+	}),
+};
 
-wrapper.style.display = 'flex';
-wrapper.style.position = 'relative';
-wrapper.style.overflow = 'hidden';
-
-generate('viewport', paths.wrapper, {
-	backgroundColor: 'black',
-	padding: '1px',
-	boxSizing: 'border-box',
-	position: 'relative',
-	overflow: 'hidden',
-	display: 'flex',
-	flexWrap: 'wrap',
-	placeContent: 'center center',
-	cursor: 'grab',
-	aspectRatio: '1',
-	touchAction: 'none',
+elements.viewport = generate({
+	parent: elements.wrapper,
+	style: {
+		backgroundColor: 'black',
+		padding: '1px',
+		boxSizing: 'border-box',
+		position: 'relative',
+		overflow: 'hidden',
+		display: 'flex',
+		flexWrap: 'wrap',
+		placeContent: 'center center',
+		cursor: 'grab',
+		aspectRatio: '1',
+		touchAction: 'none',
+	},
 });
 
-generate('imageWrapper', paths.viewport, {
-	aspectRatio: '1',
-	position: 'relative',
-}).id = ID_WRAPPER_IMAGE;
+elements.imageWrapper = generate({
+	id: ID_WRAPPER_IMAGE,
+	parent: elements.viewport,
+	style: {
+		aspectRatio: '1',
+		position: 'relative',
+	},
+});
 
-(() => {
-	const image = generate('image', paths.imageWrapper, {
+elements.image = generate({
+	parent: elements.imageWrapper,
+	id: ID_IMAGE,
+	style: {
 		padding: '2px',
 		boxSizing: 'border-box',
 		height: '100%',
 		width: '100%',
 		display: 'flex',
-	});
-	
+	},
+});
+
+elements.crosshair = elements.viewport.appendChild(crosshairImage);
+elements.crosshair.id = ID_CROSSHAIR;
+
+elements.resizerHorizontal = generate({
+	parent: elements.wrapper,
+	id: ID_RESIZER_HORIZONTAL,
+	classList: [CLASS_HIDE_VERTICAL],
+	style: {
+		right: 0,
+		height: '100%',
+		width: '20px',
+		'border-right': '1px solid white',
+		cursor: 'col-resize',
+	},
+});
+
+elements.resizerVertical = generate({
+	parent: elements.wrapper,
+	id: ID_RESIZER_VERTICAL,
+	classList: [CLASS_HIDE_HORIZONTAL],
+	style: {
+		bottom: 0,
+		width: '100%',
+		height: '20px',
+		'border-bottom': '1px solid white',
+		cursor: 'row-resize',
+	},
+});
+
+(() => {
 	const childContainer = document.createElement('div');
 	
 	childContainer.style.flexGrow = '1';
@@ -85,7 +120,6 @@ generate('imageWrapper', paths.viewport, {
 			backgroundImage: 'radial-gradient(circle, black, black 1.5px, transparent 0)',
 			backgroundSize: '18px 18px',
 			backgroundRepeat: 'round',
-			// backgroundColor: '#0000006f',
 		},
 		{
 			boxShadow: 'white 0 0 6px 1px',
@@ -104,45 +138,14 @@ generate('imageWrapper', paths.viewport, {
 		
 		return element;
 	}));
-	
-	image.appendChild(childContainer);
-	
-	image.id = ID_IMAGE;
+	elements.image.appendChild(childContainer);
 })();
 
-export const CONTAINER_BOUND_LIMIT = generate('boundLimit', paths.imageWrapper, {display: 'contents', pointerEvents: 'none'});
-export const CONTAINER_RAIL = generate('rail', paths.imageWrapper, {display: 'contents', pointerEvents: 'none'});
-export const CONTAINER_BOUND_LINE = generate('boundLine', paths.imageWrapper, {display: 'contents', pointerEvents: 'none'});
-export const CONTAINER_TANGENTS = generate('tangents', paths.imageWrapper, {display: 'contents', pointerEvents: 'none'});
+for (const name of ['boundLimit', 'rail', 'boundLine', 'tangents']) {
+	elements[name] = generate({
+		parent: elements.imageWrapper,
+		style: {display: 'contents', pointerEvents: 'none'},
+	});
+}
 
-export const CROSSHAIR = generate('crosshair', paths.viewport, {}, crosshairImage);
-
-CROSSHAIR.id = ID_CROSSHAIR;
-
-const RESIZER_HORIZONTAL = generate('resizerHorizontal', paths.wrapper, {
-	right: 0,
-	height: '100%',
-	width: '20px',
-	'border-right': '1px solid white',
-	cursor: 'col-resize',
-});
-
-RESIZER_HORIZONTAL.id = ID_RESIZER_HORIZONTAL;
-RESIZER_HORIZONTAL.classList.add(CLASS_HIDE_VERTICAL);
-
-const RESIZER_VERTICAL = generate('resizerVertical', paths.wrapper, {
-	bottom: 0,
-	width: '100%',
-	height: '20px',
-	'border-bottom': '1px solid white',
-	cursor: 'row-resize',
-});
-
-RESIZER_VERTICAL.id = ID_RESIZER_VERTICAL;
-RESIZER_VERTICAL.classList.add(CLASS_HIDE_HORIZONTAL);
-
-export default () => Object.entries(paths)
-	.reduce(
-		(elements, [id, path]) => ({...elements, [id]: getNode(path, wrapper)}),
-		{wrapper},
-	);
+export default elements;

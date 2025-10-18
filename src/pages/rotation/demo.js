@@ -1,4 +1,4 @@
-import Demo from '@/demo';
+import demo from '@/demo';
 import Tangents from '@/demo/lines/tangents';
 import Bounds from '@/demo/bounds';
 
@@ -22,9 +22,9 @@ export const getAllStartZooms = (rotation, viewport, image, radius = getCornerDi
 	];
 };
 
-export default class extends Demo {
-	bounds = new Bounds(this);
-	tangents = new Tangents(4, this, false, false, true);
+export default class {
+	bounds = new Bounds();
+	tangents = new Tangents(4, false, false, true);
 	
 	setBounds(bounds) {
 		this.bounds.set(...bounds);
@@ -37,8 +37,8 @@ export default class extends Demo {
 	updateSizesImage(doApply = true) {
 		super.updateSizesImage(false);
 		
-		this.cornerAngle = Math.atan(this.ratioImage);
-		this.cornerDistance = getCornerDistance(this.sizesImage);
+		this.cornerAngle = Math.atan(demo.ratioImage);
+		this.cornerDistance = getCornerDistance(demo.sizesImage);
 		
 		if (doApply) {
 			this.constrainPosition({ratio: true});
@@ -47,7 +47,7 @@ export default class extends Demo {
 	}
 	
 	getAllStartZooms() {
-		return getAllStartZooms(this.rotation, this.sizesViewport, this.sizesImage, this.cornerDistance, this.cornerAngle);
+		return getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage, this.cornerDistance, this.cornerAngle);
 	}
 	
 	applyZoomPoints() {
@@ -61,7 +61,7 @@ export default class extends Demo {
 	}
 	
 	setZoomPoints() {
-		this.zoomPoints = this.getZoomPoints(this.rotation, this.sizesViewport, this.sizesImage);
+		this.zoomPoints = this.getZoomPoints();
 		
 		this.setRails();
 	}
@@ -80,19 +80,17 @@ export default class extends Demo {
 		}
 		
 		if (fallthrough || position) {
-			this.position = this.getConstrainedPosition(this.position);
+			demo.position = this.getConstrainedPosition(demo.position);
 		}
 	}
 	
 	constrainZoom() {
-		this.zoom = this.getSnappedZoom(...this.zoomPoints, this.position);
+		demo.zoom = this.getSnappedZoom(...this.zoomPoints, demo.position);
 		
 		this.applyZoomPoints();
 	}
 	
 	remove() {
-		super.remove();
-		
 		this.bounds.remove();
 		this.rails.remove();
 		this.tangents.remove();

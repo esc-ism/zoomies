@@ -1,15 +1,13 @@
-import Demo from '@/demo';
-import Bounds from '@/demo/bounds';
-import tangents from '@/demo/lines/tangents';
 import {DEGREES} from '@/shared';
+import demo from '@/demo';
+import Bounds from '@/demo/bounds';
+import Tangents from '@/demo/lines/tangents';
 
-export default class extends Demo {
-	bounds = new Bounds(this);
-	tangents = new tangents(2, this, true, true, true);
+export default class {
+	bounds = new Bounds();
+	tangents = new Tangents(2, true, true, true);
 	
 	constructor() {
-		super();
-		
 		this.updateBounds();
 	}
 	
@@ -19,8 +17,8 @@ export default class extends Demo {
 	
 	constrainPosition({position, zoom, ratio, ratioImage}) {
 		if (position) {
-			this.position.x = Math.max(-0.5, Math.min(0.5, this.position.x));
-			this.position.y = Math.max(-0.5, Math.min(0.5, this.position.y));
+			demo.position.x = Math.max(-0.5, Math.min(0.5, demo.position.x));
+			demo.position.y = Math.max(-0.5, Math.min(0.5, demo.position.y));
 		}
 		
 		if (zoom || ratio) {
@@ -38,8 +36,6 @@ export default class extends Demo {
 	constrainZoom() {}
 	
 	remove() {
-		super.remove();
-		
 		this.bounds.remove();
 		this.tangents.remove();
 	}

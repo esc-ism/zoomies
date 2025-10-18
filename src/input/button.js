@@ -28,14 +28,13 @@ export default (child, isMouse) => {
 	button.style.height = '100%';
 	button.style.aspectRatio = '1 / 1';
 	button.style.width = 'auto';
-	button.style.outline = '1px solid currentcolor';
-	button.style.boxSizing = 'border-box';
 	button.style.display = 'flex';
 	button.style.justifyContent = 'center';
 	button.style.alignItems = 'center';
 	button.style.padding = '0';
 	button.style.color = 'inherit';
-	button.style.border = '2px ridge #222';
+	button.style.border = 'none';
+	button.style.borderRight = '1px solid currentcolor';
 	
 	button.setAttribute('title', `${isMouse ? 'Mouse' : 'Touchscreen'} controls`);
 	

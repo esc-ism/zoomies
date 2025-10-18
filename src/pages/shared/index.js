@@ -1,25 +1,11 @@
-import {getIdGetter} from '@/shared/css';
+import demo from '@/demo';
 
-import {generateWhenReady as generateCode} from '../code';
-import touchIcon from '../input/touch';
-import mouseIcon from '../input/mouse';
+import generateCode from '../code';
 
 import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
 	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
 } from '../consts';
-import {InputMethod} from '@/consts';
-
-const getCodeId = getIdGetter('text', 'code');
-
-let count = 0;
-let demo;
-
-export const registerDemo = (newDemo) => {
-	demo = newDemo;
-	
-	count = 0;
-};
 
 const addContent = (parent, content) => {
 	if (typeof content === 'object') {
@@ -80,18 +66,17 @@ const getNode = (description) => {
 	return node;
 };
 
-export const getCode = (statements) => {
-	const id = getCodeId(count++);
-	
+export const getCode = (statements, page) => {
 	return {
 		content: {
 			tag: 'div',
 			content: {
 				tag: 'code',
 				content: '',
-				id,
 				callback: (node) => {
-					generateCode(node, statements);
+					page.onLoad(() => {
+						generateCode(node, statements);
+					});
 				},
 			},
 		},
@@ -106,13 +91,14 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 		tag: 'span',
 		content: text,
 		classList: [CLASS_BUTTON],
-		onpointerover: () => demo.init().then(async () => {
-			const param = await getParam();
+		onpointerover: () => {
+			const param = getParam();
 			
 			demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
-		}),
-		onpointerout: () => demo.init().then(() => {
-			if (!demo.tween || demo.isRemoved) {
+		},
+		onpointerout: () => {
+			// todo do you need to require registerSystem and check if demo.system === system ?
+			if (!demo.tween) {
 				return;
 			}
 			
@@ -126,13 +112,13 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 				demo.tween.vars.onUpdate();
 				demo.tween.vars.onReverseComplete();
 			}
-		}),
-		onclick: () => demo.init().then(() => {
+		},
+		onclick: () => {
 			if (!demo.tween) {
 				return;
 			}
 			
-			demo.constructor.progress.complete();
+			demo.progress.complete();
 			
 			demo.tween.progress(1);
 			
@@ -140,66 +126,10 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 			
 			// hacky solution to run after final tween update
 			demo.tweenUpdate.then(() => {
-				demo.constructor.target.hide();
+				demo.target.hide();
 			});
-		}),
+		},
 	};
-};
-
-const getFooter = () => {
-	const container = document.createElement('div');
-	
-	container.style.width = '100%';
-	container.style.height = '3em';
-	container.style.display = 'flex';
-	container.style.boxSizing = 'border-box';
-	container.style.position = 'relative';
-	container.style.alignItems = 'center';
-	container.style.borderBottom = '1px solid currentcolor';
-	
-	const email = document.createElement('a');
-	
-	email.innerText = 'callumtylerlatham@gmail.com';
-	email.href = 'mailto:callumtylerlatham@gmail.com';
-	
-	email.style.opacity = '0.8';
-	email.style.flexGrow = '1';
-	email.style.textAlign = 'center';
-	email.style.padding = '0 0.5em';
-	email.style.overflow = 'hidden';
-	email.style.textOverflow = 'ellipsis';
-	
-	const buttonContainer = document.createElement('div');
-	
-	buttonContainer.style.height = '100%';
-	buttonContainer.style.display = 'flex';
-	
-	const update = () => {
-		const [on, off] = InputMethod.isMouse ? [mouseIcon, touchIcon] : [touchIcon, mouseIcon];
-		
-		on.disabled = true;
-		on.style.removeProperty('cursor');
-		
-		off.disabled = false;
-		off.style.cursor = 'pointer';
-	};
-	
-	InputMethod.addListener(update);
-	
-	update();
-	
-	mouseIcon.addEventListener('click', () => {
-		InputMethod.isMouse = true;
-	});
-	
-	touchIcon.addEventListener('click', () => {
-		InputMethod.isMouse = false;
-	});
-	
-	buttonContainer.append(touchIcon, mouseIcon);
-	container.append(buttonContainer, email);
-	
-	return container;
 };
 
 const getPIncluder = (() => {
@@ -215,11 +145,12 @@ export const getText = (...children) => {
 	const container = document.createElement('div');
 	
 	wrapper.style.overflow = 'auto';
-	wrapper.style.scrollbarColor = 'var(--color) transparent';
-	wrapper.style.flexGrow = '1';
 	wrapper.style.lineHeight = '1.2';
 	// I guess chrome gives outlines to scroll elements
 	wrapper.style.outline = 'none';
+	wrapper.style.minWidth = '100%';
+	wrapper.style.scrollSnapAlign = 'start';
+	wrapper.style.scrollbarGutter = 'stable';
 	
 	container.style.padding = '0 20px';
 	container.style.boxSizing = 'border-box';
@@ -229,14 +160,6 @@ export const getText = (...children) => {
 	
 	container.append(getPIncluder(), ...children.map(getNode), getPIncluder());
 	wrapper.append(container);
-	
-	window.setTimeout(() => {
-		const footer = getFooter();
-		
-		wrapper.insertAdjacentElement('afterbegin', footer);
-		
-		wrapper.scrollTop = footer.offsetHeight;
-	}, 0);
 	
 	return wrapper;
 };

@@ -1,3 +1,5 @@
+import elements from '@/demo/elements';
+
 import Demo from '../rotation/3line/demo';
 
 export default class extends Demo {
@@ -14,7 +16,7 @@ export default class extends Demo {
 		this.rails[4].deactivate(false);
 		this.rails[5].deactivate(false);
 		
-		this.constructor.elements.viewport.style.pointerEvents = 'none';
+		elements.viewport.style.pointerEvents = 'none';
 	}
 	
 	// todo CSS transition from one rail state to the next
@@ -38,6 +40,6 @@ export default class extends Demo {
 	remove() {
 		super.remove();
 		
-		this.constructor.elements.viewport.style.removeProperty('pointer-events');
+		elements.viewport.style.removeProperty('pointer-events');
 	}
 }

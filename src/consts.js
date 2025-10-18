@@ -1,6 +1,6 @@
 import {getId} from './shared/css';
 
-export const ID_WRAPPER = getId('wrapper');
+export const CLASS_WRAPPER = getId('wrapper');
 
 export const InputMethod = new class {
 	#id = 'isMouse';

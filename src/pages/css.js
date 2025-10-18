@@ -4,6 +4,7 @@ import {
 	CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION,
 	CLASS_MATH, CLASS_MATH_EQUATION, CLASS_FLASH_CONTAINER,
 	CLASS_MATH_ASSERTION,
+	CLASS_ACTIVE,
 } from './consts';
 
 addRule(`.${CLASS_FLASH_CONTAINER}`, {
@@ -90,3 +91,8 @@ addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {
 });
 
 addRule(`.${CLASS_WRAPPER} svg`, {filter: 'drop-shadow(0 0 1px black)'});
+
+addRule(`.${CLASS_WRAPPER}:not(.${CLASS_ACTIVE})`, {
+	'pointer-events': 'none',
+	filter: 'blur(1px)',
+});

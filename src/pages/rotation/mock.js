@@ -30,9 +30,9 @@ const getDimensions = (ratio, {width, height}) => {
 	};
 };
 
-export const getVarGetter = (getZoomPoints, demo, rotation = DEGREES[90], ratio = 1) => () => demo.init().then(() => {
+export const getVarGetter = (getZoomPoints, demo, rotation = DEGREES[90], ratio = 1) => () => {
 	const mockDemo = getRelevantDemo({...demo, rotation, sizesImage: getDimensions(ratio, demo.sizesViewport)});
 	const zoomPoints = getZoomPoints(mockDemo);
 	
 	return {first: zoomPoints[2], second: zoomPoints[3], zoomPoints, rotation, ratio, ratioImage: mockDemo.ratioImage};
-});
+};
