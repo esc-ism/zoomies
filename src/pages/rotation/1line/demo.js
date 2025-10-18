@@ -1,3 +1,4 @@
+import demo from '@/demo';
 import Demo, {getAllStartZooms} from '../demo';
 import Rails from '@/demo/lines/rails';
 
@@ -67,7 +68,7 @@ const getRailProgresses = [
 ];
 
 export default class extends Demo {
-	rails = new Rails(2, this, false, false, true);
+	rails = new Rails(2, false, false, true);
 	
 	setRails() {
 		this.rails.set(
@@ -82,9 +83,9 @@ export default class extends Demo {
 	
 	getPositionConstrainer() {
 		return getConstrainerFromPoints(
-			getBound(this.zoom, this.zoomPoints[0], true),
-			getBound(this.zoom, this.zoomPoints[1], false),
-			this.ratioImage,
+			getBound(demo.zoom, this.zoomPoints[0], true),
+			getBound(demo.zoom, this.zoomPoints[1], false),
+			demo.ratioImage,
 		);
 	}
 	
@@ -93,6 +94,6 @@ export default class extends Demo {
 	}
 	
 	getSnappedZoom() {
-		return getSnappedZoom(...this.zoomPoints, this.position);
+		return getSnappedZoom(...this.zoomPoints, demo.position);
 	}
 }

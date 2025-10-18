@@ -98,7 +98,7 @@ const getRails = (second, third) => {
 export default class extends Demo {
 	static getZoomPoints = getZoomPoints;
 	
-	rails = new Rails(6, this, false, false, true);
+	rails = new Rails(6, false, false, true);
 	
 	setRails() {
 		this.rails.set(
@@ -109,16 +109,16 @@ export default class extends Demo {
 	
 	setRailsProgress() {
 		this.rails.setProgress(
-			...getRailProgress(this.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2]),
-			...getRailProgress(this.zoom, this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5]),
+			...getRailProgress(demo.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2]),
+			...getRailProgress(demo.zoom, this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5]),
 		);
 	}
 	
 	getPositionConstrainer() {
 		return getConstrainerFromPoints(
-			this.bound0 = getBound(this.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2]),
-			this.bound1 = getBound(this.zoom, this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5]),
-			this.ratioImage,
+			this.bound0 = getBound(demo.zoom, this.zoomPoints[0], this.zoomPoints[1], this.zoomPoints[2]),
+			this.bound1 = getBound(demo.zoom, this.zoomPoints[3], this.zoomPoints[4], this.zoomPoints[5]),
+			demo.ratioImage,
 		);
 	}
 	

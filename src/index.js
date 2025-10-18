@@ -73,47 +73,31 @@ const textWrapper = document.createElement('div');
 
 textWrapper.style.display = 'flex';
 textWrapper.style.overflowY = 'auto';
-textWrapper.style.overflowX = 'hidden';
-textWrapper.style.scrollbarWidth = 'none';
 textWrapper.style.flexGrow = '1';
 textWrapper.style.flexDirection = 'column';
 textWrapper.style.height = '100vh';
 
+const hideHeader = () => {
+	const {scrollTop} = textWrapper;
+	
+	window.setTimeout(() => {
+		textWrapper.scrollTop = Math.min(scrollTop, header.offsetHeight);
+	}, 0);
+};
+
 window.setTimeout(() => {
 	textWrapper.scrollTop = header.offsetHeight;
-	
-	let isListening = false;
-	
-	textWrapper.addEventListener('scroll', () => {
-		if (textWrapper.scrollTop < header.offsetHeight - 1) {
-			if (!isListening) {
-				for (const page of pages) {
-					page.text.style.setProperty('overflow-y', 'clip');
-				}
-				
-				isListening = true;
-			}
-			
-			return;
-		}
-		
-		if (isListening) {
-			for (const page of pages) {
-				page.text.style.removeProperty('overflow-y');
-			}
-			
-			isListening = false;
-		}
-	});
 }, 0);
 
 const textContainer = document.createElement('div');
 
 textContainer.style.display = 'flex';
-textContainer.style.minHeight = '100vh';
+textContainer.style.minHeight = 'fit-content';
 textContainer.style.scrollSnapType = 'x mandatory';
 textContainer.style.scrollSnapStop = 'always';
 textContainer.style.overflowX = 'auto';
+textContainer.style.overflowY = 'clip';
+textContainer.style.scrollbarWidth = 'none';
 
 textWrapper.append(header, textContainer);
 wrapper.append(demo.element, textWrapper);
@@ -128,6 +112,8 @@ demo.init().then(() => {
 	currentPage.start?.();
 	
 	const setPage = (index, page, pushState = true) => {
+		hideHeader();
+		
 		currentPage.text.classList.remove(CLASS_ACTIVE);
 		currentPage.end?.();
 		demo.system.remove();
@@ -168,7 +154,8 @@ demo.init().then(() => {
 		observer.observe(page.text);
 	}
 	
-	currentPage.text.focus();
+	currentPage.text.scrollIntoView();
+	hideHeader();
 	
 	window.addEventListener('popstate', (event) => {
 		if (typeof event.state?.index !== 'number') {
@@ -178,5 +165,20 @@ demo.init().then(() => {
 		setPage(event.state.index, pages[event.state.index], false);
 		
 		event.preventDefault();
+	});
+	
+	// Ensure every arrow key press is registered by scroll elements
+	window.addEventListener('keydown', (event) => {
+		if (event.ctrlKey || event.altKey || event.shiftKey) {
+			return;
+		}
+		
+		switch (event.key) {
+			case 'ArrowUp':
+			case 'ArrowDown':
+			case 'ArrowLeft':
+			case 'ArrowRight':
+				textContainer.focus();
+		}
 	});
 });

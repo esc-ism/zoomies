@@ -253,7 +253,6 @@ export default new class {
 				}
 				
 				if (event.ctrlKey) {
-					debugger;
 					this.listeners.resizeImage(event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] / -1000);
 					
 					return;
@@ -575,14 +574,14 @@ export default new class {
 		this.ratio = this.ratioViewport / this.ratioImage;
 		this.ratioInverse = 1 / this.ratio;
 		
-		this.hooks.ratioChange.emit();
-		
 		this.elements.imageWrapper.style.height = `${Math.min(1, this.ratio) * 100}%`;
 		this.elements.imageWrapper.style.width = `${Math.min(1, this.ratioInverse) * 100}%`;
 		
 		this.setDimensions(this.sizesImage, this.elements.imageWrapper);
 		
 		this.readout.setRatio(this);
+		
+		this.hooks.ratioChange.emit();
 		
 		if (doApply) {
 			this.system.constrainPosition({ratio: true, ratioImage: true});
@@ -642,6 +641,10 @@ export default new class {
 		window.clearTimeout(this.#tweenUpdateId);
 		
 		this.target.hide();
+		
+		for (const hook of Object.values(this.hooks)) {
+			hook.clear();
+		}
 	}
 	
 	deleteTween() {

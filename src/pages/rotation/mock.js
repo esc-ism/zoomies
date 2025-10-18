@@ -1,5 +1,7 @@
 import {DEGREES} from '@/shared';
 
+import demo from '@/demo';
+
 const getRelevantDemo = ({
 	rotation,
 	sizesViewport,
@@ -30,7 +32,7 @@ const getDimensions = (ratio, {width, height}) => {
 	};
 };
 
-export const getVarGetter = (getZoomPoints, demo, rotation = DEGREES[90], ratio = 1) => () => {
+export const getVarGetter = (getZoomPoints, rotation = DEGREES[90], ratio = 1) => () => {
 	const mockDemo = getRelevantDemo({...demo, rotation, sizesImage: getDimensions(ratio, demo.sizesViewport)});
 	const zoomPoints = getZoomPoints(mockDemo);
 	

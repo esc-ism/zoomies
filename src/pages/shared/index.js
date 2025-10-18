@@ -66,7 +66,7 @@ const getNode = (description) => {
 	return node;
 };
 
-export const getCode = (statements, page) => {
+export const getCode = (callbacks, statements) => {
 	return {
 		content: {
 			tag: 'div',
@@ -74,8 +74,15 @@ export const getCode = (statements, page) => {
 				tag: 'code',
 				content: '',
 				callback: (node) => {
-					page.onLoad(() => {
-						generateCode(node, statements);
+					callbacks.push({
+						start: generateCode.bind(null, node, statements),
+						end: () => {
+							node.previousSibling.remove();
+							
+							while (node.firstChild) {
+								node.firstChild.remove();
+							}
+						},
 					});
 				},
 			},
@@ -144,17 +151,14 @@ export const getText = (...children) => {
 	const wrapper = document.createElement('div');
 	const container = document.createElement('div');
 	
-	wrapper.style.overflow = 'auto';
 	wrapper.style.lineHeight = '1.2';
 	// I guess chrome gives outlines to scroll elements
 	wrapper.style.outline = 'none';
 	wrapper.style.minWidth = '100%';
 	wrapper.style.scrollSnapAlign = 'start';
-	wrapper.style.scrollbarGutter = 'stable';
 	
 	container.style.padding = '0 20px';
 	container.style.boxSizing = 'border-box';
-	container.style.minHeight = '100%';
 	
 	wrapper.classList.add(CLASS_WRAPPER);
 	

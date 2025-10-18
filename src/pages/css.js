@@ -72,8 +72,6 @@ addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}:hover`, {
 	color: 'black',
 });
 
-addRule(`.${CLASS_WRAPPER} a`, {color: '#badfdf'});
-
 addRule([`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::before`, `.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::after`], {
 	display: 'block',
 	content: '" "',
@@ -95,4 +93,10 @@ addRule(`.${CLASS_WRAPPER} svg`, {filter: 'drop-shadow(0 0 1px black)'});
 addRule(`.${CLASS_WRAPPER}:not(.${CLASS_ACTIVE})`, {
 	'pointer-events': 'none',
 	filter: 'blur(1px)',
+	height: '1px',
+});
+
+addRule(`.${CLASS_WRAPPER}.${CLASS_ACTIVE}`, {
+	height: 'fit-content',
+	'min-height': '100vh',
 });

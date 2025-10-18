@@ -12,8 +12,9 @@ addRule(':root', {
 	'background-color': 'var(--background)',
 	color: 'var(--color)',
 	'scrollbar-color': 'var(--color) transparent',
-	
 });
+
+addRule('a', {color: '#badfdf'});
 
 addRule(`.${CLASS_WRAPPER}`, {
 	width: '100%',

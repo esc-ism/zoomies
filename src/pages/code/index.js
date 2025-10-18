@@ -16,6 +16,14 @@ let globalScope;
 let functions;
 const visuals = [];
 
+export const cleanup = () => {
+	for (const visual of visuals) {
+		visual();
+	}
+	
+	visuals.length = 0;
+};
+
 const visualClasses = {
 	Line: class extends Line {
 		static template = Line.template.cloneNode();
@@ -263,7 +271,7 @@ const getCsvs = (statement, scope, meta, indent, property = 'and') => {
 };
 
 const getLine = ({value: length, doCenter = false, isPercent = true}, rotation) => {
-	const line = new visualClasses.Line(demo, false, false, doCenter);
+	const line = new visualClasses.Line(false, false, doCenter);
 	
 	line.setPosition({x: 0, y: 0});
 	
@@ -297,12 +305,10 @@ const visualisers = {
 		demo.zoom = scope[id].value;
 		demo.applyZoom();
 		
-		return (isRemoval = false) => {
+		return () => {
 			demo.zoom = zoom;
 			
-			if (!isRemoval) {
-				demo.applyZoom();
-			}
+			demo.applyZoom();
 		};
 	},
 	x: (scope, id) => getLine(scope[id], 0),
@@ -385,8 +391,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 	}
 	
 	const doShowVisuals = id && 'type' in scope[id] && typeof scope[id].value !== 'undefined';
-	const visuals = [];
-	let hovered = [];
+	const hovered = [];
 	
 	if (doShowVisuals) {
 		element.style.color = '#9fd49f';
@@ -400,6 +405,8 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 		const ids = [id];
 		
 		element.classList.add(CLASS_NAMES.hovered);
+		
+		cleanup();
 		
 		if (isVar) {
 			const data = scope[id];
@@ -429,18 +436,9 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 			source.classList.remove(CLASS_NAMES.hovered);
 		}
 		
-		for (const visual of visuals) {
-			visual();
-		}
+		cleanup();
 		
-		visuals.length = 0;
 		hovered.length = 0;
-	});
-	
-	demo.removed.then(() => {
-		for (const visual of visuals) {
-			visual(true);
-		}
 	});
 	
 	return true;

@@ -1,3 +1,4 @@
+import demo from '@/demo';
 import {CORNERS} from '@/pages/consts';
 import Demo from '../2line/demo';
 import {getLine, getFlipped, getM, isAbove as _isAbove} from '../shared';
@@ -45,10 +46,10 @@ export const getSnappedZoom = (first0, second0, first1, second1, position) => {
 
 export default class extends Demo {
 	getZoomPoints() {
-		return getZoomPoints(this, this.getAllStartZooms());
+		return getZoomPoints(demo, this.getAllStartZooms());
 	}
 	
 	getSnappedZoom() {
-		return getSnappedZoom(...this.zoomPoints, this.position);
+		return getSnappedZoom(...this.zoomPoints, demo.position);
 	}
 }

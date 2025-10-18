@@ -24,7 +24,6 @@ const tween = async (stop) => {
 	
 	while (!doStop) {
 		const {zoomPoints, rotation, ratio} = getVarGetter(
-			demo,
 			getRandomRotation(),
 			getRandomRatio(),
 		)();

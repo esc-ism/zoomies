@@ -26,6 +26,14 @@ export default class {
 	bounds = new Bounds();
 	tangents = new Tangents(4, false, false, true);
 	
+	constructor() {
+		demo.hooks.ratioChange.add(() => {
+			demo.cornerAngle = Math.atan(demo.ratioImage);
+			
+			demo.cornerDistance = getCornerDistance(demo.sizesImage);
+		});
+	}
+	
 	setBounds(bounds) {
 		this.bounds.set(...bounds);
 	}
@@ -34,20 +42,8 @@ export default class {
 		this.tangents.set(...tangents);
 	}
 	
-	updateSizesImage(doApply = true) {
-		super.updateSizesImage(false);
-		
-		this.cornerAngle = Math.atan(demo.ratioImage);
-		this.cornerDistance = getCornerDistance(demo.sizesImage);
-		
-		if (doApply) {
-			this.constrainPosition({ratio: true});
-			this.applyPosition();
-		}
-	}
-	
 	getAllStartZooms() {
-		return getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage, this.cornerDistance, this.cornerAngle);
+		return getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage, demo.cornerDistance, demo.cornerAngle);
 	}
 	
 	applyZoomPoints() {

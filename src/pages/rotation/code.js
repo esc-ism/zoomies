@@ -303,6 +303,46 @@ export const MULTI_LINE = [
 		'',
 		{op: 'return', and: {op: 'array', and: ['angleSide', 'angleBase']}},
 	]},
+	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['zoom', 'y'], and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
+			{op: '/', and: [
+				'viewportSize',
+				{op: '*', and: [
+					{op: 'cos', and: 'progressAngle'},
+					{op: 'abs', and: {
+						op: '/', and: ['½imageWidth', {op: 'cos', and: 'cornerAngle'}],
+					}},
+				]},
+			]},
+			{op: '/', and: [
+				{op: '-', and: [
+					'½imageHeight',
+					{op: '*', and: ['½imageWidth', {op: 'tan', and: 'cornerAngle'}]},
+				]},
+				'imageHeight',
+			]},
+		]}},
+	]},
+	{op: 'func', id: 'getXIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['zoom', 'x'], and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
+			{op: '/', and: [
+				'viewportSize',
+				{op: '*', and: [
+					{op: 'cos', and: 'progressAngle'},
+					{op: 'abs', and: {
+						op: '/', and: ['½imageHeight', {op: 'cos', and: 'cornerAngle'}],
+					}},
+				]},
+			]},
+			{op: '/', and: [
+				{op: '-', and: [
+					'½imageWidth',
+					{op: '*', and: ['½imageHeight', {op: 'tan', and: 'cornerAngle'}]},
+				]},
+				'imageWidth',
+			]},
+		]}},
+	]},
 ];
 
 export const DOUBLE_LINE = [

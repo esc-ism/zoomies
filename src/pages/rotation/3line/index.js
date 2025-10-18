@@ -1,12 +1,15 @@
+import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
 import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
-import {register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, registerDemo} from '../../shared';
+import {cleanup, register as registerFunctions} from '../../code';
+import {getText, getCode, getButton} from '../../shared';
 
-import Demo from './demo';
+import System from './demo';
 import {xmlns} from '@/pages/shared/svg';
 import {CLASS_MATH} from '@/pages/consts';
+
+const code = [];
 
 const functions = [
 	...SHARED_FUNCTIONS,
@@ -123,69 +126,56 @@ const functions = [
 			{op: '+', and: [{op: '*', and: ['firstEndY', 'mult']}, 'offsetY', 'secondY']},
 		]}},
 	]},
-	{op: 'func', id: 'getYIntersect', args: ['cornerAngle'], type: 'y', and: [
-		{op: 'return', and: {
-			op: '/', and: [
-				{op: '-', and: [
-					'½imageHeight',
-					{op: '*', and: ['½imageWidth', {op: 'tan', and: 'cornerAngle'}]},
-				]},
-				'imageHeight',
-			],
-		}},
-	]},
-	{op: 'func', id: 'getXIntersect', args: ['cornerAngle'], type: 'x', and: [
-		{op: 'return', and: {
-			op: '/', and: [
-				{op: '-', and: [
-					'½imageWidth',
-					{op: '*', and: ['½imageHeight', {op: 'tan', and: 'cornerAngle'}]},
-				]},
-				'imageWidth',
-			],
-		}},
-	]},
-	{op: 'func', id: 'getAxisIntersects', args: ['isEvenQuadrant', 'quadrantAngle'], type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
+	{op: 'func', id: 'getAxisIntersects', args: ['isEvenQuadrant', 'quadrantAngle'], type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [2, 1, 5, 4], and: [
 		{op: '=', id: ['angleSide', 'angleBase'], and: {
 			op: 'call', id: 'getProgressAngles', and: ['quadrantAngle'],
 		}},
 		'',
 		{op: 'if', and: [
-			{op: '>=', and: ['isEvenQuadrant', '¼π']},
-			{op: 'return', and: {op: 'array', multiline: true, and: [
-				0,
-				{op: 'call', id: 'getYIntersect', and: [
-					{op: '+', and: ['quadrantAngle', 'angleSide']},
-				]},
-				0,
-				{op: 'call', id: 'getYIntersect', and: [
-					{op: '-', and: ['½π', 'quadrantAngle', 'angleBase']},
-				]},
+			{op: '>=', and: ['quadrantAngle', '¼π']},
+			{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideY'], and: {op: 'call', id: 'getYIntersect', and: [
+				'½viewportWidth',
+				{op: '+', and: ['quadrantAngle', 'angleSide']},
+				'angleSide',
+			]}},
+			{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseY'], and: {op: 'call', id: 'getYIntersect', and: [
+				'½viewportHeight',
+				{op: '-', and: ['½π', 'quadrantAngle', 'angleBase']},
+				'angleBase',
+			]}},
+			'',
+			{op: 'return', and: {op: 'array', multiline: 2, and: [
+				'axisIntersectSideZoom', 0, 'axisIntersectSideY',
+				'axisIntersectBaseZoom', 0, 'axisIntersectBaseY',
 			]}},
 		]},
 		'',
-		{op: '=', id: 'axisIntersectSideX', and: {
+		{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideX'], and: {
 			op: 'call', id: 'getXIntersect', and: [
+				'½viewportWidth',
 				{op: '-', and: ['½π', 'quadrantAngle', 'angleSide']},
+				'angleSide',
 			],
 		}},
-		{op: '=', id: 'axisIntersectBaseX', and: {
+		{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseX'], and: {
 			op: 'call', id: 'getXIntersect', and: [
+				'½viewportHeight',
 				{op: '+', and: ['quadrantAngle', 'angleBase']},
+				'angleBase',
 			],
 		}},
 		'',
 		{op: 'if', and: [
 			'isEvenQuadrant',
 			{op: 'return', and: {op: 'array', multiline: 2, and: [
-				{op: '-', and: 'axisIntersectSideX'}, 0,
-				'axisIntersectBaseX', 0,
+				'axisIntersectSideZoom', {op: '-', and: 'axisIntersectSideX'}, 0,
+				'axisIntersectBaseZoom', 'axisIntersectBaseX', 0,
 			]}},
 		]},
 		'',
 		{op: 'return', and: {op: 'array', multiline: 2, and: [
-			'axisIntersectSideX', 0,
-			{op: '-', and: 'axisIntersectBaseX'}, 0,
+			'axisIntersectSideZoom', 'axisIntersectSideX', 0,
+			'axisIntersectBaseZoom', {op: '-', and: 'axisIntersectBaseX'}, 0,
 		]}},
 	]},
 	{op: 'func', id: 'getDoFlip', args: [
@@ -343,8 +333,8 @@ const functions = [
 		'',
 		{op: '=', id: ['thirdZoomFlipped', 'thirdXFlipped', 'thirdYFlipped'], and: {
 			op: 'call', id: 'getIntersection', and: [
-				'secondZoom', 'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
-				'thirdX', 'thirdY', 'cornerX', 0.5,
+				'thirdZoom', 'thirdX', 'thirdY', 'cornerX', 0.5,
+				'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
 			],
 		}},
 		'',
@@ -359,8 +349,8 @@ const functions = [
 		{op: 'return', and: {op: 'array', and: [
 			{op: '...', and: {
 				op: 'call', id: 'getIntersection', and: [
+					'thirdZoom', 'thirdX', 'thirdY', 'cornerX', 0.5,
 					'firstZoom', 0, 0, 'firstEndX', 'firstEndY',
-					'thirdX', 'thirdY', 'cornerX', 0.5,
 				],
 			}},
 			'firstEndX', 'firstEndY',
@@ -386,8 +376,8 @@ const functions = [
 		}},
 		'',
 		{op: '=', multiline: 3, id: [
-			'axisIntersectXSide', 'axisIntersectYSide',
-			'axisIntersectXBase', 'axisIntersectYBase',
+			'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide',
+			'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase',
 		], and: {
 			op: 'call', id: 'getAxisIntersects', and: ['isEvenQuadrant', 'quadrantAngle'],
 		}},
@@ -419,14 +409,14 @@ const functions = [
 		'',
 		{op: '=', id: ['thirdZoomSide', 'thirdXSide', 'thirdYSide'], and: {
 			op: 'call', id: 'getIntersection', and: [
-				'secondZoom', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
-				'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+				'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+				'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
 			],
 		}},
 		{op: '=', id: ['thirdZoomBase', 'thirdXBase', 'thirdYBase'], and: {
 			op: 'call', id: 'getIntersection', and: [
-				'secondZoom', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
-				'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
+				'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
+				'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
 			],
 		}},
 		'',
@@ -443,14 +433,14 @@ const functions = [
 				{op: 'return', and: {op: 'array', multiline: [1, 1, 5], and: [
 					{op: '...', and: {
 						op: 'call', id: 'getIntersection', and: [
-							'firstZoom', 0, 0, 'firstEndXSide', 'firstEndYSide',
-							'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+							'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+							0, 0, 'firstEndXSide', 'firstEndYSide',
 						],
 					}},
 					{op: '...', and: {
 						op: 'call', id: 'getIntersection', and: [
-							'firstZoom', 0, 0, 'firstEndXBase', 'firstEndYBase',
-							'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
+							'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
+							0, 0, 'firstEndXBase', 'firstEndYBase',
 						],
 					}},
 					'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXBase', 'firstEndYBase',
@@ -460,14 +450,14 @@ const functions = [
 			{op: 'return', and: {op: 'array', multiline: [1, 1, 5, 2, 5, 5], and: [
 				{op: '...', and: {
 					op: 'call', id: 'getIntersection', multiline: 5, and: [
-						'secondZoom', 'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
-						'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+						'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+						'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
 					],
 				}},
 				{op: '...', and: {
 					op: 'call', id: 'getIntersection', multiline: 5, and: [
-						'secondZoom', 'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
-						'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
+						'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
+						'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
 					],
 				}},
 				'firstZoom', 'firstEndXSideFlipped', 'firstEndYSideFlipped', 'firstEndXBaseFlipped', 'firstEndYBaseFlipped',
@@ -796,180 +786,192 @@ const functions = [
 	]},
 ];
 
-export default (wrapper) => {
-	const demo = new Demo();
-	
-	registerDemo(demo);
-	registerFunctions(demo, functions);
-	
-	wrapper.append(
-		demo.constructor.element,
-		getText(
-			{
-				tag: 'h1',
-				content: 'Tripled Down',
-				style: {textAlign: 'center'},
-			},
-			'So single-line rails don\'t work too well, double-line has issues... is third line the charm?',
-			[
-				'The prior system can be fixed by adding a "connecting rail" between the others.',
-				'This rail can be used to ensure the preferred origin rail direction is usable.',
-				'Like in the prior system, origin rail start zoom depends on when the first pair of image corners first contacts the viewport rim.',
-				'Connecting rail start zoom is similar, but depends on the remaining pair of image corners.',
-				'Connecting rails are directed at viewport corners to keep both image corners visible.',
-			],
-			[
-				'It\'s possible for a lock rail to intersect with its origin rail before its connector.',
-				'In these instances, the connector is discarded.',
-			],
-			{
-				tag: 'h2',
-				content: 'Pan-Limit Maths',
-				style: {textAlign: 'center'},
-			},
-			// todo
-			getCode([
-				{op: '=', id: [
-					'thirdZoom0', 'thirdX0', 'thirdY0', 'thirdZoom1', 'thirdX1', 'thirdY1',
-					'firstZoom', 'firstEndX0', 'firstEndY0', 'firstEndX1', 'firstEndY1',
-					'secondZoom', 'secondIsFlipped',
-					'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
-					'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
-				], and: {
-					op: 'call', id: 'getZoomPoints',
-				}},
-				'',
-				{op: '=', id: ['topLeftX', 'topLeftY'], and: {
-					op: 'call', id: 'getBound', and: [
-						'thirdZoom0', 'thirdX0', 'thirdY0', -0.5,
-						'firstZoom', 'firstEndX0', 'firstEndY0',
-						'secondZoom', 'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
-					],
-				}},
-				'',
-				{op: '=', id: 'bottomRightX', ref: 'topLeftX', pair: 'bottomRightY', and: {
-					op: '-', and: 'topLeftX',
-				}},
-				{op: '=', id: 'bottomRightY', ref: 'topLeftY', pair: 'bottomRightX', and: {
-					op: '-', and: 'topLeftY',
-				}},
-				'',
-				{op: '=', id: ['topRightX', 'topRightY'], and: {
-					op: 'call', id: 'getBound', and: [
-						'thirdZoom1', 'thirdX1', 'thirdY1', 0.5,
-						'firstZoom', 'firstEndX1', 'firstEndY1',
-						'secondZoom', 'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
-					],
-				}},
-				'',
-				{op: '=', id: 'bottomLeftX', ref: 'topRightX', pair: 'bottomLeftY', and: {
-					op: '-', and: 'topRightX',
-				}},
-				{op: '=', id: 'bottomLeftY', ref: 'topRightY', pair: 'bottomLeftX', and: {
-					op: '-', and: 'topRightY',
-				}},
-			]),
-			{
-				tag: 'h2',
-				content: 'Pan-Limit Effectiveness',
-				style: {textAlign: 'center'},
-			},
-			[
-				'All of the prior system\'s pan-limiting flaws are fixed.',
-				'Bound changes are now perfectly fluid, providing a more consistent and reliable experience.',
-				'Besides patching issues, the connecting rails even enhance the system\'s ability to show two corners simultaneously!',
-			],
-			[
-				'I find this system to be a satisfactory improvement over "Double-Line" too.',
-				'It provides tighter pan-limits without sacrificing image visibility.',
-				'The changes have been successful in facilitating efficient panning paths.',
-			],
-			[
-				'Zoomful systems have unavoidable drawbacks.',
-				'Bounds are less inheritently less intuitive when they move around, and, especially when handling rotation, users are granted less viewfinding freedom.',
-				'Plus, there\'s obviously a huge efficiency dropoff from the good old days of',
-			],
-			{tag: 'p', classList: [CLASS_MATH], content: [
-				{tag: 'math', xmlns, content: [
-					{tag: 'mtable', xmlns, content: [
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mn', xmlns, content: '-0.5'},
-								{tag: 'mo', xmlns, content: '⩽'},
-								{tag: 'mi', xmlns, content: 'x'},
-								{tag: 'mo', xmlns, content: '⩽'},
-								{tag: 'mn', xmlns, content: '0.5'},
-							]},
+export default {
+	System,
+	start() {
+		registerFunctions(functions);
+		
+		for (const {start} of code) {
+			start();
+		}
+		
+		demo.rotation = 1.405778811644593;
+		demo.zoom = 1.3872297789271852;
+		demo.ratioImage = 0.747559670613474;
+		
+		demo.applyZoom();
+		demo.applyRotation();
+	},
+	end() {
+		cleanup();
+		
+		for (const {end} of code) {
+			end();
+		}
+	},
+	text: getText(
+		{
+			tag: 'h1',
+			content: 'Tripled Down',
+			style: {textAlign: 'center'},
+		},
+		'So single-line rails don\'t work too well, double-line has issues... is third line the charm?',
+		[
+			'The prior system can be fixed by adding a "connecting rail" between the others.',
+			'This rail can be used to ensure the preferred origin rail direction is usable.',
+			'Like in the prior system, origin rail start zoom depends on when the first pair of image corners first contacts the viewport rim.',
+			'Connecting rail start zoom is similar, but depends on the remaining pair of image corners.',
+			'Connecting rails are directed at viewport corners to keep both image corners visible.',
+		],
+		[
+			'It\'s possible for a lock rail to intersect with its origin rail before its connector.',
+			'In these instances, the connector is discarded.',
+		],
+		{
+			tag: 'h2',
+			content: 'Pan-Limit Maths',
+			style: {textAlign: 'center'},
+		},
+		// todo
+		getCode(code, [
+			{op: '=', id: [
+				'thirdZoom0', 'thirdX0', 'thirdY0', 'thirdZoom1', 'thirdX1', 'thirdY1',
+				'firstZoom', 'firstEndX0', 'firstEndY0', 'firstEndX1', 'firstEndY1',
+				'secondZoom', 'secondIsFlipped',
+				'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
+				'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
+			], and: {
+				op: 'call', id: 'getZoomPoints',
+			}},
+			'',
+			{op: '=', id: ['topLeftX', 'topLeftY'], and: {
+				op: 'call', id: 'getBound', and: [
+					'thirdZoom0', 'thirdX0', 'thirdY0', -0.5,
+					'firstZoom', 'firstEndX0', 'firstEndY0',
+					'secondZoom', 'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
+				],
+			}},
+			'',
+			{op: '=', id: 'bottomRightX', ref: 'topLeftX', pair: 'bottomRightY', and: {
+				op: '-', and: 'topLeftX',
+			}},
+			{op: '=', id: 'bottomRightY', ref: 'topLeftY', pair: 'bottomRightX', and: {
+				op: '-', and: 'topLeftY',
+			}},
+			'',
+			{op: '=', id: ['topRightX', 'topRightY'], and: {
+				op: 'call', id: 'getBound', and: [
+					'thirdZoom1', 'thirdX1', 'thirdY1', 0.5,
+					'firstZoom', 'firstEndX1', 'firstEndY1',
+					'secondZoom', 'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
+				],
+			}},
+			'',
+			{op: '=', id: 'bottomLeftX', ref: 'topRightX', pair: 'bottomLeftY', and: {
+				op: '-', and: 'topRightX',
+			}},
+			{op: '=', id: 'bottomLeftY', ref: 'topRightY', pair: 'bottomLeftX', and: {
+				op: '-', and: 'topRightY',
+			}},
+		]),
+		{
+			tag: 'h2',
+			content: 'Pan-Limit Effectiveness',
+			style: {textAlign: 'center'},
+		},
+		[
+			'All of the prior system\'s pan-limiting flaws are fixed.',
+			'Bound changes are now perfectly fluid, providing a more consistent and reliable experience.',
+			'Besides patching issues, the connecting rails even enhance the system\'s ability to show two corners simultaneously!',
+		],
+		[
+			'I find this system to be a satisfactory improvement over "Double-Line" too.',
+			'It provides tighter pan-limits without sacrificing image visibility.',
+			'The changes have been successful in facilitating efficient panning paths.',
+		],
+		[
+			'Zoomful systems have unavoidable drawbacks.',
+			'Bounds are less inheritently less intuitive when they move around, and, especially when handling rotation, users are granted less viewfinding freedom.',
+			'Plus, there\'s obviously a huge efficiency dropoff from the good old days of',
+		],
+		{tag: 'p', classList: [CLASS_MATH], content: [
+			{tag: 'math', xmlns, content: [
+				{tag: 'mtable', xmlns, content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mn', xmlns, content: '-0.5'},
+							{tag: 'mo', xmlns, content: '⩽'},
+							{tag: 'mi', xmlns, content: 'x'},
+							{tag: 'mo', xmlns, content: '⩽'},
+							{tag: 'mn', xmlns, content: '0.5'},
 						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mn', xmlns, content: '-0.5'},
-								{tag: 'mo', xmlns, content: '⩽'},
-								{tag: 'mi', xmlns, content: 'y'},
-								{tag: 'mo', xmlns, content: '⩽'},
-								{tag: 'mn', xmlns, content: '0.5'},
-							]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mn', xmlns, content: '-0.5'},
+							{tag: 'mo', xmlns, content: '⩽'},
+							{tag: 'mi', xmlns, content: 'y'},
+							{tag: 'mo', xmlns, content: '⩽'},
+							{tag: 'mn', xmlns, content: '0.5'},
 						]},
 					]},
 				]},
 			]},
-			[
-				'to the monster we have here.',
-				'Because of this, I still prefer "Viewport Center" as a pan-limiter.',
-			],
+		]},
+		[
+			'to the monster we have here.',
+			'Because of this, I still prefer "Viewport Center" as a pan-limiter.',
+		],
+		{
+			tag: 'h2',
+			content: 'Snap-Pan Maths',
+			style: {textAlign: 'center'},
+		},
+		// todo
+		getCode(code, [
+			{op: '=', id: 'snapZoom', type: 'zoom', and: {
+				op: 'max', multiline: true, and: [
+					{op: 'call', id: 'getZoom', and: [false, false, false]},
+					{op: 'call', id: 'getZoom', and: [false, true, true]},
+					{op: 'call', id: 'getZoom', and: [true, false, true]},
+					{op: 'call', id: 'getZoom', and: [true, true, false]},
+				],
+			}},
+		]),
+		{
+			tag: 'h2',
+			content: 'Snap-Pan Effectiveness',
+			style: {textAlign: 'center'},
+		},
+		[
+			'This system is fixes the prior system\'s inconsistency;',
+			'I\'d be comfortable calling it an improved snap-panning system.',
+			'"Double-Line", on the other hand, has no obvious flaw to fix.',
+			'Since both exhibit acceptable behaviour, Double-Line\'s efficiency makes the preferable standalone snap-panner.',
+		],
+		{
+			tag: 'h2',
+			content: 'Conclusion',
+			style: {textAlign: 'center'},
+		},
+		[
+			'We did it!',
+			'Presented here is a system that succeeds on both fronts.',
+			'Like I mentioned at the start of our rotation odyssey, it\'s much harder to identify "perfect" behaviour here than with the early systems.',
+			'No doubt a different approach could produce a better system, but this one lacks an obvious flaw.',
+		],
+		[
+			'Although this page represents the culmination of my labour, it\'s more conceptually interesting than practically useful.',
+			'Nevertheless, I\'m glad to have done the work.',
+			'This all started from an idea for a userscript and a feeling that I ',
 			{
-				tag: 'h2',
-				content: 'Snap-Pan Maths',
-				style: {textAlign: 'center'},
+				tag: 'i',
+				content: 'should',
 			},
-			// todo
-			getCode([
-				{op: '=', id: 'snapZoom', type: 'zoom', and: {
-					op: 'max', multiline: true, and: [
-						{op: 'call', id: 'getZoom', and: [false, false, false]},
-						{op: 'call', id: 'getZoom', and: [false, true, true]},
-						{op: 'call', id: 'getZoom', and: [true, false, true]},
-						{op: 'call', id: 'getZoom', and: [true, true, false]},
-					],
-				}},
-			]),
-			{
-				tag: 'h2',
-				content: 'Snap-Pan Effectiveness',
-				style: {textAlign: 'center'},
-			},
-			[
-				'This system is fixes the prior system\'s inconsistency;',
-				'I\'d be comfortable calling it an improved snap-panning system.',
-				'"Double-Line", on the other hand, has no obvious flaw to fix.',
-				'Since both exhibit acceptable behaviour, Double-Line\'s efficiency makes the preferable standalone snap-panner.',
-			],
-			{
-				tag: 'h2',
-				content: 'Conclusion',
-				style: {textAlign: 'center'},
-			},
-			[
-				'We did it!',
-				'Presented here is a system that succeeds on both fronts.',
-				'Like I mentioned at the start of our rotation odyssey, it\'s much harder to identify "perfect" behaviour here than with the early systems.',
-				'No doubt a different approach could produce a better system, but this one lacks an obvious flaw.',
-			],
-			[
-				'Although this page represents the culmination of my labour, it\'s more conceptually interesting than practically useful.',
-				'Nevertheless, I\'m glad to have done the work.',
-				'This all started from an idea for a userscript and a feeling that I ',
-				{
-					tag: 'i',
-					content: 'should',
-				},
-				' be able to code it.',
-				'From there, fixation became obsession and my project\'s scope ballooned way beyond what was sensible.',
-				'Still, having broke the surface of this abyss, I\'m proud to have pushed my limits so far.',
-			],
-			{style: {textAlign: 'center', font: '1.8em "viner hand itc", cursive'}, content: 'Thanks for reading ✌'},
-		),
-	);
-	
-	return demo;
+			' be able to code it.',
+			'From there, fixation became obsession and my project\'s scope ballooned way beyond what was sensible.',
+			'Still, having broke the surface of this abyss, I\'m proud to have pushed my limits so far.',
+		],
+		{style: {textAlign: 'center', font: '1.8em "viner hand itc", cursive'}, content: 'Thanks for reading ✌'},
+	),
 };

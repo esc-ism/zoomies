@@ -1,32 +1,36 @@
 import {DEGREES} from '@/shared';
-import {getText, getCode, getButton, registerDemo} from '../../shared';
-import {register as registerFunctions} from '../../code';
+import {getText, getCode, getButton} from '../../shared';
+import {cleanup, register as registerFunctions} from '../../code';
 import * as mock from '../mock';
 import {permissiveTweens, restrictiveTweens} from '../1line';
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 
 import snapImage from './snapImage';
-import Demo, {getSnappedZoom} from './demo';
+import System, {getSnappedZoom} from './demo';
 import getZoomPoints from './zoomPoints';
+
+const code = [];
 
 const getLimitedPosition = (limit = 0.4) => Math.max(-limit, Math.min(limit, Math.random() - 0.5));
 
-const getSnapVarGetter = async (demo, getRatio) => {
+const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
+
+const getSnapVarGetter = (getRatio) => {
 	const position = {x: getLimitedPosition(), y: getLimitedPosition()};
-	const {zoomPoints, rotation, ratio} = await getVarGetter(demo, Math.random() * DEGREES[180], getRatio())();
+	const {zoomPoints, rotation, ratio} = getVarGetter(Math.random() * DEGREES[180], getRatio())();
 	
 	const zoom = getSnappedZoom(...zoomPoints, position);
 	
 	return {ratio, rotation, startZoom: Math.min(zoomPoints[0].z, zoomPoints[2].z), zoom, position};
 };
 
-const getSnapTweens = (demo, getRatio) => [
+const getSnapTweens = (getRatio) => [
 	[
 		({rotation, ratio, startZoom}) => [{rotation, ratio, zoom: startZoom, position: 0}],
 		({position}) => [{position}],
 		({zoom}) => [{zoom}, {duration: 0}],
 	],
-	{getParam: getSnapVarGetter.bind(null, demo, getRatio)},
+	{getParam: getSnapVarGetter.bind(null, getRatio)},
 ];
 
 const getCornerProgressTweens = (rotation) => [
@@ -34,87 +38,47 @@ const getCornerProgressTweens = (rotation) => [
 	[{rotation}, {delay: 0.2}],
 ];
 
-const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
-
 const functions = [
 	...SHARED_FUNCTIONS,
-	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['y', 'zoom'], and: [
-		{op: 'return', and: {op: 'array', multiline: true, and: [
-			{op: '/', and: [
-				{op: '-', and: [
-					'½imageHeight',
-					{op: '*', and: ['½imageWidth', {op: 'tan', and: 'cornerAngle'}]},
-				]},
-				'imageHeight',
-			]},
-			{op: '/', and: [
-				'viewportSize',
-				{op: '*', and: [
-					{op: 'cos', and: 'progressAngle'},
-					{op: 'abs', and: {
-						op: '/', and: ['½imageWidth', {op: 'cos', and: 'cornerAngle'}],
-					}},
-				]},
-			]},
-		]}},
-	]},
-	{op: 'func', id: 'getXIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['x', 'zoom'], and: [
-		{op: 'return', and: {op: 'array', multiline: true, and: [
-			{op: '/', and: [
-				{op: '-', and: [
-					'½imageWidth',
-					{op: '*', and: ['½imageHeight', {op: 'tan', and: 'cornerAngle'}]},
-				]},
-				'imageWidth',
-			]},
-			{op: '/', and: [
-				'viewportSize',
-				{op: '*', and: [
-					{op: 'cos', and: 'progressAngle'},
-					{op: 'abs', and: {
-						op: '/', and: ['½imageHeight', {op: 'cos', and: 'cornerAngle'}],
-					}},
-				]},
-			]},
-		]}},
-	]},
-	{op: 'func', id: 'getIntersectSide', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['x', 'y', 'zoom'], pair: [1, 0], and: [
+	{op: 'func', id: 'getIntersectSide', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [2, 1], and: [
 		{op: '=', id: 'lockAngle', type: 'angle', and: {
 			op: '+', and: ['progressAngle', 'quadrantAngle'],
 		}},
 		'',
 		{op: 'if', and: [
 			{op: '<', and: ['lockAngle', 'cornerAngle']},
-			{op: 'return', and: {op: 'array', and: [
-				0,
-				{op: '...', and: {op: 'call', id: 'getYIntersect', and: ['½viewportWidth', 'lockAngle', 'progressAngle']}},
-			]}},
+			{op: '=', id: ['intersectZoom', 'intersectY'], and: {
+				op: 'call', id: 'getYIntersect', and: ['½viewportWidth', 'lockAngle', 'progressAngle'],
+			}},
+			'',
+			{op: 'return', and: {op: 'array', and: ['intersectZoom', 0, 'intersectY']}},
 		]},
 		'',
-		{op: '=', id: ['intersectX', 'intersectZoom'], and: {
+		{op: '=', id: ['intersectZoom', 'intersectX'], and: {
 			op: 'call', id: 'getXIntersect', and: ['½viewportWidth', {op: '-', and: ['½π', 'quadrantAngle', 'progressAngle']}, 'progressAngle'],
 		}},
 		'',
 		{op: 'return', and: {op: 'array', and: [
+			'intersectZoom',
 			{op: '?', and: ['isEvenQuadrant', {op: '-', and: 'intersectX'}, 'intersectX']},
 			0,
-			'intersectZoom',
 		]}},
 	]},
-	{op: 'func', id: 'getIntersectBase', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['x', 'y', 'zoom'], pair: [1, 0], and: [
+	{op: 'func', id: 'getIntersectBase', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [2, 1], and: [
 		{op: '=', id: 'lockAngle', and: {
 			op: '-', and: ['½π', 'quadrantAngle', 'progressAngle'],
 		}},
 		'',
 		{op: 'if', and: [
 			{op: '<', and: ['lockAngle', 'cornerAngle']},
-			{op: 'return', and: {op: 'array', and: [
-				0,
-				{op: '...', and: {op: 'call', id: 'getYIntersect', and: ['½viewportHeight', 'lockAngle', 'progressAngle']}},
-			]}},
+			{op: '=', id: ['intersectZoom', 'intersectY'], and: {
+				op: 'call', id: 'getYIntersect', and: ['½viewportHeight', 'lockAngle', 'progressAngle'],
+			}},
+			'',
+			{op: 'return', and: {op: 'array', and: ['intersectZoom', 0, 'intersectY']}},
 		]},
 		'',
-		{op: '=', id: ['intersectX', 'intersectZoom'], and: {
+		{op: '=', id: ['intersectZoom', 'intersectX'], and: {
 			op: 'call', id: 'getXIntersect', and: ['½viewportHeight', {op: '+', and: ['progressAngle', 'quadrantAngle']}, 'progressAngle'],
 		}},
 		'',
@@ -179,7 +143,7 @@ const functions = [
 			},
 		}},
 		'',
-		{op: '=', id: ['intersectSideX', 'intersectSideY', 'intersectSideZoom'], and: {
+		{op: '=', id: ['intersectSideZoom', 'intersectSideX', 'intersectSideY'], and: {
 			op: 'call', id: 'getIntersectSide', and: [
 				'cornerAngle',
 				'angleSide',
@@ -187,7 +151,7 @@ const functions = [
 				'isEvenQuadrant',
 			],
 		}},
-		{op: '=', id: ['intersectBaseX', 'intersectBaseY', 'intersectBaseZoom'], and: {
+		{op: '=', id: ['intersectBaseZoom', 'intersectBaseX', 'intersectBaseY'], and: {
 			op: 'call', id: 'getIntersectBase', and: [
 				'cornerAngle',
 				'angleBase',
@@ -302,205 +266,212 @@ const functions = [
 	]},
 ];
 
-export default (wrapper) => {
-	const demo = new Demo();
-	
-	const getTraceVars = getVarGetter(demo, DEGREES[90] - 0.4, 0.75);
-	
-	registerDemo(demo);
-	registerFunctions(demo, functions);
-	
-	wrapper.append(
-		demo.constructor.element,
-		getText(
-			{
-				tag: 'h1',
-				content: 'Double-Line Rotation',
-				style: {textAlign: 'center'},
-			},
-			[
-				'In the prior system, there were two playground states that revealed issues.',
-				'Let\'s start by seeing how they look here.',
-			],
-			[
-				'First, the ',
-				getButton('state', [[restrictiveTweens]]),
-				' that was too restrictive is way better!',
-				'The "Viewport Center" system gives users much more viewfinding flexibility, but in most situations this is good enough.',
-				'The overly permissive ',
-				getButton('state', [[permissiveTweens]]),
-				' is also fixed, accurately replicating the behaviour of the "Viewport Edge" system.',
-			],
-			[
-				'In the "Single-Line" system, we had no control over rail gradients; they would always be 1 or -1.',
-				'This kept us from choosing lock points.',
-				'Multi-line rails allow us to choose whatever gradients we want, providing much more flexibility.',
-			],
-			[
-				'This system places each lock point on a different viewport edge.',
-				'A point\'s distance along its edge is based on rotation angle.',
-				'For example, it lies on the expected viewport corners at ',
-				getButton('0°', getCornerProgressTweens(DEGREES[90])),
-				' and ',
-				getButton('90°', getCornerProgressTweens(0)),
-				' and travels linearly between them for ',
-				getButton('intermediate angles', [
-					...getCornerProgressTweens(DEGREES[90]),
-					[{rotation: 0}, {ease: 'none', duration: 3}],
-				]),
-				'.',
-			],
-			[
-				'Now that we\'re messing with rail gradients, we need another rail segment to connect back to the origin.',
-				'I\'ll call rail segments that determine lock points "lock rails" and the other segments "origin rails".',
-			],
-			[
-				'In this system, ',
-				getButton('origin rails', [
-					({rotation, ratio, first}) => [{position: 0, ratio, rotation, zoom: first.z}],
-					[{position: 0.5}, {delay: 0.5}],
-					({second}) => [{zoom: second.z}, {duration: 3, position: '<'}],
-				], {getParam: getTraceVars}),
-				'  follow image axes until they intersect ',
-				getButton('lock rails', [
-					({rotation, ratio, second}) => [{position: second, ratio, rotation, zoom: second.z}],
-					[{position: 0.5}, {delay: 0.5}],
-					({second}) => [{zoom: second.z * 2}, {duration: 3, position: '<'}],
-				], {getParam: getTraceVars}),
-				'.',
-			],
-			{
-				tag: 'h2',
-				content: 'Pan-Limit Maths',
-				style: {textAlign: 'center'},
-			},
-			[
-				'Each lock point must be on a different viewport edge, and adjacent corners will have lock points on adjacent edges.',
-				'Since we\'re focusing on the top-left and top-right image corners, we can say that one will be a "side" (left or right viewport edge) corner and the other a "base" (top or bottom viewport edge) corner.',
-				'This assignment will be based off rotation, with corners alternating between "base" and "side" every 90°.',
-			],
-			[
-				'Each origin rail\'s start zoom will be the zoom at which its image corner touches a viewport edge.',
-				'Lock rail start zooms are found through some clever trigonometry.',
-				// todo insert a diagram?
-			],
-			[
-				'Origin rails follow whichever axis minimises lock rail length.',
-			],
-			getCode([
-				{op: '=', id: [
-					'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',
-					'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1',
-				], and: {
-					op: 'call', id: 'getZoomPoints',
-				}},
-				'',
-				{op: '=', id: ['topLeftX', 'topLeftY'], and: {
-					op: 'call', id: 'getBound', and: ['originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0', true],
-				}},
-				'',
-				{op: '=', id: 'bottomRightX', ref: 'topLeftX', pair: 'bottomRightY', and: {
-					op: '-', and: 'topLeftX',
-				}},
-				{op: '=', id: 'bottomRightY', ref: 'topLeftY', pair: 'bottomRightX', and: {
-					op: '-', and: 'topLeftY',
-				}},
-				'',
-				{op: '=', id: ['topRightX', 'topRightY'], and: {
-					op: 'call', id: 'getBound', and: ['originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1', false],
-				}},
-				'',
-				{op: '=', id: 'bottomLeftX', ref: 'topRightX', pair: 'bottomLeftY', and: {
-					op: '-', and: 'topRightX',
-				}},
-				{op: '=', id: 'bottomLeftY', ref: 'topRightY', pair: 'bottomLeftX', and: {
-					op: '-', and: 'topRightY',
-				}},
+let getTraceVars;
+
+export default {
+	System,
+	start() {
+		getTraceVars = getVarGetter(DEGREES[90] - 0.4, 0.75);
+		
+		registerFunctions(functions);
+		
+		for (const {start} of code) {
+			start();
+		}
+	},
+	end() {
+		cleanup();
+		
+		for (const {end} of code) {
+			end();
+		}
+	},
+	text: getText(
+		{
+			tag: 'h1',
+			content: 'Double-Line Rotation',
+			style: {textAlign: 'center'},
+		},
+		[
+			'In the prior system, there were two playground states that revealed issues.',
+			'Let\'s start by seeing how they look here.',
+		],
+		[
+			'First, the ',
+			getButton('state', [[restrictiveTweens]]),
+			' that was too restrictive is way better!',
+			'The "Viewport Center" system gives users much more viewfinding flexibility, but in most situations this is good enough.',
+			'The overly permissive ',
+			getButton('state', [[permissiveTweens]]),
+			' is also fixed, accurately replicating the behaviour of the "Viewport Edge" system.',
+		],
+		[
+			'In the "Single-Line" system, we had no control over rail gradients; they would always be 1 or -1.',
+			'This kept us from choosing lock points.',
+			'Multi-line rails allow us to choose whatever gradients we want, providing much more flexibility.',
+		],
+		[
+			'This system places each lock point on a different viewport edge.',
+			'A point\'s distance along its edge is based on rotation angle.',
+			'For example, it lies on the expected viewport corners at ',
+			getButton('0°', getCornerProgressTweens(DEGREES[90])),
+			' and ',
+			getButton('90°', getCornerProgressTweens(0)),
+			' and travels linearly between them for ',
+			getButton('intermediate angles', [
+				...getCornerProgressTweens(DEGREES[90]),
+				[{rotation: 0}, {ease: 'none', duration: 3}],
 			]),
-			{
-				tag: 'h2',
-				content: 'Pan-Limit Effectiveness',
-				style: {textAlign: 'center'},
-			},
-			[
-				'There\'s no huge flaw, but this system\'s user experience is pretty terrible.',
-				'Take ',
-				getButton('this', [
-					[{ratio: 0.5, rotation: DEGREES[90] + 0.5, zoom: 1, position: 0}],
-				]),
-				' state for example — see the panning path necessary to view the offscreen corner?',
-				'There\'s no way anyone would take that path naturally.',
-				'Users naturally try to take the shortest path possible, but this system doesn\'t often allow that.',
-			],
-			[
-				'The ideal pan-limiting system is one that users find so natural and unintrusive that they don\'t consciously notice it.',
-				'Some degree of intrusiveness is necessary with zoomful systems, but there\'s no attempt at mitigation here.',
-				'This system\'s pan-limiting experience is frustrating because users must bend to its will, when it ', {tag: 'i', content: 'should'}, ' bend to the will of its users.',
-			],
-			{
-				tag: 'h2',
-				content: 'Snap-Pan Maths',
-				style: {textAlign: 'center'},
-			},
-			[
-				'The maths here build upon those of the single-line system.',
-				'As before, a lock rail is snipped to achieve matching start zooms.',
-				'Now, however, the snipped part of the lock rail must be paired with the end of the un-snipped lock rail\'s origin rail.',
-				'Finally, one more snip is necessary to match zooms for origin rails.',
-			],
-			[
-				'The final product might look similar to the image below.',
-				'Segments are coloured to show pairings.',
-			],
-			// todo give the single-line system an image?
-			{
-				tag: 'div',
-				content: snapImage,
-				style: {textAlign: 'center'},
-			},
-			[
-				'In the prior system, I needed to find a line that intersects the snap point and two adjacent rails.',
-				'Now, with the adjacent rails split into a trio of segment pairs, the maximum number of checks required to find a snap zoom is tripled.',
-			],
-			getCode([
-				{op: '=', id: ['flip0', 'flip1'], and: {
-					op: 'call', id: 'getQuadrant',
-				}},
-				'',
-				{op: '=', id: 'snapZoom', and: {
-					op: 'call', id: 'getZoom', and: ['flip0', 'flip1', {op: '!=', and: ['flip0', 'flip1']}],
-				}},
+			'.',
+		],
+		[
+			'Now that we\'re messing with rail gradients, we need another rail segment to connect back to the origin.',
+			'I\'ll call rail segments that determine lock points "lock rails" and the other segments "origin rails".',
+		],
+		[
+			'In this system, ',
+			getButton('origin rails', [
+				({rotation, ratio, first}) => [{position: 0, ratio, rotation, zoom: first.z}],
+				[{position: 0.5}, {delay: 0.5}],
+				({second}) => [{zoom: second.z}, {duration: 3, position: '<'}],
+			], {getParam: () => getTraceVars()}),
+			'  follow image axes until they intersect ',
+			getButton('lock rails', [
+				({rotation, ratio, second}) => [{position: second, ratio, rotation, zoom: second.z}],
+				[{position: 0.5}, {delay: 0.5}],
+				({second}) => [{zoom: second.z * 2}, {duration: 3, position: '<'}],
+			], {getParam: () => getTraceVars()}),
+			'.',
+		],
+		{
+			tag: 'h2',
+			content: 'Pan-Limit Maths',
+			style: {textAlign: 'center'},
+		},
+		[
+			'Each lock point must be on a different viewport edge, and adjacent corners will have lock points on adjacent edges.',
+			'Since we\'re focusing on the top-left and top-right image corners, we can say that one will be a "side" (left or right viewport edge) corner and the other a "base" (top or bottom viewport edge) corner.',
+			'This assignment will be based off rotation, with corners alternating between "base" and "side" every 90°.',
+		],
+		[
+			'Each origin rail\'s start zoom will be the zoom at which its image corner touches a viewport edge.',
+			'Lock rail start zooms are found through some clever trigonometry.',
+			// todo insert a diagram?
+		],
+		[
+			'Origin rails follow whichever axis minimises lock rail length.',
+		],
+		getCode(code, [
+			{op: '=', id: [
+				'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',
+				'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1',
+			], and: {
+				op: 'call', id: 'getZoomPoints',
+			}},
+			'',
+			{op: '=', id: ['topLeftX', 'topLeftY'], and: {
+				op: 'call', id: 'getBound', and: ['originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0', true],
+			}},
+			'',
+			{op: '=', id: 'bottomRightX', ref: 'topLeftX', pair: 'bottomRightY', and: {
+				op: '-', and: 'topLeftX',
+			}},
+			{op: '=', id: 'bottomRightY', ref: 'topLeftY', pair: 'bottomRightX', and: {
+				op: '-', and: 'topLeftY',
+			}},
+			'',
+			{op: '=', id: ['topRightX', 'topRightY'], and: {
+				op: 'call', id: 'getBound', and: ['originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1', false],
+			}},
+			'',
+			{op: '=', id: 'bottomLeftX', ref: 'topRightX', pair: 'bottomLeftY', and: {
+				op: '-', and: 'topRightX',
+			}},
+			{op: '=', id: 'bottomLeftY', ref: 'topRightY', pair: 'bottomLeftX', and: {
+				op: '-', and: 'topRightY',
+			}},
+		]),
+		{
+			tag: 'h2',
+			content: 'Pan-Limit Effectiveness',
+			style: {textAlign: 'center'},
+		},
+		[
+			'There\'s no huge flaw, but this system\'s user experience is pretty terrible.',
+			'Take ',
+			getButton('this', [
+				[{ratio: 0.5, rotation: DEGREES[90] + 0.5, zoom: 1, position: 0}],
 			]),
-			{
-				tag: 'h2',
-				content: 'Snap-Pan Effectiveness',
-				style: {textAlign: 'center'},
-			},
-			// todo expand?
-			[
-				'As a snap-panning facilitator, this system is hard to fault.',
-				'Of course it performs fine on ',
-				getButton('similar', ...getSnapTweens(demo, () => Math.random() / 5 + 0.9)),
-				' aspect ratios,',
-				'but even ',
-				getButton('distant', ...getSnapTweens(demo, () => Math.random() / 10 + 0.2)),
-				' aspect ratios reveal no flaw in its ability to derive sensible zoom levels.',
-			],
-			{
-				tag: 'h2',
-				content: 'Conclusion',
-				style: {textAlign: 'center'},
-			},
-			[
-				'This system\'s not a great pan-limiter, but it\'s an effective snap-panner.',
-			],
-			[
-				'This system achieves the goal of finding a zoomful, rotation-handling system to complement "Viewport Center".',
-				'So, uh, let\'s stop here I guess...',
-			],
-			{style: {textAlign: 'right', opacity: 0.4, textShadow: '0 0 2px currentColor'}, content: ' ...unless?'},
-		),
-	);
-	
-	return demo;
+			' state for example — see the panning path necessary to view the offscreen corner?',
+			'There\'s no way anyone would take that path naturally.',
+			'Users naturally try to take the shortest path possible, but this system doesn\'t often allow that.',
+		],
+		[
+			'The ideal pan-limiting system is one that users find so natural and unintrusive that they don\'t consciously notice it.',
+			'Some degree of intrusiveness is necessary with zoomful systems, but there\'s no attempt at mitigation here.',
+			'This system\'s pan-limiting experience is frustrating because users must bend to its will, when it ', {tag: 'i', content: 'should'}, ' bend to the will of its users.',
+		],
+		{
+			tag: 'h2',
+			content: 'Snap-Pan Maths',
+			style: {textAlign: 'center'},
+		},
+		[
+			'The maths here build upon those of the single-line system.',
+			'As before, a lock rail is snipped to achieve matching start zooms.',
+			'Now, however, the snipped part of the lock rail must be paired with the end of the un-snipped lock rail\'s origin rail.',
+			'Finally, one more snip is necessary to match zooms for origin rails.',
+		],
+		[
+			'The final product might look similar to the image below.',
+			'Segments are coloured to show pairings.',
+		],
+		// todo give the single-line system an image?
+		{
+			tag: 'div',
+			content: snapImage,
+			style: {textAlign: 'center'},
+		},
+		[
+			'In the prior system, I needed to find a line that intersects the snap point and two adjacent rails.',
+			'Now, with the adjacent rails split into a trio of segment pairs, the maximum number of checks required to find a snap zoom is tripled.',
+		],
+		getCode(code, [
+			{op: '=', id: ['flip0', 'flip1'], and: {
+				op: 'call', id: 'getQuadrant',
+			}},
+			'',
+			{op: '=', id: 'snapZoom', and: {
+				op: 'call', id: 'getZoom', and: ['flip0', 'flip1', {op: '!=', and: ['flip0', 'flip1']}],
+			}},
+		]),
+		{
+			tag: 'h2',
+			content: 'Snap-Pan Effectiveness',
+			style: {textAlign: 'center'},
+		},
+		// todo expand?
+		[
+			'As a snap-panning facilitator, this system is hard to fault.',
+			'Of course it performs fine on ',
+			getButton('similar', ...getSnapTweens(() => Math.random() / 5 + 0.9)),
+			' aspect ratios,',
+			'but even ',
+			getButton('distant', ...getSnapTweens(() => Math.random() / 10 + 0.2)),
+			' aspect ratios reveal no flaw in its ability to derive sensible zoom levels.',
+		],
+		{
+			tag: 'h2',
+			content: 'Conclusion',
+			style: {textAlign: 'center'},
+		},
+		[
+			'This system\'s not a great pan-limiter, but it\'s an effective snap-panner.',
+		],
+		[
+			'This system achieves the goal of finding a zoomful, rotation-handling system to complement "Viewport Center".',
+			'So, uh, let\'s stop here I guess...',
+		],
+		{style: {textAlign: 'right', opacity: 0.4, textShadow: '0 0 2px currentColor'}, content: ' ...unless?'},
+	),
 };
