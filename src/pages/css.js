@@ -90,13 +90,19 @@ addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {
 
 addRule(`.${CLASS_WRAPPER} svg`, {filter: 'drop-shadow(0 0 1px black)'});
 
+addRule(`.${CLASS_WRAPPER}:nth-child(2)`, {
+	'margin-left': '-100%',
+});
+
 addRule(`.${CLASS_WRAPPER}:not(.${CLASS_ACTIVE})`, {
 	'pointer-events': 'none',
-	filter: 'blur(1px)',
-	height: '1px',
+	height: 'calc(100% + 3em)',
+	'overflow-y': 'clip',
+	position: 'sticky',
+	top: '-3em',
 });
 
 addRule(`.${CLASS_WRAPPER}.${CLASS_ACTIVE}`, {
 	height: 'fit-content',
-	'min-height': '100vh',
+	'min-height': '100%',
 });

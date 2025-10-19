@@ -151,14 +151,13 @@ export default {
 		],
 		[
 			'For the past two years or so, I\'ve been delving into panning (the thing you do to look around after zooming in).',
-			'Specifically, I\'ve been working on pan-limiting where zoom, rotation, image aspect ratio and viewport aspect ratio are all variable.',
+			'Specifically, I\'ve been working on pan-limiting with variable zoom, rotation, image aspect ratio and viewport aspect ratio.',
+			'My focus is on systems with rectangular content that keep all four corners viewable at all times.',
 		],
 		[
 			'This website is a little interactive report of my findings.',
 			'It will walk you through the problem space and demonstrate solutions, ranging from trivial to the kind of thing that a non-mathematician might spend two years on.',
 		],
-		// todo register swipes to change page
-		//  todo actually put all text wrappers in a flex container and (snap) scroll to turn page
 		getInstruction({callback: (element) => {
 			const update = () => {
 				element.innerText = InputMethod.isMouse ?

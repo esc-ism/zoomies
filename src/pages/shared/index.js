@@ -155,7 +155,8 @@ export const getText = (...children) => {
 	// I guess chrome gives outlines to scroll elements
 	wrapper.style.outline = 'none';
 	wrapper.style.minWidth = '100%';
-	wrapper.style.scrollSnapAlign = 'start';
+	wrapper.style.scrollSnapAlign = 'center';
+	wrapper.style.scrollSnapStop = 'always';
 	
 	container.style.padding = '0 20px';
 	container.style.boxSizing = 'border-box';

@@ -472,6 +472,5 @@ export default {
 			'This system achieves the goal of finding a zoomful, rotation-handling system to complement "Viewport Center".',
 			'So, uh, let\'s stop here I guess...',
 		],
-		{style: {textAlign: 'right', opacity: 0.4, textShadow: '0 0 2px currentColor'}, content: ' ...unless?'},
 	),
 };

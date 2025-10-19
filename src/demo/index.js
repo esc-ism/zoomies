@@ -2,7 +2,7 @@ import {gsap} from 'gsap';
 
 import './css';
 
-import {getTheta, DEGREES, ERROR_ALLOWANCE} from '@/shared';
+import {getTheta, DEGREES, ALLOWANCE_ERROR} from '@/shared';
 
 import Readout from './readout';
 import Target from './target';
@@ -780,7 +780,7 @@ export default new class {
 			let hasTween = false;
 			
 			const record = (type, value, label = type) => {
-				if (!effects[label] && Math.abs(this.tween.data.target[type] - value) < ERROR_ALLOWANCE) {
+				if (!effects[label] && Math.abs(this.tween.data.target[type] - value) < ALLOWANCE_ERROR) {
 					return;
 				}
 				

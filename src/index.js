@@ -6,6 +6,7 @@ import {CLASS_WRAPPER, InputMethod} from './consts';
 import touchIcon from './input/touch';
 import mouseIcon from './input/mouse';
 import {CLASS_ACTIVE} from './pages/consts';
+import {ALLOWANCE_ERROR} from './shared';
 
 const params = new URLSearchParams(location.search);
 
@@ -18,10 +19,15 @@ wrapper.classList.add(CLASS_WRAPPER);
 const header = (() => {
 	const container = document.createElement('div');
 	
-	container.style.minHeight = '3em';
+	container.style.height = '3em';
 	container.style.display = 'flex';
 	container.style.alignItems = 'center';
 	container.style.borderBottom = '1px solid currentcolor';
+	container.style.position = 'sticky';
+	container.style.minWidth = '100%';
+	container.style.left = '0';
+	container.style.marginTop = '-3em';
+	container.style.boxSizing = 'border-box';
 	
 	// todo weird colour. are all your links this colour now? why?
 	const email = document.createElement('a');
@@ -69,94 +75,75 @@ const header = (() => {
 	return container;
 })();
 
-const textWrapper = document.createElement('div');
-
-textWrapper.style.display = 'flex';
-textWrapper.style.overflowY = 'auto';
-textWrapper.style.flexGrow = '1';
-textWrapper.style.flexDirection = 'column';
-textWrapper.style.height = '100vh';
-
-const hideHeader = () => {
-	const {scrollTop} = textWrapper;
-	
-	window.setTimeout(() => {
-		textWrapper.scrollTop = Math.min(scrollTop, header.offsetHeight);
-	}, 0);
-};
-
-window.setTimeout(() => {
-	textWrapper.scrollTop = header.offsetHeight;
-}, 0);
-
+// todo put in wrapper with header, make header absolute & stop with the margin-left: -100%
 const textContainer = document.createElement('div');
 
 textContainer.style.display = 'flex';
-textContainer.style.minHeight = 'fit-content';
 textContainer.style.scrollSnapType = 'x mandatory';
-textContainer.style.scrollSnapStop = 'always';
-textContainer.style.overflowX = 'auto';
-textContainer.style.overflowY = 'clip';
-textContainer.style.scrollbarWidth = 'none';
+textContainer.style.overflow = 'auto';
+textContainer.style.paddingTop = '3em';
+textContainer.style.position = 'relative';
+textContainer.style.flexGrow = '1';
+textContainer.style.maxHeight = '100vh';
+textContainer.style.boxSizing = 'border-box';
+textContainer.tabIndex = 0;
 
-textWrapper.append(header, textContainer);
-wrapper.append(demo.element, textWrapper);
+// Without this, snap scroll breaks after scrolling down 🤷‍♂️
+(() => {
+	const span = document.createElement('span');
+	
+	textContainer.addEventListener('onscrollend' in textContainer ? 'scrollend' : 'scroll', () => {
+		textContainer.appendChild(span);
+	});
+})();
+
+textContainer.append(header);
+wrapper.append(demo.element, textContainer);
 root.appendChild(wrapper);
 
-let currentPage = pages[Math.max(0, Math.min(pages.length - 1, Number.parseInt(params.get('page')) || 0))];
+textContainer.focus();
+
+let currentIndex = Math.max(0, Math.min(pages.length - 1, Number.parseInt(params.get('page')) || 0));
+let currentPage = pages[currentIndex];
 
 demo.setSystem(new currentPage.System());
 currentPage.text.classList.add(CLASS_ACTIVE);
 
-demo.init().then(() => {
+demo.init().then(async () => {
 	currentPage.start?.();
 	
 	const setPage = (index, page, pushState = true) => {
-		hideHeader();
+		const {scrollTop} = textContainer;
 		
 		currentPage.text.classList.remove(CLASS_ACTIVE);
 		currentPage.end?.();
 		demo.system.remove();
 		demo.remove();
 		
+		currentIndex = index;
 		currentPage = page;
 		
 		currentPage.text.classList.add(CLASS_ACTIVE);
 		demo.setSystem(new page.System());
 		page.start?.();
 		
+		textContainer.scrollTop = Math.min(scrollTop, header.offsetHeight);
+		
 		if (pushState) {
 			params.set('page', index);
 			
+			// record page navigation in the history
 			history.pushState({index}, '', `${location.origin}${location.pathname}?${params.toString()}`);
 		}
 	};
 	
-	for (const [i, page] of pages.entries()) {
+	for (const page of pages) {
 		textContainer.appendChild(page.text);
-		
-		let isFirst = true;
-		
-		const observer = new IntersectionObserver((entries) => {
-			if (isFirst) {
-				isFirst = false;
-				
-				if (entries.length < 2) {
-					return;
-				}
-			}
-			
-			if (entries[entries.length - 1].intersectionRatio >= 0.5) {
-				setPage(i, page);
-			}
-		}, {root: textContainer, threshold: 0.5});
-		
-		observer.observe(page.text);
 	}
 	
 	currentPage.text.scrollIntoView();
-	hideHeader();
 	
+	// handle history navigation without reloading the site
 	window.addEventListener('popstate', (event) => {
 		if (typeof event.state?.index !== 'number') {
 			return;
@@ -164,21 +151,103 @@ demo.init().then(() => {
 		
 		setPage(event.state.index, pages[event.state.index], false);
 		
+		pages[event.state.index].text.scrollIntoView();
+		
 		event.preventDefault();
 	});
 	
-	// Ensure every arrow key press is registered by scroll elements
-	window.addEventListener('keydown', (event) => {
-		if (event.ctrlKey || event.altKey || event.shiftKey) {
-			return;
+	// improves handling of held down horizontal arrow keys
+	// also prevents pausing when the keys are hit mid-scroll
+	(() => {
+		let isInterim = false;
+		
+		if ('onscrollsnapchanging' in textContainer && 'onscrollsnapchange' in textContainer) {
+			textContainer.addEventListener('scrollsnapchanging', () => {
+				isInterim = true;
+			});
+			
+			textContainer.addEventListener('scrollsnapchange', () => {
+				window.setTimeout(() => {
+					isInterim = false;
+				}, 100);
+			});
+		} else {
+			let timeout;
+			
+			textContainer.addEventListener('scroll', () => {
+				isInterim = true;
+				
+				window.clearTimeout(timeout);
+				
+				timeout = window.setTimeout(() => {
+					isInterim = false;
+					
+					timeout = undefined;
+				}, 200);
+			});
 		}
 		
-		switch (event.key) {
-			case 'ArrowUp':
-			case 'ArrowDown':
-			case 'ArrowLeft':
-			case 'ArrowRight':
-				textContainer.focus();
+		window.addEventListener('keydown', (event) => {
+			if (!isInterim || event.ctrlKey || event.altKey || event.shiftKey) {
+				return;
+			}
+			
+			switch (event.key) {
+				case 'ArrowLeft':
+				case 'ArrowRight':
+					event.preventDefault();
+			}
+		});
+	})();
+	
+	// set page as active when it's scrolled to
+	if ('onscrollsnapchange' in textContainer) {
+		// keep from triggering on page load
+		await new Promise((resolve) => {
+			textContainer.addEventListener('scroll', resolve, {once: true});
+		});
+		
+		const indices = new Map();
+		
+		for (const [i, page] of pages.entries()) {
+			indices.set(page.text, i);
 		}
-	});
+		
+		textContainer.addEventListener('scrollsnapchange', ({snapTargetInline: target}) => {
+			if (currentPage.text.isSameNode(target)) {
+				return;
+			}
+			
+			const index = indices.get(target);
+			
+			setPage(index, pages[index]);
+		});
+	} else {
+		let scrollLeft;
+		let width;
+		
+		new ResizeObserver(() => {
+			scrollLeft = textContainer.scrollLeft;
+			width = textContainer.getBoundingClientRect().width;
+		}).observe(textContainer);
+		
+		textContainer.addEventListener('scroll', () => {
+			if (textContainer.scrollLeft === scrollLeft) {
+				return;
+			}
+			
+			scrollLeft = textContainer.scrollLeft;
+			
+			const progress = scrollLeft / width;
+			const index = Math.round(progress);
+			
+			if (Math.abs(progress - index) > ALLOWANCE_ERROR) {
+				return;
+			}
+			
+			if (!pages[index].text.isSameNode(currentPage.text)) {
+				setPage(index, pages[index]);
+			}
+		});
+	}
 });
