@@ -12,8 +12,7 @@ export const getSVG = () => {
 	
 	const screen = document.createElementNS(SVG_NAMESPACE, 'path');
 	
-	screen.setAttribute('d', 'M31.36,2v20h-0.72V2.36H1.36v22.28H12v0.721H1c-0.199,0-0.36-0.161-0.36-0.36V2'
-	+ 'c0-0.199,0.161-0.36,0.36-0.36h30C31.199,1.64,31.36,1.801,31.36,2z');
+	screen.setAttribute('d', 'M31.36,2v20h-0.72V2.36H1.36v22.28H12v0.721H1c-0.199,0-0.36-0.161-0.36-0.36V2c0-0.199,0.161-0.36,0.36-0.36h30C31.199,1.64,31.36,1.801,31.36,2z');
 	
 	svg.appendChild(screen);
 	

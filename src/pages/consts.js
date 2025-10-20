@@ -18,6 +18,7 @@ export const CLASS_MATH_ASSERTION = getTextId('math', 'assertion');
 export const CLASS_INSTRUCTION = getTextId('instruction');
 
 export const CLASS_BUTTON = getTextId('button');
+export const CLASS_BUTTON_ACTIVE = getTextId('button', 'active');
 
 export const CLASS_ACTIVE = getTextId('active');
 

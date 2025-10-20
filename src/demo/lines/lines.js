@@ -155,8 +155,8 @@ export class Connection extends Line {
 	setHeight(from, to) {
 		const {ratioImage} = demo;
 		
-		const xSquared = to.x ? Math.pow((to.x - from.x) * ratioImage, 2) : 0;
-		const ySquared = to.y ? Math.pow((to.y - from.y), 2) : 0;
+		const xSquared = Math.pow((to.x - from.x) * ratioImage, 2);
+		const ySquared = Math.pow((to.y - from.y), 2);
 		
 		super.setHeight(Math.sqrt(xSquared + ySquared) * 100);
 	}

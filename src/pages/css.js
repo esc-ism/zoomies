@@ -5,6 +5,7 @@ import {
 	CLASS_MATH, CLASS_MATH_EQUATION, CLASS_FLASH_CONTAINER,
 	CLASS_MATH_ASSERTION,
 	CLASS_ACTIVE,
+	CLASS_BUTTON_ACTIVE,
 } from './consts';
 
 addRule(`.${CLASS_FLASH_CONTAINER}`, {
@@ -62,14 +63,14 @@ addRule(`.${CLASS_MATH} math`, {
 
 const buttonColour = '#eaacfd';
 
-addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}`, {
-	color: buttonColour,
-	cursor: 'pointer',
-});
-
-addRule(`.${CLASS_WRAPPER} .${CLASS_BUTTON}:hover`, {
+addRule(`.${CLASS_BUTTON_ACTIVE}`, {
 	'background-color': buttonColour,
 	color: 'black',
+});
+
+addRule(`.${CLASS_BUTTON}`, {
+	color: buttonColour,
+	cursor: 'pointer',
 });
 
 addRule([`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::before`, `.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::after`], {
@@ -90,14 +91,10 @@ addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {
 
 addRule(`.${CLASS_WRAPPER} svg`, {filter: 'drop-shadow(0 0 1px black)'});
 
-addRule(`.${CLASS_WRAPPER}:nth-child(2)`, {
-	'margin-left': '-100%',
-});
-
 addRule(`.${CLASS_WRAPPER}:not(.${CLASS_ACTIVE})`, {
 	'pointer-events': 'none',
 	height: 'calc(100% + 3em)',
-	'overflow-y': 'clip',
+	overflow: 'clip',
 	position: 'sticky',
 	top: '-3em',
 });

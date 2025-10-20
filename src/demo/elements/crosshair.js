@@ -28,11 +28,11 @@ svg.style.pointerEvents = 'none';
 
 const cross = document.createElementNS(SVG_NAMESPACE, 'path');
 
-cross.setAttribute('d', `M${offsetRadius} ${-offsetRadius}`
-+ `l${radius} 0l0 ${offsetDiameter}l${-radius} 0`
-+ `l0 ${radius}l${-offsetDiameter} 0l0 ${-radius}`
-+ `l${-radius} 0l0 ${-offsetDiameter}l${radius} 0`
-+ `l0 ${-radius}l${offsetDiameter} 0l0 ${radius}Z`);
+cross.setAttribute('d', `M${offsetRadius} ${-offsetRadius}` +
+`l${radius} 0l0 ${offsetDiameter}l${-radius} 0` +
+`l0 ${radius}l${-offsetDiameter} 0l0 ${-radius}` +
+`l${-radius} 0l0 ${-offsetDiameter}l${radius} 0` +
+`l0 ${-radius}l${offsetDiameter} 0l0 ${radius}Z`);
 
 svg.appendChild(cross);
 

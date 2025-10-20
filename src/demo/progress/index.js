@@ -28,8 +28,7 @@ export default class {
 		const values = {};
 		
 		this.timeline = gsap.timeline({paused: true})
-			.fromTo(values, {blur: 0}, {blur: 2, duration: 0.5, ease: 'none'}, 0)
-			.fromTo(values, {opacity: 1}, {opacity: 0, duration: 0.6, ease: 'none'}, 0.15)
+			.fromTo(values, {blur: 0, opacity: 1}, {blur: 2, opacity: 0, duration: 0.5, ease: 'none'})
 			.eventCallback('onUpdate', () => {
 				this.element.style.opacity = `${values.opacity}`;
 				this.element.style.filter = `blur(${values.blur}px)`;

@@ -3,7 +3,7 @@ import demo from '@/demo';
 import {InputMethod} from '@/consts';
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 import {CLASS_FLASH_CONTAINER, CLASS_MATH} from '../consts';
-import {getText, getButton, getInstruction, flash} from '../shared';
+import {getText, getButton, getInstruction, flash, getInputDependent} from '../shared';
 
 import getRestartButton from './restart';
 
@@ -168,8 +168,9 @@ export default {
 		'Let\'s get into its issues.',
 		getInstruction([
 			'Notice the pink text below?',
-			'Holding your cursor over pink text will demonstrate relevant concepts.',
-			'Click pink text to skip to the end of demonstrations and set your playground state.',
+			getInputDependent((isMouse) =>
+				` ${isMouse ? 'Click' : 'Tap'} it for a visualisation.` +
+				` ${isMouse ? 'Click' : 'Tap'} again to restore your playground state.`),
 		]),
 		[
 			'A competent user of this system may ',

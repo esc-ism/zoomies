@@ -10,8 +10,6 @@ import {ALLOWANCE_ERROR} from './shared';
 
 const params = new URLSearchParams(location.search);
 
-const root = document.querySelector('#root');
-
 const wrapper = document.createElement('div');
 
 wrapper.classList.add(CLASS_WRAPPER);
@@ -20,16 +18,17 @@ const header = (() => {
 	const container = document.createElement('div');
 	
 	container.style.height = '3em';
+	container.style.minWidth = '100%';
 	container.style.display = 'flex';
 	container.style.alignItems = 'center';
 	container.style.borderBottom = '1px solid currentcolor';
-	container.style.position = 'sticky';
-	container.style.minWidth = '100%';
-	container.style.left = '0';
-	container.style.marginTop = '-3em';
 	container.style.boxSizing = 'border-box';
+	container.style.position = 'sticky';
+	container.style.left = '0';
+	// avoid affecting page positions
+	container.style.marginLeft = '-100%';
+	container.style.marginTop = '-3em';
 	
-	// todo weird colour. are all your links this colour now? why?
 	const email = document.createElement('a');
 	
 	email.innerText = 'callumtylerlatham@gmail.com';
@@ -75,7 +74,6 @@ const header = (() => {
 	return container;
 })();
 
-// todo put in wrapper with header, make header absolute & stop with the margin-left: -100%
 const textContainer = document.createElement('div');
 
 textContainer.style.display = 'flex';
@@ -99,14 +97,14 @@ textContainer.tabIndex = 0;
 
 textContainer.append(header);
 wrapper.append(demo.element, textContainer);
-root.appendChild(wrapper);
+document.body.appendChild(wrapper);
 
 textContainer.focus();
 
 let currentIndex = Math.max(0, Math.min(pages.length - 1, Number.parseInt(params.get('page')) || 0));
 let currentPage = pages[currentIndex];
 
-demo.setSystem(new currentPage.System());
+demo.setSystem(currentPage);
 currentPage.text.classList.add(CLASS_ACTIVE);
 
 demo.init().then(async () => {
@@ -124,7 +122,7 @@ demo.init().then(async () => {
 		currentPage = page;
 		
 		currentPage.text.classList.add(CLASS_ACTIVE);
-		demo.setSystem(new page.System());
+		demo.setSystem(page);
 		page.start?.();
 		
 		textContainer.scrollTop = Math.min(scrollTop, header.offsetHeight);
@@ -142,6 +140,12 @@ demo.init().then(async () => {
 	}
 	
 	currentPage.text.scrollIntoView();
+	
+	demo.pageMinWidth = textContainer.offsetWidth - currentPage.text.clientWidth + 2;
+	demo.pageMinHeight = header.offsetHeight;
+	
+	textContainer.style.minWidth = `${demo.pageMinWidth}px`;
+	textContainer.style.minHeight = `${demo.pageMinHeight}px`;
 	
 	// handle history navigation without reloading the site
 	window.addEventListener('popstate', (event) => {

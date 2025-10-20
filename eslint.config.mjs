@@ -52,7 +52,7 @@ export default [
 			'@stylistic/quote-props': ['error', 'as-needed'],
 			'@stylistic/no-tabs': ['error', {allowIndentationTabs: true}],
 			'@stylistic/object-curly-spacing': ['error', 'never'],
-			'@stylistic/operator-linebreak': ['error', 'before', {overrides: {'?': 'after', ':': 'after'}}],
+			'@stylistic/operator-linebreak': ['error', 'after'],
 			'@stylistic/object-curly-newline': ['error', {consistent: true}],
 			'@stylistic/arrow-parens': ['error', 'always'],
 			'@stylistic/linebreak-style': ['error', 'unix'],

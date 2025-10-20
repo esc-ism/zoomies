@@ -50,22 +50,27 @@ const getInitialRatio = () => isVertical() ?
 		Math.min(1, (window.innerWidth / 2) / window.innerHeight);
 
 class ActionHook {
-	listeners = [];
+	listeners = {
+		local: [],
+		global: [],
+	};
 	
-	add(listener) {
-		this.listeners.push(listener);
+	add(listener, isGlobal = false) {
+		this.listeners[isGlobal ? 'global' : 'local'].push(listener);
 	}
 	
 	emit() {
-		for (let i = this.listeners.length - 1; i >= 0; --i) {
-			if (this.listeners[i]()) {
-				this.listeners.splice(i, 1);
+		for (const listeners of [this.listeners.global, this.listeners.local]) {
+			for (let i = listeners.length - 1; i >= 0; --i) {
+				if (listeners[i]()) {
+					listeners.splice(i, 1);
+				}
 			}
 		}
 	}
 	
 	clear() {
-		this.listeners.length = 0;
+		this.listeners.local.length = 0;
 	}
 }
 
@@ -96,24 +101,26 @@ export default new class {
 			
 			if (isHorizontal) {
 				const position = event.clientX - offset;
+				const max = window.innerWidth - this.pageMinWidth - event.target.offsetWidth;
 				
-				if (window.innerWidth > position + event.target.clientWidth) {
-					this.ratioViewport = (event.clientX - offset) / this.sizesViewport.height;
+				if (position < max) {
+					this.ratioViewport = position / this.sizesViewport.height;
 					
 					return;
 				}
 				
-				ratio = (window.innerWidth - event.target.clientWidth) / this.sizesViewport.height;
+				ratio = max / this.sizesViewport.height;
 			} else {
 				const position = event.clientY - offset;
+				const max = window.innerHeight - this.pageMinHeight - event.target.offsetHeight;
 				
-				if (window.innerHeight > position + event.target.clientHeight) {
-					this.ratioViewport = this.sizesViewport.width / (event.clientY - offset);
+				if (position < max) {
+					this.ratioViewport = this.sizesViewport.width / position;
 					
 					return;
 				}
 				
-				ratio = this.sizesViewport.width / (window.innerHeight - event.target.clientHeight);
+				ratio = this.sizesViewport.width / max;
 			}
 			
 			if (this.ratioViewport !== ratio) {
@@ -424,11 +431,20 @@ export default new class {
 		
 		for (const key of Object.keys(this.listeners)) {
 			this.hooks[key] = new ActionHook();
+			
+			const listener = this.listeners[key];
+			
+			this.listeners[key] = (...args) => {
+				this.hooks[key].emit();
+				
+				return listener(...args);
+			};
 		}
 	}
 	
-	setSystem(system) {
-		this.system = system;
+	setSystem({System, text}) {
+		this.system = new System();
+		this.page = text;
 		
 		// todo do you need ratioImage: true?
 		this.system.constrainPosition({ratio: true});
@@ -648,11 +664,13 @@ export default new class {
 	}
 	
 	deleteTween() {
-		this.target.hide();
-		
 		this.tween.kill();
 		
+		window.clearTimeout(this.#tweenUpdateId);
+		
 		delete this.tween;
+		
+		this.target.hide();
 	}
 	
 	getTweenTarget(tween) {
@@ -766,7 +784,9 @@ export default new class {
 	}
 	
 	setTween(...targets) {
-		this.tween?.progress(0).kill();
+		if (this.tween) {
+			this.deleteTween();
+		}
 		
 		this.tween = gsap.timeline({paused: true, data: {}});
 		

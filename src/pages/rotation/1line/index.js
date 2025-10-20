@@ -3,9 +3,8 @@ import System, {getBound, getZoomPoints} from './demo';
 import SHARED_FUNCTIONS from '../code';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, getInstruction} from '../../shared';
+import {getText, getCode, getButton, getInstruction, getInputDependent} from '../../shared';
 
-import {InputMethod} from '@/consts';
 import {DEGREES} from '@/shared';
 import {xmlns, opSpace, getOverlined} from '@/pages/shared/svg';
 
@@ -206,15 +205,7 @@ export default {
 			'Knowing this, only the top-left and top-right corners need be considered.',
 			getInstruction([
 				'This code snippet includes custom functions. ',
-				{tag: 'span', callback: (element) => {
-					const update = () => {
-						element.innerText = `Click "getStartZooms" to unfold it and ${InputMethod.isMouse ? 'click' : 'tap'} the "function" text to re-fold.`;
-					};
-					
-					update();
-					
-					InputMethod.addListener(update);
-				}},
+				getInputDependent((isMouse) => `Click "getStartZooms" to unfold it and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
 				'Note that the "rotation" value\'s unit is ',
 				{
 					tag: 'a',

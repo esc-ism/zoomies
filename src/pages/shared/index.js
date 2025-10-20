@@ -4,8 +4,26 @@ import generateCode from '../code';
 
 import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
-	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
+	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER, CLASS_BUTTON_ACTIVE,
 } from '../consts';
+import {InputMethod} from '@/consts';
+
+let activeButton;
+
+for (const action of Object.keys(demo.listeners)) {
+	demo.hooks[action].add(() => {
+		if (activeButton) {
+			activeButton.removeEventListener('blur', releaseButton);
+			activeButton.blur();
+			
+			activeButton.classList.remove(CLASS_BUTTON_ACTIVE);
+			activeButton = undefined;
+			
+			demo.deleteTween();
+			demo.progress.complete();
+		}
+	}, true);
+}
 
 const addContent = (parent, content) => {
 	if (typeof content === 'object') {
@@ -91,50 +109,52 @@ export const getCode = (callbacks, statements) => {
 	};
 };
 
+const releaseButton = () => {
+	activeButton.classList.remove(CLASS_BUTTON_ACTIVE);
+	activeButton = undefined;
+	
+	if (demo.tween.totalDuration() > 0 && demo.tween.time() > 0) {
+		demo.tween
+			.timeScale(3)
+			.reverse();
+	} else {
+		demo.tween.revert();
+		
+		demo.tween.vars.onUpdate();
+		demo.tween.vars.onReverseComplete();
+	}
+};
+
 export const getButton = (text, tweens, {doReset = false, getParam = () => undefined} = {}) => {
 	const resetTweens = doReset ? TWEENS_RESET : [];
+	
+	let element;
 	
 	return {
 		tag: 'span',
 		content: text,
 		classList: [CLASS_BUTTON],
-		onpointerover: () => {
+		tabIndex: 0,
+		onclick: () => {
+			if (element.isSameNode(activeButton)) {
+				element.removeEventListener('blur', releaseButton);
+				
+				releaseButton();
+				
+				return;
+			}
+			
+			element.classList.add(CLASS_BUTTON_ACTIVE);
+			activeButton = element;
+			
+			element.addEventListener('blur', releaseButton, {once: true});
+			
 			const param = getParam();
 			
 			demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
 		},
-		onpointerout: () => {
-			// todo do you need to require registerSystem and check if demo.system === system ?
-			if (!demo.tween) {
-				return;
-			}
-			
-			if (demo.tween.totalDuration() > 0 && demo.tween.time() > 0) {
-				demo.tween
-					.timeScale(3)
-					.reverse();
-			} else {
-				demo.tween.revert();
-				
-				demo.tween.vars.onUpdate();
-				demo.tween.vars.onReverseComplete();
-			}
-		},
-		onclick: () => {
-			if (!demo.tween) {
-				return;
-			}
-			
-			demo.progress.complete();
-			
-			demo.tween.progress(1);
-			
-			demo.deleteTween();
-			
-			// hacky solution to run after final tween update
-			demo.tweenUpdate.then(() => {
-				demo.target.hide();
-			});
+		callback: (_element) => {
+			element = _element;
 		},
 	};
 };
@@ -197,3 +217,13 @@ export const flash = (target) => {
 	
 	flash.addEventListener('transitionend', () => flash.remove(), {once: true});
 };
+
+export const getInputDependent = (get) => ({tag: 'span', callback: (element) => {
+	const update = () => {
+		element.innerText = get(InputMethod.isMouse);
+	};
+	
+	update();
+	
+	InputMethod.addListener(update);
+}});
