@@ -16,12 +16,12 @@ addVerticalRule([`#${ID_WRAPPER}`, `#${ID_WRAPPER_IMAGE}`], {
 });
 
 addHorizontalRule(`#${ID_WRAPPER}`, {
-	'padding-right': '20px',
+	'padding-right': '1lh',
 });
 
 addVerticalRule(`#${ID_WRAPPER}`, {
 	'flex-direction': 'column',
-	'padding-bottom': '20px',
+	'padding-bottom': '1lh',
 });
 
 addHorizontalRule(`#${ID_WRAPPER_IMAGE}`, {

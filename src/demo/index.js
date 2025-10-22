@@ -2,7 +2,7 @@ import {gsap} from 'gsap';
 
 import './css';
 
-import {getTheta, DEGREES, ALLOWANCE_ERROR} from '@/shared';
+import {getTheta, DEGREES, ALLOWANCE_ERROR, getAngleDiff} from '@/shared';
 
 import Readout from './readout';
 import Target from './target';
@@ -13,14 +13,8 @@ import elements from './elements';
 import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL, TWEEN_DEFAULT} from './consts';
 import {isVertical, list as orientation} from '@/shared/orientation';
 
-const getAngleDiff = (a, b) => {
-	let diff = a - b;
-	
-	if (diff > DEGREES[180]) {
-		diff = DEGREES[360] - diff;
-	} else if (diff < -DEGREES[180]) {
-		diff = -DEGREES[360] - diff;
-	}
+const getAngleData = (a, b) => {
+	const diff = getAngleDiff(a, b);
 	
 	return [Math.abs(diff), Math.abs(a - diff / 2)];
 };
@@ -85,6 +79,8 @@ export default new class {
 	
 	listeners = {
 		zoom: (increment) => {
+			this.hooks.zoom.emit();
+			
 			if (increment > 0) {
 				this.zoom *= 1 + increment;
 			} else {
@@ -97,6 +93,8 @@ export default new class {
 			this.applyZoom();
 		},
 		resizeViewport: (isHorizontal, offset, event) => {
+			this.hooks.resizeViewport.emit();
+			
 			let ratio;
 			
 			if (isHorizontal) {
@@ -128,6 +126,8 @@ export default new class {
 			}
 		},
 		resizeImage: (increment) => {
+			this.hooks.resizeImage.emit();
+			
 			if (increment > 0) {
 				this.ratioImage *= 1 + increment;
 			} else {
@@ -135,12 +135,16 @@ export default new class {
 			}
 		},
 		resetViewport: () => {
-			this.ratioViewport = 1;
+			this.hooks.resetViewport.emit();
+			
+			this.ratioViewport = getInitialRatio();
 		},
 		pan: () => {
 			const change = {x: 0, y: 0};
 			
 			return (x, y) => {
+				this.hooks.pan.emit();
+				
 				change.x += x;
 				change.y += y;
 				
@@ -157,6 +161,8 @@ export default new class {
 			};
 		},
 		rotate: () => {
+			this.hooks.rotate.emit();
+			
 			const target = {...this.position};
 			
 			this.constrainRotation();
@@ -168,6 +174,8 @@ export default new class {
 			this.applyPosition();
 		},
 		snap: (offsetX, offsetY) => {
+			this.hooks.snap.emit();
+			
 			this.position.x = offsetX / this.sizesImage.width - 0.5;
 			this.position.y = 0.5 - offsetY / this.sizesImage.height;
 			
@@ -177,6 +185,8 @@ export default new class {
 			this.applyPosition();
 		},
 		resetImage: () => {
+			this.hooks.resetImage.emit();
+			
 			this.zoom = 1;
 			this.rotation = DEGREES[90];
 			
@@ -271,7 +281,6 @@ export default new class {
 			this.addPointerDownListener(
 				viewport, image,
 				{
-					isClick: ({buttons, target}) => buttons !== 1 || image.isSameNode(target),
 					onStart: () => {
 						image.style.cursor = 'grabbing';
 					},
@@ -280,13 +289,13 @@ export default new class {
 						
 						image.style.removeProperty('cursor');
 					},
-					get: ({pointerType, offsetX, offsetY, buttons}) => pointerType === 'mouse' ?
+					get: ({pointerType, offsetX, offsetY, buttons, target}) => pointerType === 'mouse' ?
 							[
 								() => {
-									if (buttons === 1) {
-										this.listeners.snap(offsetX, offsetY);
-									} else {
+									if (buttons !== 1) {
 										this.listeners.resetImage();
+									} else if (image.isSameNode(target)) {
+										this.listeners.snap(offsetX, offsetY);
 									}
 								},
 								buttons === 1 ?
@@ -332,7 +341,7 @@ export default new class {
 								(clickCount) => {
 									if (clickCount > 1) {
 										this.listeners.resetImage();
-									} else {
+									} else if (image.isSameNode(target)) {
 										this.listeners.snap(offsetX, offsetY);
 									}
 								},
@@ -376,7 +385,7 @@ export default new class {
 											return;
 										}
 										
-										const [angleDiff, angleMean] = getAngleDiff(touch.angle, other.angle);
+										const [angleDiff, angleMean] = getAngleData(touch.angle, other.angle);
 										
 										if (angleDiff > DEGREES[90]) {
 											if (angleDiff > DEGREES[270]) {
@@ -431,14 +440,6 @@ export default new class {
 		
 		for (const key of Object.keys(this.listeners)) {
 			this.hooks[key] = new ActionHook();
-			
-			const listener = this.listeners[key];
-			
-			this.listeners[key] = (...args) => {
-				this.hooks[key].emit();
-				
-				return listener(...args);
-			};
 		}
 	}
 	
@@ -450,7 +451,7 @@ export default new class {
 		this.system.constrainPosition({ratio: true});
 	}
 	
-	addPointerDownListener(element, target, {isClick: getIsClick, onStart, onFinish, get}) {
+	addPointerDownListener(element, target, {onStart, onFinish, get}) {
 		const events = {};
 		let pointerCount = 0;
 		let clickCount = 0;
@@ -489,7 +490,7 @@ export default new class {
 			
 			pointerCount++;
 			
-			let isClick = getIsClick?.(event) ?? true;
+			let isClick = true;
 			
 			target.setPointerCapture(event.pointerId);
 			

@@ -2,7 +2,7 @@ import './css';
 
 import demo from './demo';
 import pages from './pages';
-import {CLASS_WRAPPER, InputMethod} from './consts';
+import {CLASS_WRAPPER, inputListener} from './consts';
 import touchIcon from './input/touch';
 import mouseIcon from './input/mouse';
 import {CLASS_ACTIVE} from './pages/consts';
@@ -25,9 +25,9 @@ const header = (() => {
 	container.style.boxSizing = 'border-box';
 	container.style.position = 'sticky';
 	container.style.left = '0';
+	container.style.marginTop = '-3em';
 	// avoid affecting page positions
 	container.style.marginLeft = '-100%';
-	container.style.marginTop = '-3em';
 	
 	const email = document.createElement('a');
 	
@@ -46,8 +46,8 @@ const header = (() => {
 	buttonContainer.style.height = '100%';
 	buttonContainer.style.display = 'flex';
 	
-	const update = () => {
-		const [on, off] = InputMethod.isMouse ? [mouseIcon, touchIcon] : [touchIcon, mouseIcon];
+	const update = (isMouse) => {
+		const [on, off] = isMouse ? [mouseIcon, touchIcon] : [touchIcon, mouseIcon];
 		
 		on.disabled = true;
 		on.style.removeProperty('cursor');
@@ -56,16 +56,14 @@ const header = (() => {
 		off.style.cursor = 'pointer';
 	};
 	
-	InputMethod.addListener(update);
-	
-	update();
+	inputListener.add(update);
 	
 	mouseIcon.addEventListener('click', () => {
-		InputMethod.isMouse = true;
+		inputListener.set(true);
 	});
 	
 	touchIcon.addEventListener('click', () => {
-		InputMethod.isMouse = false;
+		inputListener.set(false);
 	});
 	
 	buttonContainer.append(touchIcon, mouseIcon);
@@ -82,7 +80,6 @@ textContainer.style.overflow = 'auto';
 textContainer.style.paddingTop = '3em';
 textContainer.style.position = 'relative';
 textContainer.style.flexGrow = '1';
-textContainer.style.maxHeight = '100vh';
 textContainer.style.boxSizing = 'border-box';
 textContainer.tabIndex = 0;
 

@@ -15,3 +15,17 @@ export const getTheta = (toX, toY, fromX = 0, fromY = 0) => Math.atan2(toY - fro
 export const ALLOWANCE_ERROR = 0.001;
 
 export const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+export const getAngleDiff = (a, b) => {
+	const diff = a - b;
+	
+	if (diff > DEGREES[180]) {
+		return DEGREES[360] - diff;
+	}
+	
+	if (diff < -DEGREES[180]) {
+		return -DEGREES[360] - diff;
+	}
+	
+	return diff;
+};

@@ -6,7 +6,7 @@ addRule(':root', {
 	'--color': '#dddddd',
 	'--background': '#231e25',
 	
-	'font-family': 'perpetua, serif',
+	'font-family': 'EnsuredPerpetua',
 	'font-size': '21px',
 	'font-weight': '400',
 	'background-color': 'var(--background)',

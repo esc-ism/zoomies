@@ -1,3 +1,4 @@
+import {inputListener} from '@/consts';
 import {getIdGetter} from '@/shared/css';
 
 const getId = getIdGetter('demo');
@@ -13,7 +14,11 @@ export const ID_CROSSHAIR = getId('crosshair');
 export const ID_RESIZER_HORIZONTAL = getId('resizer', 'horizontal');
 export const ID_RESIZER_VERTICAL = getId('resizer', 'vertical');
 
-export const ALLOWANCE_CLICK = 1;
+export let ALLOWANCE_CLICK;
+
+inputListener.add((isMouse) => {
+	ALLOWANCE_CLICK = isMouse ? 1 : 2;
+});
 
 export const MULTIPLIERS_SCROLL = [1, 40, 800];
 

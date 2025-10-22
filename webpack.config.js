@@ -10,8 +10,10 @@ const shared = {
 		},
 	},
 	entry: './src/index.js',
-	plugins: [new FileCopy({patterns: [{from: './src/index.html'}]})],
-	
+	plugins: [new FileCopy({patterns: [
+		{from: './src/index.html'},
+		{from: './fonts/*'},
+	]})],
 };
 
 module.exports = [

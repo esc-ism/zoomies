@@ -17,7 +17,7 @@ addRule(`.${CLASS_CONTAINER}`, {
 	right: '0',
 	display: 'flex',
 	'flex-wrap': 'nowrap',
-	height: '20px',
+	height: '1lh',
 	'margin-right': '10px',
 });
 

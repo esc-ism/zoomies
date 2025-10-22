@@ -794,13 +794,6 @@ export default {
 		for (const {start} of code) {
 			start();
 		}
-		
-		demo.rotation = 1.405778811644593;
-		demo.zoom = 1.3872297789271852;
-		demo.ratioImage = 0.747559670613474;
-		
-		demo.applyZoom();
-		demo.applyRotation();
 	},
 	end() {
 		cleanup();
@@ -972,6 +965,6 @@ export default {
 			'From there, fixation became obsession and my project\'s scope ballooned way beyond what was sensible.',
 			'Still, having broke the surface of this abyss, I\'m proud to have pushed my limits so far.',
 		],
-		{style: {textAlign: 'center', font: '1.8em "viner hand itc", cursive'}, content: 'Thanks for reading ✌'},
+		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC'}, content: 'Thanks for reading ✌'},
 	),
 };

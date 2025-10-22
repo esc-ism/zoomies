@@ -2,12 +2,12 @@ import {getId} from './shared/css';
 
 export const CLASS_WRAPPER = getId('wrapper');
 
-export const InputMethod = new class {
+export const inputListener = new class {
 	#id = 'isMouse';
 	#isMouse = JSON.parse(localStorage.getItem(this.#id)) ?? window.matchMedia('(pointer: fine)').matches;
 	#listeners = [];
 	
-	set isMouse(value) {
+	set(value) {
 		this.#isMouse = value;
 		
 		localStorage.setItem(this.#id, value);
@@ -17,11 +17,11 @@ export const InputMethod = new class {
 		}
 	}
 	
-	get isMouse() {
-		return this.#isMouse;
-	}
-	
-	addListener(listener) {
+	add(listener, doCall = true) {
 		this.#listeners.push(listener);
+		
+		if (doCall) {
+			listener(this.#isMouse);
+		}
 	}
 }();

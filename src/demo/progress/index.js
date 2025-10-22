@@ -42,6 +42,8 @@ export default class {
 	}
 	
 	reset() {
+		this.element.style.width = '0';
+		
 		this.timeline.progress(0).pause();
 	}
 	

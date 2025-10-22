@@ -85,7 +85,7 @@ elements.resizerHorizontal = generate({
 	style: {
 		right: 0,
 		height: '100%',
-		width: '20px',
+		width: '1lh',
 		'border-right': '1px solid white',
 		cursor: 'col-resize',
 	},
@@ -98,7 +98,7 @@ elements.resizerVertical = generate({
 	style: {
 		bottom: 0,
 		width: '100%',
-		height: '20px',
+		height: '1lh',
 		'border-bottom': '1px solid white',
 		cursor: 'row-resize',
 	},

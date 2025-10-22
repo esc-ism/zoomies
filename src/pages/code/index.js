@@ -5,7 +5,7 @@ import {Line} from '@/demo/lines/lines';
 
 import getButtons from './buttons';
 
-import {flash} from '../shared';
+import flash from '../shared/flash';
 import {DEGREES} from '@/shared';
 import {SVG_NAMESPACE} from '@/shared';
 import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED} from './consts';

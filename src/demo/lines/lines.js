@@ -48,11 +48,10 @@ export class Line {
 	static template = document.createElement('div');
 	
 	static {
-		this.template.style.pointerEvents = 'one';
 		this.template.style.position = 'absolute';
 		this.template.style.transformOrigin = 'top center';
 		this.template.style.translate = '-50% 0';
-		this.template.style.width = `${window.devicePixelRatio}px`;
+		this.template.style.width = '1px';
 	}
 	
 	element = (this.constructor.template ?? Line.template).cloneNode();

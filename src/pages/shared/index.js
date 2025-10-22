@@ -1,4 +1,5 @@
 import demo from '@/demo';
+import {inputListener} from '@/consts';
 
 import generateCode from '../code';
 
@@ -6,7 +7,6 @@ import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
 	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER, CLASS_BUTTON_ACTIVE,
 } from '../consts';
-import {InputMethod} from '@/consts';
 
 let activeButton;
 
@@ -178,7 +178,7 @@ export const getText = (...children) => {
 	wrapper.style.scrollSnapAlign = 'center';
 	wrapper.style.scrollSnapStop = 'always';
 	
-	container.style.padding = '0 20px';
+	container.style.padding = '0 1em';
 	container.style.boxSizing = 'border-box';
 	
 	wrapper.classList.add(CLASS_WRAPPER);
@@ -191,39 +191,10 @@ export const getText = (...children) => {
 
 export const getInstruction = (...content) => ({classList: [CLASS_INSTRUCTION], content});
 
-export const flash = (target) => {
-	// todo remove
-	if (!target.classList.contains(CLASS_FLASH_CONTAINER)) {
-		console.error('ohno');
-		debugger;
-	}
-	
-	const flash = document.createElement('span');
-	
-	flash.style.position = 'absolute';
-	flash.style.height = '100%';
-	flash.style.width = '100%';
-	flash.style.backgroundColor = '#777';
-	flash.style.top = '0';
-	flash.style.left = '0';
-	flash.style.opacity = '1';
-	flash.style.transition = 'opacity 0.5s ease-out';
-	
-	target.appendChild(flash);
-	
-	window.setTimeout(() => {
-		flash.style.opacity = '0';
-	}, 0);
-	
-	flash.addEventListener('transitionend', () => flash.remove(), {once: true});
-};
-
 export const getInputDependent = (get) => ({tag: 'span', callback: (element) => {
-	const update = () => {
-		element.innerText = get(InputMethod.isMouse);
+	const update = (isMouse) => {
+		element.innerText = get(isMouse);
 	};
 	
-	update();
-	
-	InputMethod.addListener(update);
+	inputListener.add(update);
 }});
