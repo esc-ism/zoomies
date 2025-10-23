@@ -27,11 +27,15 @@ export default class {
 	tangents = new Tangents(4, false, false, true);
 	
 	constructor() {
-		demo.hooks.ratioChange.add(() => {
+		const setCornerData = () => {
 			demo.cornerAngle = Math.atan(demo.ratioImage);
 			
 			demo.cornerDistance = getCornerDistance(demo.sizesImage);
-		});
+		};
+		
+		demo.hooks.ratioChange.add(setCornerData);
+		
+		setCornerData();
 	}
 	
 	setBounds(bounds) {
