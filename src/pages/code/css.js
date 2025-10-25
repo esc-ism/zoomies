@@ -112,6 +112,6 @@ addRule(`.${CLASS_MAXIMISED} > *`, {
 });
 
 addRule(`.${CLASS_CODE}:not(.${CLASS_MAXIMISED}) > *`, {
-	'max-height': 'calc(100dvh - 2em)',
+	'max-height': 'calc(100dvh - 2em - 16px)',
 	overscroll: 'contain',
 });

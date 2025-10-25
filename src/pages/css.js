@@ -53,12 +53,18 @@ addRule(`.${CLASS_MATH}`, {
 	'background-color': '#372d2d',
 });
 
+addRule('mtext', {width: 'max-content'});
+
 addRule(`.${CLASS_MATH} math`, {
 	'overflow-x': 'auto',
 	'font-family': '"cambria math", math',
 	'font-size': '0.9em',
 	padding: '0.4em',
 	display: 'block',
+});
+
+addRule(`.${CLASS_MATH} math + math`, {
+	'border-top': '1px solid #868686',
 });
 
 const buttonColour = '#eaacfd';
@@ -71,6 +77,14 @@ addRule(`.${CLASS_BUTTON_ACTIVE}`, {
 addRule(`.${CLASS_BUTTON}`, {
 	color: buttonColour,
 	cursor: 'pointer',
+});
+
+addRule(`.${CLASS_BUTTON}:hover`, {
+	'text-shadow': 'currentcolor 0 0 1px',
+});
+
+addRule(`.${CLASS_BUTTON_ACTIVE}:hover`, {
+	'text-shadow': 'currentcolor 0 0 0.5px',
 });
 
 addRule([`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::before`, `.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::after`], {

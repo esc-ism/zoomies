@@ -808,17 +808,17 @@ export default {
 			content: 'Tripled Down',
 			style: {textAlign: 'center'},
 		},
-		'So single-line rails don\'t work too well, double-line has issues... is third line the charm?',
+		'Single-line rails don\'t work too well, double-line has issues... is third line the charm?',
 		[
 			'The prior system can be fixed by adding a "connecting rail" between the others.',
-			'This rail can be used to ensure the preferred origin rail direction is usable.',
-			'Like in the prior system, origin rail start zoom depends on when the first pair of image corners first contacts the viewport rim.',
-			'Connecting rail start zoom is similar, but depends on the remaining pair of image corners.',
-			'Connecting rails are directed at viewport corners to keep both image corners visible.',
+			'With this rail, we can ensure that the preferred origin rail direction is usable.',
+			'Origin rails are unchanged, with one pair of image corners hitting the viewport rim at their start zoom.',
+			'The remaining pair of image corners hit the viewport rim at connecting rail start zooms.',
+			'Connecting rails are pointed directly towards viewport corners, which keeps both image corners visible.',
 		],
 		[
-			'It\'s possible for a lock rail to intersect with its origin rail before its connector.',
-			'In these instances, the connector is discarded.',
+			'It\'s possible for a lock rail to intersect with its origin rail before its connecting rail.',
+			'In these instances, the connecting rail isn\'t used.',
 		],
 		{
 			tag: 'h2',
@@ -826,6 +826,11 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		// todo
+		[
+			'The prior system required us to calculate the coordinates of viewport edge midpoints.',
+			'Here, we must find the coordinates of a viewport corner at the connecting rail\'s start zoom when the viewport is centered on its intersection with the origin rail.',
+			
+		],
 		getCode(code, [
 			{op: '=', id: [
 				'thirdZoom0', 'thirdX0', 'thirdY0', 'thirdZoom1', 'thirdX1', 'thirdY1',

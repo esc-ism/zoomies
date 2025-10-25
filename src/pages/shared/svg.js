@@ -20,9 +20,9 @@ export const getLine = ([x1, y1], [x2, y2]) => {
 	return line;
 };
 
-export const COLOURS = ['#374', '#962', '#722'];
-
-const DIAGRAM_SCALE = 15;
+// todo delete
+export const OLD_COLOURS = ['#374', '#962', '#722'];
+export const COLOURS = ['rgba(218, 160, 65, 1)', 'rgba(66, 185, 211, 1)'];
 
 export const getDiagram = (radii, strokeRadius, topLeft, topRight) => {
 	const strokeDiameter = strokeRadius * 2;
@@ -37,9 +37,8 @@ export const getDiagram = (radii, strokeRadius, topLeft, topRight) => {
 	svg.setAttribute('stroke-opacity', '0.8');
 	
 	svg.style.textAlign = 'center';
-	svg.style.width = `${radii.x * DIAGRAM_SCALE}px`;
-	svg.style.border = `${strokeRadius * DIAGRAM_SCALE}px solid black`;
 	svg.style.backgroundColor = '#111';
+	svg.style.maxHeight = `min(calc(100dvh - 2em - 16px), ${130 / strokeRadius}px)`;
 	
 	const image = document.createElementNS(SVG_NAMESPACE, 'path');
 	
@@ -61,7 +60,16 @@ export const getDiagram = (radii, strokeRadius, topLeft, topRight) => {
 		[(topRight[0] + topLeft[0]) / 2, (topRight[1] + topLeft[1]) / 2],
 	].map((point) => getLine([-point[0], -point[1]], point)));
 	
-	svg.append(axes);
+	const border = document.createElementNS(SVG_NAMESPACE, 'g');
+	
+	border.append(
+		getLine([-radii.x, -radii.y], [radii.x, -radii.y]),
+		getLine([radii.x, -radii.y], [radii.x, radii.y]),
+		getLine([radii.x, radii.y], [-radii.x, radii.y]),
+		getLine([-radii.x, radii.y], [-radii.x, -radii.y]),
+	);
+	
+	svg.append(border, axes);
 	
 	return svg;
 };

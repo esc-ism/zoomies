@@ -2,7 +2,6 @@ import demo from '@/demo';
 import elements from '@/demo/elements';
 
 import Hideables from './copies';
-
 import {setLineStyle} from '../bounds';
 import {Line} from './lines';
 

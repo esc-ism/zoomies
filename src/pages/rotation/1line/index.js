@@ -9,6 +9,7 @@ import {DEGREES} from '@/shared';
 import {xmlns, opSpace, getOverlined} from '@/pages/shared/svg';
 
 import {CLASS_MATH, CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
+import zoomImage from './pointsImage';
 
 import * as mock from '../mock';
 
@@ -203,37 +204,589 @@ export default {
 			'To know each rail\'s start zoom, we need to find the maximum zoom at which image corners are visible from the origin.',
 			'Adjacent rails can differ, but opposite rails always share a start zoom.',
 			'Knowing this, only the top-left and top-right corners need be considered.',
-			getInstruction([
-				'This code snippet includes custom functions. ',
-				getInputDependent((isMouse) => `Click "getStartZooms" to unfold it and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
-				'Note that the "rotation" value\'s unit is ',
-				{
-					tag: 'a',
-					content: 'radians',
-					href: 'https://en.wikipedia.org/wiki/Radian',
-				},
-				' and has a default value of ',
-				{
-					tag: 'span',
-					style: {'white-space': 'nowrap'},
-					content: [
-						{tag: 'math', xmlns, content: [
-							{tag: 'mn', xmlns, content: '½'},
-							{tag: 'mi', xmlns, content: 'π'},
+		],
+		// todo
+		[
+			'Origin rail start zooms are unchanged, but now travel directly towards viewport edge midpoints.',
+			'This requires us to find the coordinates of these midpoints.',
+			'Using the base image corners and the viewport\'s top edge as an example, a diagram of the problem is given below, followed by its solution.',
+		],
+		{
+			tag: 'div',
+			content: zoomImage,
+			style: {textAlign: 'center'},
+		},
+		{tag: 'p', classList: [CLASS_MATH], content: [
+			{tag: 'math', xmlns, content: [
+				{tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mtext', xmlns, content: 'let the image\'s angle of rotation be '},
 						]},
-						'.',
-					],
-				},
-			]),
-			getCode(code, [
-				{op: '=', id: ['topLeftZoom', 'topRightZoom'], and: {
-					op: 'call', id: 'getStartZooms',
-				}},
-			]),
-			[
-				'Given these zoom values, deriving pan-limits is straightforward.',
-				'The calculation is demonstrated below.',
-			],
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'θ'},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mtext', xmlns, content: 'let the viewport side start zoom be '},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'z'},
+								{tag: 'mi', xmlns, content: 'x'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mtext', xmlns, content: 'let the viewport base start zoom be '},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'z'},
+								{tag: 'mi', xmlns, content: 'y'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mtext', xmlns, content: 'let half of the image\'s width be'},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'i'},
+								{tag: 'mi', xmlns, content: 'w'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mtext', xmlns, content: 'let half of the image\'s height be'},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'i'},
+								{tag: 'mi', xmlns, content: 'h'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mtext', xmlns, content: 'let half of the viewport\'s width at default zoom be'},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'v'},
+								{tag: 'mi', xmlns, content: 'w'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mtext', xmlns, content: 'let half of the viewport\'s height at default zoom be'},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'v'},
+								{tag: 'mi', xmlns, content: 'h'},
+							]},
+						]},
+					]},
+				]},
+			]},
+			{tag: 'math', xmlns, content: [
+				{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'A'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '('},
+							{tag: 'mn', xmlns, content: '0'},
+							{tag: 'mo', xmlns, content: ', '},
+							{tag: 'mn', xmlns, content: '0'},
+							{tag: 'mo', xmlns, content: ')'},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'B'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '('},
+							{tag: 'mo', xmlns, content: '-'},
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'i'},
+								{tag: 'mi', xmlns, content: 'w'},
+							]},
+							{tag: 'mo', xmlns, content: ', '},
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'i'},
+								{tag: 'mi', xmlns, content: 'h'},
+							]},
+							{tag: 'mo', xmlns, content: ')'},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'D'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '('},
+							{tag: 'mn', xmlns, content: '0'},
+							{tag: 'mo', xmlns, content: ', '},
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'i'},
+								{tag: 'mi', xmlns, content: 'h'},
+							]},
+							{tag: 'mo', xmlns, content: ')'},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '|'},
+							{tag: 'mi', xmlns, content: 'A'},
+							{tag: 'mi', xmlns, content: 'C'},
+							{tag: 'mo', xmlns, content: '|'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'v'},
+										{tag: 'mi', xmlns, content: 'h'},
+									]},
+								]},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'z'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+								]},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '|'},
+							{tag: 'mi', xmlns, content: 'B'},
+							{tag: 'mi', xmlns, content: 'C'},
+							{tag: 'mo', xmlns, content: '|'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'v'},
+										{tag: 'mi', xmlns, content: 'w'},
+									]},
+								]},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'z'},
+										{tag: 'mi', xmlns, content: 'x'},
+									]},
+								]},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '∠'},
+							{tag: 'mi', xmlns, content: 'C'},
+							{tag: 'mi', xmlns, content: 'A'},
+							{tag: 'mi', xmlns, content: 'D'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'θ'},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '∠'},
+							{tag: 'mi', xmlns, content: 'A'},
+							{tag: 'mi', xmlns, content: 'D'},
+							{tag: 'mi', xmlns, content: 'B'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mn', xmlns, content: '90'},
+							{tag: 'mo', xmlns, content: '°'},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '∠'},
+							{tag: 'mi', xmlns, content: 'A'},
+							{tag: 'mi', xmlns, content: 'C'},
+							{tag: 'mi', xmlns, content: 'B'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mn', xmlns, content: '90'},
+							{tag: 'mo', xmlns, content: '°'},
+						]},
+					]},
+				]},
+			]},
+			{tag: 'math', xmlns, content: [
+				{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, content: '∠'},
+								{tag: 'mi', xmlns, content: 'D'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+							]},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'msup', xmlns, content: [
+									{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'tan'},
+									{tag: 'mn', xmlns, content: '-1'},
+								]},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'i'},
+											{tag: 'mi', xmlns, content: 'w'},
+										]},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'i'},
+											{tag: 'mi', xmlns, content: 'h'},
+										]},
+									]},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, content: '∠'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+							]},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '∠'},
+									{tag: 'mi', xmlns, content: 'D'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'B'},
+								]},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'mi', xmlns, content: 'θ'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '|'},
+							{tag: 'mi', xmlns, content: 'A'},
+							{tag: 'mi', xmlns, content: 'B'},
+							{tag: 'mo', xmlns, content: '|'},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msqrt', xmlns, content: [
+								{tag: 'msup', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'i'},
+										{tag: 'mi', xmlns, content: 'w'},
+									]},
+									{tag: 'mn', xmlns, content: '2'},
+								]},
+								{tag: 'mo', xmlns, content: '+'},
+								{tag: 'msup', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'i'},
+										{tag: 'mi', xmlns, content: 'h'},
+									]},
+									{tag: 'mn', xmlns, content: '2'},
+								]},
+							]},
+						]},
+					]},
+				]},
+			]},
+			{tag: 'math', xmlns, content: [
+				{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'sin'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mo', xmlns, content: '∠'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mo', xmlns, content: '|'},
+								]},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mo', xmlns, content: '|'},
+								]},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, content: '|'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mo', xmlns, content: '|'},
+							]},
+							{tag: 'mo', xmlns, content: '×'},
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'sin'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mo', xmlns, content: '∠'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, content: '|'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mo', xmlns, content: '|'},
+							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'v'},
+										{tag: 'mi', xmlns, content: 'w'},
+									]},
+								]},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'z'},
+										{tag: 'mi', xmlns, content: 'x'},
+									]},
+								]},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'z'},
+								{tag: 'mi', xmlns, content: 'x'},
+							]},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'v'},
+										{tag: 'mi', xmlns, content: 'w'},
+									]},
+								]},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mo', xmlns, content: '|'},
+										{tag: 'mi', xmlns, content: 'A'},
+										{tag: 'mi', xmlns, content: 'B'},
+										{tag: 'mo', xmlns, content: '|'},
+									]},
+									{tag: 'mo', xmlns, content: '×'},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'sin'},
+										{tag: 'mo', xmlns, content: '('},
+										{tag: 'mo', xmlns, content: '∠'},
+										{tag: 'mi', xmlns, content: 'C'},
+										{tag: 'mi', xmlns, content: 'A'},
+										{tag: 'mi', xmlns, content: 'B'},
+										{tag: 'mo', xmlns, content: ')'},
+									]},
+								]},
+							]},
+						]},
+					]},
+				]},
+			]},
+			{tag: 'math', xmlns, content: [
+				{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'cos'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mo', xmlns, content: '∠'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mo', xmlns, content: '|'},
+								]},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mo', xmlns, content: '|'},
+								]},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, content: '|'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mo', xmlns, content: '|'},
+							]},
+							{tag: 'mo', xmlns, content: '×'},
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'cos'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mo', xmlns, content: '∠'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, content: '|'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mo', xmlns, content: '|'},
+							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'v'},
+										{tag: 'mi', xmlns, content: 'h'},
+									]},
+								]},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'z'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+								]},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'z'},
+								{tag: 'mi', xmlns, content: 'y'},
+							]},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'v'},
+										{tag: 'mi', xmlns, content: 'h'},
+									]},
+								]},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mo', xmlns, content: '|'},
+										{tag: 'mi', xmlns, content: 'A'},
+										{tag: 'mi', xmlns, content: 'B'},
+										{tag: 'mo', xmlns, content: '|'},
+									]},
+									{tag: 'mo', xmlns, content: '×'},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'cos'},
+										{tag: 'mo', xmlns, content: '('},
+										{tag: 'mo', xmlns, content: '∠'},
+										{tag: 'mi', xmlns, content: 'C'},
+										{tag: 'mi', xmlns, content: 'A'},
+										{tag: 'mi', xmlns, content: 'B'},
+										{tag: 'mo', xmlns, content: ')'},
+									]},
+								]},
+							]},
+						]},
+					]},
+				]},
+			]},
+		]},
+		getInstruction([
+			'This code snippet includes custom functions. ',
+			getInputDependent((isMouse) => `Click "getStartZooms" to unfold it and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
+			'Note that the "rotation" value\'s unit is ',
+			{
+				tag: 'a',
+				content: 'radians',
+				href: 'https://en.wikipedia.org/wiki/Radian',
+			},
+			' and has a default value of ',
+			{
+				tag: 'span',
+				style: {'white-space': 'nowrap'},
+				content: [
+					{tag: 'math', xmlns, content: [
+						{tag: 'mn', xmlns, content: '½'},
+						{tag: 'mi', xmlns, content: 'π'},
+					]},
+					'.',
+				],
+			},
+		]),
+		getCode(code, [
+			{op: '=', id: ['topLeftZoom', 'topRightZoom'], and: {
+				op: 'call', id: 'getStartZooms',
+			}},
+		]),
+		[
+			'Given these zoom values, deriving pan-limits is straightforward.',
+			'The calculation is demonstrated below.',
 		],
 		getCode(code, [
 			{op: '=', id: ['topLeftX', 'topLeftY'], and: {

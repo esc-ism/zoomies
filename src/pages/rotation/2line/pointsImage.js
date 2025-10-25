@@ -1,5 +1,5 @@
 import {SVG_NAMESPACE} from '@/shared';
-import {COLOURS, getDiagram, getLine} from '@/pages/shared/svg';
+import {OLD_COLOURS, getDiagram, getLine} from '@/pages/shared/svg';
 
 const radii = {x: 25, y: 20};
 const strokeRadius = 0.4;
@@ -19,7 +19,7 @@ const points = [
 for (let i = 0; i < 3; ++i) {
 	const group = document.createElementNS(SVG_NAMESPACE, 'g');
 	
-	group.setAttribute('stroke', COLOURS[i]);
+	group.setAttribute('stroke', OLD_COLOURS[i]);
 	
 	group.append(getLine(points[i], points[(i + 1) % 3]));
 	
