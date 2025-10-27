@@ -1,10 +1,10 @@
 import {DEGREES} from '@/shared';
-import {xmlns} from '@/pages/shared/svg';
-import {CLASS_MATH, CLASS_MATH_EQUATION} from '../consts';
+import {xmlns} from '@/pages/shared/math';
+import {CLASS_MATH_EQUATION} from '../consts';
 
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
-import {getText, getCode, getButton, getInstruction} from '../shared';
+import {getText, getCode, getButton, getInstruction, getMath} from '../shared';
 import {getSnapPosition} from '../center';
 
 import System from './demo';
@@ -144,9 +144,10 @@ export default {
 			'Snap-panning now requires an accommodating zoom adjustment.',
 			'We can derive the formula by solving the pan-limiting calculation for zoom.',
 		],
-		{tag: 'p', classList: [CLASS_MATH], content: [
-			{tag: 'math', xmlns, content: [
-				{tag: 'mtable', classList: [CLASS_MATH_EQUATION], xmlns, content: [
+		getMath(
+			{
+				title: 'Variables',
+				content: {tag: 'mtable', classList: [CLASS_MATH_EQUATION], xmlns, content: [
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mfrac', xmlns, content: [
@@ -167,88 +168,91 @@ export default {
 						]},
 					]},
 				]},
-			]},
-			{tag: 'math', xmlns, content: [
-				{tag: 'mtable', classList: [CLASS_MATH_EQUATION], xmlns, content: [
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mn', xmlns, content: '0.5'},
-							{tag: 'mo', xmlns, content: '-'},
-							{tag: 'mfrac', xmlns, content: [
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'r'},
+			},
+			{
+				title: {tag: 'mi', content: 'zoom'},
+				content: [
+					{tag: 'mtable', classList: [CLASS_MATH_EQUATION], xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '0.5'},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'r'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'zoom'},
+									]},
 								]},
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'zoom'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: '|position|'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '0.5'},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'mi', xmlns, content: '|position|'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'r'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'zoom'},
+									]},
 								]},
 							]},
 						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'zoom'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mn', xmlns, content: '0.5'},
+								{tag: 'mo', xmlns, content: '-'},
+								{tag: 'mi', xmlns, content: '|position|'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'r'},
+							]},
 						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: '|position|'},
-						]},
-					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mn', xmlns, content: '0.5'},
-							{tag: 'mo', xmlns, content: '-'},
-							{tag: 'mi', xmlns, content: '|position|'},
-						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mo', xmlns, content: '='},
-						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mfrac', xmlns, content: [
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'r'},
-								]},
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'zoom'},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'zoom'},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '='},
+							]},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'r'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mn', xmlns, content: '0.5'},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: '|position|'},
+									]},
 								]},
 							]},
 						]},
 					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'zoom'},
-							{tag: 'mo', xmlns, content: '('},
-							{tag: 'mn', xmlns, content: '0.5'},
-							{tag: 'mo', xmlns, content: '-'},
-							{tag: 'mi', xmlns, content: '|position|'},
-							{tag: 'mo', xmlns, content: ')'},
-						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mo', xmlns, content: '='},
-						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'r'},
-						]},
-					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'zoom'},
-						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mo', xmlns, content: '='},
-						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mfrac', xmlns, content: [
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mi', xmlns, content: 'r'},
-								]},
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mn', xmlns, content: '0.5'},
-									{tag: 'mo', xmlns, content: '-'},
-									{tag: 'mi', xmlns, content: '|position|'},
-								]},
-							]},
-						]},
-					]},
-				]},
-			]},
-		]},
+				],
+			},
+		),
 		getCode(code, [
 			{op: '=', id: 'zoomX', type: 'zoom', and: {
 				op: '/', and: ['½viewportWidth', 'imageWidth', {op: '-', and: [0.5, {op: 'abs', and: 'x'}]}],

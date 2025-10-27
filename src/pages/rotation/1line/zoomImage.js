@@ -1,5 +1,5 @@
 import {SVG_NAMESPACE} from '@/shared';
-import {COLOURS, getDiagram, getLine} from '@/pages/shared/svg';
+import {COLOURS, getDiagram, getLine, getText} from '@/pages/shared/svg';
 
 const radii = {x: 25, y: 20};
 const strokeRadius = 0.4;
@@ -18,25 +18,6 @@ const points = [
 	[radii.x * 0.17, radii.y * -0.6, 1],
 	[-radii.x * 0.8 - strokeRadius, -radii.y],
 ];
-
-const getText = (text, [x, y], strokeRadius, offsetX = 0, offsetY = 0) => {
-	const fontSize = strokeRadius * 10;
-	const element = document.createElementNS(SVG_NAMESPACE, 'text');
-	
-	element.textContent = text;
-	element.style.fontSize = `${fontSize}px`;
-	element.style.fontFamily = '"cambria math", math';
-	element.style.fill = 'currentcolor';
-	element.style.userSelect = 'none';
-	
-	element.setAttribute('stroke-width', '0');
-	element.setAttribute('x', x);
-	element.setAttribute('y', y);
-	element.setAttribute('dx', `${fontSize * offsetX / 1.5}px`);
-	element.setAttribute('dy', `${fontSize / 3 + fontSize * offsetY / 1.5}px`);
-	
-	return element;
-};
 
 const groups = [
 	document.createElementNS(SVG_NAMESPACE, 'g'),

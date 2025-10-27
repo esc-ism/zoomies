@@ -3,11 +3,10 @@ import {DEGREES} from '@/shared';
 
 import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getButton} from '../../shared';
+import {getText, getCode, getButton, getMath} from '../../shared';
 
 import System from './demo';
-import {xmlns} from '@/pages/shared/svg';
-import {CLASS_MATH} from '@/pages/consts';
+import {xmlns} from '@/pages/shared/math';
 
 const code = [];
 
@@ -829,8 +828,8 @@ export default {
 		[
 			'The prior system required us to calculate the coordinates of viewport edge midpoints.',
 			'Here, we must find the coordinates of a viewport corner at the connecting rail\'s start zoom when the viewport is centered on its intersection with the origin rail.',
-			
 		],
+		'to do...',
 		getCode(code, [
 			{op: '=', id: [
 				'thirdZoom0', 'thirdX0', 'thirdY0', 'thirdZoom1', 'thirdX1', 'thirdY1',
@@ -892,30 +891,28 @@ export default {
 			'Bounds are less inheritently less intuitive when they move around, and, especially when handling rotation, users are granted less viewfinding freedom.',
 			'Plus, there\'s obviously a huge efficiency dropoff from the good old days of',
 		],
-		{tag: 'p', classList: [CLASS_MATH], content: [
-			{tag: 'math', xmlns, content: [
-				{tag: 'mtable', xmlns, content: [
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mn', xmlns, content: '-0.5'},
-							{tag: 'mo', xmlns, content: '⩽'},
-							{tag: 'mi', xmlns, content: 'x'},
-							{tag: 'mo', xmlns, content: '⩽'},
-							{tag: 'mn', xmlns, content: '0.5'},
-						]},
+		getMath({
+			content: {tag: 'mtable', xmlns, content: [
+				{tag: 'mtr', xmlns, content: [
+					{tag: 'mtd', xmlns, content: [
+						{tag: 'mn', xmlns, content: '-0.5'},
+						{tag: 'mo', xmlns, content: '⩽'},
+						{tag: 'mi', xmlns, content: 'x'},
+						{tag: 'mo', xmlns, content: '⩽'},
+						{tag: 'mn', xmlns, content: '0.5'},
 					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mn', xmlns, content: '-0.5'},
-							{tag: 'mo', xmlns, content: '⩽'},
-							{tag: 'mi', xmlns, content: 'y'},
-							{tag: 'mo', xmlns, content: '⩽'},
-							{tag: 'mn', xmlns, content: '0.5'},
-						]},
+				]},
+				{tag: 'mtr', xmlns, content: [
+					{tag: 'mtd', xmlns, content: [
+						{tag: 'mn', xmlns, content: '-0.5'},
+						{tag: 'mo', xmlns, content: '⩽'},
+						{tag: 'mi', xmlns, content: 'y'},
+						{tag: 'mo', xmlns, content: '⩽'},
+						{tag: 'mn', xmlns, content: '0.5'},
 					]},
 				]},
 			]},
-		]},
+		}),
 		[
 			'to the monster we have here.',
 			'Because of this, I still prefer "Viewport Center" as a pan-limiter.',

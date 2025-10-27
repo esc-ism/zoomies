@@ -1,11 +1,11 @@
 import {DEGREES, getAngleDiff} from '@/shared';
-import {xmlns} from '@/pages/shared/svg';
+import {xmlns} from '@/pages/shared/math';
 import demo from '@/demo';
 import {inputListener} from '@/consts';
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
-import {CLASS_FLASH_CONTAINER, CLASS_MATH} from '../consts';
-import {getText, getButton, getInstruction, getInputDependent} from '../shared';
+import {CLASS_FLASH_CONTAINER, CLASS_MATH_WRAPPER} from '../consts';
+import {getText, getButton, getInstruction, getInputDependent, getMath} from '../shared';
 import flash from '../shared/flash';
 
 import getRestartButton from './restart';
@@ -280,30 +280,28 @@ export default {
 			'To demonstrate the value of pan-limiting, I\'m starting with a system that neglects it.',
 			'It may be described like:',
 		],
-		{tag: 'p', classList: [CLASS_MATH], content: [
-			{tag: 'math', xmlns, content: [
-				{tag: 'mtable', xmlns, content: [
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mn', xmlns, content: '-∞'},
-							{tag: 'mo', xmlns, content: '<'},
-							{tag: 'mi', xmlns, content: 'x'},
-							{tag: 'mo', xmlns, content: '<'},
-							{tag: 'mn', xmlns, content: '∞'},
-						]},
+		getMath({
+			content: {tag: 'mtable', xmlns, content: [
+				{tag: 'mtr', xmlns, content: [
+					{tag: 'mtd', xmlns, content: [
+						{tag: 'mn', xmlns, content: '-∞'},
+						{tag: 'mo', xmlns, content: '<'},
+						{tag: 'mi', xmlns, content: 'x'},
+						{tag: 'mo', xmlns, content: '<'},
+						{tag: 'mn', xmlns, content: '∞'},
 					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mn', xmlns, content: '-∞'},
-							{tag: 'mo', xmlns, content: '<'},
-							{tag: 'mi', xmlns, content: 'y'},
-							{tag: 'mo', xmlns, content: '<'},
-							{tag: 'mn', xmlns, content: '∞'},
-						]},
+				]},
+				{tag: 'mtr', xmlns, content: [
+					{tag: 'mtd', xmlns, content: [
+						{tag: 'mn', xmlns, content: '-∞'},
+						{tag: 'mo', xmlns, content: '<'},
+						{tag: 'mi', xmlns, content: 'y'},
+						{tag: 'mo', xmlns, content: '<'},
+						{tag: 'mn', xmlns, content: '∞'},
 					]},
 				]},
 			]},
-		]},
+		}),
 		{
 			tag: 'h2',
 			style: {textAlign: 'center'},

@@ -1,15 +1,15 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
-import {xmlns} from '@/pages/shared/svg';
+import {xmlns} from '@/pages/shared/math';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getButton} from '../../shared';
+import {getText, getCode, getButton, getMath} from '../../shared';
 
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 import System, {getSnappedZoom} from './demo';
 import * as mock from '../mock';
 import getZoomPoints from './zoomPoints';
-import {CLASS_MATH, CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
 
 import pointsImage from './pointsImage';
 
@@ -258,33 +258,10 @@ export default {
 			content: pointsImage,
 			style: {textAlign: 'center'},
 		},
-		{tag: 'p', classList: [CLASS_MATH], content: [
-			{tag: 'math', xmlns, content: [
-				{tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mtext', xmlns, content: 'let the red and orange lines meet at '},
-						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'A'},
-						]},
-					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mtext', xmlns, content: 'let the orange and green lines meet at '},
-						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'B'},
-						]},
-					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mtext', xmlns, content: 'let the green and red lines meet at '},
-						]},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'C'},
-						]},
-					]},
+		getMath(
+			{
+				title: 'Variables',
+				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mtext', xmlns, content: 'let the image\'s angle of rotation be '},
@@ -311,9 +288,10 @@ export default {
 						]},
 					]},
 				]},
-			]},
-			{tag: 'math', xmlns, content: [
-				{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+			},
+			{
+				title: 'Declarations',
+				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mi', xmlns, content: 'A'},
@@ -365,9 +343,10 @@ export default {
 						]},
 					]},
 				]},
-			]},
-			{tag: 'math', xmlns, content: [
-				{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+			},
+			{
+				title: 'Coordinates',
+				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mo', xmlns, content: '|'},
@@ -378,13 +357,19 @@ export default {
 						{tag: 'mtext', xmlns, content: '='},
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mrow', xmlns, content: [
-								{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'sin'},
-								{tag: 'mo', xmlns, content: '('},
-								{tag: 'mi', xmlns, content: 'θ'},
-								{tag: 'mo', xmlns, content: ')'},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'sin'},
+									{tag: 'mo', xmlns, content: '('},
+									{tag: 'mi', xmlns, content: 'θ'},
+									{tag: 'mo', xmlns, content: ')'},
+								]},
+								{tag: 'mo', xmlns, content: '×'},
+								{tag: 'mi', xmlns, content: 'd'},
 							]},
-							{tag: 'mo', xmlns, content: '×'},
-							{tag: 'mi', xmlns, content: 'd'},
+						]},
+						{tag: 'mtext', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'x'},
 						]},
 					]},
 					{tag: 'mtr', xmlns, content: [
@@ -397,18 +382,24 @@ export default {
 						{tag: 'mtext', xmlns, content: '='},
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mrow', xmlns, content: [
-								{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'cos'},
-								{tag: 'mo', xmlns, content: '('},
-								{tag: 'mi', xmlns, content: 'θ'},
-								{tag: 'mo', xmlns, content: ')'},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'cos'},
+									{tag: 'mo', xmlns, content: '('},
+									{tag: 'mi', xmlns, content: 'θ'},
+									{tag: 'mo', xmlns, content: ')'},
+								]},
+								{tag: 'mo', xmlns, content: '×'},
+								{tag: 'mi', xmlns, content: 'd'},
 							]},
-							{tag: 'mo', xmlns, content: '×'},
-							{tag: 'mi', xmlns, content: 'd'},
+						]},
+						{tag: 'mtext', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'y'},
 						]},
 					]},
 				]},
-			]},
-		]},
+			},
+		),
 		getCode(code, [
 			{op: '=', id: [
 				'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',

@@ -1,14 +1,5 @@
 import {SVG_NAMESPACE} from '@/shared';
 
-export const xmlns = 'http://www.w3.org/1998/Math/MathML';
-
-export const opSpace = {tag: 'mspace', style: {width: '0.8em'}, xmlns};
-export const getOverlined = (content) => ({
-	tag: 'mrow', xmlns, style: {textDecoration: 'overline', textDecorationThickness: '1px'}, content: content.split('').map((content) => ({
-		tag: 'mi', xmlns, content,
-	})),
-});
-
 export const getLine = ([x1, y1], [x2, y2]) => {
 	const line = document.createElementNS(SVG_NAMESPACE, 'line');
 	
@@ -29,7 +20,7 @@ export const getDiagram = (radii, strokeRadius, topLeft, topRight) => {
 	
 	const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
 	
-	svg.setAttribute('viewBox', `${-radii.x - strokeRadius} ${-radii.y - strokeRadius} ${radii.x * 2 + strokeDiameter} ${radii.y * 2 + strokeDiameter}`);
+	svg.setAttribute('viewBox', `${-radii.x - strokeDiameter} ${-radii.y - strokeDiameter} ${(radii.x + strokeDiameter) * 2} ${(radii.y + strokeDiameter) * 2}`);
 	svg.setAttribute('fill', 'none');
 	svg.setAttribute('stroke', 'black');
 	svg.setAttribute('stroke-linecap', 'round');
@@ -63,13 +54,32 @@ export const getDiagram = (radii, strokeRadius, topLeft, topRight) => {
 	const border = document.createElementNS(SVG_NAMESPACE, 'g');
 	
 	border.append(
-		getLine([-radii.x, -radii.y], [radii.x, -radii.y]),
-		getLine([radii.x, -radii.y], [radii.x, radii.y]),
-		getLine([radii.x, radii.y], [-radii.x, radii.y]),
-		getLine([-radii.x, radii.y], [-radii.x, -radii.y]),
+		getLine([-radii.x - strokeRadius, -radii.y - strokeRadius], [radii.x + strokeRadius, -radii.y - strokeRadius]),
+		getLine([radii.x + strokeRadius, -radii.y - strokeRadius], [radii.x + strokeRadius, radii.y + strokeRadius]),
+		getLine([radii.x + strokeRadius, radii.y + strokeRadius], [-radii.x - strokeRadius, radii.y + strokeRadius]),
+		getLine([-radii.x - strokeRadius, radii.y + strokeRadius], [-radii.x - strokeRadius, -radii.y - strokeRadius]),
 	);
 	
 	svg.append(border, axes);
 	
 	return svg;
+};
+
+export const getText = (text, [x, y], strokeRadius, offsetX = 0, offsetY = 0) => {
+	const fontSize = strokeRadius * 10;
+	const element = document.createElementNS(SVG_NAMESPACE, 'text');
+	
+	element.textContent = text;
+	element.style.fontSize = `${fontSize}px`;
+	element.style.fontFamily = '"cambria math", math';
+	element.style.fill = 'currentcolor';
+	element.style.userSelect = 'none';
+	
+	element.setAttribute('stroke-width', '0');
+	element.setAttribute('x', x);
+	element.setAttribute('y', y);
+	element.setAttribute('dx', `${fontSize * offsetX / 1.5}px`);
+	element.setAttribute('dy', `${fontSize / 3 + fontSize * offsetY / 1.5}px`);
+	
+	return element;
 };

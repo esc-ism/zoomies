@@ -1,12 +1,12 @@
 import {addRule} from '@/shared/css';
 
 import {
-	CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION,
-	CLASS_MATH, CLASS_MATH_EQUATION, CLASS_FLASH_CONTAINER,
-	CLASS_MATH_ASSERTION,
-	CLASS_ACTIVE,
-	CLASS_BUTTON_ACTIVE,
+	CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
+	CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_EQUATION, CLASS_MATH_ASSERTION,
+	CLASS_ACTIVE, CLASS_BUTTON_ACTIVE, CLASS_MATH_TITLE, CLASS_MATH_BODY,
+	
 } from './consts';
+import {SUB_PIXEL_BS} from '@/shared';
 
 addRule(`.${CLASS_FLASH_CONTAINER}`, {
 	overflow: 'hidden',
@@ -14,8 +14,8 @@ addRule(`.${CLASS_FLASH_CONTAINER}`, {
 	position: 'relative',
 });
 
-addRule([`.${CLASS_CODE}`, `.${CLASS_MATH}`], {
-	'box-shadow': 'white 0 0 2px',
+addRule([`.${CLASS_CODE}`, `.${CLASS_MATH_WRAPPER}`], {
+	border: '1px solid #868686',
 	'border-radius': '10px',
 });
 
@@ -48,23 +48,73 @@ addRule(`.${CLASS_CODE} code`, {
 
 addRule(`.${CLASS_CODE} br + br + br`, {display: 'none'});
 
-addRule(`.${CLASS_MATH}`, {
+addRule(`.${CLASS_MATH_BODY}`, {
+	padding: '0.4em',
+});
+
+addRule(`.${CLASS_MATH_TITLE} + .${CLASS_MATH_BODY}`, {
+	'padding-top': '0',
+});
+
+addRule(`.${CLASS_MATH_WRAPPER}`, {
 	'text-align': 'center',
 	'background-color': '#372d2d',
+	'max-height': 'calc(100dvh - 2em - 16px)',
+	'overscroll-behavior-x': 'contain',
+	overflow: 'auto',
+});
+
+addRule(`.${CLASS_MATH_CONTAINER}`, {
+	'min-width': 'fit-content',
+	display: 'flex',
+	// order manipulation to keep title line fillers from covering prior titles
+	'flex-direction': 'column-reverse',
+});
+
+addRule(`.${CLASS_MATH_TITLE}:hover`, {
+	'background-color': 'rgb(73 65 78)',
+});
+
+addRule(`msub.${CLASS_MATH_TITLE}`, {
+	'margin-top': 'calc(-0.5ex - 1px)',
+});
+
+addRule(`.${CLASS_MATH_CONTAINER} math:last-child`, {
+	'min-height': '0.75lh',
+});
+
+addRule(`.${CLASS_MATH_CONTAINER} math`, {
+	'font-family': '"cambria math", math',
+	'font-size': '0.9em',
+	display: 'block',
+	width: '100%',
+	'min-height': '0.5lh',
 });
 
 addRule('mtext', {width: 'max-content'});
 
-addRule(`.${CLASS_MATH} math`, {
-	'overflow-x': 'auto',
-	'font-family': '"cambria math", math',
-	'font-size': '0.9em',
-	padding: '0.4em',
-	display: 'block',
+addRule(`.${CLASS_MATH_TITLE} *`, {
+	'pointer-events': 'none',
 });
 
-addRule(`.${CLASS_MATH} math + math`, {
-	'border-top': '1px solid #868686',
+addRule(`.${CLASS_MATH_TITLE}`, {
+	position: 'sticky',
+	'border-radius': '10px 0',
+	top: '0',
+	left: '0',
+	cursor: 'pointer',
+	'background-color': '#372d2d',
+	outline: `${SUB_PIXEL_BS}px solid #868686`,
+	display: 'flex',
+	'align-items': 'center',
+	'min-height': '1lh',
+	width: 'max-content',
+	padding: '1px 5px',
+	'user-select': 'none',
+	'overflow-x': 'clip',
+	'max-width': '100%',
+	'text-overflow': 'ellipsis',
+	color: '#868686',
 });
 
 const buttonColour = '#eaacfd';

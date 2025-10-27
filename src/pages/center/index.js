@@ -1,9 +1,9 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
-import {xmlns} from '@/pages/shared/svg';
-import {CLASS_MATH} from '../consts';
+import {xmlns} from '@/pages/shared/math';
+import {CLASS_MATH_WRAPPER} from '../consts';
 
-import {getText, getButton} from '../shared';
+import {getText, getButton, getMath} from '../shared';
 
 import System from './demo';
 
@@ -35,30 +35,28 @@ export default {
 			'Here, we have the simplest reasonable system, where the center of the viewport is bound by the image.',
 			'The system may be described like:',
 		],
-		{tag: 'p', classList: [CLASS_MATH], content: [
-			{tag: 'math', xmlns, content: [
-				{tag: 'mtable', xmlns, content: [
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mn', xmlns, content: '-0.5'},
-							{tag: 'mo', xmlns, content: '⩽'},
-							{tag: 'mi', xmlns, content: 'x'},
-							{tag: 'mo', xmlns, content: '⩽'},
-							{tag: 'mn', xmlns, content: '0.5'},
-						]},
+		getMath({
+			content: {tag: 'mtable', xmlns, content: [
+				{tag: 'mtr', xmlns, content: [
+					{tag: 'mtd', xmlns, content: [
+						{tag: 'mn', xmlns, content: '-0.5'},
+						{tag: 'mo', xmlns, content: '⩽'},
+						{tag: 'mi', xmlns, content: 'x'},
+						{tag: 'mo', xmlns, content: '⩽'},
+						{tag: 'mn', xmlns, content: '0.5'},
 					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mn', xmlns, content: '-0.5'},
-							{tag: 'mo', xmlns, content: '⩽'},
-							{tag: 'mi', xmlns, content: 'y'},
-							{tag: 'mo', xmlns, content: '⩽'},
-							{tag: 'mn', xmlns, content: '0.5'},
-						]},
+				]},
+				{tag: 'mtr', xmlns, content: [
+					{tag: 'mtd', xmlns, content: [
+						{tag: 'mn', xmlns, content: '-0.5'},
+						{tag: 'mo', xmlns, content: '⩽'},
+						{tag: 'mi', xmlns, content: 'y'},
+						{tag: 'mo', xmlns, content: '⩽'},
+						{tag: 'mn', xmlns, content: '0.5'},
 					]},
 				]},
 			]},
-		]},
+		}),
 		{
 			tag: 'h2',
 			content: 'Effectiveness',

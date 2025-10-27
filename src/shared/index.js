@@ -16,6 +16,8 @@ export const ALLOWANCE_ERROR = 0.001;
 
 export const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
+export const SUB_PIXEL_BS = 1 / window.devicePixelRatio;
+
 export const getAngleDiff = (a, b) => {
 	const diff = a - b;
 	

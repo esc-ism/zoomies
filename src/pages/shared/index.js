@@ -6,7 +6,10 @@ import generateCode from '../code';
 import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
 	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER, CLASS_BUTTON_ACTIVE,
+	CLASS_MATH_TITLE, CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_BODY,
 } from '../consts';
+import {SUB_PIXEL_BS} from '@/shared';
+import {xmlns} from './math';
 
 let activeButton;
 
@@ -198,3 +201,56 @@ export const getInputDependent = (get) => ({tag: 'span', callback: (element) => 
 	
 	inputListener.add(update);
 }});
+
+const getMathTitle = (content, isFirst = false) => {
+	const title = {tag: 'mtext', classList: [CLASS_MATH_TITLE], onclick: (() => {
+		let isHidden = false;
+		
+		return ({target}) => {
+			// eslint-disable-next-line no-cond-assign
+			if (isHidden = !isHidden) {
+				target.nextElementSibling.style.display = 'none';
+			} else {
+				target.nextElementSibling.style.removeProperty('display');
+			}
+		// target.parentElement.style.paddingBottom = '1px';
+		};
+	})(), xmlns, content};
+	
+	if (isFirst) {
+		return [title];
+	}
+	
+	const blocker = document.createElement('div');
+	
+	blocker.style.position = 'sticky';
+	blocker.style.left = '0';
+	blocker.style.width = '10px';
+	blocker.style.height = `${SUB_PIXEL_BS}px`;
+	blocker.style.marginTop = `-${SUB_PIXEL_BS}px`;
+	blocker.style.backgroundColor = '#372d2d';
+	
+	const line = document.createElement('div');
+	
+	line.style.backgroundColor = '#868686';
+	line.style.verticalAlign = 'center';
+	// todo make borders SUB_PX_BS instead of 1px
+	line.style.height = `${SUB_PIXEL_BS}px`;
+	
+	return [line, blocker, title];
+};
+
+export const getMath = (...sections) => {
+	const content = [];
+	
+	for (let i = sections.length - 1; i >= 0; --i) {
+		const section = sections[i];
+		const body = {tag: 'div', classList: [CLASS_MATH_BODY], content: section.content};
+		
+		content.push({tag: 'math', xmlns, content: 'title' in section ? [...getMathTitle(section.title, i === 0), body] : body});
+	}
+	
+	return {tag: 'p', classList: [CLASS_MATH_WRAPPER], content: [
+		{tag: 'div', classList: [CLASS_MATH_CONTAINER], content},
+	]};
+};

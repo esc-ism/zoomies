@@ -10,7 +10,10 @@ export const CLASS_WRAPPER = getTextId('wrapper');
 
 export const CLASS_CODE = getTextId('code');
 
-export const CLASS_MATH = getTextId('math');
+export const CLASS_MATH_WRAPPER = getTextId('math', 'wrapper');
+export const CLASS_MATH_CONTAINER = getTextId('math', 'container');
+export const CLASS_MATH_TITLE = getTextId('math', 'title');
+export const CLASS_MATH_BODY = getTextId('math', 'body');
 
 export const CLASS_MATH_EQUATION = getTextId('math', 'equation');
 export const CLASS_MATH_ASSERTION = getTextId('math', 'assertion');

@@ -48,6 +48,7 @@ export default [
 			'no-sparse-arrays': 'off',
 			'no-unused-vars': ['error', {args: 'all'}],
 			'@stylistic/no-extra-semi': 'error',
+			'@stylistic/semi-style': ['error', 'last'],
 			'@stylistic/no-extra-parens': 'error',
 			'@stylistic/quote-props': ['error', 'as-needed'],
 			'@stylistic/no-tabs': ['error', {allowIndentationTabs: true}],

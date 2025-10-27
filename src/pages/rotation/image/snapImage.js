@@ -4,8 +4,8 @@ import {getProgressed} from '../shared';
 
 const radii = {x: 30, y: 20};
 const strokeRadius = 0.4;
-const topLeft = [-radii.x * 0.7 - strokeRadius, -radii.y - strokeRadius];
-const topRight = [radii.x + strokeRadius, -radii.y * 0.3 - strokeRadius];
+const topLeft = [-radii.x * 0.7, -radii.y];
+const topRight = [radii.x, -radii.y * 0.3];
 
 const svg = getDiagram(radii, strokeRadius, topLeft, topRight);
 
