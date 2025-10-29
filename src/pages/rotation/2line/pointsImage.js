@@ -1,5 +1,5 @@
 import {SVG_NAMESPACE} from '@/shared';
-import {OLD_COLOURS, getDiagram, getLine, getText} from '@/pages/shared/svg';
+import {COLOURS, getDiagram, getLine, getText} from '@/pages/shared/svg';
 
 const radii = {x: 25, y: 20};
 const strokeRadius = 0.4;
@@ -11,23 +11,24 @@ const svg = getDiagram(
 );
 
 const points = [
-	[0, -radii.y],
-	[radii.x * 0.255, -radii.y * 0.895],
 	[0, 0],
+	[radii.x * 0.255, -radii.y * 0.895],
+	[0, -radii.y],
 ];
 
-for (let i = 0; i < 3; ++i) {
-	const group = document.createElementNS(SVG_NAMESPACE, 'g');
-	
-	group.setAttribute('stroke', OLD_COLOURS[i]);
-	
-	group.append(getLine(points[i], points[(i + 1) % 3]));
-	
-	svg.appendChild(group);
+const group = document.createElementNS(SVG_NAMESPACE, 'g');
+
+group.setAttribute('stroke', COLOURS[0]);
+
+for (let i = 0; i < points.length; ++i) {
+	group.appendChild(getLine(points[i], points[(i + 1) % points.length]));
 }
 
-svg.appendChild(getText('A', points[2], strokeRadius, -0.2, 1));
-svg.appendChild(getText('B', points[1], strokeRadius, 0.45, 0.2));
-svg.appendChild(getText('C', points[0], strokeRadius, -1.5, 0.4));
+svg.append(
+	group,
+	getText('A', points[0], strokeRadius, -0.2, 1),
+	getText('B', points[1], strokeRadius, 0.45, 0.2),
+	getText('C', points[2], strokeRadius, -1.5, 0.4),
+);
 
 export default svg;

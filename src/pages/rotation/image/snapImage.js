@@ -1,5 +1,5 @@
 import {SVG_NAMESPACE} from '@/shared';
-import {getDiagram, getLine, OLD_COLOURS} from '@/pages/shared/svg';
+import {getDiagram, getLine, COLOURS} from '@/pages/shared/svg';
 import {getProgressed} from '../shared';
 
 const radii = {x: 30, y: 20};
@@ -25,7 +25,7 @@ const POINTS = [
 for (let i = 0; i < 3; ++i) {
 	const group = document.createElementNS(SVG_NAMESPACE, 'g');
 	
-	group.setAttribute('stroke', OLD_COLOURS[i]);
+	group.setAttribute('stroke', COLOURS[i]);
 	
 	group.append(...POINTS.map((points) => getMirroredLine(points[i], points[i + 1])).flat());
 	
