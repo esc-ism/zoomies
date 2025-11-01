@@ -3,7 +3,7 @@ import {getFlipped, getProgress, getProgressedLine, getZoomPairSecond} from '.';
 export const getDirected = (first, second, flip, cornerX) => {
 	const get = flip ? (position) => getFlipped(position) : ({x, y}) => ({x, y});
 	
-	return [[first, get(first.end)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
+	return [[get(first), get(first.end)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
 };
 
 export const isValidZoom = (zoom) => zoom !== null && !isNaN(zoom);
