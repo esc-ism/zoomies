@@ -357,8 +357,7 @@ export const DOUBLE_LINE = [
 				op: '?', and: ['isLeft', -0.5, 0.5],
 			}},
 			'',
-			// todo multiline?
-			{op: 'return', and: {op: 'array', and: [
+			{op: 'return', and: {op: 'array', multiline: true, and: [
 				{op: '-', and: [
 					'cornerX',
 					{op: '/', and: [

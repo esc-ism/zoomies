@@ -506,7 +506,7 @@ export default {
 		[
 			'In all prior systems, it was straightforward to rule out pairs of rails that didn\'t need checking.',
 			'Here, however, region in which the position lies is no longer obvious.',
-			'Plus even if a snap zoom is found in one region, the bound inversion behaviour means that another valid zoom may exist in another region.',
+			'Plus, even if a snap zoom is found in one region, the bound inversion behaviour means that another valid zoom may exist in another region.',
 			'For simplicity, I neglect to rule out rail pairings and check every region.',
 		],
 		[

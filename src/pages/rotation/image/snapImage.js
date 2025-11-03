@@ -2,12 +2,14 @@ import {SVG_NAMESPACE} from '@/shared';
 import {getDiagram, getLine, COLOURS} from '@/pages/shared/svg';
 import {getProgressed} from '../shared';
 
-const radii = {x: 30, y: 20};
+const radii = {x: 20, y: 20};
 const strokeRadius = 0.4;
-const topLeft = [-radii.x * 0.7, -radii.y];
+const topLeft = [-radii.x * 0.26, -radii.y];
 const topRight = [radii.x, -radii.y * 0.3];
 
 const svg = getDiagram(radii, strokeRadius, topLeft, topRight);
+
+svg.style.marginLeft = '0.5em';
 
 const getMirroredLine = (...points) => [getLine(...points), getLine(...points.map(([x, y]) => [-x, -y]))];
 
@@ -18,8 +20,8 @@ const getSplit = (from, to, ratio) => {
 };
 
 const POINTS = [
-	[[0, 0], ...getSplit([radii.x * 0.045, radii.y * -0.2], topLeft, 0.5)],
-	[...getSplit([radii.x * 0.2, radii.y * 0.082], [radii.x * 0.5, radii.y * 0.205], 0.5), topRight],
+	[[0, 0], ...getSplit([radii.x * 0.113, radii.y * -0.2], topLeft, 0.3)],
+	[...getSplit([radii.x * 0.1, radii.y * 0.055], [radii.x * 0.3, radii.y * 0.167], 0.5), topRight],
 ];
 
 for (let i = 0; i < 3; ++i) {

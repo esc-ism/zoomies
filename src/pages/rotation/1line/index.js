@@ -205,7 +205,6 @@ export default {
 			'Adjacent rails can differ, but opposite rails always share a start zoom.',
 			'Knowing this, only the top-left and top-right corners need be considered.',
 		],
-		// todo
 		[
 			'For a given corner, there are two possible start zooms —',
 			'one if the corner disappears off the side of the viewport, and another if it disappears off its base.',
@@ -980,8 +979,8 @@ export default {
 		'The maths for snap-panning will take a little longer to run through.',
 		'For brevity, I\'ll refer to image positions used in snap-panning as "snap points".',
 		[
-			'Observe how the rails split the image into four sectors.',
-			'Any snap point will fall into one of these sectors, bordered by two rails (any point exactly between two sectors may be assigned to either).',
+			'Observe how the rails split the image into four regions.',
+			'Any snap point will fall into one of these regions, bordered by two rails (any point exactly between two regions may be assigned to either).',
 			'If one rail\'s start zoom is lower than the other, we can snip off its start to make them match.',
 		],
 		getCode(code, [

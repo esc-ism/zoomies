@@ -6,7 +6,8 @@ import {permissiveTweens, restrictiveTweens} from '../1line';
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 
 import zoomImage from './zoomImage';
-import snapImage from './snapImage';
+import snapImageTrio from './snapImage';
+import snapImageDuo from './snapImageDuo';
 import System, {getSnappedZoom} from './demo';
 import getZoomPoints from './zoomPoints';
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '@/pages/consts';
@@ -790,22 +791,21 @@ export default {
 		[
 			'The maths here build upon those of the single-line system.',
 			'As before, a lock rail is snipped to achieve matching start zooms.',
-			'Now, however, the snipped part of the lock rail must be paired with the end of the un-snipped lock rail\'s origin rail.',
-			'Finally, one more snip is necessary to match zooms for origin rails.',
+			'Now, however, the snipped part of the lock rail must be paired with the end of its partner\'s origin rail.',
+			'If the origin rails don\'t share a gradient, one last snip is necessary to match zooms for origin rails.',
 		],
 		[
-			'The final product might look similar to the image below.',
+			'The final product may have either two or three segments, as seen below.',
 			'Segments are coloured to show pairings.',
 		],
 		// todo give the single-line system an image?
-		{
-			tag: 'div',
-			content: snapImage,
-			style: {textAlign: 'center'},
-		},
+		{tag: 'div', style: {display: 'flex', justifyContent: 'space-evenly'}, content: [
+			snapImageDuo,
+			snapImageTrio,
+		]},
 		[
-			'In the prior system, I needed to find a line that intersects the snap point and two adjacent rails.',
-			'Now, with the adjacent rails split into a trio of segment pairs, the maximum number of checks required to find a snap zoom is tripled.',
+			'As before, we need to find a line that intersects the snap point and two adjacent rails.',
+			'Here, with the additional segment pairs, the maximum number of checks required is tripled.',
 		],
 		getCode(code, [
 			{op: '=', id: 'match0', and: {op: '||', and: [
@@ -828,12 +828,12 @@ export default {
 		// todo expand?
 		[
 			'As a snap-panning facilitator, this system is hard to fault.',
-			'Of course it performs fine on ',
+			'Of course, it performs fine with ',
 			getButton('similar', ...getSnapTweens(() => Math.random() / 5 + 0.9)),
 			' aspect ratios,',
-			'but even ',
+			'but it performs equally well with ',
 			getButton('distant', ...getSnapTweens(() => Math.random() / 10 + 0.2)),
-			' aspect ratios reveal no flaw in its ability to derive sensible zoom levels.',
+			' aspect ratios.',
 		],
 		{
 			tag: 'h2',

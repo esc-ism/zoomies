@@ -447,7 +447,6 @@ export default new class {
 		this.system = new System();
 		this.page = text;
 		
-		// todo do you need ratioImage: true?
 		this.system.constrainPosition({ratio: true});
 	}
 	

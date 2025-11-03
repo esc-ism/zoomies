@@ -10,7 +10,6 @@ import System from './demo';
 import {xmlns} from '@/pages/shared/math';
 
 import pointsImage from './pointsImage';
-import snapImage from './snapImage';
 
 const code = [];
 
@@ -202,7 +201,6 @@ const functions = [
 		}},
 		'',
 		{op: 'return', and: {
-			// todo this work?
 			op: '==', and: [
 				{op: '>', and: ['mFirst', 0]},
 				{op: '<', and: ['mThird', 'mFirst']},
@@ -737,29 +735,37 @@ const functions = [
 			op: 'call', id: 'getPairings', and: ['flip0', 'flip1'],
 		}},
 		'',
+		{op: '=', id: 'snapC', and: {op: 'call', id: 'getIntersectZoom', and: [
+			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C', 'isInverse', 1,
+		]}},
+		'',
+		{op: 'if', and: [
+			'snapC',
+			{op: 'return', and: 'snapC'},
+		]},
+		'',
+		{op: '=', id: 'snapB', and: {op: 'call', id: 'getIntersectZoom', and: [
+			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', 'isInverse', {
+				op: '-', and: [
+					1,
+					{op: '/', and: ['zoomB', 'zoomC']},
+				],
+			},
+		]}},
+		'',
+		{op: 'if', and: [
+			{op: '||', and: [{op: '!', and: 'hasA'}, 'snapB']},
+			{op: 'return', and: 'snapB'},
+		]},
+		'',
 		{op: 'return', and: {
-			op: '||', multiline: true, and: [
-				{op: 'call', id: 'getIntersectZoom', and: ['zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C', 'isInverse', 1]},
-				{op: 'call', id: 'getIntersectZoom', and: [
-					'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', 'isInverse', {
-						op: '-', and: [
-							1,
-							{op: '/', and: ['zoomB', 'zoomC']},
-						],
-					},
-				]},
-				{op: '?', and: [
-					'hasA',
-					{op: 'call', id: 'getIntersectZoom', and: [
-						'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A', 'isInverse', {
-							op: '-', and: [
-								1,
-								{op: '/', and: ['zoomA', 'zoomB']},
-							],
-						},
-					]},
-					0,
-				]},
+			op: 'call', id: 'getIntersectZoom', and: [
+				'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A', 'isInverse', {
+					op: '-', and: [
+						1,
+						{op: '/', and: ['zoomA', 'zoomB']},
+					],
+				},
 			],
 		}},
 	]},
@@ -1161,17 +1167,15 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Despite introducing an additional rail, this system still only needs three checks per sector.',
-			// todo yeah this is always the case. talk about it earlier
-			'In fact, there are cases where only two checks are needed here!',
-			'Some complication does still arise from the occasional absence of a connecting rail',
-			'Since it\'s possible for one set of rails to lack a connecting rail, there are ',
+			'Despite introducing an additional rail, this system still only needs two or three checks per region, depending on connecting rail similarity.',
+			'It turns out that origin rails aren\'t ever necessary here, so nothing much has changed from the two-line systems.',
 		],
-		{
-			tag: 'div',
-			content: snapImage,
-			style: {textAlign: 'center'},
-		},
+		[
+			'It\'s definitely possible to pinpoint the snap position\'s region here, but it\'d be tricky.',
+			'I\'ve elected to just check every region again.',
+			'Taking an inferior approach is a little irksome, but this method is simple and avoids introducing sneaky bugs.',
+			'If you cared about efficiency, this would be the way to improve it.',
+		],
 		getCode(code, [
 			{op: '=', id: 'snapZoom', type: 'zoom', and: {
 				op: 'max', multiline: true, and: [
@@ -1188,9 +1192,10 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'This system is fixes the prior system\'s inconsistency;',
+			'This system fixes the prior\'s inconsistency;',
 			'I\'d be comfortable calling it an improved snap-panning system.',
 			'"Double-Line", on the other hand, has no obvious flaw to fix.',
+			'Even if I added region-checking code to this system, it would be more complex and inefficient than Double-Line\'s.',
 			'Since both exhibit acceptable behaviour, Double-Line\'s efficiency makes the preferable standalone snap-panner.',
 		],
 		{
