@@ -228,15 +228,7 @@ export default {
 					{tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the image\'s angle of rotation be '},
-							]},
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mi', xmlns, content: 'θ'},
-							]},
-						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the viewport side start zoom be '},
+								{tag: 'div', content: 'let the viewport side start zoom be '},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
@@ -247,7 +239,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the viewport base start zoom be '},
+								{tag: 'div', content: 'let the viewport base start zoom be '},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
@@ -258,7 +250,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let half of the image\'s width be'},
+								{tag: 'div', content: 'let half of the image\'s width be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
@@ -269,7 +261,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let half of the image\'s height be'},
+								{tag: 'div', content: 'let half of the image\'s height be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
@@ -280,7 +272,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let half of the viewport\'s width at default zoom be'},
+								{tag: 'div', content: 'let half of the viewport\'s width at default zoom be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
@@ -291,7 +283,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let half of the viewport\'s height at default zoom be'},
+								{tag: 'div', content: 'let half of the viewport\'s height at default zoom be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
@@ -307,6 +299,15 @@ export default {
 				title: 'Declarations',
 				content: [
 					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'θ'},
+							]},
+							{tag: 'mtext', xmlns, content: 'is'},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'div', content: 'the image\'s angle of rotation'},
+							]},
+						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mi', xmlns, content: 'A'},
@@ -406,83 +407,60 @@ export default {
 								]},
 							]},
 						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mo', xmlns, content: '∠'},
-								{tag: 'mi', xmlns, content: 'C'},
-								{tag: 'mi', xmlns, content: 'A'},
-								{tag: 'mi', xmlns, content: 'D'},
-							]},
-							{tag: 'mtext', xmlns, content: 'is'},
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mi', xmlns, content: 'θ'},
-							]},
-						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mo', xmlns, content: '∠'},
-								{tag: 'mi', xmlns, content: 'A'},
-								{tag: 'mi', xmlns, content: 'D'},
-								{tag: 'mi', xmlns, content: 'B'},
-							]},
-							{tag: 'mtext', xmlns, content: 'is'},
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mn', xmlns, content: '90'},
-								{tag: 'mo', xmlns, content: '°'},
-							]},
-						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mo', xmlns, content: '∠'},
-								{tag: 'mi', xmlns, content: 'A'},
-								{tag: 'mi', xmlns, content: 'C'},
-								{tag: 'mi', xmlns, content: 'B'},
-							]},
-							{tag: 'mtext', xmlns, content: 'is'},
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mn', xmlns, content: '90'},
-								{tag: 'mo', xmlns, content: '°'},
-							]},
-						]},
 					]},
 				],
 			},
 			{
-				title: 'Inferences',
+				title: [
+					{tag: 'mo', xmlns, content: '∠'},
+					{tag: 'mi', xmlns, content: 'B'},
+					{tag: 'mi', xmlns, content: 'A'},
+					{tag: 'mi', xmlns, content: 'C'},
+				],
 				content: [
 					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'tan'},
+								{tag: 'mo', xmlns, content: '('},
 								{tag: 'mrow', xmlns, content: [
 									{tag: 'mo', xmlns, content: '∠'},
-									{tag: 'mi', xmlns, content: 'D'},
-									{tag: 'mi', xmlns, content: 'A'},
 									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'D'},
 								]},
+								{tag: 'mo', xmlns, content: ')'},
 							]},
 							{tag: 'mo', xmlns, content: '='},
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'msup', xmlns, content: [
-										{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'tan'},
-										{tag: 'mn', xmlns, content: '-1'},
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mo', xmlns, content: '|'},
+										{tag: 'mi', xmlns, content: 'B'},
+										{tag: 'mi', xmlns, content: 'D'},
+										{tag: 'mo', xmlns, content: '|'},
 									]},
-									{tag: 'mo', xmlns, content: '('},
-									{tag: 'mfrac', xmlns, content: [
-										{tag: 'mrow', xmlns, content: [
-											{tag: 'msub', xmlns, content: [
-												{tag: 'mi', xmlns, content: 'i'},
-												{tag: 'mi', xmlns, content: 'w'},
-											]},
-										]},
-										{tag: 'mrow', xmlns, content: [
-											{tag: 'msub', xmlns, content: [
-												{tag: 'mi', xmlns, content: 'i'},
-												{tag: 'mi', xmlns, content: 'h'},
-											]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mo', xmlns, content: '|'},
+										{tag: 'mi', xmlns, content: 'A'},
+										{tag: 'mi', xmlns, content: 'D'},
+										{tag: 'mo', xmlns, content: '|'},
+									]},
+								]},
+								{tag: 'mo', xmlns, content: '='},
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'i'},
+											{tag: 'mi', xmlns, content: 'w'},
 										]},
 									]},
-									{tag: 'mo', xmlns, content: ')'},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'i'},
+											{tag: 'mi', xmlns, content: 'h'},
+										]},
+									]},
 								]},
 							]},
 						]},
@@ -490,9 +468,42 @@ export default {
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mrow', xmlns, content: [
 									{tag: 'mo', xmlns, content: '∠'},
-									{tag: 'mi', xmlns, content: 'C'},
-									{tag: 'mi', xmlns, content: 'A'},
 									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'D'},
+								]},
+							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msup', xmlns, content: [
+									{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'tan'},
+									{tag: 'mn', xmlns, content: '-1'},
+								]},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'i'},
+											{tag: 'mi', xmlns, content: 'w'},
+										]},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'i'},
+											{tag: 'mi', xmlns, content: 'h'},
+										]},
+									]},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '∠'},
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
 								]},
 							]},
 							{tag: 'mo', xmlns, content: '='},
@@ -500,9 +511,9 @@ export default {
 								{tag: 'mrow', xmlns, content: [
 									{tag: 'mrow', xmlns, content: [
 										{tag: 'mo', xmlns, content: '∠'},
-										{tag: 'mi', xmlns, content: 'D'},
-										{tag: 'mi', xmlns, content: 'A'},
 										{tag: 'mi', xmlns, content: 'B'},
+										{tag: 'mi', xmlns, content: 'A'},
+										{tag: 'mi', xmlns, content: 'D'},
 									]},
 									{tag: 'mo', xmlns, content: '-'},
 									{tag: 'mi', xmlns, content: 'θ'},
@@ -510,12 +521,85 @@ export default {
 							]},
 						]},
 						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msup', xmlns, content: [
+											{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'tan'},
+											{tag: 'mn', xmlns, content: '-1'},
+										]},
+										{tag: 'mo', xmlns, content: '('},
+										{tag: 'mfrac', xmlns, content: [
+											{tag: 'mrow', xmlns, content: [
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'i'},
+													{tag: 'mi', xmlns, content: 'w'},
+												]},
+											]},
+											{tag: 'mrow', xmlns, content: [
+												{tag: 'msub', xmlns, content: [
+													{tag: 'mi', xmlns, content: 'i'},
+													{tag: 'mi', xmlns, content: 'h'},
+												]},
+											]},
+										]},
+										{tag: 'mo', xmlns, content: ')'},
+									]},
+									{tag: 'mo', xmlns, content: '-'},
+									{tag: 'mi', xmlns, content: 'θ'},
+								]},
+							]},
+						]},
+					]},
+				],
+			},
+			{
+				title: [
+					{tag: 'mo', xmlns, content: '|'},
+					{tag: 'mi', xmlns, content: 'A'},
+					{tag: 'mi', xmlns, content: 'B'},
+					{tag: 'mo', xmlns, content: '|'},
+				],
+				content: [
+					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '|'},
 								{tag: 'mi', xmlns, content: 'A'},
 								{tag: 'mi', xmlns, content: 'B'},
 								{tag: 'mo', xmlns, content: '|'},
 							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msqrt', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msup', xmlns, content: [
+											{tag: 'mrow', xmlns, content: [
+												{tag: 'mo', xmlns, content: '|'},
+												{tag: 'mi', xmlns, content: 'A'},
+												{tag: 'mi', xmlns, content: 'D'},
+												{tag: 'mo', xmlns, content: '|'},
+											]},
+											{tag: 'mn', xmlns, content: '2'},
+										]},
+										{tag: 'mo', xmlns, content: '+'},
+										{tag: 'msup', xmlns, content: [
+											{tag: 'row', xmlns, content: [
+												{tag: 'mo', xmlns, content: '|'},
+												{tag: 'mi', xmlns, content: 'B'},
+												{tag: 'mi', xmlns, content: 'D'},
+												{tag: 'mo', xmlns, content: '|'},
+											]},
+											{tag: 'mn', xmlns, content: '2'},
+										]},
+									]},
+								]},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns},
 							{tag: 'mo', xmlns, content: '='},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msqrt', xmlns, content: [
@@ -553,9 +637,9 @@ export default {
 									{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'sin'},
 									{tag: 'mo', xmlns, content: '('},
 									{tag: 'mo', xmlns, content: '∠'},
-									{tag: 'mi', xmlns, content: 'C'},
-									{tag: 'mi', xmlns, content: 'A'},
 									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
 									{tag: 'mo', xmlns, content: ')'},
 								]},
 							]},
@@ -590,9 +674,9 @@ export default {
 									{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'sin'},
 									{tag: 'mo', xmlns, content: '('},
 									{tag: 'mo', xmlns, content: '∠'},
-									{tag: 'mi', xmlns, content: 'C'},
-									{tag: 'mi', xmlns, content: 'A'},
 									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
 									{tag: 'mo', xmlns, content: ')'},
 								]},
 							]},
@@ -649,9 +733,9 @@ export default {
 											{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'sin'},
 											{tag: 'mo', xmlns, content: '('},
 											{tag: 'mo', xmlns, content: '∠'},
-											{tag: 'mi', xmlns, content: 'C'},
-											{tag: 'mi', xmlns, content: 'A'},
 											{tag: 'mi', xmlns, content: 'B'},
+											{tag: 'mi', xmlns, content: 'A'},
+											{tag: 'mi', xmlns, content: 'C'},
 											{tag: 'mo', xmlns, content: ')'},
 										]},
 									]},
@@ -674,9 +758,9 @@ export default {
 									{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'cos'},
 									{tag: 'mo', xmlns, content: '('},
 									{tag: 'mo', xmlns, content: '∠'},
-									{tag: 'mi', xmlns, content: 'C'},
-									{tag: 'mi', xmlns, content: 'A'},
 									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
 									{tag: 'mo', xmlns, content: ')'},
 								]},
 							]},
@@ -711,9 +795,9 @@ export default {
 									{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'cos'},
 									{tag: 'mo', xmlns, content: '('},
 									{tag: 'mo', xmlns, content: '∠'},
-									{tag: 'mi', xmlns, content: 'C'},
-									{tag: 'mi', xmlns, content: 'A'},
 									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
 									{tag: 'mo', xmlns, content: ')'},
 								]},
 							]},
@@ -770,9 +854,9 @@ export default {
 											{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'cos'},
 											{tag: 'mo', xmlns, content: '('},
 											{tag: 'mo', xmlns, content: '∠'},
-											{tag: 'mi', xmlns, content: 'C'},
-											{tag: 'mi', xmlns, content: 'A'},
 											{tag: 'mi', xmlns, content: 'B'},
+											{tag: 'mi', xmlns, content: 'A'},
+											{tag: 'mi', xmlns, content: 'C'},
 											{tag: 'mo', xmlns, content: ')'},
 										]},
 									]},
@@ -896,8 +980,8 @@ export default {
 		'The maths for snap-panning will take a little longer to run through.',
 		'For brevity, I\'ll refer to image positions used in snap-panning as "snap points".',
 		[
-			'Observe how the rails split the image into four segments.',
-			'Any snap point will fall into one of these segments, bordered by two rails (any point exactly between two segments may be assigned to either).',
+			'Observe how the rails split the image into four sectors.',
+			'Any snap point will fall into one of these sectors, bordered by two rails (any point exactly between two sectors may be assigned to either).',
 			'If one rail\'s start zoom is lower than the other, we can snip off its start to make them match.',
 		],
 		getCode(code, [
@@ -1016,7 +1100,7 @@ export default {
 					{tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the rails be '},
+								{tag: 'div', content: 'let the rails be '},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								getOverlined('AB'),
@@ -1028,7 +1112,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the snap point be '},
+								{tag: 'div', content: 'let the snap point be '},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '('},
@@ -1040,7 +1124,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the target line segment be '},
+								{tag: 'div', content: 'let the target line segment be '},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								getOverlined('EF'),

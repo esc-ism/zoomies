@@ -89,7 +89,7 @@ const functions = [
 				{op: '...', and: {
 					op: 'call', id: 'getIntersection', and: ['targetX', 'targetY', 'axisY', 'cornerX', 'axisZoom'],
 				}},
-				'targetX', 'targetY',
+				'targetX', 'targetY', true,
 			]}},
 		]},
 		'',
@@ -97,10 +97,10 @@ const functions = [
 			{op: '...', and: {
 				op: 'call', id: 'getIntersection', and: ['backupX', 'backupY', 'axisY', 'cornerX', 'axisZoom'],
 			}},
-			'backupX', 'backupY',
+			'backupX', 'backupY', false,
 		]}},
 	]},
-	{op: 'func', id: 'getZoomPoints', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: 2, and: [
+	{op: 'func', id: 'getZoomPoints', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: [6], and: [
 		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
@@ -124,7 +124,7 @@ const functions = [
 			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
 		}},
 		'',
-		{op: '=', id: ['angleBase', 'angleSide'], and: {
+		{op: '=', id: ['angleSide', 'angleBase'], and: {
 			op: 'call', id: 'getProgressAngles', and: ['quadrantAngle'],
 		}},
 		'',
@@ -143,10 +143,10 @@ const functions = [
 			],
 		}},
 		'',
-		{op: '=', multiline: true, id: ['intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY'], and: {
+		{op: '=', multiline: true, id: ['intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY', 'intersectSideIsRight'], and: {
 			op: 'call', id: 'getCloseIntersection', and: ['rightX', 'rightY', 'topX', 'topY', 'axisIntersectSideY', 'axisIntersectSideZoom', 'isEvenQuadrant'],
 		}},
-		{op: '=', multiline: true, id: ['intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY'], and: {
+		{op: '=', multiline: true, id: ['intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY', 'intersectBaseIsTop'], and: {
 			op: 'call', id: 'getCloseIntersection', and: ['topX', 'topY', 'rightX', 'rightY', 'axisIntersectBaseY', 'axisIntersectBaseZoom', {op: '!', and: 'isEvenQuadrant'}],
 		}},
 		'',
@@ -155,44 +155,15 @@ const functions = [
 			{op: 'return', and: {op: 'array', multiline: 2, and: [
 				'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY',
 				'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY',
+				{op: '!=', and: ['intersectSideIsRight', 'intersectBaseIsTop']},
 			]}},
 		]},
 		'',
 		{op: 'return', and: {op: 'array', multiline: 2, and: [
 			'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY',
 			'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY',
+			{op: '!=', and: ['intersectSideIsRight', 'intersectBaseIsTop']},
 		]}},
-	]},
-	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], type: 'zoom', and: [
-		{op: '=', multiline: 3, id: [
-			'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A',
-			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B',
-			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C',
-		], and: {
-			op: 'call', id: 'getPairings', and: ['flip0', 'flip1'],
-		}},
-		'',
-		{op: 'return', and: {
-			op: '||', multiline: true, and: [
-				{op: 'call', id: 'getIntersectZoom', and: ['zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C', 'isInverse', 1]},
-				{op: 'call', id: 'getIntersectZoom', and: [
-					'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', 'isInverse', {
-						op: '-', and: [
-							1,
-							{op: '/', and: ['zoomB', 'zoomC']},
-						],
-					},
-				]},
-				{op: 'call', id: 'getIntersectZoom', and: [
-					'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A', 'isInverse', {
-						op: '-', and: [
-							1,
-							{op: '/', and: ['zoomA', 'zoomB']},
-						],
-					},
-				]},
-			],
-		}},
 	]},
 ];
 
@@ -264,27 +235,22 @@ export default {
 				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'mtext', xmlns, content: 'let the image\'s angle of rotation be '},
+							{tag: 'div', content: 'let half of the viewport\'s height at the target start zoom be'},
 						]},
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'θ'},
+							{tag: 'mi', xmlns, content: 'd'},
 						]},
 					]},
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'mtext', xmlns, content: 'let '},
-							{tag: 'mfrac', xmlns, style: {padding: '0 0.5em'}, content: [
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mtext', xmlns, content: 'viewport height'},
-								]},
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mn', xmlns, content: '2'},
-								]},
-							]},
-							{tag: 'mtext', xmlns, content: 'at the target start zoom be'},
+							{tag: 'div', content: 'let the top viewport edge\'s midpoint be'},
 						]},
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'd'},
+							{tag: 'mo', xmlns, content: '('},
+							{tag: 'mi', xmlns, content: 'x'},
+							{tag: 'mo', xmlns, content: ', '},
+							{tag: 'mi', xmlns, content: 'y'},
+							{tag: 'mo', xmlns, content: ')'},
 						]},
 					]},
 				]},
@@ -292,6 +258,15 @@ export default {
 			{
 				title: 'Declarations',
 				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'θ'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'div', content: 'the image\'s angle of rotation'},
+						]},
+					]},
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mi', xmlns, content: 'A'},
@@ -307,31 +282,6 @@ export default {
 					]},
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'mo', xmlns, content: '∠'},
-							{tag: 'mi', xmlns, content: 'C'},
-							{tag: 'mi', xmlns, content: 'A'},
-							{tag: 'mi', xmlns, content: 'B'},
-						]},
-						{tag: 'mtext', xmlns, content: 'is'},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'θ'},
-						]},
-					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mo', xmlns, content: '∠'},
-							{tag: 'mi', xmlns, content: 'A'},
-							{tag: 'mi', xmlns, content: 'B'},
-							{tag: 'mi', xmlns, content: 'C'},
-						]},
-						{tag: 'mtext', xmlns, content: 'is'},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mn', xmlns, content: '90'},
-							{tag: 'mo', xmlns, content: '°'},
-						]},
-					]},
-					{tag: 'mtr', xmlns, content: [
-						{tag: 'mtd', xmlns, content: [
 							{tag: 'mo', xmlns, content: '|'},
 							{tag: 'mi', xmlns, content: 'A'},
 							{tag: 'mi', xmlns, content: 'C'},
@@ -342,11 +292,6 @@ export default {
 							{tag: 'mi', xmlns, content: 'd'},
 						]},
 					]},
-				]},
-			},
-			{
-				title: 'Coordinates',
-				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mo', xmlns, content: '|'},
@@ -354,20 +299,7 @@ export default {
 							{tag: 'mi', xmlns, content: 'C'},
 							{tag: 'mo', xmlns, content: '|'},
 						]},
-						{tag: 'mtext', xmlns, content: '='},
-						{tag: 'mtd', xmlns, content: [
-							{tag: 'mrow', xmlns, content: [
-								{tag: 'mrow', xmlns, content: [
-									{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'sin'},
-									{tag: 'mo', xmlns, content: '('},
-									{tag: 'mi', xmlns, content: 'θ'},
-									{tag: 'mo', xmlns, content: ')'},
-								]},
-								{tag: 'mo', xmlns, content: '×'},
-								{tag: 'mi', xmlns, content: 'd'},
-							]},
-						]},
-						{tag: 'mtext', xmlns, content: '='},
+						{tag: 'mtext', xmlns, content: 'is'},
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mi', xmlns, content: 'x'},
 						]},
@@ -379,20 +311,109 @@ export default {
 							{tag: 'mi', xmlns, content: 'B'},
 							{tag: 'mo', xmlns, content: '|'},
 						]},
-						{tag: 'mtext', xmlns, content: '='},
+						{tag: 'mtext', xmlns, content: 'is'},
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'mrow', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'y'},
+						]},
+					]},
+				]},
+			},
+			{
+				title: {tag: 'mi', xmlns, content: 'x'},
+				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'sin'},
+							{tag: 'mo', xmlns, content: '('},
+							{tag: 'mi', xmlns, content: 'θ'},
+							{tag: 'mo', xmlns, content: ')'},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
 								{tag: 'mrow', xmlns, content: [
-									{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'cos'},
-									{tag: 'mo', xmlns, content: '('},
-									{tag: 'mi', xmlns, content: 'θ'},
-									{tag: 'mo', xmlns, content: ')'},
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mo', xmlns, content: '|'},
 								]},
-								{tag: 'mo', xmlns, content: '×'},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mo', xmlns, content: '|'},
+								]},
+							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'x'},
 								{tag: 'mi', xmlns, content: 'd'},
 							]},
 						]},
-						{tag: 'mtext', xmlns, content: '='},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'sin'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mi', xmlns, content: 'θ'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+							{tag: 'mo', xmlns, content: '×'},
+							{tag: 'mi', xmlns, content: 'd'},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'x'},
+						]},
+					]},
+				]},
+			},
+			{
+				title: {tag: 'mi', xmlns, content: 'y'},
+				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'cos'},
+							{tag: 'mo', xmlns, content: '('},
+							{tag: 'mi', xmlns, content: 'θ'},
+							{tag: 'mo', xmlns, content: ')'},
+						]},
+						{tag: 'mo', xmlns, content: '='},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'B'},
+									{tag: 'mo', xmlns, content: '|'},
+								]},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '|'},
+									{tag: 'mi', xmlns, content: 'A'},
+									{tag: 'mi', xmlns, content: 'C'},
+									{tag: 'mo', xmlns, content: '|'},
+								]},
+							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'y'},
+								{tag: 'mi', xmlns, content: 'd'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mrow', xmlns, content: [
+								{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: 'cos'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mi', xmlns, content: 'θ'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+							{tag: 'mo', xmlns, content: '×'},
+							{tag: 'mi', xmlns, content: 'd'},
+						]},
+						{tag: 'mo', xmlns, content: '='},
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mi', xmlns, content: 'y'},
 						]},
@@ -404,6 +425,7 @@ export default {
 			{op: '=', id: [
 				'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',
 				'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1',
+				'match0',
 			], and: {
 				op: 'call', id: 'getZoomPoints',
 			}},

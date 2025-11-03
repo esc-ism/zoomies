@@ -3,7 +3,7 @@ import {CORNERS} from '@/pages/consts';
 import Demo from '../2line/demo';
 import {getLine, getFlipped, getM, isAbove as _isAbove} from '../shared';
 
-import {getDirected, getFirstPairing, getSecondPairings, getZoom} from '../shared/snapZoom';
+import {getPairings, getZoom} from '../shared/snapZoom';
 
 import getZoomPoints from './zoomPoints';
 
@@ -26,22 +26,9 @@ const getQuadrant = (second0, second1, position) => {
 };
 
 export const getSnappedZoom = (first0, second0, first1, second1, position) => {
-	const getPairings = (flip0, flip1) => {
-		const [lineFirst0, lineSecond0] = getDirected(first0, second0, flip0, -0.5);
-		const [lineFirst1, lineSecond1] = getDirected(first1, second1, flip1, 0.5);
-		
-		const pairings = getSecondPairings(second0, second1, lineFirst0, lineFirst1, lineSecond0, lineSecond1);
-		
-		if (first0.end.axis !== first1.end.axis) {
-			pairings.unshift(getFirstPairing(first0, first1, lineFirst0, lineFirst1));
-		}
-		
-		return pairings;
-	};
-	
 	const [flip0, flip1] = getQuadrant(second0, second1, position);
 	
-	return getZoom(position, flip0 !== flip1, ...getPairings(flip0, flip1));
+	return getZoom(position, flip0 !== flip1, ...getPairings(first0, second0, flip0, first1, second1, flip1));
 };
 
 export default class extends Demo {

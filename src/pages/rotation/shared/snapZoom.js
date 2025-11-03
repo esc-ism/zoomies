@@ -1,7 +1,7 @@
 import {getFlipped, getProgress, getProgressedLine, getZoomPairSecond} from '.';
 
 export const getDirected = (first, second, flip, cornerX) => {
-	const get = flip ? (position) => getFlipped(position) : ({x, y}) => ({x, y});
+	const get = flip ? (position) => getFlipped(position) : ({x, y, z}) => ({x, y, z});
 	
 	return [[get(first), get(first.end)], [{...get(second), z: second.z}, get({x: cornerX, y: 0.5})]];
 };
@@ -37,3 +37,16 @@ export const getSecondPairings = (second0, second1, lineFirst0, lineFirst1, line
 			[second0.z, lineSecond0, getProgressedLine(lineFirst1, second0)],
 			[second1.z, getProgressedLine(lineSecond0, second1), lineSecond1],
 		];
+
+export const getPairings = (first0, second0, flip0, first1, second1, flip1) => {
+	const [lineFirst0, lineSecond0] = getDirected(first0, second0, flip0, -0.5);
+	const [lineFirst1, lineSecond1] = getDirected(first1, second1, flip1, 0.5);
+	
+	const pairings = getSecondPairings(second0, second1, lineFirst0, lineFirst1, lineSecond0, lineSecond1);
+	
+	if (first0.end.axis !== first1.end.axis) {
+		pairings.unshift(getFirstPairing(first0, first1, lineFirst0, lineFirst1));
+	}
+	
+	return pairings;
+};

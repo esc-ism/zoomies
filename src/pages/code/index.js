@@ -367,6 +367,10 @@ const visualise = (scope, ...ids) => {
 	
 	const [first, second] = (scope[ids[0]].type[0] === 'x' ? ids : [ids[1], ids[0]]).map((id) => scope[id]);
 	
+	if (first.value === 0) {
+		return getLine({...second}, DEGREES[90]);
+	}
+	
 	const angle = Math.atan(second.value / (first.value * demo.ratioImage));
 	const value = Math.sqrt(Math.pow(first.value * demo.ratioImage, 2) + Math.pow(second.value, 2));
 	

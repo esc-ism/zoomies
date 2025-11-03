@@ -13,12 +13,12 @@ const getP = ({end, ...first}, point) => {
 	return (end[axis] - first[axis]) / (point[axis] - first[axis]);
 };
 
-const getIntersection = (lineFirst, lineSecond) => {
+const getIntersection = (lineFirst, lineSecond, z) => {
 	const point = getGenericIntersection(lineFirst, lineSecond);
 	const progress = (point.y - lineSecond[0].y) / (lineSecond[1].y - lineSecond[0].y);
 	
 	point.p = getP(lineFirst[0], point);
-	point.z = lineSecond[0].z / (1 - progress);
+	point.z = z ?? (lineSecond[0].z / (1 - progress));
 	point.end = lineSecond[1];
 	
 	return point;
@@ -82,6 +82,16 @@ const getShared = ({startZooms: [zoomSide, zoomBase], ...data}) => {
 			];
 };
 
+const makeFirstInt = (first, {z}, third, yIntersect) => {
+	Object.assign(third, getGenericIntersection([first, first.end], yIntersect));
+	
+	third.p = getP(first, third);
+	// avoid calculating since rounding errors can make x≈y≈0 snap zooms impossible
+	third.z = z;
+	third.isFirstInt = true;
+};
+
+// todo rename
 const mod = (first, second, third, firstFlipped, secondFlipped, yIntersect) => {
 	if (third.z >= second.z) {
 		return;
@@ -96,8 +106,7 @@ const mod = (first, second, third, firstFlipped, secondFlipped, yIntersect) => {
 		return;
 	}
 	
-	Object.assign(third, getIntersection([first, first.end], yIntersect));
-	third.isFirstInt = true;
+	makeFirstInt(first, second, third, yIntersect);
 };
 
 const getAll = (data) => {
@@ -122,10 +131,8 @@ const getAll = (data) => {
 				Object.assign(firstBase, firstBaseFlipped);
 			}
 			
-			Object.assign(thirdSide, getIntersection([firstSide, firstSide.end], [data.yIntersectSide, data.cornerSide]));
-			Object.assign(thirdBase, getIntersection([firstBase, firstBase.end], [data.yIntersectBase, data.cornerBase]));
-			
-			thirdSide.isFirstInt = thirdBase.isFirstInt = true;
+			makeFirstInt(firstSide, secondSide, thirdSide, [data.yIntersectSide, data.cornerSide]);
+			makeFirstInt(firstBase, secondBase, thirdBase, [data.yIntersectBase, data.cornerBase]);
 		} else {
 			Object.assign(firstSide, firstSideFlipped);
 			Object.assign(firstBase, firstBaseFlipped);

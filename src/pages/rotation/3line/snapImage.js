@@ -9,6 +9,8 @@ const topRight = [radii.x, -radii.y * 0.3];
 
 const svg = getDiagram(radii, strokeRadius, topLeft, topRight);
 
+window.setTimeout(() => svg.scrollIntoView(), 200);
+
 const getMirroredLine = (...points) => [getLine(...points), getLine(...points.map(([x, y]) => [-x, -y]))];
 
 const getSplit = (from, to, ratio) => {

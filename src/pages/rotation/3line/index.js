@@ -1,12 +1,16 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
-import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, getMath} from '../../shared';
+import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 
 import System from './demo';
 import {xmlns} from '@/pages/shared/math';
+
+import pointsImage from './pointsImage';
+import snapImage from './snapImage';
 
 const code = [];
 
@@ -346,13 +350,11 @@ const functions = [
 		]},
 		'',
 		{op: 'return', and: {op: 'array', and: [
-			{op: '...', and: {
-				op: 'call', id: 'getIntersection', and: [
-					'thirdZoom', 'thirdX', 'thirdY', 'cornerX', 0.5,
-					'firstZoom', 0, 0, 'firstEndX', 'firstEndY',
+			'secondZoom', {op: '...', and: {
+				op: 'call', id: 'getGenericIntersection', and: [
+					0, 0, 'firstEndX', 'firstEndY', 'thirdX', 'thirdY', 'cornerX', 0.5,
 				],
-			}},
-			'firstEndX', 'firstEndY',
+			}}, 'firstEndX', 'firstEndY',
 		]}},
 	]},
 	{op: 'func', id: 'getAll', type: [
@@ -430,16 +432,14 @@ const functions = [
 					'⅛π',
 				]},
 				{op: 'return', and: {op: 'array', multiline: [1, 1, 5], and: [
-					{op: '...', and: {
-						op: 'call', id: 'getIntersection', and: [
-							'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
-							0, 0, 'firstEndXSide', 'firstEndYSide',
+					'secondZoom', {op: '...', and: {
+						op: 'call', id: 'getGenericIntersection', and: [
+							0, 0, 'firstEndXSide', 'firstEndYSide', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
 						],
 					}},
-					{op: '...', and: {
-						op: 'call', id: 'getIntersection', and: [
-							'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
-							0, 0, 'firstEndXBase', 'firstEndYBase',
+					'secondZoom', {op: '...', and: {
+						op: 'call', id: 'getGenericIntersection', and: [
+							0, 0, 'firstEndXBase', 'firstEndYBase', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
 						],
 					}},
 					'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXBase', 'firstEndYBase',
@@ -639,11 +639,15 @@ const functions = [
 			],
 		}},
 	]},
-	{op: 'func', id: 'getPairings', type: [
+	{op: 'func', id: 'getPairings', args: ['flip0', 'flip1'], type: [
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',,
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
-	], pair: [,2, 1, 4, 3, 6, 5, 8, 7,,11, 10, 13, 12, 15, 14, 17, 16,,,21, 20, 23, 22, 25, 24, 27, 26], args: ['flip0', 'flip1'], and: [
+	], pair: [
+		,2, 1, 4, 3, 6, 5, 8, 7,,
+		11, 10, 13, 12, 15, 14, 17, 16,,,
+		21, 20, 23, 22, 25, 24, 27, 26,
+	], multilineResult: [9, 9, 10], and: [
 		{op: '=', multiline: 2, id: [
 			'zoomLow0', 'fromXLow0', 'fromYLow0', 'toXLow0', 'toYLow0',
 			'zoomHigh0', 'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0',
@@ -667,7 +671,7 @@ const functions = [
 			],
 		}},
 		'',
-		{op: '=', id: [
+		{op: '=', multiline: 2, id: [
 			'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
 			'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
 		], and: {
@@ -705,35 +709,11 @@ const functions = [
 		}},
 		'',
 		{op: 'if', and: [
-			{op: '!', and: 'hasSecond0'},
-			{op: 'return', and: {op: 'array', multiline: [9, 9, 2, 3, 4], and: [
-				'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
-				'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
-				true, 'secondZoom',
-				{op: '...', and: {op: 'call', id: 'getProgressed', and: [
-					'fromXLow0', 'fromYLow0', 'toXLow0', 'toYLow0', 'zoomLow0', 'secondZoom',
-				]}},
-				'toXLow0', 'toYLow0',
-				'fromXHigh1', 'fromYHigh1', 'toXHigh1', 'toYHigh1',
-			]}},
-		]},
-		'',
-		{op: 'if', and: [
-			{op: '!', and: 'hasSecond1'},
-			{op: 'return', and: {op: 'array', multiline: [9, 9, 2, 4, 3], and: [
-				'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
-				'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
-				true, 'secondZoom',
-				'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0',
-				{op: '...', and: {op: 'call', id: 'getProgressed', and: [
-					'fromXLow1', 'fromYLow1', 'toXLow1', 'toYLow1', 'zoomLow1', 'secondZoom',
-				]}},
-				'toXLow1', 'toYLow1',
-			]}},
-		]},
-		'',
-		{op: 'if', and: [
-			'secondIsFlipped',
+			{op: '&&', and: [
+				'hasSecond0',
+				'hasSecond1',
+				'secondIsFlipped',
+			]},
 			{op: 'return', and: {op: 'array', multiline: [9, 9, 2, 4, 4], and: [
 				'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
 				'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
@@ -749,7 +729,7 @@ const functions = [
 		]}},
 	]},
 	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], type: 'zoom', and: [
-		{op: '=', multiline: [9, 9, 10], id: [
+		{op: '=', id: [
 			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C',
 			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B',
 			'hasA', 'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A',
@@ -824,12 +804,270 @@ export default {
 			content: 'Pan-Limit Maths',
 			style: {textAlign: 'center'},
 		},
-		// todo
 		[
-			'The prior system required us to calculate the coordinates of viewport edge midpoints.',
-			'Here, we must find the coordinates of a viewport corner at the connecting rail\'s start zoom when the viewport is centered on its intersection with the origin rail.',
+			'Like a movie preparing setups that pay off in the final act, this system relies purely on the concepts introduced earlier.',
+			'Since we can find the connecting rail\'s start position by interpolating along its origin rail,',
+			'the only new wrinkle introduced is the question of its end point.',
 		],
-		'to do...',
+		[
+			'I\'ve stated that connecting rails are pointed at viewport corners, but how can we find these corners\' coordinates?',
+			'You might notice that this is reminiscent of the prior system\'s viewport midpoint problem.',
+			'Conveniently, we can re-use those maths and locate corners by summing midpoint coordinates!',
+		],
+		[
+			'Before, we calculated top and right midpoints at different zoom levels (used here as the origin and connecting rail start zooms).',
+			'It\'s simpler to interpolate down the pre-calculated midpoint from origin rail start zoom to connecting rail start zoom than do more trigonometry.',
+			'So that\'s what you see below!',
+		],
+		[
+			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'B'}]},
+			' is the origin rail midpoint, positioned on the left rather than the right for clarity. ',
+			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'C'}]},
+			' and ',
+			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
+			' are the connecting rail midpoints, with ',
+			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
+			' being the unknown.',
+		],
+		{
+			tag: 'div',
+			content: pointsImage,
+			style: {textAlign: 'center'},
+		},
+		getMath(
+			{
+				title: 'Variables',
+				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'div', content: 'let half of the viewport\'s width at default zoom be'},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'v'},
+								{tag: 'mi', xmlns, content: 'w'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'div', content: 'let half of the viewport\'s height at default zoom be'},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'v'},
+								{tag: 'mi', xmlns, content: 'h'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'div', content: 'let the origin rail\'s start zoom be'},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'z'},
+								{tag: 'mi', xmlns, content: '0'},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'div', content: 'let the connecting rail\'s start zoom be'},
+						]},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'msub', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'z'},
+								{tag: 'mi', xmlns, content: '1'},
+							]},
+						]},
+					]},
+				]},
+			},
+			{
+				title: 'Declarations',
+				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mi', xmlns, content: 'A'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '('},
+							{tag: 'mn', xmlns, content: '0'},
+							{tag: 'mo', xmlns, content: ', '},
+							{tag: 'mn', xmlns, content: '0'},
+							{tag: 'mo', xmlns, content: ')'},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '|'},
+							{tag: 'mi', xmlns, content: 'A'},
+							{tag: 'mi', xmlns, content: 'B'},
+							{tag: 'mo', xmlns, content: '|'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'v'},
+									{tag: 'mi', xmlns, content: 'w'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'z'},
+									{tag: 'mi', xmlns, content: '0'},
+								]},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '|'},
+							{tag: 'mi', xmlns, content: 'A'},
+							{tag: 'mi', xmlns, content: 'C'},
+							{tag: 'mo', xmlns, content: '|'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'v'},
+									{tag: 'mi', xmlns, content: 'h'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'z'},
+									{tag: 'mi', xmlns, content: '1'},
+								]},
+							]},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mo', xmlns, content: '|'},
+							{tag: 'mi', xmlns, content: 'A'},
+							{tag: 'mi', xmlns, content: 'D'},
+							{tag: 'mo', xmlns, content: '|'},
+						]},
+						{tag: 'mtext', xmlns, content: 'is'},
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mfrac', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'v'},
+									{tag: 'mi', xmlns, content: 'w'},
+								]},
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'z'},
+									{tag: 'mi', xmlns, content: '1'},
+								]},
+							]},
+						]},
+					]},
+				]},
+			},
+			{
+				title: {tag: 'mi', xmlns, content: 'E'},
+				content: [
+					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'D'},
+									{tag: 'mi', xmlns, content: 'x'},
+								]},
+							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '-'},
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'B'},
+										{tag: 'mi', xmlns, content: 'x'},
+									]},
+								]},
+								{tag: 'mo', xmlns, content: '×'},
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'z'},
+										{tag: 'mi', xmlns, content: '0'},
+									]},
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'z'},
+										{tag: 'mi', xmlns, content: '1'},
+									]},
+								]},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'msub', xmlns, content: [
+									{tag: 'mi', xmlns, content: 'D'},
+									{tag: 'mi', xmlns, content: 'y'},
+								]},
+							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'mo', xmlns, content: '-'},
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'B'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+								]},
+								{tag: 'mo', xmlns, content: '×'},
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'z'},
+										{tag: 'mi', xmlns, content: '0'},
+									]},
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'z'},
+										{tag: 'mi', xmlns, content: '1'},
+									]},
+								]},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'E'},
+							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'C'},
+										{tag: 'mi', xmlns, content: 'x'},
+									]},
+									{tag: 'mo', xmlns, content: '+'},
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'D'},
+										{tag: 'mi', xmlns, content: 'x'},
+									]},
+								]},
+								{tag: 'mo', xmlns, content: ', '},
+								{tag: 'mrow', xmlns, content: [
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'C'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+									{tag: 'mo', xmlns, content: '+'},
+									{tag: 'msub', xmlns, content: [
+										{tag: 'mi', xmlns, content: 'D'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+								]},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+						]},
+					]},
+				],
+			},
+		),
+		[
+			'The other main additions are conditions to identify which of the two possible corners connecting rails should point towards.',
+			'I\'ve also had to include special case checks for when corner rails and connecting rails have identical gradients, or when they\'re similar enough that rounding errors become catastrophic.',
+		],
 		getCode(code, [
 			{op: '=', id: [
 				'thirdZoom0', 'thirdX0', 'thirdY0', 'thirdZoom1', 'thirdX1', 'thirdY1',
@@ -922,7 +1160,18 @@ export default {
 			content: 'Snap-Pan Maths',
 			style: {textAlign: 'center'},
 		},
-		// todo
+		[
+			'Despite introducing an additional rail, this system still only needs three checks per sector.',
+			// todo yeah this is always the case. talk about it earlier
+			'In fact, there are cases where only two checks are needed here!',
+			'Some complication does still arise from the occasional absence of a connecting rail',
+			'Since it\'s possible for one set of rails to lack a connecting rail, there are ',
+		],
+		{
+			tag: 'div',
+			content: snapImage,
+			style: {textAlign: 'center'},
+		},
 		getCode(code, [
 			{op: '=', id: 'snapZoom', type: 'zoom', and: {
 				op: 'max', multiline: true, and: [

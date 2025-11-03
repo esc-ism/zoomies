@@ -7,29 +7,14 @@ import getConstrainerFromPoints from '../shared/constrain';
 
 import {CORNERS} from '@/pages/consts';
 import getZoomPoints from './zoomPoints';
-import {getDirected, getFirstPairing, getSecondPairings, getZoom, isValidZoom} from '../shared/snapZoom';
+import {getZoom, isValidZoom, getPairings} from '../shared/snapZoom';
 
-export const getSnappedZoom = (first0, second0, first1, second1, position) => {
-	const getPairings = (flip0, flip1) => {
-		const [lineFirst0, lineSecond0] = getDirected(first0, second0, flip0, -0.5);
-		const [lineFirst1, lineSecond1] = getDirected(first1, second1, flip1, 0.5);
-		
-		const pairings = getSecondPairings(second0, second1, lineFirst0, lineFirst1, lineSecond0, lineSecond1);
-		
-		if (first0.end.axis !== first1.end.axis) {
-			pairings.unshift(getFirstPairing(first0, first1, lineFirst0, lineFirst1));
-		}
-		
-		return pairings;
-	};
-	
-	return Math.max(...[
-		getZoom(position, false, ...getPairings(false, false)),
-		getZoom(position, true, ...getPairings(false, true)),
-		getZoom(position, true, ...getPairings(true, false)),
-		getZoom(position, false, ...getPairings(true, true)),
-	].filter(isValidZoom));
-};
+export const getSnappedZoom = (first0, second0, first1, second1, position) => Math.max(...[
+	getZoom(position, false, ...getPairings(first0, second0, false, first1, second1, false)),
+	getZoom(position, true, ...getPairings(first0, second0, false, first1, second1, true)),
+	getZoom(position, true, ...getPairings(first0, second0, true, first1, second1, false)),
+	getZoom(position, false, ...getPairings(first0, second0, true, first1, second1, true)),
+].filter(isValidZoom));
 
 export const getRailProgress = (zoom, first, second) => {
 	if (zoom <= first.z) {

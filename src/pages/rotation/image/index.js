@@ -43,7 +43,7 @@ const getCornerProgressTweens = (rotation) => [
 
 const functions = [
 	...SHARED_FUNCTIONS,
-	{op: 'func', id: 'getIntersectSide', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [2, 1], and: [
+	{op: 'func', id: 'getIntersectSide', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
 		{op: '=', id: 'lockAngle', type: 'angle', and: {
 			op: '+', and: ['progressAngle', 'quadrantAngle'],
 		}},
@@ -67,8 +67,8 @@ const functions = [
 			0,
 		]}},
 	]},
-	{op: 'func', id: 'getIntersectBase', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [2, 1], and: [
-		{op: '=', id: 'lockAngle', and: {
+	{op: 'func', id: 'getIntersectBase', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
+		{op: '=', id: 'lockAngle', type: 'angle', and: {
 			op: '-', and: ['½π', 'quadrantAngle', 'progressAngle'],
 		}},
 		'',
@@ -86,9 +86,9 @@ const functions = [
 		}},
 		'',
 		{op: 'return', and: {op: 'array', and: [
+			'intersectZoom',
 			{op: '?', and: ['isEvenQuadrant', 'intersectX', {op: '-', and: 'intersectX'}]},
 			0,
-			'intersectZoom',
 		]}},
 	]},
 	// todo rename all the "first, second, third" stuff to "origin, connector, lock"
@@ -117,10 +117,6 @@ const functions = [
 			op: 'call', id: 'getStartZooms',
 		}},
 		'',
-		{op: '=', id: ['rightX', 'rightY', 'topX', 'topY'], and: {
-			op: 'call', id: 'getViewportPoints', and: ['zoomSide', 'zoomBase'],
-		}},
-		'',
 		{op: '=', id: 'isEvenQuadrant', and: {
 			op: '!=', and: [
 				{op: '%', and: [
@@ -136,13 +132,13 @@ const functions = [
 			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
 		}},
 		'',
-		{op: '=', id: ['angleBase', 'angleSide'], and: {
+		{op: '=', id: ['angleSide', 'angleBase'], and: {
 			op: 'call', id: 'getProgressAngles', and: ['quadrantAngle'],
 		}},
 		'',
 		{op: '=', id: 'cornerAngle', type: 'angle', and: {
 			op: 'atan', and: {
-				op: '/', and: ['viewportHeight', 'viewportWidth'],
+				op: '/', and: ['imageHeight', 'imageWidth'],
 			},
 		}},
 		'',
@@ -235,37 +231,6 @@ const functions = [
 			{op: 'call', id: 'isBelow', and: [{op: '-', and: 'x1'}, {op: '-', and: 'y1'}, -0.5, -0.5]},
 			true,
 		]}},
-	]},
-	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], type: 'zoom', and: [
-		{op: '=', multiline: 3, id: [
-			'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A',
-			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B',
-			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C',
-		], and: {
-			op: 'call', id: 'getPairings', and: ['flip0', 'flip1'],
-		}},
-		'',
-		{op: 'return', and: {
-			op: '||', multiline: true, and: [
-				{op: 'call', id: 'getIntersectZoom', and: ['zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C', 'isInverse', 1]},
-				{op: 'call', id: 'getIntersectZoom', and: [
-					'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', 'isInverse', {
-						op: '-', and: [
-							1,
-							{op: '/', and: ['zoomB', 'zoomC']},
-						],
-					},
-				]},
-				{op: 'call', id: 'getIntersectZoom', and: [
-					'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A', 'isInverse', {
-						op: '-', and: [
-							1,
-							{op: '/', and: ['zoomA', 'zoomB']},
-						],
-					},
-				]},
-			],
-		}},
 	]},
 ];
 
@@ -362,8 +327,8 @@ export default {
 			'Like origin rail start zooms, lock rails are found through trigonometry.',
 			'There are four kinds of lock rail;',
 			'they can start from either axis and end at either a side or base corner.',
-			'Each of the four variations has slightly different formulae, but each formula is derived through similar geometry.',
-			'Demonstrated below is an x-axis, base corner lock rail problem, where ',
+			'Each of the four variations has slightly different formulae, but they all present similar problems with similar solutions.',
+			'Demonstrated below is an x-axis, base corner problem, where ',
 			{tag: 'math', xmlns, style: {fontSize: '0.8em'}, content: getOverlined('AC')},
 			' is the lock rail.',
 			'The diagram is used to derive start zoom and start position formulae.',
@@ -372,7 +337,6 @@ export default {
 			tag: 'div',
 			content: zoomImage,
 			style: {textAlign: 'center'},
-			callback: (element) => window.setTimeout(() => element.scrollIntoView({block: 'center'}), 100),
 		},
 		getMath(
 			{
@@ -381,31 +345,19 @@ export default {
 					{tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the image\'s angle of rotation be '},
+								{tag: 'div', content: 'let the lock rail start from'},
 							]},
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mi', xmlns, content: 'θ'},
-							]},
-						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the lock rail\'s angle be '},
-							]},
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mi', xmlns, content: 'α'},
-							]},
-						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the x coordinate of the lock rail at y=0 be '},
-							]},
-							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '('},
 								{tag: 'mi', xmlns, content: 'x'},
+								{tag: 'mo', xmlns, content: ', '},
+								{tag: 'mn', xmlns, content: '0'},
+								{tag: 'mo', xmlns, content: ')'},
 							]},
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let the target start zoom be '},
+								{tag: 'div', content: 'let the target start zoom be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mi', xmlns, content: 'z'},
@@ -413,7 +365,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let half of the image\'s width be'},
+								{tag: 'div', content: 'let half of the image\'s width be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
@@ -424,7 +376,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let half of the image\'s height be'},
+								{tag: 'div', content: 'let half of the image\'s height be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'msub', xmlns, content: [
@@ -435,7 +387,7 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mtext', xmlns, content: 'let half of the viewport\'s height at default zoom be'},
+								{tag: 'div', content: 'let half of the viewport\'s height at default zoom be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mi', xmlns, content: 'v'},
@@ -498,51 +450,33 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mo', xmlns, content: '∠'},
-								{tag: 'mi', xmlns, content: 'A'},
-								{tag: 'mi', xmlns, content: 'B'},
-								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mi', xmlns, content: 'θ'},
 							]},
 							{tag: 'mtext', xmlns, content: 'is'},
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'mn', xmlns, content: '90'},
-								{tag: 'mo', xmlns, content: '°'},
+								{tag: 'div', content: 'the image\'s angle of rotation'},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mi', xmlns, content: 'α'},
+							]},
+							{tag: 'mtext', xmlns, content: 'is'},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mtext', xmlns, content: 'the desired lock rail angle'},
 							]},
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '∠'},
-								{tag: 'mi', xmlns, content: 'D'},
-								{tag: 'mi', xmlns, content: 'A'},
 								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'C'},
 							]},
 							{tag: 'mtext', xmlns, content: 'is'},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mi', xmlns, content: 'θ'},
-							]},
-						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mo', xmlns, content: '∠'},
-								{tag: 'mi', xmlns, content: 'A'},
-								{tag: 'mi', xmlns, content: 'D'},
-								{tag: 'mi', xmlns, content: 'C'},
-							]},
-							{tag: 'mtext', xmlns, content: 'is'},
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mn', xmlns, content: '90'},
-								{tag: 'mo', xmlns, content: '°'},
-							]},
-						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mo', xmlns, content: '∠'},
-								{tag: 'mi', xmlns, content: 'D'},
-								{tag: 'mi', xmlns, content: 'A'},
-								{tag: 'mi', xmlns, content: 'C'},
-							]},
-							{tag: 'mtext', xmlns, content: 'is'},
-							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, content: '+'},
 								{tag: 'mi', xmlns, content: 'α'},
 							]},
 						]},
@@ -874,6 +808,10 @@ export default {
 			'Now, with the adjacent rails split into a trio of segment pairs, the maximum number of checks required to find a snap zoom is tripled.',
 		],
 		getCode(code, [
+			{op: '=', id: 'match0', and: {op: '||', and: [
+				{op: '==', and: ['endX0', 'endX1']},
+				{op: '==', and: ['endY0', 'endY1']},
+			]}},
 			{op: '=', id: ['flip0', 'flip1'], and: {
 				op: 'call', id: 'getQuadrant',
 			}},

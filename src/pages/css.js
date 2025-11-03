@@ -32,7 +32,9 @@ addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(3)`, {'text-align': 'left'});
 
 addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(1)`, {'text-align': '-webkit-right'});
 addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(1)`, {'text-align': 'right'});
-addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2)`, {'text-align': 'left'});
+addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2)`, {'text-align': 'left', 'vertical-align': 'middle'});
+
+addRule(`.${CLASS_MATH_BODY} div`, {'text-wrap-style': 'balance'});
 
 addRule(`.${CLASS_CODE} > div`, {'overflow-x': 'auto'});
 
@@ -91,7 +93,13 @@ addRule(`.${CLASS_MATH_CONTAINER} math`, {
 	'min-height': '0.5lh',
 });
 
-addRule('mtext', {width: 'max-content'});
+// fixes <msqrt><msup><mo>|</mo><mn>2</mn></msup></msqrt> being too tall
+addRule('msqrt msup mo', {height: 0});
+
+addRule('mtext', {
+	width: 'max-content',
+	'white-space': 'pre-wrap',
+});
 
 addRule(`.${CLASS_MATH_TITLE} *`, {
 	'pointer-events': 'none',

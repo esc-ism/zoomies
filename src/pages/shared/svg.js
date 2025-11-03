@@ -13,36 +13,52 @@ export const getLine = ([x1, y1], [x2, y2]) => {
 
 export const COLOURS = ['rgba(66, 185, 211, 1)', 'rgba(218, 160, 65, 1)', 'rgba(142, 68, 195, 1)'];
 
+export const getBorder = (bX, bY, strokeDiameter) => {
+	const border = document.createElementNS(SVG_NAMESPACE, 'g');
+	
+	border.setAttribute('stroke-width', strokeDiameter);
+	border.setAttribute('stroke-linecap', 'square');
+	
+	border.append(
+		getLine([-bX, -bY], [bX, -bY]),
+		getLine([bX, -bY], [bX, bY]),
+		getLine([bX, bY], [-bX, bY]),
+		getLine([-bX, bY], [-bX, -bY]),
+	);
+	
+	return border;
+};
+
 export const getDiagram = (radii, strokeRadius, topLeft, topRight, transforms) => {
 	const strokeDiameter = strokeRadius * 2;
 	
 	const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
 	
-	const rX = radii.x + strokeDiameter;
-	const rY = radii.y + strokeDiameter;
+	const rX = radii.x + strokeDiameter + strokeRadius;
+	const rY = radii.y + strokeDiameter + strokeRadius;
 	
 	svg.setAttribute('viewBox', `${-rX} ${-rY} ${rX * 2} ${rY * 2}`);
 	svg.setAttribute('fill', 'none');
 	svg.setAttribute('stroke', 'black');
 	svg.setAttribute('stroke-linecap', 'round');
-	svg.setAttribute('stroke-width', strokeDiameter);
+	svg.setAttribute('stroke-width', strokeRadius);
 	svg.setAttribute('stroke-opacity', '0.8');
 	
 	svg.style.textAlign = 'center';
-	svg.style.backgroundColor = '#111';
-	svg.style.maxHeight = `min(calc(100dvh - 2em - 16px), ${130 / strokeRadius}px)`;
+	svg.style.backgroundColor = '#222222';
+	svg.style.maxHeight = `min(calc(100dvh - 2em - 16px), ${125 / strokeRadius}px)`;
 	
 	const image = document.createElementNS(SVG_NAMESPACE, 'path');
 	
 	image.setAttribute('d', `M${topLeft[0]} ${topLeft[1]}L${topRight[0]} ${topRight[1]}L${-topLeft[0]} ${-topLeft[1]}L${-topRight[0]} ${-topRight[1]}Z`);
-	image.style.color = 'var(--background)';
+	image.style.color = '#382f3c';
 	image.setAttribute('fill', 'currentcolor');
+	image.setAttribute('stroke-width', strokeDiameter);
 	
 	const axes = document.createElementNS(SVG_NAMESPACE, 'g');
 	
 	axes.setAttribute('stroke', '#aaa');
 	axes.setAttribute('stroke-dasharray', `0 ${strokeRadius * 5}`);
-	axes.setAttribute('stroke-width', strokeRadius);
 	axes.setAttribute('stroke-opacity', '1');
 	
 	axes.append(...[
@@ -58,25 +74,13 @@ export const getDiagram = (radii, strokeRadius, topLeft, topRight, transforms) =
 		axes.setAttribute('transform', transforms);
 	}
 	
-	const border = document.createElementNS(SVG_NAMESPACE, 'g');
-	
-	const bX = rX - strokeRadius;
-	const bY = rY - strokeRadius;
-	
-	border.append(
-		getLine([-bX, -bY], [bX, -bY]),
-		getLine([bX, -bY], [bX, bY]),
-		getLine([bX, bY], [-bX, bY]),
-		getLine([-bX, bY], [-bX, -bY]),
-	);
-	
-	svg.append(image, axes, border);
+	svg.append(image, axes, getBorder(rX - strokeRadius, rY - strokeRadius, strokeDiameter));
 	
 	return svg;
 };
 
-export const getText = (text, [x, y], strokeRadius, offsetX = 0, offsetY = 0) => {
-	const fontSize = strokeRadius * 10;
+export const getText = (text, [x, y], strokeRadius, offsetX = 0, offsetY = 0, isSmall = false) => {
+	const fontSize = strokeRadius * (isSmall ? 7 : 10);
 	const element = document.createElementNS(SVG_NAMESPACE, 'text');
 	
 	element.textContent = text;
