@@ -875,6 +875,8 @@ const generateButtons = (parent, statements) => {
 			
 			generate(args.parent, args.statements);
 		}
+		
+		removeTitle();
 	});
 	
 	buttons.max.addEventListener('click', () => {
