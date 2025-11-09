@@ -1,8 +1,7 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
-import {xmlns} from '@/pages/shared/math';
-import {CLASS_MATH_WRAPPER} from '../consts';
 
+import {xmlns} from '../shared/math';
 import {getText, getButton, getMath} from '../shared';
 
 import System from './demo';

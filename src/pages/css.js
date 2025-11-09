@@ -4,7 +4,6 @@ import {
 	CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
 	CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_EQUATION, CLASS_MATH_ASSERTION,
 	CLASS_ACTIVE, CLASS_BUTTON_ACTIVE, CLASS_MATH_TITLE, CLASS_MATH_BODY,
-	
 } from './consts';
 import {SUB_PIXEL_BS} from '@/shared';
 
@@ -17,6 +16,7 @@ addRule(`.${CLASS_FLASH_CONTAINER}`, {
 addRule([`.${CLASS_CODE}`, `.${CLASS_MATH_WRAPPER}`], {
 	border: '1px solid #868686',
 	'border-radius': '10px',
+	'max-height': 'calc(var(--text-height) - 2em - var(--scrollbar-width))',
 });
 
 addRule(`.${CLASS_CODE}`, {
@@ -32,7 +32,9 @@ addRule(`.${CLASS_MATH_EQUATION} mtd:nth-child(3)`, {'text-align': 'left'});
 
 addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(1)`, {'text-align': '-webkit-right'});
 addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(1)`, {'text-align': 'right'});
-addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2)`, {'text-align': 'left', 'vertical-align': 'middle'});
+addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2)`, {'text-align': 'left', 'vertical-align': 'bottom'});
+// necessary for vertical alignment since parent has `vertical-align: bottom` rather than `middle`
+addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2) > :only-child`, {'margin-bottom': 'calc((1lh - 1cap) / 2)'});
 
 addRule(`.${CLASS_MATH_BODY} div`, {'text-wrap-style': 'balance'});
 
@@ -61,7 +63,6 @@ addRule(`.${CLASS_MATH_TITLE} + .${CLASS_MATH_BODY}`, {
 addRule(`.${CLASS_MATH_WRAPPER}`, {
 	'text-align': 'center',
 	'background-color': '#372d2d',
-	'max-height': 'calc(100dvh - 2em - 16px)',
 	'overscroll-behavior-x': 'contain',
 	overflow: 'auto',
 });

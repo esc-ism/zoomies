@@ -1,7 +1,7 @@
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
-import {CLASS_MATH_EQUATION} from '../consts';
 
+import {CLASS_MATH_EQUATION} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
 import {getText, getCode, getButton, getInstruction, getMath} from '../shared';

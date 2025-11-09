@@ -7,6 +7,7 @@ import touchIcon from './input/touch';
 import mouseIcon from './input/mouse';
 import {CLASS_ACTIVE} from './pages/consts';
 import {ALLOWANCE_ERROR} from './shared';
+import {addRule} from './shared/css';
 
 const params = new URLSearchParams(location.search);
 
@@ -76,6 +77,7 @@ const textContainer = document.createElement('div');
 
 textContainer.style.display = 'flex';
 textContainer.style.scrollSnapType = 'x mandatory';
+// textContainer.style.scrollbarWidth = 'none';
 textContainer.style.overflow = 'auto';
 textContainer.style.paddingTop = '3em';
 textContainer.style.position = 'relative';
@@ -112,7 +114,6 @@ demo.init().then(async () => {
 		
 		currentPage.text.classList.remove(CLASS_ACTIVE);
 		currentPage.end?.();
-		demo.system.remove();
 		demo.remove();
 		
 		currentIndex = index;
@@ -137,6 +138,35 @@ demo.init().then(async () => {
 	}
 	
 	currentPage.text.scrollIntoView();
+	
+	(() => {
+		const styleNode = document.createElement('style');
+		
+		document.head.appendChild(styleNode);
+		
+		addRule(':root', {'--scrollbar-width': '0'}, styleNode);
+		
+		// detects zoom changes - they change scrollbar px size
+		new ResizeObserver(() => {
+			styleNode.sheet.deleteRule(0);
+			
+			addRule(':root', {'--scrollbar-width': `${textContainer.getBoundingClientRect().width - currentPage.text.getBoundingClientRect().width}px`}, styleNode);
+		}).observe(demo.elements.crosshair);
+	})();
+	
+	(() => {
+		const styleNode = document.createElement('style');
+		
+		document.head.appendChild(styleNode);
+		
+		addRule(':root', {'--text-height': '0'}, styleNode);
+		
+		new ResizeObserver(() => {
+			styleNode.sheet.deleteRule(0);
+			
+			addRule(':root', {'--text-height': `${textContainer.getBoundingClientRect().height}px`}, styleNode);
+		}).observe(textContainer);
+	})();
 	
 	demo.pageMinWidth = textContainer.offsetWidth - currentPage.text.clientWidth + 2;
 	demo.pageMinHeight = header.offsetHeight;

@@ -1,6 +1,10 @@
 import {DEGREES} from '@/shared';
-import {getText, getCode, getButton, getMath} from '../../shared';
+
+import {getText, getCode, getButton, getMath, getDiagrammedMath} from '../../shared';
 import {cleanup, register as registerFunctions} from '../../code';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
+import {getOverlined, xmlns} from '../../shared/math';
+
 import * as mock from '../mock';
 import {permissiveTweens, restrictiveTweens} from '../1line';
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
@@ -10,8 +14,6 @@ import snapImageTrio from './snapImage';
 import snapImageDuo from './snapImageDuo';
 import System, {getSnappedZoom} from './demo';
 import getZoomPoints from './zoomPoints';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '@/pages/consts';
-import {getOverlined, xmlns} from '@/pages/shared/math';
 
 const code = [];
 
@@ -334,12 +336,8 @@ export default {
 			' is the lock rail.',
 			'The diagram is used to derive start zoom and start position formulae.',
 		],
-		{
-			tag: 'div',
-			content: zoomImage,
-			style: {textAlign: 'center'},
-		},
-		getMath(
+		getDiagrammedMath(
+			zoomImage,
 			{
 				title: 'Variables',
 				content: [
@@ -830,8 +828,7 @@ export default {
 			'As a snap-panning facilitator, this system is hard to fault.',
 			'Of course, it performs fine with ',
 			getButton('similar', ...getSnapTweens(() => Math.random() / 5 + 0.9)),
-			' aspect ratios,',
-			'but it performs equally well with ',
+			' aspect ratios, but it performs equally well with ',
 			getButton('distant', ...getSnapTweens(() => Math.random() / 10 + 0.2)),
 			' aspect ratios.',
 		],

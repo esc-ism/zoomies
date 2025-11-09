@@ -104,6 +104,7 @@ addRule(`p.${CLASS_MAXIMISED}`, {
 	margin: '0',
 	'border-radius': '0',
 	'z-index': 2,
+	'max-height': 'unset',
 });
 
 addRule(`.${CLASS_MAXIMISED} > *`, {
@@ -112,6 +113,5 @@ addRule(`.${CLASS_MAXIMISED} > *`, {
 });
 
 addRule(`.${CLASS_CODE}:not(.${CLASS_MAXIMISED}) > *`, {
-	'max-height': 'calc(100dvh - 2em - 16px)',
 	overscroll: 'contain',
 });

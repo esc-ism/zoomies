@@ -1,15 +1,13 @@
 import gsap from 'gsap';
 
+import {inputListener} from '@/consts';
 import demo from '@/demo';
-
-import System from './demo';
+import {DEGREES} from '@/shared';
 
 import {getText, getInstruction} from '../shared';
 import {getBound, getRailProgress, getVarGetter} from '../rotation/3line/demo';
 
-import {DEGREES} from '@/shared';
-import {inputListener} from '@/consts';
-
+import System from './demo';
 // todo
 //  I'm thinking it'd be cooler to devote a quadrant of the screen to each corner
 //  scale and pan to zoom in on each image corner

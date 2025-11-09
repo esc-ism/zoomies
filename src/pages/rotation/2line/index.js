@@ -3,7 +3,7 @@ import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, getMath} from '../../shared';
+import {getText, getCode, getButton, getDiagrammedMath} from '../../shared';
 
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 import System, {getSnappedZoom} from './demo';
@@ -224,12 +224,8 @@ export default {
 			'This requires us to find the coordinates of these midpoints.',
 			'Using the base image corners and the viewport\'s top edge as an example, a diagram of the problem is given below, followed by its solution.',
 		],
-		{
-			tag: 'div',
-			content: pointsImage,
-			style: {textAlign: 'center'},
-		},
-		getMath(
+		getDiagrammedMath(
+			pointsImage,
 			{
 				title: 'Variables',
 				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [

@@ -14,17 +14,11 @@ export const getLine = ([x1, y1], [x2, y2]) => {
 export const COLOURS = ['rgba(66, 185, 211, 1)', 'rgba(218, 160, 65, 1)', 'rgba(142, 68, 195, 1)'];
 
 export const getBorder = (bX, bY, strokeDiameter) => {
-	const border = document.createElementNS(SVG_NAMESPACE, 'g');
+	const border = document.createElementNS(SVG_NAMESPACE, 'path');
 	
 	border.setAttribute('stroke-width', strokeDiameter);
 	border.setAttribute('stroke-linecap', 'square');
-	
-	border.append(
-		getLine([-bX, -bY], [bX, -bY]),
-		getLine([bX, -bY], [bX, bY]),
-		getLine([bX, bY], [-bX, bY]),
-		getLine([-bX, bY], [-bX, -bY]),
-	);
+	border.setAttribute('d', `M${strokeDiameter - bX} ${-bY}L${bX} ${-bY}L${bX} ${bY}L${-bX} ${bY}L${-bX} ${-bY}`);
 	
 	return border;
 };
@@ -46,7 +40,6 @@ export const getDiagram = (radii, strokeRadius, topLeft, topRight, transforms) =
 	
 	svg.style.textAlign = 'center';
 	svg.style.backgroundColor = '#222222';
-	svg.style.maxHeight = `min(calc(100dvh - 2em - 16px), ${125 / strokeRadius}px)`;
 	
 	const image = document.createElementNS(SVG_NAMESPACE, 'path');
 	

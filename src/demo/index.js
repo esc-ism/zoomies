@@ -198,7 +198,10 @@ export default new class {
 		},
 	};
 	
-	hooks = {ratioChange: new ActionHook()};
+	hooks = {
+		remove: new ActionHook(),
+		ratioChange: new ActionHook(),
+	};
 	
 	sizesImage = {};
 	sizesViewport = {};
@@ -651,6 +654,8 @@ export default new class {
 	}
 	
 	remove() {
+		this.system.remove();
+		
 		// triggers onReverseComplete which calls deleteTween
 		this.tween?.progress(0);
 		

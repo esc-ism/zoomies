@@ -1,11 +1,11 @@
-import {DEGREES, getAngleDiff} from '@/shared';
-import {xmlns} from '@/pages/shared/math';
 import demo from '@/demo';
 import {inputListener} from '@/consts';
+import {DEGREES, getAngleDiff} from '@/shared';
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
-import {CLASS_FLASH_CONTAINER, CLASS_MATH_WRAPPER} from '../consts';
+import {CLASS_FLASH_CONTAINER} from '../consts';
 import {getText, getButton, getInstruction, getInputDependent, getMath} from '../shared';
+import {xmlns} from '../shared/math';
 import flash from '../shared/flash';
 
 import getRestartButton from './restart';
@@ -153,6 +153,7 @@ export default {
 	end: () => {
 		exits++;
 		exitResolve();
+		
 		demo.progress.reset();
 	},
 	text: getText(

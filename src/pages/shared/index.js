@@ -3,6 +3,8 @@ import {inputListener} from '@/consts';
 
 import generateCode from '../code';
 
+import * as move from './svg/move';
+
 import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
 	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER, CLASS_BUTTON_ACTIVE,
@@ -195,11 +197,9 @@ export const getText = (...children) => {
 export const getInstruction = (...content) => ({classList: [CLASS_INSTRUCTION], content});
 
 export const getInputDependent = (get) => ({tag: 'span', callback: (element) => {
-	const update = (isMouse) => {
+	inputListener.add((isMouse) => {
 		element.innerText = get(isMouse);
-	};
-	
-	inputListener.add(update);
+	});
 }});
 
 const getMathTitle = (content, isFirst = false) => {
@@ -253,4 +253,24 @@ export const getMath = (...sections) => {
 	return {tag: 'p', classList: [CLASS_MATH_WRAPPER], content: [
 		{tag: 'div', classList: [CLASS_MATH_CONTAINER], content},
 	]};
+};
+
+export const getDiagrammedMath = (diagram, ...sections) => {
+	return {...getMath(...sections), callback: (element) => {
+		let isShowing = false;
+		
+		move.register(element);
+		
+		new IntersectionObserver((entries) => {
+			if (entries[entries.length - 1].isIntersecting) {
+				move.show(diagram, element);
+				
+				isShowing = true;
+			} else if (isShowing) {
+				move.hide();
+				
+				isShowing = false;
+			}
+		}, {threshold: 0.5}).observe(element);
+	}};
 };

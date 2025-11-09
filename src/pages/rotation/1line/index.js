@@ -1,17 +1,16 @@
 import demo from '@/demo';
-import System, {getBound, getZoomPoints} from './demo';
-import SHARED_FUNCTIONS from '../code';
+import {DEGREES} from '@/shared';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, getInstruction, getInputDependent, getMath} from '../../shared';
-
-import {DEGREES} from '@/shared';
-import {xmlns, opSpace, getOverlined} from '@/pages/shared/math';
-
+import {getText, getCode, getButton, getInstruction, getInputDependent, getMath, getDiagrammedMath} from '../../shared';
+import {xmlns, opSpace, getOverlined} from '../../shared/math';
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
-import zoomImage from './zoomImage';
 
+import SHARED_FUNCTIONS from '../code';
 import * as mock from '../mock';
+
+import System, {getBound, getZoomPoints} from './demo';
+import zoomImage from './zoomImage';
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
@@ -215,12 +214,15 @@ export default {
 			'We need to find the viewport sizes at which its edges might contact the image corner.',
 			'Using the top-left image corner as an example, a diagram of the problem is given below, followed by its solution.',
 		],
-		{
-			tag: 'div',
-			content: zoomImage,
-			style: {textAlign: 'center'},
-		},
-		getMath(
+		getInstruction([
+			'Notice any notches to the left?',
+			'These indicate diagrammed maths.',
+			'The notches show where diagrams will appear and disappear.',
+			getInputDependent((isMouse) => isMouse ? 'Click' : 'Tap'),
+			' diagrams to scroll perfectly to their maths.',
+		]),
+		getDiagrammedMath(
+			zoomImage,
 			{
 				title: 'Variables',
 				content: [
@@ -871,7 +873,7 @@ export default {
 		],
 		getInstruction([
 			'This code snippet includes custom functions. ',
-			getInputDependent((isMouse) => `Click "getStartZooms" to unfold it and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
+			getInputDependent((isMouse) => `${isMouse ? 'Click' : 'Tap'} "getStartZooms" to unfold it and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
 			'Note that the "rotation" value\'s unit is ',
 			{
 				tag: 'a',

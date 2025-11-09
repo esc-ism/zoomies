@@ -3,12 +3,12 @@ import {DEGREES} from '@/shared';
 
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, getMath} from '../../shared';
+import {getText, getCode, getButton, getMath, getDiagrammedMath} from '../../shared';
+import {xmlns} from '../../shared/math';
+
 import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 
 import System from './demo';
-import {xmlns} from '@/pages/shared/math';
-
 import pointsImage from './pointsImage';
 
 const code = [];
@@ -795,11 +795,11 @@ export default {
 		},
 		'Single-line rails don\'t work too well, double-line has issues... is third line the charm?',
 		[
-			'The prior system can be fixed by adding a "connecting rail" between the others.',
-			'With this rail, we can ensure that the preferred origin rail direction is usable.',
-			'Origin rails are unchanged, with one pair of image corners hitting the viewport rim at their start zoom.',
-			'The remaining pair of image corners hit the viewport rim at connecting rail start zooms.',
-			'Connecting rails are pointed directly towards viewport corners, which keeps both image corners visible.',
+			'This time, the top-left and top-right image corners share an origin rail.',
+			'Its job is to keep both corners viewable for as long as possible.',
+			'When this fails, enter the "connecting rail"!',
+			'Connecting rails are pointed directly towards viewport corners, each keeping a pair of image corners visible.',
+			'Connecting rails run until they intersect with lock rails, at which point we\'re home free.',
 		],
 		[
 			'It\'s possible for a lock rail to intersect with its origin rail before its connecting rail.',
@@ -811,9 +811,10 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Like a movie preparing setups that pay off in the final act, this system relies purely on the concepts introduced earlier.',
-			'Since we can find the connecting rail\'s start position by interpolating along its origin rail,',
-			'the only new wrinkle introduced is the question of its end point.',
+			'Like a movie paying off its setups in the final act, this system relies purely on the concepts introduced earlier.',
+			'One pair of image corners disappears at the origin rail\'s start zoom and the other disappears at the connecting rail\'s.',
+			'We can find the connecting rail\'s start position by interpolating along its origin rail.',
+			'The only new wrinkle introduced is the question of its end point.',
 		],
 		[
 			'I\'ve stated that connecting rails are pointed at viewport corners, but how can we find these corners\' coordinates?',
@@ -821,26 +822,22 @@ export default {
 			'Conveniently, we can re-use those maths and locate corners by summing midpoint coordinates!',
 		],
 		[
-			'Before, we calculated top and right midpoints at different zoom levels (used here as the origin and connecting rail start zooms).',
+			'Before, we calculated top and right midpoints at different zoom levels (used here as origin and connecting rail start zooms).',
 			'It\'s simpler to interpolate down the pre-calculated midpoint from origin rail start zoom to connecting rail start zoom than do more trigonometry.',
 			'So that\'s what you see below!',
 		],
 		[
 			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'B'}]},
-			' is the origin rail midpoint, positioned on the left rather than the right for clarity. ',
+			' is a midpoint at origin rail start zoom, positioned on the left rather than the right for clarity. ',
 			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'C'}]},
 			' and ',
 			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
-			' are the connecting rail midpoints, with ',
+			' are the midpoints at connecting rail start zoom, with ',
 			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
 			' being the unknown.',
 		],
-		{
-			tag: 'div',
-			content: pointsImage,
-			style: {textAlign: 'center'},
-		},
-		getMath(
+		getDiagrammedMath(
+			pointsImage,
 			{
 				title: 'Variables',
 				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
