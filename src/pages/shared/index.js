@@ -232,7 +232,7 @@ const getMathTitle = (content, isFirst = false) => {
 	
 	const line = document.createElement('div');
 	
-	line.style.backgroundColor = '#868686';
+	line.style.backgroundColor = 'var(--border-color)';
 	line.style.verticalAlign = 'center';
 	// todo make borders SUB_PX_BS instead of 1px
 	line.style.height = `${SUB_PIXEL_BS}px`;

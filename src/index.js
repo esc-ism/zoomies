@@ -77,7 +77,6 @@ const textContainer = document.createElement('div');
 
 textContainer.style.display = 'flex';
 textContainer.style.scrollSnapType = 'x mandatory';
-// textContainer.style.scrollbarWidth = 'none';
 textContainer.style.overflow = 'auto';
 textContainer.style.paddingTop = '3em';
 textContainer.style.position = 'relative';

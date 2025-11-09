@@ -215,11 +215,10 @@ export default {
 			'Using the top-left image corner as an example, a diagram of the problem is given below, followed by its solution.',
 		],
 		getInstruction([
-			'Notice any notches to the left?',
-			'These indicate diagrammed maths.',
-			'The notches show where diagrams will appear and disappear.',
+			'You may have noticed the little white ◤ to the left.',
+			'This is one of three visual indicators for where mathematical diagrams will appear.',
 			getInputDependent((isMouse) => isMouse ? 'Click' : 'Tap'),
-			' diagrams to scroll perfectly to their maths.',
+			' diagrams to center their maths.',
 		]),
 		getDiagrammedMath(
 			zoomImage,

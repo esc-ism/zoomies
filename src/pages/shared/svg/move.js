@@ -7,52 +7,60 @@ const cancelEvent = (event) => {
 	event.stopPropagation();
 };
 
-const container = (() => {
-	const container = document.createElement('div');
-	
-	container.style.display = 'flex';
-	container.style.width = container.style.height = '100%';
-	container.style.justifyContent = 'center';
-	container.style.alignItems = 'center';
-	container.style.pointerEvents = 'all';
-	container.style.cursor = 'pointer';
-	
-	container.addEventListener('wheel', cancelEvent);
-	container.addEventListener('pointerdown', cancelEvent);
-	
-	return container;
-})();
+const diagramContainer = document.createElement('div');
 
-container.addEventListener('click', (event) => {
+diagramContainer.style.display = 'flex';
+diagramContainer.style.width = diagramContainer.style.height = '100%';
+diagramContainer.style.justifyContent = 'center';
+diagramContainer.style.alignItems = 'center';
+diagramContainer.style.pointerEvents = 'all';
+diagramContainer.style.cursor = 'pointer';
+
+diagramContainer.addEventListener('wheel', cancelEvent);
+diagramContainer.addEventListener('pointerdown', cancelEvent);
+
+diagramContainer.addEventListener('click', (event) => {
 	event.stopImmediatePropagation();
 	
 	target.scrollIntoView({behavior: 'smooth', block: 'center'});
 });
+
+const notchContainer = document.createElement('p');
+
+notchContainer.style.position = 'relative';
+notchContainer.style.top = 'calc(var(--text-height) * -0.5 + var(--scrollbar-width) * 0.5 - 1em + 1px)';
+notchContainer.style.height = 'calc((var(--text-height) - var(--scrollbar-width)) * 2 - 2px)';
+notchContainer.style.marginBottom = 'calc((var(--text-height) - var(--scrollbar-width)) * -2 + 2px)';
+notchContainer.style.left = '-1em';
+notchContainer.style.width = '0';
+
+notchContainer.append(
+	document.createElement('div'),
+	document.createElement('div'),
+	document.createElement('div'),
+);
+
+for (const notch of notchContainer.children) {
+	notch.style.position = 'absolute';
+	notch.style.width = notch.style.height = '0';
+	notch.style.borderColor = 'transparent';
+	notch.style.borderStyle = 'solid';
+	notch.style.borderWidth = '0.5em';
+	notch.style.borderLeftColor = 'white';
+}
+
+notchContainer.children[0].style.borderTop = notchContainer.children[2].style.borderBottom = 'none';
+notchContainer.children[0].style.top = notchContainer.children[2].style.bottom = '0';
+notchContainer.children[1].style.top = '50%';
+notchContainer.children[1].style.transform = 'translateY(-50%)';
 
 export const register = async (element) => {
 	await new Promise((resolve) => {
 		window.setTimeout(resolve, 0);
 	});
 	
-	element.previousElementSibling.style.marginBottom = '0';
-	const borderWidth = 0.4;
-	
-	for (let i = 0; i < 3; ++i) {
-		const mult = -0.5 + i;
-		const notch = document.createElement('div');
-		
-		notch.style.position = 'relative';
-		notch.style.top = `calc(var(--text-height) * ${mult} - ${borderWidth}em - var(--scrollbar-width) * ${mult} + 2px)`;
-		notch.style.left = '-1em';
-		notch.style.marginBottom = `calc(${borderWidth * -2}em + 1px)`;
-		notch.style.width = notch.style.height = '0';
-		notch.style.borderColor = 'transparent';
-		notch.style.borderStyle = 'solid';
-		notch.style.borderWidth = `${borderWidth}em`;
-		notch.style.borderLeftColor = 'white';
-		
-		element.insertAdjacentElement('beforebegin', notch);
-	}
+	element.style.marginTop = '0';
+	element.insertAdjacentElement('beforebegin', notchContainer.cloneNode(true));
 };
 
 export const show = (svg, _target) => {
@@ -63,8 +71,8 @@ export const show = (svg, _target) => {
 	demo.elements.crosshair.style.display = 'none';
 	demo.elements.imageWrapper.style.display = 'none';
 	
-	container.appendChild(svg);
-	demo.elements.viewport.appendChild(container);
+	diagramContainer.appendChild(svg);
+	demo.elements.viewport.appendChild(diagramContainer);
 };
 
 export const hide = () => {
@@ -75,6 +83,6 @@ export const hide = () => {
 	
 	demo.updateSizesViewport();
 	
-	container.firstChild.remove();
-	container.remove();
+	diagramContainer.firstChild.remove();
+	diagramContainer.remove();
 };

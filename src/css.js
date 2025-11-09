@@ -5,6 +5,7 @@ import {addVerticalRule} from './shared/orientation';
 addRule(':root', {
 	'--color': '#dddddd',
 	'--background': '#231e25',
+	'--border-color': '#868686',
 	
 	'font-family': 'EnsuredPerpetua',
 	'font-size': '21px',

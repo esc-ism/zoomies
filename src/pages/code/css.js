@@ -1,7 +1,9 @@
 import {addRule} from '@/shared/css';
 
-import {CLASS_NAMES, CLASS_MAXIMISED} from './consts';
-import {CLASS_CODE} from '../consts';
+import {
+	CLASS_NAMES, CLASS_MAXIMISED, CLASS_TOOLTIP,
+	CLASS_TOOLTIP_BOTTOM, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT,
+} from './consts';
 
 const addPseudoRule = (selector, content, {display = 'inline', ...styles} = {}) => addRule(selector, {display, ...styles, content: `"${content}"`});
 const addKeywordPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`, color: 'rgb(219 142 56)'});
@@ -75,12 +77,7 @@ addPseudoRule(`.${CLASS_NAMES.indent}::after`, '  ');
 addRule(`.${CLASS_NAMES['=']} > :last-child::after`, {display: 'block'});
 
 // dynamic ops
-for (const [name, color] of [
-	['bool', '#90b0f9'],
-	['number', '#90b0f9'],
-]) {
-	addRule(`.${CLASS_NAMES[name]}`, {color});
-}
+addRule([`.${CLASS_NAMES.bool}`, `.${CLASS_NAMES.number}`, `.${CLASS_TOOLTIP}`], {color: '#90b0f9'});
 
 addRule(`.${CLASS_NAMES.evocation}`, {color: 'rgb(212 188 0)'});
 
@@ -112,6 +109,75 @@ addRule(`.${CLASS_MAXIMISED} > *`, {
 	height: '100%',
 });
 
-addRule(`.${CLASS_CODE}:not(.${CLASS_MAXIMISED}) > *`, {
-	overscroll: 'contain',
+const arrowSize = '0.5ch';
+
+addRule(`.${CLASS_TOOLTIP}`, {
+	'font-family': 'consolas, monospace',
+	'font-size': '0.85em',
+	padding: '3px 1ch',
+	'border-radius': '1ch',
+	'white-space': 'nowrap',
+	position: 'absolute',
+	'z-index': '3',
+	'background-color': '#343a45',
+	outline: '1px solid var(--border-color)',
+	'box-shadow': 'white 0px 0px 1px',
+	'text-shadow': '0 0 4px #202020',
+	'pointer-events': 'none',
+});
+
+addRule(`.${CLASS_TOOLTIP}::before`, {
+	content: '""',
+	position: 'absolute',
+	display: 'block',
+	width: '0',
+	height: '0',
+	'border-width': `calc(${arrowSize})`,
+	'border-color': 'transparent',
+	'border-style': 'solid',
+});
+
+addRule([`.${CLASS_TOOLTIP_LEFT}`, `.${CLASS_TOOLTIP_RIGHT}`], {
+	transform: 'translateY(-50%)',
+});
+addRule([`.${CLASS_TOOLTIP_LEFT}::before`, `.${CLASS_TOOLTIP_RIGHT}::before`], {
+	top: '50%',
+	transform: 'translateY(-50%)',
+});
+addRule([`.${CLASS_TOOLTIP_BOTTOM}::before`, `.${CLASS_TOOLTIP_TOP}::before`], {
+	left: '50%',
+	transform: 'translateX(-50%)',
+});
+
+addRule(`.${CLASS_TOOLTIP_LEFT}`, {
+	translate: `calc(-100% - (${arrowSize})) 0`,
+});
+addRule(`.${CLASS_TOOLTIP}.${CLASS_TOOLTIP_LEFT}::before`, {
+	left: '100%',
+	'border-left-color': 'var(--border-color)',
+});
+
+addRule(`.${CLASS_TOOLTIP_RIGHT}`, {
+	translate: `calc(${arrowSize}) 0`,
+});
+addRule(`.${CLASS_TOOLTIP}.${CLASS_TOOLTIP_RIGHT}::before`, {
+	right: '100%',
+	'border-right-color': 'var(--border-color)',
+});
+
+addRule(`.${CLASS_TOOLTIP_BOTTOM}`, {
+	translate: `-50% calc(${arrowSize})`,
+});
+addRule(`.${CLASS_TOOLTIP}.${CLASS_TOOLTIP_BOTTOM}::before`, {
+	bottom: '100%',
+	'border-bottom-color': 'var(--border-color)',
+});
+
+addRule(`.${CLASS_TOOLTIP_TOP}`, {
+	translate: `-50% calc((${arrowSize}) * -1)`,
+	transform: 'translateY(-100%)',
+});
+addRule(`.${CLASS_TOOLTIP}.${CLASS_TOOLTIP_TOP}::before`, {
+	top: '100%',
+	'border-top-color': 'var(--border-color)',
 });

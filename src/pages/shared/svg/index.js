@@ -38,7 +38,7 @@ export const getDiagram = (radii, strokeRadius, topLeft, topRight, transforms) =
 	svg.setAttribute('stroke-width', strokeRadius);
 	svg.setAttribute('stroke-opacity', '0.8');
 	
-	svg.style.textAlign = 'center';
+	svg.style.maxHeight = '100%';
 	svg.style.backgroundColor = '#222222';
 	
 	const image = document.createElementNS(SVG_NAMESPACE, 'path');

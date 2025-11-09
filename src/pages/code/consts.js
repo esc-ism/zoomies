@@ -83,3 +83,10 @@ export const CLASS_NAMES = {
 	line: getId('line'),
 	wrapper: getId('wrapper'),
 };
+
+export const CLASS_TOOLTIP = getId('tooltip');
+
+export const CLASS_TOOLTIP_BOTTOM = getId('tooltip', 'bottom');
+export const CLASS_TOOLTIP_TOP = getId('tooltip', 'top');
+export const CLASS_TOOLTIP_LEFT = getId('tooltip', 'left');
+export const CLASS_TOOLTIP_RIGHT = getId('tooltip', 'right');

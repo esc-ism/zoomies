@@ -4,7 +4,7 @@ import {xmlns} from '@/pages/shared/math';
 import {CLASS_MATH_EQUATION} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
-import {getText, getCode, getButton, getInstruction, getMath} from '../shared';
+import {getText, getCode, getButton, getInstruction, getMath, getInputDependent} from '../shared';
 import {getSnapPosition} from '../center';
 
 import System from './demo';
@@ -93,8 +93,9 @@ export default {
 			],
 			[
 				'Greyed out code is unexecuted.',
-				'Steady your mouse over a variable in executed code to see its value.',
-				'If the variable is green, you\'ll see a visualisation of its value in the playground.',
+				getInputDependent((isMouse) => isMouse ?
+					'Click a variable in executed code to see its value. Green variables offer playground visualisations of their values when moused over.' :
+					'Tap a variable in executed code to see its value. Green variables will provide playground visualisations of their values.'),
 			],
 			['After changing playground state, code won\'t be up to date until it\'s rerun via the ', refreshButton, ' button at its top-right corner.'],
 		),

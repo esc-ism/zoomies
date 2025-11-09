@@ -13,9 +13,14 @@ addRule(`.${CLASS_FLASH_CONTAINER}`, {
 	position: 'relative',
 });
 
-addRule([`.${CLASS_CODE}`, `.${CLASS_MATH_WRAPPER}`], {
-	border: '1px solid #868686',
+addRule([`.${CLASS_MATH_WRAPPER}`, `.${CLASS_CODE}`], {
+	border: '1px solid var(--border-color)',
 	'border-radius': '10px',
+});
+
+addRule([`.${CLASS_MATH_WRAPPER}`, `.${CLASS_CODE} > div`], {
+	overflow: 'auto',
+	'overscroll-behavior-x': 'contain',
 	'max-height': 'calc(var(--text-height) - 2em - var(--scrollbar-width))',
 });
 
@@ -37,8 +42,6 @@ addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2)`, {'text-align': 'left', 'ver
 addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2) > :only-child`, {'margin-bottom': 'calc((1lh - 1cap) / 2)'});
 
 addRule(`.${CLASS_MATH_BODY} div`, {'text-wrap-style': 'balance'});
-
-addRule(`.${CLASS_CODE} > div`, {'overflow-x': 'auto'});
 
 addRule(`.${CLASS_CODE} code`, {
 	'font-family': 'consolas, monospace',
@@ -63,8 +66,6 @@ addRule(`.${CLASS_MATH_TITLE} + .${CLASS_MATH_BODY}`, {
 addRule(`.${CLASS_MATH_WRAPPER}`, {
 	'text-align': 'center',
 	'background-color': '#372d2d',
-	'overscroll-behavior-x': 'contain',
-	overflow: 'auto',
 });
 
 addRule(`.${CLASS_MATH_CONTAINER}`, {
@@ -113,7 +114,7 @@ addRule(`.${CLASS_MATH_TITLE}`, {
 	left: '0',
 	cursor: 'pointer',
 	'background-color': '#372d2d',
-	outline: `${SUB_PIXEL_BS}px solid #868686`,
+	outline: `${SUB_PIXEL_BS}px solid var(--border-color)`,
 	display: 'flex',
 	'align-items': 'center',
 	'min-height': '1lh',
@@ -123,7 +124,7 @@ addRule(`.${CLASS_MATH_TITLE}`, {
 	'overflow-x': 'clip',
 	'max-width': '100%',
 	'text-overflow': 'ellipsis',
-	color: '#868686',
+	color: 'var(--border-color)',
 });
 
 const buttonColour = '#eaacfd';

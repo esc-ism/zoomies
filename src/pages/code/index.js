@@ -5,7 +5,7 @@ import {SVG_NAMESPACE, DEGREES} from '@/shared';
 
 import flash from '../shared/flash';
 
-import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED} from './consts';
+import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED, CLASS_TOOLTIP, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_BOTTOM, CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT} from './consts';
 import getButtons from './buttons';
 
 import './css';
@@ -387,6 +387,89 @@ const getTitle = (value, type) => {
 	return `${getRoundedString(value)}`;
 };
 
+const [setTitle, removeTitle] = (() => {
+	let activeElement;
+	
+	const tooltip = document.createElement('div');
+	
+	tooltip.classList.add(CLASS_TOOLTIP);
+	
+	return [
+		(element, title) => {
+			element.addEventListener('click', (event) => {
+				event.stopPropagation();
+				
+				// toggle off
+				if (element.isSameNode(activeElement)) {
+					removeTitle();
+					
+					return;
+				}
+				
+				activeElement = element;
+				
+				const {offsetParent} = element;
+				const scrollerLocal = offsetParent.firstChild;
+				const scrollerGlobal = offsetParent.offsetParent;
+				
+				tooltip.style.removeProperty('display');
+				
+				const left = element.offsetLeft - scrollerLocal.scrollLeft + offsetParent.offsetLeft + element.offsetWidth / 2;
+				
+				if (left <= offsetParent.offsetLeft) {
+					tooltip.style.left = `${element.offsetLeft - scrollerLocal.scrollLeft + offsetParent.offsetLeft + element.offsetWidth}px`;
+					tooltip.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop + element.offsetHeight / 2}px`;
+					
+					tooltip.classList.add(CLASS_TOOLTIP_RIGHT);
+					tooltip.classList.remove(CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_BOTTOM);
+				} else if (left >= offsetParent.offsetLeft + offsetParent.clientWidth) {
+					tooltip.style.left = `${element.offsetLeft - scrollerLocal.scrollLeft + offsetParent.offsetLeft}px`;
+					tooltip.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop + element.offsetHeight / 2}px`;
+					
+					tooltip.classList.add(CLASS_TOOLTIP_LEFT);
+					tooltip.classList.remove(CLASS_TOOLTIP_RIGHT, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_BOTTOM);
+				} else {
+					tooltip.style.left = `${left}px`;
+					
+					const isTop = scrollerGlobal ?
+							(element.offsetHeight / 2 + element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop - scrollerGlobal.scrollTop >= scrollerGlobal.clientHeight / 2) :
+							(element.offsetHeight / 2 + element.offsetTop - scrollerLocal.scrollTop >= offsetParent.clientHeight / 2);
+					
+					if (isTop) {
+						tooltip.classList.add(CLASS_TOOLTIP_TOP);
+						tooltip.classList.remove(CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT, CLASS_TOOLTIP_BOTTOM);
+						
+						tooltip.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop}px`;
+					} else {
+						tooltip.classList.add(CLASS_TOOLTIP_BOTTOM);
+						tooltip.classList.remove(CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT, CLASS_TOOLTIP_TOP);
+						
+						tooltip.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop + element.offsetHeight}px`;
+					}
+				}
+				
+				if (!scrollerGlobal) {
+					tooltip.style.position = 'fixed';
+				}
+				
+				tooltip.innerText = title;
+				
+				// todo place once
+				element.offsetParent.parentElement.insertAdjacentElement('afterbegin', tooltip);
+				
+				window.addEventListener('scroll', () => {
+					removeTitle();
+				}, {once: true, capture: true});
+			});
+		},
+		() => {
+			tooltip.style.display = 'none';
+			
+			activeElement = undefined;
+		},
+	];
+})();
+
 const makeHoverable = (element, id, scope, meta, isVar) => {
 	if (!meta.active) {
 		return false;
@@ -400,7 +483,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 	}
 	
 	if (id && 'value' in scope[id]) {
-		element.setAttribute('title', getTitle(scope[id].value, scope[id].type));
+		setTitle(element, getTitle(scope[id].value, scope[id].type));
 	}
 	
 	element.addEventListener('mouseenter', () => {
@@ -704,20 +787,20 @@ const interpretters = {
 		const {target, wrapper, ...result} = functions[statement.id](csvs, {...scope}, indent, meta);
 		
 		if (makeHoverable(id, undefined, scope, meta)) {
-			id.setAttribute('title', Array.isArray(result.value) ?
-				`[${result.value.map((value) => getTitle(value, result.type)).join(', ')}]` :
-					getTitle(result.value, result.type));
-			
 			makeHoverable(target, undefined, scope, meta);
 			
 			id.style.cursor = 'pointer';
 			
 			id.addEventListener('click', () => {
 				id.replaceWith(wrapper);
+				
+				removeTitle();
 			});
 			
 			target.addEventListener('click', () => {
 				wrapper.replaceWith(id);
+				
+				removeTitle();
 			});
 		}
 		
@@ -798,12 +881,16 @@ const generateButtons = (parent, statements) => {
 		buttons.max.replaceWith(buttons.min);
 		
 		parent.parentElement.parentElement.classList.add(CLASS_MAXIMISED);
+		
+		removeTitle();
 	});
 	
 	buttons.min.addEventListener('click', () => {
 		buttons.min.replaceWith(buttons.max);
 		
 		parent.parentElement.parentElement.classList.remove(CLASS_MAXIMISED);
+		
+		removeTitle();
 	});
 };
 
