@@ -1,3 +1,4 @@
+import {SUB_PIXEL_BS} from '@/shared';
 import {addRule} from '@/shared/css';
 
 import {
@@ -5,7 +6,6 @@ import {
 	CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_EQUATION, CLASS_MATH_ASSERTION,
 	CLASS_ACTIVE, CLASS_BUTTON_ACTIVE, CLASS_MATH_TITLE, CLASS_MATH_BODY,
 } from './consts';
-import {SUB_PIXEL_BS} from '@/shared';
 
 addRule(`.${CLASS_FLASH_CONTAINER}`, {
 	overflow: 'hidden',
@@ -87,7 +87,7 @@ addRule(`.${CLASS_MATH_CONTAINER} math:last-child`, {
 	'min-height': '0.75lh',
 });
 
-addRule(`.${CLASS_MATH_CONTAINER} math`, {
+addRule(`.${CLASS_MATH_CONTAINER} > math`, {
 	'font-family': '"cambria math", math',
 	'font-size': '0.9em',
 	display: 'block',

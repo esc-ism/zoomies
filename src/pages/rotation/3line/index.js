@@ -1,14 +1,14 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, getMath, getDiagrammedMath} from '../../shared';
 import {xmlns} from '../../shared/math';
 
 import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 
-import System from './demo';
+import System, {getVarGetter} from './demo';
 import pointsImage from './pointsImage';
 
 const code = [];
@@ -771,9 +771,17 @@ const functions = [
 	]},
 ];
 
+let getDirectVars;
+
 export default {
 	System,
 	start() {
+		getDirectVars = () => {
+			const data = getVarGetter(-DEGREES[270] + 0.4, 0.7)();
+			
+			return {...data, position: {x: -data.zoomPoints[2].x, y: -data.zoomPoints[2].y}};
+		};
+		
 		registerFunctions(functions);
 		
 		for (const {start} of code) {
@@ -795,10 +803,25 @@ export default {
 		},
 		'Single-line rails don\'t work too well, double-line has issues... is third line the charm?',
 		[
-			'This time, the top-left and top-right image corners share an origin rail.',
-			'Its job is to keep both corners viewable for as long as possible.',
+			'This time, the top-left and top-right image corners always share an origin rail.',
+			'Its job is to keep both corners viewable for as ',
+			getButton('long as possible', [
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
+				({zoomPoints}) => [{position: zoomPoints[4], zoom: zoomPoints[4].z}],
+			], {getParam: () => getDirectVars()}),
+			'.',
 			'When this fails, enter the "connecting rail"!',
-			'Connecting rails are pointed directly towards viewport corners, each keeping a pair of image corners visible.',
+			'Connecting rails are pointed directly towards ',
+			getButton('viewport corners', [
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}],
+				({zoomPoints}) => [{position: zoomPoints[4].end}],
+			], {getParam: () => getDirectVars()}),
+			', each keeping a ',
+			getButton('pair', [
+				({rotation, ratio, zoomPoints, position}) => [{rotation, ratio, zoom: zoomPoints[1].z, position}],
+				({zoomPoints}) => [{zoom: zoomPoints[2].z}],
+			], {getParam: () => getDirectVars()}),
+			' of image corners visible.',
 			'Connecting rails run until they intersect with lock rails, at which point we\'re home free.',
 		],
 		[
@@ -812,12 +835,27 @@ export default {
 		},
 		[
 			'Like a movie paying off its setups in the final act, this final system relies purely on the concepts introduced earlier.',
-			'One pair of image corners disappears at the origin rail\'s start zoom and the other disappears at the connecting rail\'s.',
+			'One pair of image corners ',
+			getButton('disappears', [
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
+				({zoomPoints}) => [{zoom: zoomPoints[3].z * 1.05}, TWEEN_OPTIONS_YOYO],
+			], {getParam: () => getDirectVars()}),
+			' at the origin rail\'s start zoom and the other ',
+			getButton('disappears', [
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: 0}],
+				({zoomPoints}) => [{zoom: zoomPoints[4].z * 1.05}, TWEEN_OPTIONS_YOYO],
+			], {getParam: () => getDirectVars()}),
+			' at the connecting rail\'s.',
 			'We can find the connecting rail\'s start position by interpolating along its origin rail.',
 			'The only new wrinkle introduced is the question of its end point.',
 		],
 		[
-			'I\'ve stated that connecting rails are pointed at viewport corners, but how can we find these corners\' coordinates?',
+			'I\'ve stated that connecting rails are pointed at ',
+			getButton('viewport corners', [
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}],
+				({zoomPoints}) => [{position: zoomPoints[4].end}],
+			], {getParam: () => getDirectVars()}),
+			', but how can we find these corners\' coordinates?',
 			'You might notice that this is reminiscent of the prior system\'s viewport midpoint problem.',
 			'Conveniently, we can re-use those maths and locate corners by summing midpoint coordinates!',
 		],
@@ -826,18 +864,21 @@ export default {
 			'It\'s simpler to interpolate down the pre-calculated midpoint from origin rail start zoom to connecting rail start zoom than do more trigonometry.',
 			'So that\'s what you see below!',
 		],
-		[
-			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'B'}]},
-			' is a midpoint at origin rail start zoom, positioned on the left rather than the right for clarity. ',
-			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'C'}]},
-			' and ',
-			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
-			' are the midpoints at connecting rail start zoom, with ',
-			{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
-			' being the unknown.',
-		],
 		getDiagrammedMath(
 			pointsImage,
+			{
+				isText: true,
+				content: [
+					{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'B'}]},
+					' is a midpoint at origin rail start zoom, positioned on the left rather than the right for clarity. ',
+					{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'C'}]},
+					' and ',
+					{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
+					' are the midpoints at connecting rail start zoom, with ',
+					{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
+					' being the unknown.',
+				],
+			},
 			{
 				title: 'Variables',
 				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
@@ -1119,13 +1160,19 @@ export default {
 		},
 		[
 			'All of the prior system\'s pan-limiting flaws are fixed.',
-			'Bound changes are now perfectly fluid, providing a more consistent and reliable experience.',
+			'Bound changes are now perfectly ',
+			getButton('fluid', [
+				() => [{ratioImage: demo.ratioViewport > 1 ? 0.75 : 1.5, zoom: 1, position: 0}],
+				() => [{rotation: demo.rotation + DEGREES[180]}, {ease: 'none', duration: 4}],
+				() => [{rotation: demo.rotation - DEGREES[180]}, {duration: 0}],
+				() => [{rotation: demo.rotation - DEGREES[360]}, {ease: 'none', duration: 4}],
+			]),
+			', providing a more consistent and reliable experience.',
 			'Besides patching issues, the connecting rails even enhance the system\'s ability to show two corners simultaneously!',
 		],
 		[
 			'I find this system to be a satisfactory improvement over "Double-Line" too.',
-			'It provides tighter pan-limits without sacrificing image visibility.',
-			'The changes have been successful in facilitating efficient panning paths.',
+			'The changes have been successful in minimising distance to bounds corners without sacrificing image visibility.',
 		],
 		[
 			'Zoomful systems have unavoidable drawbacks.',
@@ -1155,7 +1202,7 @@ export default {
 			]},
 		}),
 		[
-			'to the monster we have here.',
+			'to the behemoth we have here.',
 			'Because of this, I still prefer "Viewport Center" as a pan-limiter.',
 		],
 		{
@@ -1218,6 +1265,6 @@ export default {
 			'From there, fixation became obsession and my project\'s scope ballooned way beyond what was sensible.',
 			'Still, having broke the surface of this abyss, I\'m proud to have pushed my limits so far.',
 		],
-		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'var(--text-height)'}, content: 'Thanks for reading ✌'},
+		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
 	),
 };

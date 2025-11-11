@@ -1,8 +1,9 @@
 import demo from '@/demo';
 import elements from '@/demo/elements';
 
-import Hideables from './copies';
 import {setLineStyle} from '../bounds';
+
+import Hideables from './copies';
 import {Line} from './lines';
 
 class Tangent extends Line {

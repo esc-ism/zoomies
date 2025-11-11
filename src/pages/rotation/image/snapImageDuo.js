@@ -1,5 +1,7 @@
 import {SVG_NAMESPACE} from '@/shared';
-import {getDiagram, getLine, COLOURS} from '@/pages/shared/svg';
+
+import {getDiagram, getLine, COLOURS} from '../../shared/svg';
+
 import {getProgressed} from '../shared';
 
 const radii = {x: 13, y: 20};

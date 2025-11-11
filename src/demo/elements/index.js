@@ -1,8 +1,13 @@
-import '../css';
-
-import {ID_WRAPPER, ID_WRAPPER_IMAGE, ID_IMAGE, ID_CROSSHAIR, ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL} from '../consts';
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
+
+import {
+	ID_WRAPPER, ID_WRAPPER_IMAGE, ID_IMAGE, ID_CROSSHAIR,
+	ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL, PADDING_IMAGE,
+} from '../consts';
+
 import crosshairImage from './crosshair';
+
+import '../css';
 
 const generate = ({parent, style, id, classList}) => {
 	const element = document.createElement('div');
@@ -41,8 +46,7 @@ elements.viewport = generate({
 	parent: elements.wrapper,
 	style: {
 		backgroundColor: 'black',
-		padding: '1px',
-		boxSizing: 'border-box',
+		padding: `${PADDING_IMAGE}px`,
 		position: 'relative',
 		overflow: 'hidden',
 		display: 'flex',

@@ -1,16 +1,15 @@
 import demo from '@/demo';
 import {inputListener} from '@/consts';
+import {SUB_PIXEL_BS} from '@/shared';
 
 import generateCode from '../code';
-
-import * as move from './svg/move';
-
 import {
 	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
 	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER, CLASS_BUTTON_ACTIVE,
 	CLASS_MATH_TITLE, CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_BODY,
 } from '../consts';
-import {SUB_PIXEL_BS} from '@/shared';
+
+import * as move from './svg/move';
 import {xmlns} from './math';
 
 let activeButton;
@@ -246,7 +245,11 @@ export const getMath = (...sections) => {
 		const section = sections[i];
 		const body = {tag: 'div', classList: [CLASS_MATH_BODY], content: section.content};
 		
-		content.push({tag: 'math', xmlns, content: 'title' in section ? [...getMathTitle(section.title, i === 0), body] : body});
+		if (section.isText) {
+			content.push(body);
+		} else {
+			content.push({tag: 'math', xmlns, content: 'title' in section ? [...getMathTitle(section.title, i === 0), body] : body});
+		}
 	}
 	
 	return {tag: 'p', classList: [CLASS_MATH_WRAPPER], content: [

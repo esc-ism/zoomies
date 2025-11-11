@@ -302,15 +302,15 @@ export default {
 		[
 			'In this system, ',
 			getButton('origin rails', [
-				({rotation, ratio, first}) => [{position: 0, ratio, rotation, zoom: first.z}],
+				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}],
 				[{position: 0.5}, {delay: 0.5}],
 				({second}) => [{zoom: second.z}, {duration: 3, position: '<'}],
 			], {getParam: () => getTraceVars()}),
 			'  follow image axes until they intersect ',
 			getButton('lock rails', [
-				({rotation, ratio, second}) => [{position: second, ratio, rotation, zoom: second.z}],
+				({rotation, ratio, zoomPoints}) => [{position: zoomPoints[2], ratio, rotation, zoom: zoomPoints[2].z}],
 				[{position: 0.5}, {delay: 0.5}],
-				({second}) => [{zoom: second.z * 2}, {duration: 3, position: '<'}],
+				({zoomPoints}) => [{zoom: zoomPoints[2].z * 2}, {duration: 3, position: '<'}],
 			], {getParam: () => getTraceVars()}),
 			'.',
 			'Origin rails follow whichever axis minimises lock rail length.',

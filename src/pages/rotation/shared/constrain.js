@@ -1,4 +1,5 @@
 import {DEGREES} from '@/shared';
+
 import {getFlipped, getLine, getLineX, getLineY, getM, isAbove, isRight} from '.';
 
 const get2DConstrained = (() => {

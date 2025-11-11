@@ -203,9 +203,9 @@ export default {
 			'The ideal system would always allow users to see what they want in the shortest pan possible, since that\'s their natural inclination.',
 			'For example, to see the rightmost image corner, travel directly ',
 			getButton('east', [
-				({rotation, ratio, second}) => [{rotation, ratio, zoom: second.z, position: 0}],
-				({second}) => [{position: second}, {delay: 0.5}],
-				({first}) => [{position: first.end}, {duration: 0}],
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
+				({zoomPoints}) => [{position: zoomPoints[3]}, {delay: 0.5}],
+				({zoomPoints}) => [{position: zoomPoints[2]}, {duration: 0}],
 			], {getParam: () => getDirectVars()}),
 			'.',
 			'This can be achieved by swapping image axis for viewport axis-based origin rails.',
@@ -480,7 +480,7 @@ export default {
 			'Bounds jump around when rotating into and out of these windows.',
 			'Within them, at pre-inversion zooms, the system provides ',
 			getButton('insufficiently restrictive', [
-				({ratioImage, rotation, second}) => [{ratioImage, rotation, position: 0, zoom: second.z + 0.01}],
+				({ratioImage, rotation, zoomPoints}) => [{ratioImage, rotation, position: 0, zoom: zoomPoints[3].z + 0.01}],
 				({second: {x, y}}) => [{x, y}],
 			], {getParam: getVarGetter(DEGREES[135], 0.6)}),
 			' pan-limits',

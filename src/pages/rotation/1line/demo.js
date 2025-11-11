@@ -1,11 +1,11 @@
 import demo from '@/demo';
-import Demo, {getAllStartZooms} from '../demo';
 import Rails from '@/demo/lines/rails';
 
+import {CORNERS} from '../../consts';
+
+import Demo, {getAllStartZooms} from '../demo';
 import {isAbove, getProgressedLine, getIntersectProgress} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
-
-import {CORNERS} from '@/pages/consts';
 
 export const getZoomPoints = (demo, startZooms = getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage)) => startZooms.map(({x, y}) => ({x: 0, y: 0, z: Math.min(x, y)}));
 

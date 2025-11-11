@@ -1,3 +1,4 @@
+import {DEGREES} from '@/shared';
 import demo from '@/demo';
 import Bounds from '@/demo/bounds';
 import Rails from '@/demo/lines/rails';
@@ -5,7 +6,6 @@ import Tangents from '@/demo/lines/tangents';
 
 import {CORNERS} from '../consts';
 import {getBound} from '../rotation/shared';
-import {DEGREES} from '@/shared';
 
 export default class {
 	bounds = new Bounds();

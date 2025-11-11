@@ -1,6 +1,6 @@
 import {gsap} from 'gsap';
 
-import elements from '../elements';
+import elements from './elements';
 
 const getColour = (() => {
 	const low = {threshold: 0.15};

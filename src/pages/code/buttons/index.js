@@ -1,10 +1,9 @@
-import './css';
-
 import {CLASS_CONTAINER, CLASS_WRAPPER} from './consts';
-
 import getRefreshButton from './refresh';
 import getMaxButton from './size/maximise';
 import getMinButton from './size/minimise';
+
+import './css';
 
 export default () => {
 	const wrapper = document.createElement('span');

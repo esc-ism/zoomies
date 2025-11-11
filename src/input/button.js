@@ -1,7 +1,8 @@
-import './css';
-
 import {SVG_NAMESPACE} from '@/shared';
+
 import {CLASS_BUTTON} from './consts';
+
+import './css';
 
 export const getSVG = () => {
 	const svg = document.createElementNS(SVG_NAMESPACE, 'svg');

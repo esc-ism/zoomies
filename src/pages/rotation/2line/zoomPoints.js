@@ -1,7 +1,8 @@
-import {CORNERS} from '@/pages/consts';
-import {getAllStartZooms} from '../demo';
-
 import {DEGREES} from '@/shared';
+
+import {CORNERS} from '../../consts';
+
+import {getAllStartZooms} from '../demo';
 import {getAxisIntersectY, getGenericIntersection, getM, getPoints, getProgressAngles, getQuadrantAngle} from '../shared';
 
 const getIntersection = (line, corner, middle) => {

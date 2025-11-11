@@ -26,3 +26,5 @@ export const TWEEN_DEFAULT = {
 	duration: 1,
 	ease: 'power1.inOut',
 };
+
+export const PADDING_IMAGE = 2;

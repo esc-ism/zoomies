@@ -1,6 +1,5 @@
-import {getId, getIdGetter} from '@/shared/css';
-
 import {DEGREES} from '@/shared';
+import {getId, getIdGetter} from '@/shared/css';
 
 export const CLASS_FLASH_CONTAINER = getId('flash', 'container');
 

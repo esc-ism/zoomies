@@ -1,13 +1,14 @@
 import demo from '@/demo';
 import Rails from '@/demo/lines/rails';
-import Demo from '../demo';
 
+import {CORNERS} from '../../consts';
+
+import Demo from '../demo';
 import {getBound, getProgress} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
-
-import {CORNERS} from '@/pages/consts';
-import getZoomPoints from './zoomPoints';
 import {getZoom, isValidZoom, getPairings} from '../shared/snapZoom';
+
+import getZoomPoints from './zoomPoints';
 
 export const getSnappedZoom = (first0, second0, first1, second1, position) => Math.max(...[
 	getZoom(position, false, ...getPairings(first0, second0, false, first1, second1, false)),

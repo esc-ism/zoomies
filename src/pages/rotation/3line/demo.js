@@ -1,14 +1,14 @@
 import demo from '@/demo';
 import Rails from '@/demo/lines/rails';
-import Demo from '../demo';
 
-import {getZoomProgressed, getProgressedLine, getProgress} from '../shared';
+import Demo from '../demo';
+import {getZoomProgressed, getProgress} from '../shared';
 import {getDirected as getDirectedDuo, getSecondPairings, getZoom, isValidZoom} from '../shared/snapZoom';
 import getConstrainerFromPoints from '../shared/constrain';
-
-import getZoomPoints from './zoomPoints';
 import {getRailProgress as getFirstIntRailProgress} from '../2line/demo';
 import * as mock from '../mock';
+
+import getZoomPoints from './zoomPoints';
 
 export const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 

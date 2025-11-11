@@ -1,6 +1,7 @@
+import {SVG_NAMESPACE} from '@/shared';
+
 import {getSvg} from '../shared';
 
-import {SVG_NAMESPACE} from '@/shared';
 import {INNER, OUTER} from './shared';
 
 const lines = [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(([multX, multY]) => {

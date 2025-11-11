@@ -1,5 +1,3 @@
-import './css';
-
 import demo from './demo';
 import pages from './pages';
 import {CLASS_WRAPPER, inputListener} from './consts';
@@ -8,6 +6,8 @@ import mouseIcon from './input/mouse';
 import {CLASS_ACTIVE} from './pages/consts';
 import {ALLOWANCE_ERROR} from './shared';
 import {addRule} from './shared/css';
+
+import './css';
 
 const params = new URLSearchParams(location.search);
 

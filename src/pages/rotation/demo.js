@@ -1,8 +1,7 @@
+import {getTheta} from '@/shared';
 import demo from '@/demo';
 import Tangents from '@/demo/lines/tangents';
 import Bounds from '@/demo/bounds';
-
-import {getTheta} from '@/shared';
 
 const getCornerDistance = ({halfWidth, halfHeight}) => Math.sqrt(Math.pow(halfWidth, 2) + Math.pow(halfHeight, 2));
 

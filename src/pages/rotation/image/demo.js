@@ -1,8 +1,9 @@
 import demo from '@/demo';
-import {CORNERS} from '@/pages/consts';
+
+import {CORNERS} from '../../consts';
+
 import Demo from '../2line/demo';
 import {getLine, getFlipped, getM, isAbove as _isAbove} from '../shared';
-
 import {getPairings, getZoom} from '../shared/snapZoom';
 
 import getZoomPoints from './zoomPoints';

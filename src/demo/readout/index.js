@@ -1,8 +1,8 @@
-import './css';
-
 import elements from '../elements';
 
 import {IDS, POSTFIXES, FORMATTERS, ID} from './consts';
+
+import './css';
 
 export default class {
 	element = document.createElement('table');

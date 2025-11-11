@@ -1,17 +1,15 @@
 import {gsap} from 'gsap';
 
-import './css';
-
+import {isVertical, list as orientation} from '@/shared/orientation';
 import {getTheta, DEGREES, ALLOWANCE_ERROR, getAngleDiff} from '@/shared';
 
 import Readout from './readout';
 import Target from './target';
 import Progress from './progress';
-
 import elements from './elements';
-
 import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL, TWEEN_DEFAULT} from './consts';
-import {isVertical, list as orientation} from '@/shared/orientation';
+
+import './css';
 
 const getAngleData = (a, b) => {
 	const diff = getAngleDiff(a, b);
@@ -210,7 +208,6 @@ export default new class {
 			// todo can this be a 0 delay settimeout?
 			const resizeObserver = new ResizeObserver(() => {
 				if (!this.isRemoved) {
-					this.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
 					this.elements.viewport.style.aspectRatio = `${this.ratioViewport}`;
 					
 					this.updateSizesViewport();
@@ -548,8 +545,6 @@ export default new class {
 	set ratioImage(ratio) {
 		this._ratioImage = ratio;
 		this.ratioImageInverse = 1 / this.ratioImage;
-		
-		this.elements.imageWrapper.style.aspectRatio = `${this.ratioImage}`;
 		
 		this.updateSizesImage();
 	}

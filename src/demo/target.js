@@ -1,10 +1,9 @@
 import demo from '@/demo';
-import elements from '../elements';
-
-import {Connection, setPosition} from '../lines/lines';
-import {setLineStyle} from '../bounds';
-
 import {DEGREES} from '@/shared';
+
+import {Connection, setPosition} from './lines/lines';
+import {setLineStyle} from './bounds';
+import elements from './elements';
 
 export default class {
 	element = document.createElement('div');
