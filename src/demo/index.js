@@ -79,8 +79,6 @@ export default new class {
 	
 	listeners = {
 		zoom: (increment) => {
-			this.hooks.zoom.emit();
-			
 			if (increment > 0) {
 				this.zoom *= 1 + increment;
 			} else {
@@ -93,8 +91,6 @@ export default new class {
 			this.applyZoom();
 		},
 		resizeViewport: (isHorizontal, offset, event) => {
-			this.hooks.resizeViewport.emit();
-			
 			let ratio;
 			
 			if (isHorizontal) {
@@ -126,8 +122,6 @@ export default new class {
 			}
 		},
 		resizeImage: (increment) => {
-			this.hooks.resizeImage.emit();
-			
 			if (increment > 0) {
 				this.ratioImage *= 1 + increment;
 			} else {
@@ -135,8 +129,6 @@ export default new class {
 			}
 		},
 		resetViewport: () => {
-			this.hooks.resetViewport.emit();
-			
 			this.ratioViewport = getInitialRatio();
 		},
 		pan: () => {
@@ -161,8 +153,6 @@ export default new class {
 			};
 		},
 		rotate: () => {
-			this.hooks.rotate.emit();
-			
 			const target = {...this.position};
 			
 			this.constrainRotation();
@@ -174,8 +164,6 @@ export default new class {
 			this.applyPosition();
 		},
 		snap: (offsetX, offsetY) => {
-			this.hooks.snap.emit();
-			
 			this.position.x = offsetX / this.sizesImage.width - 0.5;
 			this.position.y = 0.5 - offsetY / this.sizesImage.height;
 			
@@ -185,8 +173,6 @@ export default new class {
 			this.applyPosition();
 		},
 		resetImage: () => {
-			this.hooks.resetImage.emit();
-			
 			this.zoom = 1;
 			this.rotation = DEGREES[90];
 			
@@ -441,8 +427,16 @@ export default new class {
 		this.readout.setRotation(this);
 		this.readout.setRatio(this);
 		
-		for (const key of Object.keys(this.listeners)) {
+		for (const [key, listener] of Object.entries(this.listeners)) {
 			this.hooks[key] = new ActionHook();
+			
+			this.listeners[key] = (...args) => {
+				window.setTimeout(() => {
+					this.hooks[key].emit();
+				}, 0);
+				
+				return listener(...args);
+			};
 		}
 	}
 	
@@ -668,10 +662,12 @@ export default new class {
 		}
 	}
 	
-	deleteTween() {
+	deleteTween(isOngoing = true) {
 		this.tween.kill();
 		
-		window.clearTimeout(this.#tweenUpdateId);
+		if (isOngoing) {
+			window.clearTimeout(this.#tweenUpdateId);
+		}
 		
 		delete this.tween;
 		
@@ -850,7 +846,11 @@ export default new class {
 			.eventCallback('onUpdate', () => {
 				this.progress.set(this.tween.totalProgress());
 			})
-			.eventCallback('onReverseComplete', () => this.deleteTween())
+			.eventCallback('onReverseComplete', () => {
+				this.tween.vars.onUpdate();
+				
+				this.deleteTween(false);
+			})
 			.play();
 	}
 }();

@@ -811,7 +811,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Like a movie paying off its setups in the final act, this system relies purely on the concepts introduced earlier.',
+			'Like a movie paying off its setups in the final act, this final system relies purely on the concepts introduced earlier.',
 			'One pair of image corners disappears at the origin rail\'s start zoom and the other disappears at the connecting rail\'s.',
 			'We can find the connecting rail\'s start position by interpolating along its origin rail.',
 			'The only new wrinkle introduced is the question of its end point.',
@@ -822,7 +822,7 @@ export default {
 			'Conveniently, we can re-use those maths and locate corners by summing midpoint coordinates!',
 		],
 		[
-			'Before, we calculated top and right midpoints at different zoom levels (used here as origin and connecting rail start zooms).',
+			'Before, we calculated top and right-side midpoints at different zoom levels (used here as origin and connecting rail start zooms).',
 			'It\'s simpler to interpolate down the pre-calculated midpoint from origin rail start zoom to connecting rail start zoom than do more trigonometry.',
 			'So that\'s what you see below!',
 		],
@@ -1129,7 +1129,7 @@ export default {
 		],
 		[
 			'Zoomful systems have unavoidable drawbacks.',
-			'Bounds are less inheritently less intuitive when they move around, and, especially when handling rotation, users are granted less viewfinding freedom.',
+			'Bounds are inheritently less intuitive when they move around, and, especially when handling rotation, users are granted less viewfinding freedom.',
 			'Plus, there\'s obviously a huge efficiency dropoff from the good old days of',
 		],
 		getMath({
@@ -1164,8 +1164,8 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Despite introducing an additional rail, this system still only needs two or three checks per region, depending on connecting rail similarity.',
-			'It turns out that origin rails aren\'t ever necessary here, so nothing much has changed from the two-line systems.',
+			'Despite introducing an additional rail, this system still only needs two or three checks per region, depending on whether adjacent corners share a connecting rail.',
+			'It turns out that it\'s never necessary to consider origin rails in snap zoom calculation, so nothing much has changed from the two-line systems.',
 		],
 		[
 			'It\'s definitely possible to pinpoint the snap position\'s region here, but it\'d be tricky.',
@@ -1218,6 +1218,6 @@ export default {
 			'From there, fixation became obsession and my project\'s scope ballooned way beyond what was sensible.',
 			'Still, having broke the surface of this abyss, I\'m proud to have pushed my limits so far.',
 		],
-		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC'}, content: 'Thanks for reading ✌'},
+		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'var(--text-height)'}, content: 'Thanks for reading ✌'},
 	),
 };

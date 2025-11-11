@@ -16,8 +16,8 @@ export const ID_RESIZER_VERTICAL = getId('resizer', 'vertical');
 
 export let ALLOWANCE_CLICK;
 
-inputListener.add((isMouse) => {
-	ALLOWANCE_CLICK = isMouse ? 1 : 2;
+inputListener.add(() => {
+	ALLOWANCE_CLICK = inputListener.isMouse ? 1 : 2;
 });
 
 export const MULTIPLIERS_SCROLL = [1, 40, 800];

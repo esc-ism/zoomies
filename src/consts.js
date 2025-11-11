@@ -7,13 +7,17 @@ export const inputListener = new class {
 	#isMouse = JSON.parse(localStorage.getItem(this.#id)) ?? window.matchMedia('(pointer: fine)').matches;
 	#listeners = [];
 	
+	get isMouse() {
+		return this.#isMouse;
+	}
+	
 	set(value) {
 		this.#isMouse = value;
 		
 		localStorage.setItem(this.#id, value);
 		
 		for (const listener of this.#listeners) {
-			listener(value);
+			listener();
 		}
 	}
 	
@@ -21,7 +25,7 @@ export const inputListener = new class {
 		this.#listeners.push(listener);
 		
 		if (doCall) {
-			listener(this.#isMouse);
+			listener();
 		}
 	}
 }();

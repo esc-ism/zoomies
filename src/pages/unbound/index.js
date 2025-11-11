@@ -168,7 +168,7 @@ export default {
 		{
 			style: {fontStyle: 'italic'},
 			content: [
-				'Wait, before that, what\'s the thing ',
+				'Wait — before that, what\'s the thing ',
 				{tag: 'span', classList: [CLASS_HIDE_HORIZONTAL], content: 'at the top'},
 				{tag: 'span', classList: [CLASS_HIDE_VERTICAL], content: 'to the left'},
 				'?',
@@ -177,6 +177,7 @@ export default {
 		[
 			'Glad you asked!',
 			'It\'s our first pan-limiting playground.',
+			// todo hook ratioImage and change square/rect
 			'The colourful, spotted square is the "image" and it\'s being seen through the "viewport".',
 			'To the viewport\'s top-left is a readout of the playground\'s state.',
 			'Follow the instructions below to see what you can do with it.',
@@ -188,12 +189,12 @@ export default {
 				
 				let [instruction] = instructions;
 				
-				const update = (isMouse) => {
+				const update = () => {
 					if (!instruction) {
 						return;
 					}
 					
-					const text = instruction[isMouse ? 'mouse' : 'touch'];
+					const text = instruction[inputListener.isMouse ? 'mouse' : 'touch'];
 					
 					if (instruction.hasAlt) {
 						[horizontal.innerText, vertical.innerText] = text;
@@ -277,7 +278,7 @@ export default {
 			},
 		},
 		[
-			'Each webpage will provide a playground for a unique pan-limiting system.',
+			'Each page will provide a playground for a unique pan-limiting system.',
 			'To demonstrate the value of pan-limiting, I\'m starting with a system that neglects it.',
 			'It may be described like:',
 		],
@@ -335,7 +336,7 @@ export default {
 			'Pan-limiting systems prevent this by keeping users from the no-man\'s land beyond the confines of the image.',
 		],
 		[
-			'Pan-limits here are fixed, regardless of zoom.',
+			'Pan-limits here are unaffected by zoom.',
 			'More advanced systems can take a position and derive an appropriate zoom level, which is useful when span-panning.',
 			'I\'ll talk more about that later.',
 		],

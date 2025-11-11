@@ -9,7 +9,7 @@ import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 import System, {getSnappedZoom} from './demo';
 import * as mock from '../mock';
 import getZoomPoints from './zoomPoints';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
 
 import pointsImage from './pointsImage';
 
@@ -211,7 +211,7 @@ export default {
 			'This can be achieved by swapping image axis for viewport axis-based origin rails.',
 		],
 		[
-			'Again, whichever origin rail direction minimises lock rail length is preferred, but intersects are no longer guaranteed.',
+			'Again, whichever origin rail direction minimises lock rail length is preferred, but intersections are now less reliable.',
 			'Lock rails are unchanged.',
 		],
 		{
@@ -220,7 +220,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Origin rail start zooms are unchanged, but now travel directly towards viewport edge midpoints.',
+			'Origin rails retain the same start zooms, but now travel directly towards viewport edge midpoints.',
 			'This requires us to find the coordinates of these midpoints.',
 			'Using the base image corners and the viewport\'s top edge as an example, a diagram of the problem is given below, followed by its solution.',
 		],
@@ -467,9 +467,9 @@ export default {
 			'The result is crossed lock rails, with bounds that seem to ',
 			getButton('invert', [
 				({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom: zoom / 1.1}],
-				({zoom}) => [{zoom: zoom * 1.1}, {duration: 0.5, repeat: 3, yoyo: true}],
-			], {getParam: async () => {
-				const data = await getVarGetter(demo, DEGREES[135], demo.ratioViewport / 0.5)();
+				({zoom}) => [{zoom: zoom * 1.1}, TWEEN_OPTIONS_YOYO],
+			], {getParam: () => {
+				const data = getVarGetter(DEGREES[135], demo.ratioViewport / 0.5)();
 				const zoom = getSnappedZoom(...data.zoomPoints, {x: 0, y: 0});
 				
 				return {...data, zoom};
@@ -482,7 +482,7 @@ export default {
 			getButton('insufficiently restrictive', [
 				({ratioImage, rotation, second}) => [{ratioImage, rotation, position: 0, zoom: second.z + 0.01}],
 				({second: {x, y}}) => [{x, y}],
-			], {getParam: getVarGetter(demo, DEGREES[135], 0.6)}),
+			], {getParam: getVarGetter(DEGREES[135], 0.6)}),
 			' pan-limits',
 		],
 		[
@@ -501,7 +501,7 @@ export default {
 		},
 		[
 			'In all prior systems, it was straightforward to rule out pairs of rails that didn\'t need checking.',
-			'Here, however, region in which the position lies is no longer obvious.',
+			'Here, however, the region in which the position lies is no longer obvious.',
 			'Plus, even if a snap zoom is found in one region, the bound inversion behaviour means that another valid zoom may exist in another region.',
 			'For simplicity, I neglect to rule out rail pairings and check every region.',
 		],

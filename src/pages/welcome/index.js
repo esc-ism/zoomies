@@ -149,18 +149,23 @@ export default {
 		],
 		[
 			'For the past two years or so, I\'ve been delving into panning (the thing you do to look around after zooming in).',
-			'Specifically, I\'ve been working on pan-limiting with variable zoom, rotation, image aspect ratio and viewport aspect ratio.',
-			'My focus is on systems with rectangular content that keep all four corners viewable at all times.',
+			'Specifically, I\'ve been working on  systems with rectangular content that keep all four corners viewable at all times, focusing on pan-limiting where the following are all variable:',
+			{tag: 'ul', style: {marginBlockStart: '0.5em', marginBlockEnd: '0.5em'}, content: [
+				'Zoom',
+				'Rotation',
+				'Image aspect ratio',
+				'Viewport aspect ratio',
+			].map((content) => ({tag: 'li', content}))},
 		],
 		[
 			'This website is a little interactive report of my findings.',
 			'It will walk you through the problem space and demonstrate solutions, ranging from trivial to the kind of thing that a non-mathematician might spend two years on.',
 		],
 		getInstruction({callback: (element) => {
-			const update = (isMouse) => {
-				element.innerText = isMouse ?
-					'Hit your right arrow key to continue. If you\'re not using keyboard and mouse, scroll up to select touchscreen controls.' :
-					'Swipe left to continue. If you\'re using keyboard and mouse, scroll up to select that control scheme.';
+			const update = () => {
+				element.innerText = inputListener.isMouse ?
+					'Hit your right arrow key to see the next page. If you\'re not using keyboard and mouse, scroll up to select touchscreen controls.' :
+					'Swipe left to see the next page. If you\'re using keyboard and mouse, scroll up to select that control scheme.';
 			};
 			
 			inputListener.add(update);

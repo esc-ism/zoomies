@@ -35,3 +35,5 @@ export const CORNERS = {
 	BOTTOM_LEFT: {x: -0.5, y: -0.5},
 	BOTTOM_RIGHT: {x: 0.5, y: -0.5},
 };
+
+export const TWEEN_OPTIONS_YOYO = {duration: 0.5, repeat: 3, yoyo: true};

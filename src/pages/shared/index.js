@@ -125,7 +125,6 @@ const releaseButton = () => {
 	} else {
 		demo.tween.revert();
 		
-		demo.tween.vars.onUpdate();
 		demo.tween.vars.onReverseComplete();
 	}
 };
@@ -197,8 +196,8 @@ export const getText = (...children) => {
 export const getInstruction = (...content) => ({classList: [CLASS_INSTRUCTION], content});
 
 export const getInputDependent = (get) => ({tag: 'span', callback: (element) => {
-	inputListener.add((isMouse) => {
-		element.innerText = get(isMouse);
+	inputListener.add(() => {
+		element.innerText = get(inputListener.isMouse);
 	});
 }});
 

@@ -104,9 +104,10 @@ addRule(`p.${CLASS_MAXIMISED}`, {
 	'max-height': 'unset',
 });
 
-addRule(`.${CLASS_MAXIMISED} > *`, {
+addRule(`.${CLASS_MAXIMISED} > div`, {
 	overflow: 'auto',
 	height: '100%',
+	'max-height': 'unset',
 });
 
 const arrowSize = '0.5ch';

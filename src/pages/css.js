@@ -18,7 +18,7 @@ addRule([`.${CLASS_MATH_WRAPPER}`, `.${CLASS_CODE}`], {
 	'border-radius': '10px',
 });
 
-addRule([`.${CLASS_MATH_WRAPPER}`, `.${CLASS_CODE} > div`], {
+addRule([`.${CLASS_MATH_WRAPPER}`, `.${CLASS_CODE} > *`], {
 	overflow: 'auto',
 	'overscroll-behavior-x': 'contain',
 	'max-height': 'calc(var(--text-height) - 2em - var(--scrollbar-width))',

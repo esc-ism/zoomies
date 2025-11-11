@@ -13,12 +13,12 @@ export const getLine = ([x1, y1], [x2, y2]) => {
 
 export const COLOURS = ['rgba(66, 185, 211, 1)', 'rgba(218, 160, 65, 1)', 'rgba(142, 68, 195, 1)'];
 
-export const getBorder = (bX, bY, strokeDiameter) => {
+export const getBorder = (rX, rY, strokeDiameter) => {
 	const border = document.createElementNS(SVG_NAMESPACE, 'path');
 	
 	border.setAttribute('stroke-width', strokeDiameter);
 	border.setAttribute('stroke-linecap', 'square');
-	border.setAttribute('d', `M${strokeDiameter - bX} ${-bY}L${bX} ${-bY}L${bX} ${bY}L${-bX} ${bY}L${-bX} ${-bY}`);
+	border.setAttribute('d', `M${strokeDiameter - rX} ${-rY}L${rX} ${-rY}L${rX} ${rY}L${-rX} ${rY}L${-rX} ${-rY}`);
 	
 	return border;
 };

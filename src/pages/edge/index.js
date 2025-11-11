@@ -1,7 +1,7 @@
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
-import {CLASS_MATH_EQUATION} from '../consts';
+import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
 import {getText, getCode, getButton, getInstruction, getMath, getInputDependent} from '../shared';
@@ -52,14 +52,9 @@ export default {
 		],
 		[
 			'Whereas the prior system had fixed pan-limits, from now on bounds will ',
-			getButton('grow', [
+			getButton('grow and shrink', [
 				[{zoom: 1, position: 0}, {duration: 0}],
-				[{zoom: 1.5}],
-			]),
-			' and ',
-			getButton('shrink', [
-				[{zoom: 1.5, position: 0}, {duration: 0}],
-				[{zoom: 1}],
+				[{zoom: 1.5}, TWEEN_OPTIONS_YOYO],
 			]),
 			' alongside zoom.',
 			'Bounds may be a point at the image\'s origin, a ',
@@ -143,7 +138,7 @@ export default {
 		},
 		[
 			'Snap-panning now requires an accommodating zoom adjustment.',
-			'We can derive the formula by solving the pan-limiting calculation for zoom.',
+			'We can derive the formula by solving the pan-limiting calculation for zoom, replacing "boundX" and "boundY" with the target position.',
 		],
 		getMath(
 			{

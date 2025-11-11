@@ -47,8 +47,8 @@ const header = (() => {
 	buttonContainer.style.height = '100%';
 	buttonContainer.style.display = 'flex';
 	
-	const update = (isMouse) => {
-		const [on, off] = isMouse ? [mouseIcon, touchIcon] : [touchIcon, mouseIcon];
+	const update = () => {
+		const [on, off] = inputListener.isMouse ? [mouseIcon, touchIcon] : [touchIcon, mouseIcon];
 		
 		on.disabled = true;
 		on.style.removeProperty('cursor');

@@ -1,6 +1,6 @@
 import {DEGREES} from '@/shared';
 
-import {getText, getCode, getButton, getMath, getDiagrammedMath} from '../../shared';
+import {getText, getCode, getButton, getDiagrammedMath} from '../../shared';
 import {cleanup, register as registerFunctions} from '../../code';
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
 import {getOverlined, xmlns} from '../../shared/math';
@@ -488,6 +488,34 @@ export default {
 					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
+								{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: 'cos'},
+								{tag: 'mo', xmlns, content: '('},
+								{tag: 'mo', xmlns, content: '∠'},
+								{tag: 'mi', xmlns, content: 'B'},
+								{tag: 'mi', xmlns, content: 'A'},
+								{tag: 'mi', xmlns, content: 'C'},
+								{tag: 'mo', xmlns, content: ')'},
+							]},
+							{tag: 'mo', xmlns, content: '='},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mo', xmlns, content: '|'},
+										{tag: 'mi', xmlns, content: 'A'},
+										{tag: 'mi', xmlns, content: 'B'},
+										{tag: 'mo', xmlns, content: '|'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'mo', xmlns, content: '|'},
+										{tag: 'mi', xmlns, content: 'A'},
+										{tag: 'mi', xmlns, content: 'C'},
+										{tag: 'mo', xmlns, content: '|'},
+									]},
+								]},
+							]},
+						]},
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '|'},
 								{tag: 'mi', xmlns, content: 'A'},
 								{tag: 'mi', xmlns, content: 'C'},
@@ -797,10 +825,25 @@ export default {
 			'Segments are coloured to show pairings.',
 		],
 		// todo give the single-line system an image?
-		{tag: 'div', style: {display: 'flex', justifyContent: 'space-evenly'}, content: [
+		{tag: 'div', style: {
+			display: 'flex',
+			maxHeight: 'calc(var(--text-height) - 2em - var(--scrollbar-width))',
+			// avoids a weird scroll snap when resizing viewport with page top inside the images
+			overflowAnchor: 'none',
+		}, content: [
 			snapImageDuo,
 			snapImageTrio,
-		]},
+		].map((image) => {
+			const container = document.createElement('div');
+			
+			container.style.display = 'flex';
+			container.style.justifyContent = 'center';
+			container.style.flexGrow = `${image.viewBox.baseVal.width / image.viewBox.baseVal.height}`;
+			
+			container.appendChild(image);
+			
+			return container;
+		})},
 		[
 			'As before, we need to find a line that intersects the snap point and two adjacent rails.',
 			'Here, with the additional segment pairs, the maximum number of checks required is tripled.',

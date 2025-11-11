@@ -1,5 +1,6 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
+import {isVertical} from '@/shared/orientation';
 
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, getInstruction, getInputDependent, getMath, getDiagrammedMath} from '../../shared';
@@ -164,9 +165,9 @@ export default {
 			'Because the last system was so simple, it\'s obvious that there\'s no way to improve its behaviour for un-rotated images.',
 			'This won\'t be the case for rotated images;',
 			'there are myriad approaches to pan-limiting, some more effective than others, but no clear "perfect" solution.',
-			'This is the simplest possible zoomful system that can handle image rotation.',
 		],
 		[
+			'This is the simplest possible zoomful system that can handle image rotation.',
 			'The rail to each image corner is a direct, single line (hence the page\'s title) from the image\'s origin.',
 			'Consequently, image corners are ',
 			getButton('locked', [
@@ -215,10 +216,29 @@ export default {
 			'Using the top-left image corner as an example, a diagram of the problem is given below, followed by its solution.',
 		],
 		getInstruction([
-			'You may have noticed the little white ◤ to the left.',
-			'This is one of three visual indicators for where mathematical diagrams will appear.',
-			getInputDependent((isMouse) => isMouse ? 'Click' : 'Tap'),
-			' diagrams to center their maths.',
+			[
+				'If maths depend on a diagram, scrolling close enough will make the diagram appear.',
+				'You may have noticed the little white ', {tag: 'span', style: {fontSize: '0.77em'/* borderWidth * 1.54 */}, content: '◤'}, ' to the left.',
+				'This is one of three threshold indicators.',
+				'Scroll it off the top of the screen to see the diagram.',
+			],
+			{callback: (element) => {
+				const {viewport} = demo.elements;
+				
+				demo.hooks.resizeViewport.add(() => {
+					const property = isVertical() ? 'Height' : 'Width';
+					
+					if (viewport[`client${property}`] < window[`inner${property}`] / 10) {
+						element.innerText = 'The diagram replaces the playground, so you may have to do some resizing to see it.';
+					} else {
+						element.innerText = '';
+					}
+				}, true);
+			}},
+			[
+				getInputDependent((isMouse) => isMouse ? 'Click' : 'Tap'),
+				' diagrams to center their maths.',
+			],
 		]),
 		getDiagrammedMath(
 			zoomImage,
@@ -962,7 +982,7 @@ export default {
 				[{zoom: 1}],
 			]),
 			' out past the point that pan-limits become one-dimensional.',
-			'This is a problem for any state some rotation and a lock point close to a viewport corner',
+			'This is a problem for any rotated state with a lock point close to a viewport corner',
 		],
 		[
 			'There, the system was too restrictive, but at other times it isn\'t restrictive enough!',
@@ -970,7 +990,7 @@ export default {
 			getButton('this', [[permissiveTweens]]),
 			' simple, un-rotated state.',
 			'Pans along the y axis shouldn\'t be allowed here.',
-			'Unfortunately, it\'s impossible to allows pans along only one axis with single-line rails.',
+			'Unfortunately, it\'s impossible to allow pans along only one axis with single-line rails.',
 		],
 		{
 			tag: 'h2',
@@ -978,7 +998,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		'The maths for snap-panning will take a little longer to run through.',
-		'For brevity, I\'ll refer to image positions used in snap-panning as "snap points".',
+		'I\'ll refer to image positions used as snap-pan targets as "snap points".',
 		[
 			'Observe how the rails split the image into four regions.',
 			'Any snap point will fall into one of these regions, bordered by two rails (any point exactly between two regions may be assigned to either).',
@@ -1088,7 +1108,7 @@ export default {
 		]}),
 		[
 			'Now that we can define points at ', {tag: 'i', content: 't'}, ', we can define the line segment that passes through the snap point.',
-			'Using the snap point as a separator, we can split it in two.',
+			'Using the snap point as a separator, we can split the segment in two.',
 			'Knowing that these derived line segments must share a gradient, we can use ',
 			{tag: 'span', content: '"m = dY / dX"', style: {whiteSpace: 'nowrap'}},
 			' to write the equation we\'re trying to solve.',
