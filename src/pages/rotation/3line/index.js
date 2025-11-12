@@ -6,6 +6,7 @@ import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getButton, getMath, getDiagrammedMath} from '../../shared';
 import {xmlns} from '../../shared/math';
 
+import {getFlipped} from '../shared';
 import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 
 import System, {getVarGetter} from './demo';
@@ -771,15 +772,31 @@ const functions = [
 	]},
 ];
 
+const useTopLeft = ({zoomPoints}) => {
+	if (zoomPoints[2].isFirstInt) {
+		return false;
+	}
+	
+	if (zoomPoints[5].isFirstInt) {
+		return true;
+	}
+	
+	return zoomPoints[2].p < zoomPoints[5].p;
+};
+
 let getDirectVars;
 
 export default {
 	System,
 	start() {
 		getDirectVars = () => {
-			const data = getVarGetter(-DEGREES[270] + 0.4, 0.7)();
+			const data = getVarGetter(-DEGREES[270] + DEGREES['45_2'], demo.ratioViewport / 1.5)();
 			
-			return {...data, position: {x: -data.zoomPoints[2].x, y: -data.zoomPoints[2].y}};
+			if (useTopLeft(data)) {
+				return {...data, third: getFlipped(data.zoomPoints[2])};
+			}
+			
+			return {...data, third: data.zoomPoints[5]};
 		};
 		
 		registerFunctions(functions);
@@ -818,8 +835,8 @@ export default {
 			], {getParam: () => getDirectVars()}),
 			', each keeping a ',
 			getButton('pair', [
-				({rotation, ratio, zoomPoints, position}) => [{rotation, ratio, zoom: zoomPoints[1].z, position}],
-				({zoomPoints}) => [{zoom: zoomPoints[2].z}],
+				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[1].z, position: third}],
+				({third}) => [{zoom: third.z}],
 			], {getParam: () => getDirectVars()}),
 			' of image corners visible.',
 			'Connecting rails run until they intersect with lock rails, at which point we\'re home free.',
