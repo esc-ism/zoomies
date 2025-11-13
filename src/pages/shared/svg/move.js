@@ -9,12 +9,16 @@ const cancelEvent = (event) => {
 
 const diagramContainer = document.createElement('div');
 
+diagramContainer.style.position = 'absolute';
+diagramContainer.style.zIndex = '10';
 diagramContainer.style.display = 'flex';
 diagramContainer.style.width = diagramContainer.style.height = '100%';
 diagramContainer.style.justifyContent = 'center';
 diagramContainer.style.alignItems = 'center';
 diagramContainer.style.pointerEvents = 'all';
 diagramContainer.style.cursor = 'pointer';
+diagramContainer.style.backgroundColor = 'black';
+diagramContainer.style.backgroundColor = 'black';
 
 diagramContainer.addEventListener('wheel', cancelEvent);
 diagramContainer.addEventListener('pointerdown', cancelEvent);
@@ -67,21 +71,13 @@ export const show = (svg, _target) => {
 	target = _target;
 	
 	demo.elements.viewport.style.pointerEvents = 'none';
-	demo.readout.element.style.display = 'none';
-	demo.elements.crosshair.style.display = 'none';
-	demo.elements.imageWrapper.style.display = 'none';
 	
 	diagramContainer.appendChild(svg);
-	demo.elements.viewport.appendChild(diagramContainer);
+	demo.elements.viewport.insertAdjacentElement('afterbegin', diagramContainer);
 };
 
 export const hide = () => {
 	demo.elements.viewport.style.removeProperty('pointer-events');
-	demo.elements.crosshair.style.removeProperty('display');
-	demo.elements.imageWrapper.style.removeProperty('display');
-	demo.readout.element.style.removeProperty('display');
-	
-	demo.updateSizesViewport();
 	
 	diagramContainer.firstChild.remove();
 	diagramContainer.remove();

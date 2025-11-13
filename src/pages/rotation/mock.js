@@ -1,6 +1,6 @@
 import {DEGREES} from '@/shared';
 import demo from '@/demo';
-import {PADDING_IMAGE} from '@/demo/consts';
+import {PADDING_VIEWPORT} from '@/demo/consts';
 
 const getRelevantDemo = ({
 	rotation,
@@ -32,16 +32,12 @@ const getDimensions = (ratio, width, height) => {
 	};
 };
 
-// - 0.5 since there's some margin of error & it's better to use a larger than smaller image
-// for example, you don't want 2d bounds when they should be 1d
-const sizeDeduction = PADDING_IMAGE * 2 - 0.5;
-
 export const getVarGetter = (getZoomPoints, rotation = DEGREES[90], ratio = 1) => () => {
 	const {width, height} = demo.sizesViewport;
 	const mockDemo = getRelevantDemo({
 		...demo,
 		rotation,
-		sizesImage: getDimensions(ratio, width - sizeDeduction, height - sizeDeduction),
+		sizesImage: getDimensions(ratio, width - PADDING_VIEWPORT, height - PADDING_VIEWPORT),
 	});
 	const zoomPoints = getZoomPoints(mockDemo);
 	

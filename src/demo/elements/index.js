@@ -2,7 +2,7 @@ import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
 import {
 	ID_WRAPPER, ID_WRAPPER_IMAGE, ID_IMAGE, ID_CROSSHAIR,
-	ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL, PADDING_IMAGE,
+	ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL, PADDING_VIEWPORT,
 } from '../consts';
 
 import crosshairImage from './crosshair';
@@ -46,12 +46,8 @@ elements.viewport = generate({
 	parent: elements.wrapper,
 	style: {
 		backgroundColor: 'black',
-		padding: `${PADDING_IMAGE}px`,
 		position: 'relative',
 		overflow: 'hidden',
-		display: 'flex',
-		flexWrap: 'wrap',
-		placeContent: 'center center',
 		cursor: 'grab',
 		aspectRatio: '1',
 		touchAction: 'none',
@@ -59,8 +55,21 @@ elements.viewport = generate({
 });
 
 elements.imageWrapper = generate({
-	id: ID_WRAPPER_IMAGE,
 	parent: elements.viewport,
+	style: {
+		padding: `${PADDING_VIEWPORT}px`,
+		boxSizing: 'border-box',
+		height: '100%',
+		width: '100%',
+		display: 'flex',
+		flexWrap: 'wrap',
+		placeContent: 'center center',
+	},
+});
+
+elements.imageContainer = generate({
+	id: ID_WRAPPER_IMAGE,
+	parent: elements.imageWrapper,
 	style: {
 		aspectRatio: '1',
 		position: 'relative',
@@ -68,10 +77,11 @@ elements.imageWrapper = generate({
 });
 
 elements.image = generate({
-	parent: elements.imageWrapper,
+	parent: elements.imageContainer,
 	id: ID_IMAGE,
 	style: {
-		padding: '2px',
+		// ensure rim visibility
+		padding: `${4 - PADDING_VIEWPORT}px`,
 		boxSizing: 'border-box',
 		height: '100%',
 		width: '100%',
@@ -119,16 +129,12 @@ elements.resizerVertical = generate({
 		{
 			backgroundImage: 'radial-gradient(at -100% center, rgb(0 200 160), transparent), radial-gradient(at center 300%, rgb(255 0 0), transparent), radial-gradient(at 130% center, rgb(160 200 0), transparent), radial-gradient(at center -200%, rgb(0 0 255), transparent)',
 			backgroundBlendMode: 'overlay',
+			boxShadow: 'white 0 0 6px 1px',
 		},
 		{
 			backgroundImage: 'radial-gradient(circle, black, black 1.5px, transparent 0)',
 			backgroundSize: '18px 18px',
 			backgroundRepeat: 'round',
-		},
-		{
-			boxShadow: 'white 0 0 6px 1px',
-			zIndex: '1',
-			position: 'relative',
 		},
 	].map((styles) => {
 		const element = document.createElement('div');
@@ -147,7 +153,7 @@ elements.resizerVertical = generate({
 
 for (const name of ['boundLimit', 'rail', 'boundLine', 'tangents']) {
 	elements[name] = generate({
-		parent: elements.imageWrapper,
+		parent: elements.imageContainer,
 		style: {display: 'contents', pointerEvents: 'none'},
 	});
 }

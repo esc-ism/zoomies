@@ -1,6 +1,7 @@
 import {DEGREES} from '@/shared';
 
-import {getText, getCode, getButton, getDiagrammedMath} from '../../shared';
+import {getText, getCode, getDiagrammedMath} from '../../shared';
+import {getButton, clearButton} from '../../shared/button';
 import {cleanup, register as registerFunctions} from '../../code';
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
 import {getOverlined, xmlns} from '../../shared/math';
@@ -10,8 +11,8 @@ import {permissiveTweens, restrictiveTweens} from '../1line';
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 
 import zoomImage from './zoomImage';
-import snapImageTrio from './snapImage';
-import snapImageDuo from './snapImageDuo';
+import snapImageTrio from './snapImage/triple';
+import snapImageDuo from './snapImage/double';
 import System, {getSnappedZoom} from './demo';
 import getZoomPoints from './zoomPoints';
 
@@ -256,6 +257,8 @@ export default {
 		for (const {end} of code) {
 			end();
 		}
+		
+		clearButton();
 	},
 	text: getText(
 		{
@@ -322,8 +325,8 @@ export default {
 		},
 		[
 			'Each lock point must be on a different viewport edge, and adjacent corners will have lock points on adjacent edges.',
-			'Since we\'re focusing on the top-left and top-right image corners, we can say that one will be a "side" (left or right viewport edge) corner and the other a "base" (top or bottom viewport edge) corner.',
-			'This assignment will be based off rotation, with corners alternating between "base" and "side" every 90°.',
+			'Since we\'re focusing on the top-left and top-right image corners, we can say that one will be a viewport side corner and the other a vewport base corner.',
+			'This assignment will be based off rotation, with corners alternating between base and side every 90°.',
 		],
 		// todo define "lock angle"
 		[

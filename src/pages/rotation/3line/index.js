@@ -3,7 +3,8 @@ import {DEGREES} from '@/shared';
 
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, getMath, getDiagrammedMath} from '../../shared';
+import {getText, getCode, getMath, getDiagrammedMath} from '../../shared';
+import {getButton, clearButton} from '../../shared/button';
 import {xmlns} from '../../shared/math';
 
 import {getFlipped} from '../shared';
@@ -811,6 +812,8 @@ export default {
 		for (const {end} of code) {
 			end();
 		}
+		
+		clearButton();
 	},
 	text: getText(
 		{

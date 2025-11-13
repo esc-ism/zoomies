@@ -1,5 +1,5 @@
 const SINGLE_LINE = [
-	{op: 'func', id: 'getIntersectRatio', args: ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'isInverse'], and: [
+	{op: 'func', id: 'getT', args: ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'isInverse'], and: [
 		{op: '=', id: 'a', and: {
 			op: '-', and: [
 				{op: '+', and: [
@@ -148,22 +148,22 @@ export default SINGLE_LINE;
 
 export const MULTI_LINE = [
 	...SINGLE_LINE,
-	{op: 'func', id: 'getIntersectZoom', args: ['startZoom', 'fromX0', 'fromY0', 'toX0', 'toY0', 'fromX1', 'fromY1', 'toX1', 'toY1', 'isInverse', 'maxP'], type: 'zoom', and: [
+	{op: 'func', id: 'getIntersectZoom', args: ['startZoom', 'fromX0', 'fromY0', 'toX0', 'toY0', 'fromX1', 'fromY1', 'toX1', 'toY1', 'isInverse', 'maxT'], type: 'zoom', and: [
 		{op: 'if', and: [
-			{op: '>=', and: ['maxP', 0]},
-			{op: '=', id: 'p', and: {
-				op: 'call', id: 'getIntersectRatio', and: ['fromX0', 'fromY0', 'toX0', 'toY0', 'fromX1', 'fromY1', 'toX1', 'toY1', 'isInverse'],
+			{op: '>=', and: ['maxT', 0]},
+			{op: '=', id: 't', and: {
+				op: 'call', id: 'getT', and: ['fromX0', 'fromY0', 'toX0', 'toY0', 'fromX1', 'fromY1', 'toX1', 'toY1', 'isInverse'],
 			}},
 			'',
 			{op: 'if', and: [
 				{op: '&&', and: [
-					{op: '>=', and: ['p', 0]},
-					{op: '<=', and: ['p', 'maxP']},
+					{op: '>=', and: ['t', 0]},
+					{op: '<=', and: ['t', 'maxT']},
 				]},
 				{op: 'return', and: {
 					op: '/', and: [
 						'startZoom',
-						{op: '-', and: [1, 'p']},
+						{op: '-', and: [1, 't']},
 					],
 				}},
 			]},
@@ -248,7 +248,7 @@ export const MULTI_LINE = [
 		}},
 	]},
 	{op: 'func', id: 'getProgressed', args: ['fromX', 'fromY', 'toX', 'toY', 'lowZoom', 'highZoom'], pair: [1, 0], and: [
-		{op: '=', id: 'p', and: {
+		{op: '=', id: 't', and: {
 			op: '-', and: [
 				1,
 				{op: '/', and: ['lowZoom', 'highZoom']},
@@ -259,14 +259,14 @@ export const MULTI_LINE = [
 			{op: '+', and: [
 				'fromX',
 				{op: '*', and: [
-					'p',
+					't',
 					{op: '-', and: ['toX', 'fromX']},
 				]},
 			]},
 			{op: '+', and: [
 				'fromY',
 				{op: '*', and: [
-					'p',
+					't',
 					{op: '-', and: ['toY', 'fromY']},
 				]},
 			]},

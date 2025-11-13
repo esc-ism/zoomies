@@ -3,15 +3,17 @@ import {DEGREES} from '@/shared';
 import {isVertical} from '@/shared/orientation';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, getInstruction, getInputDependent, getMath, getDiagrammedMath} from '../../shared';
+import {getText, getCode, getInstruction, getInputDependent, getMath, getDiagrammedMath} from '../../shared';
+import {getButton, clearButton} from '../../shared/button';
 import {xmlns, opSpace, getOverlined} from '../../shared/math';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
 
 import SHARED_FUNCTIONS from '../code';
 import * as mock from '../mock';
 
 import System, {getBound, getZoomPoints} from './demo';
 import zoomImage from './zoomImage';
+import snapImage from './snapImage';
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
@@ -136,12 +138,12 @@ const functions = [
 ];
 
 // todo rename
-let keeper;
+let getLockVars;
 
 export default {
 	System,
 	start() {
-		keeper = getVarGetter(-DEGREES[270] + 0.5, 0.6);
+		getLockVars = getVarGetter(-DEGREES[270] + 0.5, 0.6);
 		
 		registerFunctions(functions);
 		
@@ -155,6 +157,8 @@ export default {
 		for (const {end} of code) {
 			end();
 		}
+		
+		clearButton();
 	},
 	text: getText(
 		{
@@ -170,30 +174,6 @@ export default {
 		[
 			'This is the simplest possible zoomful system that can handle image rotation.',
 			'The rail to each image corner is a direct, single line (hence the page\'s title) from the image\'s origin.',
-			'Consequently, image corners are ',
-			getButton('locked', [
-				({zoomPoints, rotation, ratio}) => [{zoom: zoomPoints[1].z, rotation, ratio, position: 0}],
-				({zoomPoints}) => [{zoom: zoomPoints[1].z * 1.5}, {
-					onUpdate() {
-						demo.tweenUpdate.then(() => {
-							demo.position = getBound(demo.zoom, zoomPoints[1], false) || demo.position;
-							
-							demo.applyPosition();
-						});
-					},
-					onStart() {
-						demo.tween.data.ignorePosition = true;
-					},
-					onReverseComplete() {
-						demo.position.x = demo.position.y = 0;
-						
-						demo.applyPosition();
-					},
-					duration: 2.5, ease: 'none',
-				}],
-			], {getParam: () => keeper()}),
-			' to the position on the viewport\'s rim that they first contact, regardless of zoom.',
-			'I\'ll refer to this as the corner\'s "lock point".',
 		],
 		{
 			tag: 'h2',
@@ -208,7 +188,17 @@ export default {
 		],
 		[
 			'For a given corner, there are two possible start zooms —',
-			'one if the corner disappears off the side of the viewport, and another if it disappears off its base.',
+			'one if the corner disappears off the ',
+			getButton('"side"', [
+				[{rotation: DEGREES[90], ratio: 0.5, zoom: 1, position: 0}],
+				[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
+			]),
+			' (left/right) of the viewport, and another if it disappears off its ',
+			getButton('"base"', [
+				[{rotation: DEGREES[90], ratio: 2, zoom: 1, position: 0}],
+				[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
+			]),
+			' (top/bottom).',
 			'I find both zooms and disregard whichever\'s larger.',
 		],
 		[
@@ -983,33 +973,66 @@ export default {
 				[{zoom: 1}],
 			]),
 			' out past the point that pan-limits become one-dimensional.',
-			'This is a problem for any rotated state with a lock point close to a viewport corner',
 		],
 		[
-			'There, the system was too restrictive, but at other times it isn\'t restrictive enough!',
-			'For example, consider ',
+			'A consequence of using single-line rails is that image corners get ',
+			getButton('locked', [
+				({zoomPoints, rotation, ratio}) => [{zoom: zoomPoints[1].z, rotation, ratio, position: 0}],
+				({zoomPoints}) => [{zoom: zoomPoints[1].z * 1.5}, {
+					onUpdate() {
+						demo.tweenUpdate.then(() => {
+							demo.position = getBound(demo.zoom, zoomPoints[1], false) || demo.position;
+							
+							demo.applyPosition();
+						});
+					},
+					onStart() {
+						demo.tween.data.ignorePosition = true;
+					},
+					onReverseComplete() {
+						demo.position.x = demo.position.y = 0;
+						
+						demo.applyPosition();
+					},
+					duration: 2.5, ease: 'none',
+				}],
+			], {getParam: () => getLockVars()}),
+			' to the position on the viewport\'s rim that they first contact.',
+			'I\'ll refer to this as the corner\'s "lock point".',
+			'The corner visibility issue is a problem for any rotated state with a lock point close to a viewport corner.',
+		],
+		[
+			'When struggling to see a corner, the system is too restrictive.',
+			'At other times, however, it isn\'t restrictive enough!',
+			'In ',
 			getButton('this', [[permissiveTweens]]),
-			' simple, un-rotated state.',
-			'Pans along the y axis shouldn\'t be allowed here.',
-			'Unfortunately, it\'s impossible to allow pans along only one axis with single-line rails.',
+			' state, for example, pans along the y-axis shouldn\'t be allowed.',
+			'This is a fundamental limitation of single-line rails; it\'s impossible to allow pans along only one axis.',
 		],
 		{
 			tag: 'h2',
 			content: 'Snap-Pan Maths',
 			style: {textAlign: 'center'},
 		},
-		'The maths for snap-panning will take a little longer to run through.',
-		'I\'ll refer to image positions used as snap-pan targets as "snap points".',
 		[
-			'Observe how the rails split the image into four regions.',
-			'Any snap point will fall into one of these regions, bordered by two rails (any point exactly between two regions may be assigned to either).',
-			'If one rail\'s start zoom is lower than the other, we can snip off its start to make them match.',
+			'The maths for snap-panning will take a little longer to run through.',
+			'The image positions used as snap-pan targets will be referred to as "snap points".',
+		],
+		[
+			'The image is split into four "regions" by its rails.',
+			'The first step in finding a snap zoom is to find the region that our snap point lies within.',
+			'This is accomplished by finding the image corners that, alongside the origin, enclose the region.',
 		],
 		getCode(code, [
 			{op: '=', id: ['toX0', 'toY0', 'toX1', 'toY1'], and: {
 				op: 'call', id: 'getCorners',
 			}},
-			'',
+		]),
+		[
+			'The next step is to define two rails with matching start zooms that border the region.',
+			'For this, we take the existing rails and trim the one with a lower start zoom.',
+		],
+		getCode(code, [
 			{op: '=', id: ['fromX0', 'fromY0'], and: {
 				op: 'call', id: 'getSnippedStart', and: [
 					'toX0',
@@ -1028,28 +1051,23 @@ export default {
 			}},
 		]),
 		[
-			'That\'s the first part of the snap zoom calculation done.',
-			'Next, we need to find a ratio "', {tag: 'i', content: 't'}, '" such that a line segment with endpoints ', {tag: 'i', content: 't'}, ' on both rails also passes through the snap point.',
-			'When I talk about a point\'s "ratio" on its rail, I mean its distance from the rail\'s start point divided by the rail\'s total length.',
-			'It\'s a percentage measurement of how far along the point is, but between 0 and 1 instead of 0 and 100.',
-		],
-		[
-			'A kindred spirit outlines the problem ',
+			'The final step is to find some fraction of rail length "', {tag: 'i', content: 't'}, '" such that a line through both rails at ', {tag: 'i', content: 't'}, ' also passes through the snap point.',
+			'A kindred spirit gives a more detailed description of the problem ',
 			{
 				tag: 'a',
 				href: 'https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point',
 				content: 'here',
 			},
-			', including an excellent diagram that may help you to visualise the problem.',
+			', including an excellent diagram that may help you to visualise the goal.',
 		],
 		[
-			'We can write out a definition of rail points at ', {tag: 'i', content: 't'}, ' using the ',
+			'We can write out a definition of rail points at ', {tag: 'i', content: 't'}, ' using ',
 			{
 				tag: 'a',
-				href: 'https://en.wikipedia.org/wiki/Linear_interpolation',
+				href: 'https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support',
 				content: 'linear interpolation',
 			},
-			' formula.',
+			', aka "lerp".',
 		],
 		getMath({content: [
 			{tag: 'mtable', xmlns, content: [
@@ -1108,33 +1126,19 @@ export default {
 			]},
 		]}),
 		[
-			'Now that we can define points at ', {tag: 'i', content: 't'}, ', we can define the line segment that passes through the snap point.',
-			'Using the snap point as a separator, we can split the segment in two.',
-			'Knowing that these derived line segments must share a gradient, we can use ',
-			{tag: 'span', content: '"m = dY / dX"', style: {whiteSpace: 'nowrap'}},
+			'We need to define one line for each rail, each travelling through the rail at some ', {tag: 'i', content: 't'}, ' and the snap point.',
+			{tag: 'i', content: 't'}, ' is correct when these lines are parallel.',
+			'Knowing that parallel lines share a gradient, we can use ',
+			{tag: 'span', content: 'm = dY / dX', style: {whiteSpace: 'nowrap'}},
 			' to write the equation we\'re trying to solve.',
 		],
-		getMath(
+		getDiagrammedMath(
+			snapImage,
 			{
-				title: 'Variables',
+				title: 'Declarations',
 				content: [
-					{tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
+					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
 						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'div', content: 'let the rails be '},
-							]},
-							{tag: 'mtd', xmlns, content: [
-								getOverlined('AB'),
-								opSpace,
-								{tag: 'mtext', xmlns, content: ' and '},
-								opSpace,
-								getOverlined('CD'),
-							]},
-						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'div', content: 'let the snap point be '},
-							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '('},
 								{tag: 'mi', xmlns, content: 'x'},
@@ -1142,13 +1146,18 @@ export default {
 								{tag: 'mi', xmlns, content: 'y'},
 								{tag: 'mo', xmlns, content: ')'},
 							]},
+							{tag: 'mtext', xmlns, content: 'is'},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'div', content: 'the snap point'},
+							]},
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'div', content: 'let the target line segment be '},
-							]},
-							{tag: 'mtd', xmlns, content: [
 								getOverlined('EF'),
+							]},
+							{tag: 'mtext', xmlns, content: 'is'},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'div', content: 'the target line'},
 							]},
 						]},
 					]},
@@ -1685,8 +1694,8 @@ export default {
 			'From here, it\'s a simple calculation using the un-snipped rail\'s start zoom to find our final snap zoom.',
 		],
 		getCode(code, [
-			{op: '=', id: 'ratio', and: {
-				op: 'call', id: 'getIntersectRatio', multiline: [4, 4, 1], and: [
+			{op: '=', id: 't', and: {
+				op: 'call', id: 'getT', multiline: [4, 4, 1], and: [
 					'fromX0', 'fromY0', 'toX0', 'toY0',
 					'fromX1', 'fromY1', 'toX1', 'toY1',
 					{op: '!=', and: ['toY0', 'toY1']},
@@ -1698,7 +1707,7 @@ export default {
 					{op: 'max', and: ['topLeftZoom', 'topRightZoom']},
 					{op: '-', and: [
 						1,
-						'ratio',
+						't',
 					]},
 				],
 			}},

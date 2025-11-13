@@ -350,7 +350,7 @@ const visualisers = {
 		
 		svg.append(path);
 		
-		elements.imageWrapper.appendChild(svg);
+		elements.imageContainer.appendChild(svg);
 		
 		return () => svg.remove();
 	},

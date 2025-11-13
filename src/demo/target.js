@@ -9,6 +9,8 @@ export default class {
 	element = document.createElement('div');
 	crosshair = elements.crosshair.cloneNode(true);
 	
+	#isHidden = true;
+	
 	constructor() {
 		this.element.style.display = 'contents';
 		
@@ -23,13 +25,19 @@ export default class {
 		
 		setLineStyle(this.line.element);
 		
-		elements.imageWrapper.appendChild(this.element);
+		elements.imageContainer.appendChild(this.element);
 		
 		this.hide();
 	}
 	
+	isHidden() {
+		return this.#isHidden;
+	}
+	
 	hide() {
 		this.crosshair.style.display = this.line.element.style.display = 'none';
+		
+		this.#isHidden = true;
 	}
 	
 	set({x, y}) {
@@ -50,5 +58,7 @@ export default class {
 		
 		this.crosshair.style.scale = `${1 / zoom}`;
 		this.crosshair.style.rotate = `${rotation - DEGREES[90]}rad`;
+		
+		this.#isHidden = false;
 	}
 }

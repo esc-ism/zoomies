@@ -4,7 +4,8 @@ import {DEGREES, getAngleDiff} from '@/shared';
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
 import {CLASS_FLASH_CONTAINER} from '../consts';
-import {getText, getButton, getInstruction, getInputDependent, getMath} from '../shared';
+import {getText, getInstruction, getInputDependent, getMath} from '../shared';
+import {getButton, clearButton} from '../shared/button';
 import {xmlns} from '../shared/math';
 import flash from '../shared/flash';
 
@@ -155,6 +156,8 @@ export default {
 		exitResolve();
 		
 		demo.progress.reset();
+		
+		clearButton();
 	},
 	text: getText(
 		{
@@ -337,7 +340,7 @@ export default {
 		],
 		[
 			'Pan-limits here are unaffected by zoom.',
-			'More advanced systems can take a position and derive an appropriate zoom level, which is useful when span-panning.',
+			'More advanced systems can take a position and derive an appropriate zoom level, which is useful when snap-panning.',
 			'I\'ll talk more about that later.',
 		],
 		{

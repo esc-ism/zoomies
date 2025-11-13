@@ -3,7 +3,8 @@ import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getButton, getDiagrammedMath} from '../../shared';
+import {getText, getCode, getDiagrammedMath} from '../../shared';
+import {getButton, clearButton} from '../../shared/button';
 
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 import System, {getSnappedZoom} from './demo';
@@ -186,6 +187,8 @@ export default {
 		for (const {end} of code) {
 			end();
 		}
+		
+		clearButton();
 	},
 	text: getText(
 		{
@@ -202,10 +205,10 @@ export default {
 			'Tracing along image axes allowed for efficient code and passable snap-panning, but provided an unsatisfactory pan-limiting experience.',
 			'The ideal system would always allow users to see what they want in the shortest pan possible, since that\'s their natural inclination.',
 			'For example, to see the rightmost image corner, travel directly ',
-			getButton('east', [
+			getButton('right', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
 				({zoomPoints}) => [{position: zoomPoints[3]}, {delay: 0.5}],
-				({zoomPoints}) => [{position: zoomPoints[2]}, {duration: 0}],
+				({zoomPoints}) => [{position: zoomPoints[2].end}, {duration: 0}],
 			], {getParam: () => getDirectVars()}),
 			'.',
 			'This can be achieved by swapping image axis for viewport axis-based origin rails.',
@@ -488,8 +491,7 @@ export default {
 		[
 			'As image aspect ratio gets more extreme, these windows get increasingly wide and the issues get ',
 			getButton('increasingly severe', [
-				[{position: 0, ratioImage: 2, zoom: 1}],
-				[{rotation: DEGREES[90]}, {duration: 2, delay: 0.2}],
+				[{position: 0, ratioImage: 2, zoom: 1, rotation: DEGREES[90]}],
 				[{rotation: 0}, {ease: 'none', duration: 5}],
 			], {getParam: () => getDirectVars()}),
 			'.',

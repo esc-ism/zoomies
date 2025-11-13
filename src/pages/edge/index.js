@@ -4,7 +4,8 @@ import {xmlns} from '@/pages/shared/math';
 import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
-import {getText, getCode, getButton, getInstruction, getMath, getInputDependent} from '../shared';
+import {getText, getCode, getInstruction, getMath, getInputDependent} from '../shared';
+import {getButton, clearButton} from '../shared/button';
 import {getSnapPosition} from '../center';
 
 import System from './demo';
@@ -32,6 +33,8 @@ export default {
 		for (const {end} of code) {
 			end();
 		}
+		
+		clearButton();
 	},
 	text: getText(
 		{
@@ -76,7 +79,8 @@ export default {
 			'Notice that the viewport\'s dimensions half as zoom ',
 			getButton('doubles', [
 				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
-				[{position: 0.5, zoom: 2}],
+				[{zoom: 2}],
+				[{position: 0.25}],
 			]),
 			'.',
 			'This reciprocal relationship between zoom and viewport size gives the following calculation for pan-limits along the x & y axes:',
@@ -302,7 +306,7 @@ export default {
 		],
 		[
 			'From now on, we\'ll only be looking at systems built for rotation.',
-			'Those systems will build on this one, taking various approaches to replicating and improving its behaviour.',
+			'Those systems will build on this one, taking various approaches to generalising its behaviour.',
 		],
 	),
 };

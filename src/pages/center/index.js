@@ -2,7 +2,8 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
 import {xmlns} from '../shared/math';
-import {getText, getButton, getMath} from '../shared';
+import {getText, getMath} from '../shared';
+import {getButton, clearButton} from '../shared/button';
 
 import System from './demo';
 
@@ -14,6 +15,9 @@ export const getSnapPosition = () => ({
 
 export default {
 	System,
+	end: () => {
+		clearButton();
+	},
 	text: getText(
 		{
 			tag: 'h1',
@@ -68,18 +72,14 @@ export default {
 			'Its only real issue arises when we consider snap-panning.',
 		],
 		[
-			'Say we want to ',
-			getButton('fill', [
-				() => [{rotation: DEGREES[90], zoom: 2, position: getSnapPosition(demo)}],
-			]),
-			' our screens with the top-right quadrant of the image.',
-			'We can ',
+			'Say we want to fill our screens with the top-right quadrant of the image —',
+			'we can ',
 			getButton('snap-pan', [
-				() => [{position: getSnapPosition(demo)}, {duration: 0}],
+				() => [{position: getSnapPosition(demo), zoom: 1}, {duration: 0}],
 			]),
 			' to the spot we want, but a ',
 			getButton('manual zoom', [
-				() => [{position: getSnapPosition(demo)}, {duration: 0}],
+				() => [{position: getSnapPosition(demo), zoom: 1}, {duration: 0}],
 				[{rotation: DEGREES[90], zoom: 2}, {delay: 0.2}],
 			]),
 			' is necessary to achieve the desired view.',
@@ -92,7 +92,7 @@ export default {
 		},
 		[
 			'This is a perfect pan-limiting system; it can\'t be improved without also making concessions.',
-			'Unfortunately, the disregard for zoom that helps it to excel as a pan-limiter makes it a lousy snap-panner.',
+			'Unfortunately, the disregard for zoom that helps it to excel as a pan-limiter makes it unsuited to snap-panning.',
 		],
 		[
 			'I\'ll refer to systems with pan-limits affected by zoom as "zoomful".',

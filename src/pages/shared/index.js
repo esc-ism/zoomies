@@ -1,33 +1,14 @@
-import demo from '@/demo';
 import {inputListener} from '@/consts';
 import {SUB_PIXEL_BS} from '@/shared';
 
 import generateCode from '../code';
 import {
-	CLASS_BUTTON, CLASS_CODE, CLASS_WRAPPER, TWEENS_RESET,
-	CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER, CLASS_BUTTON_ACTIVE,
+	CLASS_CODE, CLASS_WRAPPER, CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
 	CLASS_MATH_TITLE, CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_BODY,
 } from '../consts';
 
 import * as move from './svg/move';
 import {xmlns} from './math';
-
-let activeButton;
-
-for (const action of Object.keys(demo.listeners)) {
-	demo.hooks[action].add(() => {
-		if (activeButton) {
-			activeButton.removeEventListener('blur', releaseButton);
-			activeButton.blur();
-			
-			activeButton.classList.remove(CLASS_BUTTON_ACTIVE);
-			activeButton = undefined;
-			
-			demo.deleteTween();
-			demo.progress.complete();
-		}
-	}, true);
-}
 
 const addContent = (parent, content) => {
 	if (typeof content === 'object') {
@@ -113,55 +94,6 @@ export const getCode = (callbacks, statements) => {
 	};
 };
 
-const releaseButton = () => {
-	activeButton.classList.remove(CLASS_BUTTON_ACTIVE);
-	activeButton = undefined;
-	
-	if (demo.tween.totalDuration() > 0 && demo.tween.time() > 0) {
-		demo.tween
-			.timeScale(3)
-			.reverse();
-	} else {
-		demo.tween.revert();
-		
-		demo.tween.vars.onReverseComplete();
-	}
-};
-
-export const getButton = (text, tweens, {doReset = false, getParam = () => undefined} = {}) => {
-	const resetTweens = doReset ? TWEENS_RESET : [];
-	
-	let element;
-	
-	return {
-		tag: 'span',
-		content: text,
-		classList: [CLASS_BUTTON],
-		tabIndex: 0,
-		onclick: () => {
-			if (element.isSameNode(activeButton)) {
-				element.removeEventListener('blur', releaseButton);
-				
-				releaseButton();
-				
-				return;
-			}
-			
-			element.classList.add(CLASS_BUTTON_ACTIVE);
-			activeButton = element;
-			
-			element.addEventListener('blur', releaseButton, {once: true});
-			
-			const param = getParam();
-			
-			demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
-		},
-		callback: (_element) => {
-			element = _element;
-		},
-	};
-};
-
 const getPIncluder = (() => {
 	const element = document.createElement('span');
 	
@@ -211,7 +143,6 @@ const getMathTitle = (content, isFirst = false) => {
 			} else {
 				target.nextElementSibling.style.removeProperty('display');
 			}
-		// target.parentElement.style.paddingBottom = '1px';
 		};
 	})(), xmlns, content};
 	

@@ -66,6 +66,8 @@ class ActionHook {
 	}
 }
 
+let startPosition;
+
 export default new class {
 	// todo necessary?
 	elements = elements;
@@ -144,10 +146,9 @@ export default new class {
 				const target = {...this.position};
 				
 				this.system.constrainPosition({position: true});
+				this.applyPosition();
 				
 				this.target.set(target);
-				
-				this.applyPosition();
 			};
 		},
 		rotate: () => {
@@ -182,10 +183,7 @@ export default new class {
 		},
 	};
 	
-	hooks = {
-		remove: new ActionHook(),
-		ratioChange: new ActionHook(),
-	};
+	hooks = {ratioChange: new ActionHook()};
 	
 	sizesImage = {};
 	sizesViewport = {};
@@ -437,11 +435,29 @@ export default new class {
 		}
 	}
 	
+	clearStartPosition() {
+		if (startPosition) {
+			startPosition = undefined;
+			
+			this.target.hide();
+		}
+	}
+	
 	setSystem({System, text}) {
+		if (startPosition) {
+			this.position.x = startPosition.x;
+			this.position.y = startPosition.y;
+		} else {
+			startPosition = {...this.position};
+		}
+		
 		this.system = new System();
 		this.page = text;
 		
-		this.system.constrainPosition({ratio: true});
+		this.system.constrainPosition({position: true, ratio: true});
+		this.applyPosition(true);
+		
+		this.target.set(startPosition);
 	}
 	
 	addPointerDownListener(element, target, {onStart, onFinish, get}) {
@@ -582,10 +598,10 @@ export default new class {
 		this.ratio = this.ratioViewport / this.ratioImage;
 		this.ratioInverse = 1 / this.ratio;
 		
-		this.elements.imageWrapper.style.height = `${Math.min(1, this.ratio) * 100}%`;
-		this.elements.imageWrapper.style.width = `${Math.min(1, this.ratioInverse) * 100}%`;
+		this.elements.imageContainer.style.height = `${Math.min(1, this.ratio) * 100}%`;
+		this.elements.imageContainer.style.width = `${Math.min(1, this.ratioInverse) * 100}%`;
 		
-		this.setDimensions(this.sizesImage, this.elements.imageWrapper);
+		this.setDimensions(this.sizesImage, this.elements.imageContainer);
 		
 		this.readout.setRatio(this);
 		
@@ -594,6 +610,8 @@ export default new class {
 		if (doApply) {
 			this.system.constrainPosition({ratio: true, ratioImage: true});
 			this.applyPosition();
+		} else {
+			this.clearStartPosition();
 		}
 	}
 	
@@ -616,21 +634,29 @@ export default new class {
 		}
 	}
 	
-	applyPosition() {
-		this.elements.imageWrapper.style.translate = `${-this.position.x * 100}% ${this.position.y * 100}%`;
-		this.elements.imageWrapper.style.transformOrigin = `${(0.5 + this.position.x) * 100}% ${(0.5 - this.position.y) * 100}%`;
+	applyPosition(isStart = false) {
+		if (!isStart) {
+			this.clearStartPosition();
+		}
+		
+		this.elements.imageContainer.style.translate = `${-this.position.x * 100}% ${this.position.y * 100}%`;
+		this.elements.imageContainer.style.transformOrigin = `${(0.5 + this.position.x) * 100}% ${(0.5 - this.position.y) * 100}%`;
 		
 		this.readout.setPosition(this);
 	}
 	
 	applyZoom() {
-		this.elements.imageWrapper.style.scale = `${this.zoom}`;
+		this.clearStartPosition();
+		
+		this.elements.imageContainer.style.scale = `${this.zoom}`;
 		
 		this.readout.setZoom(this);
 	}
 	
 	applyRotation() {
-		this.elements.imageWrapper.style.rotate = `${DEGREES[90] - this.rotation}rad`;
+		this.clearStartPosition();
+		
+		this.elements.imageContainer.style.rotate = `${DEGREES[90] - this.rotation}rad`;
 		
 		this.readout.setRotation(this);
 	}
@@ -643,12 +669,12 @@ export default new class {
 	}
 	
 	remove() {
-		this.system.remove();
-		
 		// triggers onReverseComplete which calls deleteTween
 		this.tween?.progress(0);
 		
 		window.clearTimeout(this.#tweenUpdateId);
+		
+		this.system.remove();
 		
 		this.target.hide();
 		
@@ -690,7 +716,7 @@ export default new class {
 				this.system.constrainPosition(effects);
 				this.applyPosition();
 				
-				if (!ignorePosition) {
+				if (!ignorePosition || !this.target.isHidden()) {
 					this.target.set(target);
 				}
 				

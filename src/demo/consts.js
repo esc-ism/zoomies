@@ -27,4 +27,5 @@ export const TWEEN_DEFAULT = {
 	ease: 'power1.inOut',
 };
 
-export const PADDING_IMAGE = 2;
+// gives rounding error leeway for zoom=1 angle=0 states to ensure 0D bounds
+export const PADDING_VIEWPORT = 1;

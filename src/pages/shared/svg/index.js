@@ -1,5 +1,7 @@
 import {SVG_NAMESPACE} from '@/shared';
 
+import {getProgressed} from '../../rotation/shared';
+
 export const getLine = ([x1, y1], [x2, y2]) => {
 	const line = document.createElementNS(SVG_NAMESPACE, 'line');
 	
@@ -11,7 +13,13 @@ export const getLine = ([x1, y1], [x2, y2]) => {
 	return line;
 };
 
-export const COLOURS = ['rgba(66, 185, 211, 1)', 'rgba(218, 160, 65, 1)', 'rgba(142, 68, 195, 1)'];
+export const getSplit = (from, to, ratio) => {
+	const {x, y} = getProgressed({x: from[0], y: from[1]}, {x: to[0], y: to[1]}, ratio);
+	
+	return [from, [x, y], to];
+};
+
+export const COLOURS = ['#42b9d3', '#daa041', '#8e44c3'];
 
 export const getBorder = (rX, rY, strokeDiameter) => {
 	const border = document.createElementNS(SVG_NAMESPACE, 'path');
