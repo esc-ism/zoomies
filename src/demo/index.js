@@ -870,6 +870,8 @@ export default new class {
 			.eventCallback('onReverseComplete', () => {
 				this.tween.vars.onUpdate();
 				
+				this.tween.revert();
+				
 				this.deleteTween(false);
 			})
 			.play();

@@ -268,7 +268,7 @@ const getCsvs = (statement, scope, meta, indent, property = 'and') => {
 	return {values, elements, unbroken, shapeData};
 };
 
-const getLine = ({value: length, doCenter = false, isPercent = true}, rotation) => {
+const getLine = ({value: length, doCenter = false, isPercent = true}, rotation, isX) => {
 	const line = new visualClasses.Line(false, false, doCenter);
 	
 	line.setPosition({x: 0, y: 0});
@@ -281,6 +281,8 @@ const getLine = ({value: length, doCenter = false, isPercent = true}, rotation) 
 	
 	if (!isPercent) {
 		height /= demo.sizesImage.height;
+	} else if (isX) {
+		height *= demo.ratioImage;
 	}
 	
 	if (height < 0) {
@@ -309,7 +311,7 @@ const visualisers = {
 			demo.applyZoom();
 		};
 	},
-	x: (scope, id) => getLine(scope[id], 0),
+	x: (scope, id) => getLine(scope[id], 0, true),
 	y: (scope, id) => getLine(scope[id], DEGREES[90]),
 	xvp: (scope, id) => getLine(scope[id], DEGREES[90] - demo.rotation),
 	yvp: (scope, id) => getLine(scope[id], DEGREES[180] - demo.rotation),

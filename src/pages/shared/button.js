@@ -21,9 +21,13 @@ for (const action of Object.keys(demo.listeners)) {
 	demo.hooks[action].add(clearButton, true);
 }
 
-const releaseButton = () => {
+const releaseButton = (event) => {
 	activeButton.classList.remove(CLASS_BUTTON_ACTIVE);
 	activeButton = undefined;
+	
+	if (event?.relatedTarget?.classList.contains(CLASS_BUTTON)) {
+		return;
+	}
 	
 	if (demo.tween.totalDuration() > 0 && demo.tween.time() > 0) {
 		demo.tween

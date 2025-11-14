@@ -1,10 +1,10 @@
 import {DEGREES} from '@/shared';
 
-import {getText, getCode, getDiagrammedMath} from '../../shared';
-import {getButton, clearButton} from '../../shared/button';
 import {cleanup, register as registerFunctions} from '../../code';
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
-import {getOverlined, xmlns} from '../../shared/math';
+import {getText, getCode, getDiagrammedMath} from '../../shared';
+import {getButton, clearButton} from '../../shared/button';
+import {xmlns} from '../../shared/math';
 
 import * as mock from '../mock';
 import {permissiveTweens, restrictiveTweens} from '../1line';
@@ -18,7 +18,7 @@ import getZoomPoints from './zoomPoints';
 
 const code = [];
 
-const getLimitedPosition = (limit = 0.4) => Math.max(-limit, Math.min(limit, Math.random() - 0.5));
+const getLimitedPosition = (limit = 0.3) => Math.max(-limit, Math.min(limit, Math.random() - 0.5));
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
@@ -306,14 +306,14 @@ export default {
 			'In this system, ',
 			getButton('origin rails', [
 				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}],
-				[{position: 0.5}, {delay: 0.5}],
-				({second}) => [{zoom: second.z}, {duration: 3, position: '<'}],
+				[{position: 0.5}, {delay: 0.1}],
+				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {duration: 3, position: '<'}],
 			], {getParam: () => getTraceVars()}),
 			'  follow image axes until they intersect ',
 			getButton('lock rails', [
-				({rotation, ratio, zoomPoints}) => [{position: zoomPoints[2], ratio, rotation, zoom: zoomPoints[2].z}],
-				[{position: 0.5}, {delay: 0.5}],
-				({zoomPoints}) => [{zoom: zoomPoints[2].z * 2}, {duration: 3, position: '<'}],
+				({rotation, ratio, zoomPoints}) => [{position: zoomPoints[3], ratio, rotation, zoom: zoomPoints[3].z}],
+				[{position: 0.5}, {delay: 0.1}],
+				({zoomPoints}) => [{zoom: zoomPoints[3].z * 2}, {duration: 3, position: '<'}],
 			], {getParam: () => getTraceVars()}),
 			'.',
 			'Origin rails follow whichever axis minimises lock rail length.',
@@ -325,7 +325,7 @@ export default {
 		},
 		[
 			'Each lock point must be on a different viewport edge, and adjacent corners will have lock points on adjacent edges.',
-			'Since we\'re focusing on the top-left and top-right image corners, we can say that one will be a viewport side corner and the other a vewport base corner.',
+			'Since we\'re focusing on adjacent (top-left and top-right) image corners, we can say that one will be a viewport side corner and the other a vewport base corner.',
 			'This assignment will be based off rotation, with corners alternating between base and side every 90°.',
 		],
 		// todo define "lock angle"
@@ -334,9 +334,7 @@ export default {
 			'There are four kinds of lock rail;',
 			'they can start from either axis and end at either a side or base corner.',
 			'Each of the four variations has slightly different formulae, but they all present similar problems with similar solutions.',
-			'Demonstrated below is an x-axis, base corner problem, where ',
-			{tag: 'math', xmlns, style: {fontSize: '0.8em'}, content: getOverlined('AC')},
-			' is the lock rail.',
+			'Demonstrated below is an x-axis, base corner problem.',
 			'The diagram is used to derive start zoom and start position formulae.',
 		],
 		getDiagrammedMath(

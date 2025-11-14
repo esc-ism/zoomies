@@ -66,24 +66,24 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Despite its simplicity, this system actually works wonderfully.',
+			// todo you're unsure about "wonderfully"
+			'Despite its simplicity, this system works wonderfully.',
 			'Its intuitive, unrestrictive pan-limits provide a frictionless user experience, and the code is hyper-efficient.',
 			'In most cases, I think it\'s the best solution.',
-			'Its only real issue arises when we consider snap-panning.',
+			'Its only deficiency arises when we consider snap-panning.',
 		],
 		[
-			'Say we want to fill our screens with the top-right quadrant of the image —',
-			'we can ',
-			getButton('snap-pan', [
+			'Say you want to fill your screen with the top-right quadrant of the image —',
+			'it\'d be nice if ',
+			getButton('snap-panning', [
 				() => [{position: getSnapPosition(demo), zoom: 1}, {duration: 0}],
 			]),
-			' to the spot we want, but a ',
-			getButton('manual zoom', [
+			' could give you the desired view without having to ',
+			getButton('zoom', [
 				() => [{position: getSnapPosition(demo), zoom: 1}, {duration: 0}],
 				[{rotation: DEGREES[90], zoom: 2}, {delay: 0.2}],
 			]),
-			' is necessary to achieve the desired view.',
-			'It\'d be nice if an appropriate zoom could be applied automatically.',
+			' manually.',
 		],
 		{
 			tag: 'h2',
@@ -99,7 +99,7 @@ export default {
 			'All future systems will be zoomful.',
 		],
 		[
-			'A sensible way to apply these systems is to pair this one with an upcoming system, using the other system solely for snap-pans.',
+			'A sensible way to apply these systems is to pair this one with a zoomful system, using the other system solely for snap-pans.',
 			'If your image can\'t be rotated, its ideal partner is the next system up.',
 		],
 	),

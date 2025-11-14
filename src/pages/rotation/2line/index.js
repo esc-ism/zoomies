@@ -484,7 +484,7 @@ export default {
 			'Within them, at pre-inversion zooms, the system provides ',
 			getButton('insufficiently restrictive', [
 				({ratioImage, rotation, zoomPoints}) => [{ratioImage, rotation, position: 0, zoom: zoomPoints[3].z + 0.01}],
-				({second: {x, y}}) => [{x, y}],
+				({zoomPoints}) => [{position: zoomPoints[3]}],
 			], {getParam: getVarGetter(DEGREES[135], 0.6)}),
 			' pan-limits',
 		],
@@ -505,7 +505,7 @@ export default {
 			'In all prior systems, it was straightforward to rule out pairs of rails that didn\'t need checking.',
 			'Here, however, the region in which the position lies is no longer obvious.',
 			'Plus, even if a snap zoom is found in one region, the bound inversion behaviour means that another valid zoom may exist in another region.',
-			'For simplicity, I neglect to rule out rail pairings and check every region.',
+			'For simplicity, I check every region.',
 		],
 		[
 			'The system\'s efficiency per rail pair is similar to that of the prior.',
@@ -545,8 +545,12 @@ export default {
 		},
 		[
 			'This system\'s less efficient and even worse at pan-limiting than the prior.',
-			'Not ideal!',
+			'It\'s actually the only system I\'ve discussed that has no justifiable application - even Unbound is useful in ', {tag: 'i', content: 'some'}, ' contexts.',
 		],
+		{
+			content: 'Not ideal!',
+			style: {textAlign: 'center'},
+		},
 		[
 			'Outside of the problem windows, however, it is exactly what I\'m looking for.',
 			'The system shows that this approach to origin rails has promise, but it needs an innovation.',

@@ -1130,7 +1130,7 @@ export default {
 		),
 		[
 			'The other main additions are conditions to identify which of the two possible corners connecting rails should point towards.',
-			'I\'ve also had to include special case checks for when corner rails and connecting rails have identical gradients, or when they\'re similar enough that rounding errors become catastrophic.',
+			'I\'ve also had to include special case checks for when corner rails and connecting rails have identical gradients, or when they\'re similar enough that rounding errors keep my code from finding accurate intersections.',
 		],
 		getCode(code, [
 			{op: '=', id: [
@@ -1231,8 +1231,8 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Despite introducing an additional rail, this system still only needs two or three checks per region, depending on whether adjacent corners share a connecting rail.',
 			'It turns out that it\'s never necessary to consider origin rails in snap zoom calculation, so nothing much has changed from the two-line systems.',
+			'We still only need two or three checks per region, depending on whether adjacent corners share a connecting rail.',
 		],
 		[
 			'It\'s definitely possible to pinpoint the snap position\'s region here, but it\'d be tricky.',

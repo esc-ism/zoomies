@@ -137,7 +137,6 @@ const functions = [
 	]},
 ];
 
-// todo rename
 let getLockVars;
 
 export default {
@@ -181,8 +180,8 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'We\'ll call the zoom at which bounds start progressing along a rail its "start zoom".',
-			'To know each rail\'s start zoom, we need to find the maximum zoom at which image corners are visible from the origin.',
+			'A rail\'s "start zoom" is the zoom at which bounds start progressing along it.',
+			'To assign start zooms, we need to find the maximum zoom at which image corners are visible from the origin.',
 			'Adjacent rails can differ, but opposite rails always share a start zoom.',
 			'Knowing this, only the top-left and top-right corners need be considered.',
 		],
@@ -1020,8 +1019,8 @@ export default {
 		],
 		[
 			'The image is split into four "regions" by its rails.',
-			'The first step in finding a snap zoom is to find the region that our snap point lies within.',
-			'This is accomplished by finding the image corners that, alongside the origin, enclose the region.',
+			'The first step in finding a snap zoom is to find the region that the snap point lies within.',
+			'Specifically, we need to know which image corners enclose the region, alongside the origin.',
 		],
 		getCode(code, [
 			{op: '=', id: ['toX0', 'toY0', 'toX1', 'toY1'], and: {
@@ -1030,7 +1029,16 @@ export default {
 		]),
 		[
 			'The next step is to define two rails with matching start zooms that border the region.',
-			'For this, we take the existing rails and trim the one with a lower start zoom.',
+			'For this, we take the existing rails and trim the one with a ',
+			getButton('lower', [
+				({zoomPoints, rotation, ratio}) => [{position: 0, zoom: zoomPoints[0].z, ratio, rotation}],
+				({zoomPoints}) => [{zoom: zoomPoints[1].z}, TWEEN_OPTIONS_YOYO],
+			], {
+				getParam: () => demo.ratioViewport < 1 ?
+						getVarGetter(DEGREES[90] - 0.5, 0.5)() :
+						getVarGetter(-DEGREES[270] + 0.5, 2)(),
+			}),
+			' start zoom.',
 		],
 		getCode(code, [
 			{op: '=', id: ['fromX0', 'fromY0'], and: {
@@ -1051,14 +1059,14 @@ export default {
 			}},
 		]),
 		[
-			'The final step is to find some fraction of rail length "', {tag: 'i', content: 't'}, '" such that a line through both rails at ', {tag: 'i', content: 't'}, ' also passes through the snap point.',
+			'The final step is to find some fraction "', {tag: 'i', content: 't'}, '" of rail length such that a line through both rails at ', {tag: 'i', content: 't'}, ' also passes through the snap point.',
 			'A kindred spirit gives a more detailed description of the problem ',
 			{
 				tag: 'a',
 				href: 'https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point',
 				content: 'here',
 			},
-			', including an excellent diagram that may help you to visualise the goal.',
+			', including an excellent diagram that you may find helpful.',
 		],
 		[
 			'We can write out a definition of rail points at ', {tag: 'i', content: 't'}, ' using ',
@@ -1126,8 +1134,9 @@ export default {
 			]},
 		]}),
 		[
-			'We need to define one line for each rail, each travelling through the rail at some ', {tag: 'i', content: 't'}, ' and the snap point.',
-			{tag: 'i', content: 't'}, ' is correct when these lines are parallel.',
+			'We need to define one line for each rail.',
+			'Each line must pass through the snap point and intersect its rail at some ', {tag: 'i', content: 't'}, '.',
+			'At the correct ', {tag: 'i', content: 't'}, ' value, the lines will be parallel.',
 			'Knowing that parallel lines share a gradient, we can use ',
 			{tag: 'span', content: 'm = dY / dX', style: {whiteSpace: 'nowrap'}},
 			' to write the equation we\'re trying to solve.',
@@ -1719,7 +1728,7 @@ export default {
 		},
 		'Okay! Now that we\'ve gone through how snap-panning works, how useful is it in practise?',
 		[
-			'Like with pan-limiting, it\'s perfect until we decouple aspect ratios.',
+			'Like with pan-limiting, it works perfectly until we decouple aspect ratios.',
 			'Being too restrictive isn\'t as much of an issue here, but being too permissive isn\'t ideal.',
 			'Consider ',
 			getButton('this', [
@@ -1727,7 +1736,7 @@ export default {
 				[{y: 0.25, zoom: 2}, {duration: 0}],
 			]),
 			' snap-pan.',
-			'Not zooming in enough to hide the empty space above the image doesn\'t make much sense. ',
+			'Not zooming in enough to hide the empty space above the image doesn\'t make much sense.',
 			getButton('Increasing', [
 				[{ratio: 0.25, rotation: DEGREES[90], position: 0}],
 				[{y: 0.25, zoom: 2}, {duration: 0}],
@@ -1740,8 +1749,13 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Unfortunately, a system with single-line rails doesn\'t produce satisfactory behaviour;',
-			'its pan-limits can be too restrictive and, when image and viewport don\'t share an aspect ratio, it fails to reproduce the prior system\'s behaviour for un-rotated images.',
+			'Single-line rails don\'t fulfill my needs; pan-limits can be too restrictive or too permissive,',
+			'and the prior system\'s behaviour for un-rotated images isn\'t reliable reproduced.',
+		],
+		[
+			'Notably, however, these problems only apply when the image and viewport have different aspect ratios.',
+			'Oftentimes, viewports will be sized to exactly match their contents.',
+			'When said contents can be rotated, this system has a valid use case.',
 		],
 	),
 };

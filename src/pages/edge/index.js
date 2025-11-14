@@ -1,3 +1,4 @@
+import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
@@ -67,7 +68,19 @@ export default {
 			' (they can be a ',
 			{tag: 'a', content: 'rhombus', href: 'https://en.wikipedia.org/wiki/Rhombus'},
 			' in upcoming systems, but not this one).',
-			'The new playground lines plot all possible positions of line segment endpoints and parallelogram corners.',
+			'The new playground ',
+			// todo rubbish; flash white lines over rails or make them brighter when you click this
+			getButton('lines', [
+				[{zoom: 1, position: 0}],
+				({zoomPoints}) => [{position: zoomPoints[1]}, {duration: 0}],
+				({zoomPoints}) => [{position: zoomPoints[1]}, {delay: 0.5, duration: 0}],
+				({zoomPoints}) => [{zoom: zoomPoints[1].z, position: zoomPoints[1]}, {delay: 0.5}],
+				() => [{position: 0.5}, {duration: 0}],
+				({lowAxis}) => [{[lowAxis === 'y' ? 'x' : 'y']: -0.5}, {delay: 0.5, duration: 0}],
+				() => [{position: -0.5}, {delay: 0.5, duration: 0}],
+				({lowAxis}) => [{[lowAxis === 'y' ? 'x' : 'y']: 0.5}, {delay: 0.5, duration: 0}],
+			], {getParam: () => demo.system}),
+			' plot all possible positions of line segment endpoints and parallelogram corners.',
 			'I will refer to them as "rails", since bounds appear to travel along them.',
 		],
 		{
@@ -83,7 +96,7 @@ export default {
 				[{position: 0.25}],
 			]),
 			'.',
-			'This reciprocal relationship between zoom and viewport size gives the following calculation for pan-limits along the x & y axes:',
+			'This reciprocal relationship between zoom and viewport size gives the following calculation for pan-limits:',
 		],
 		getInstruction(
 			[
@@ -274,8 +287,10 @@ export default {
 		[
 			'Zoom is now adjusted for us automatically when ',
 			getButton('snap-panning', [
-				[{position: 0.5, zoom: 2}, {duration: 0}],
-			]),
+				[{zoom: 1, position: 0}],
+				({lowAxis}) => [{[lowAxis === 'y' ? 'x' : 'y']: 0.25}],
+				({zoomPoints}) => [{zoom: zoomPoints[1].z * 2}, {duration: 0}],
+			], {getParam: () => demo.system}),
 			'.',
 			'Position will even be ',
 			getButton('corrected', [
@@ -306,7 +321,7 @@ export default {
 		],
 		[
 			'From now on, we\'ll only be looking at systems built for rotation.',
-			'Those systems will build on this one, taking various approaches to generalising its behaviour.',
+			'All upcoming systems will be based on this one, taking various approaches to generalising its behaviour.',
 		],
 	),
 };
