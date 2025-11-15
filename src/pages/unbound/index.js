@@ -336,7 +336,7 @@ export default {
 		],
 		[
 			'You can imagine how someone might slide away from the image and become lost in the void.',
-			'Pan-limiting systems prevent this by keeping users from the no-man\'s land beyond the confines of the image.',
+			'Pan-limiting systems prevent this by keeping users from straying too far beyond the confines of the image.',
 		],
 		[
 			'Pan-limits here are unaffected by zoom.',

@@ -305,9 +305,9 @@ const visualisers = {
 		demo.zoom = scope[id].value;
 		demo.applyZoom();
 		
+		demo.zoom = zoom;
+		
 		return () => {
-			demo.zoom = zoom;
-			
 			demo.applyZoom();
 		};
 	},
@@ -511,9 +511,19 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 			}
 		}
 		
-		if (doShowVisuals) {
-			visuals.push(visualise(scope, ...ids));
+		if (!doShowVisuals) {
+			return;
 		}
+		
+		if (visuals.length === 0) {
+			demo.hooks.any.add(() => {
+				cleanup();
+				
+				return true;
+			});
+		}
+		
+		visuals.push(visualise(scope, ...ids));
 	});
 	
 	element.addEventListener('mouseleave', () => {

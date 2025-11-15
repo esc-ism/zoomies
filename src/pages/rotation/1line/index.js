@@ -166,11 +166,6 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Because the last system was so simple, it\'s obvious that there\'s no way to improve its behaviour for un-rotated images.',
-			'This won\'t be the case for rotated images;',
-			'there are myriad approaches to pan-limiting, some more effective than others, but no clear "perfect" solution.',
-		],
-		[
 			'This is the simplest possible zoomful system that can handle image rotation.',
 			'The rail to each image corner is a direct, single line (hence the page\'s title) from the image\'s origin.',
 		],
@@ -180,7 +175,18 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'A rail\'s "start zoom" is the zoom at which bounds start progressing along it.',
+			'A rail\'s "start zoom" is the zoom at which bounds ',
+			getButton('start progressing', [
+				(zoom) => [{zoom, position: 0}],
+				(zoom) => [{zoom: zoom * 1.05}, TWEEN_OPTIONS_YOYO],
+			], {
+				getParam: () => {
+					const {zoomPoints} = demo.system;
+					
+					return zoomPoints[zoomPoints[0].z < zoomPoints[1].z ? 0 : 1].z;
+				},
+			}),
+			' along it.',
 			'To assign start zooms, we need to find the maximum zoom at which image corners are visible from the origin.',
 			'Adjacent rails can differ, but opposite rails always share a start zoom.',
 			'Knowing this, only the top-left and top-right corners need be considered.',
@@ -203,7 +209,7 @@ export default {
 		[
 			'Finding the start zooms requires some trigonometry.',
 			'We need to find the viewport sizes at which its edges might contact the image corner.',
-			'Using the top-left image corner as an example, a diagram of the problem is given below, followed by its solution.',
+			'A solution is given below, using the top-left image corner as an example.',
 		],
 		getInstruction([
 			[
@@ -1075,7 +1081,7 @@ export default {
 				href: 'https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support',
 				content: 'linear interpolation',
 			},
-			', aka "lerp".',
+			'.',
 		],
 		getMath({content: [
 			{tag: 'mtable', xmlns, content: [

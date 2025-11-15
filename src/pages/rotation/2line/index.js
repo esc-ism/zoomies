@@ -197,10 +197,6 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'New idea! Let\'s move the goalposts!',
-			'Can we find a system that handles rotation and succeeds at both pan-limiting ', {tag: 'i', content: 'and'}, ' snap-panning?',
-		],
-		[
 			'The prior system\'s inadequacies stemmed from my approach to origin rails.',
 			'Tracing along image axes allowed for efficient code and passable snap-panning, but provided an unsatisfactory pan-limiting experience.',
 			'The ideal system would always allow users to see what they want in the shortest pan possible, since that\'s their natural inclination.',
@@ -225,7 +221,7 @@ export default {
 		[
 			'Origin rails retain the same start zooms, but now travel directly towards viewport edge midpoints.',
 			'This requires us to find the coordinates of these midpoints.',
-			'Using the base image corners and the viewport\'s top edge as an example, a diagram of the problem is given below, followed by its solution.',
+			'A solution is given below, using the base image corners and the viewport\'s top edge as an example.',
 		],
 		getDiagrammedMath(
 			pointsImage,
@@ -508,8 +504,8 @@ export default {
 			'For simplicity, I check every region.',
 		],
 		[
-			'The system\'s efficiency per rail pair is similar to that of the prior.',
-			'Given that 4 rail pairs must be checked instead of just one, it ends up running around 4 times slower.',
+			'The system\'s efficiency per rail pair is similar to that of the prior',
+			'but, since four rail pairs must be checked instead of just one, it ends up running around four times slower.',
 		],
 		'If there\'s more than one possible snap zoom, the higher value is used.',
 		getCode(code, [

@@ -58,7 +58,7 @@ export default {
 			'Whereas the prior system had fixed pan-limits, from now on bounds will ',
 			getButton('grow and shrink', [
 				[{zoom: 1, position: 0}, {duration: 0}],
-				[{zoom: 1.5}, TWEEN_OPTIONS_YOYO],
+				[{zoom: 1.25}, TWEEN_OPTIONS_YOYO],
 			]),
 			' alongside zoom.',
 			'Bounds may be a point at the image\'s origin, a ',
@@ -139,12 +139,12 @@ export default {
 			'Aspect ratio dictates the zooms at which each starts growing, with ratios ',
 			getButton('over 1', [
 				[{ratio: 1, zoom: 1}],
-				[{ratio: 2}, {ease: 'none', duration: 2.5}],
+				[{ratio: 2}, {ease: 'none', duration: 1}],
 			]),
 			' affecting ', {tag: 'i', content: 'boundX'}, '\'s minimum zoom and ratios ',
 			getButton('below 1', [
 				[{ratio: 1, zoom: 1}],
-				[{ratio: 0.5}, {ease: 'none', duration: 2.5}],
+				[{ratio: 0.5}, {ease: 'none', duration: 1}],
 			]),
 			' affecting ', {tag: 'i', content: 'boundY'}, '\'s.',
 		],

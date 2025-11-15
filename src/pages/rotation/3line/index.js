@@ -1188,11 +1188,16 @@ export default {
 				() => [{rotation: demo.rotation - DEGREES[360]}, {ease: 'none', duration: 4}],
 			]),
 			', providing a more consistent and reliable experience.',
-			'Besides patching issues, the connecting rails even enhance the system\'s ability to show two corners simultaneously!',
+			'Besides patching issues, the connecting rails even enhance the system\'s ability to show ',
+			getButton('two corners', [
+				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: third}],
+				({third}) => [{zoom: third.z}, TWEEN_OPTIONS_YOYO],
+			], {getParam: () => getDirectVars()}),
+			' simultaneously!',
 		],
 		[
 			'I find this system to be a satisfactory improvement over "Double-Line" too.',
-			'The changes have been successful in minimising distance to bounds corners without sacrificing image visibility.',
+			'The changes have been successful in minimising distance to bounds\' vertices without sacrificing image visibility.',
 		],
 		[
 			'Zoomful systems have unavoidable drawbacks.',
@@ -1260,7 +1265,7 @@ export default {
 			'I\'d be comfortable calling it an improved snap-panning system.',
 			'"Double-Line", on the other hand, has no obvious flaw to fix.',
 			'Even if I added region-checking code to this system, it would be more complex and inefficient than Double-Line\'s.',
-			'Since both exhibit acceptable behaviour, Double-Line\'s efficiency makes the preferable standalone snap-panner.',
+			'Since both exhibit acceptable behaviour, Double-Line\'s efficiency makes it the preferable standalone snap-panner.',
 		],
 		{
 			tag: 'h2',
@@ -1268,14 +1273,17 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'We did it!',
-			'Presented here is a system that succeeds on both fronts.',
-			'Like I mentioned at the start of our rotation odyssey, it\'s much harder to identify "perfect" behaviour here than with the early systems.',
-			'No doubt a different approach could produce a better system, but this one lacks an obvious flaw.',
+			'This is a system that succeeds on both fronts.',
+			'It does all that\'s required to be considered a success, despite my ambitious requirements.',
+			'It\'s likely that a different approach could produce something wholly superior,',
+			'but this is the final form of my line of reasoning.',
 		],
 		[
-			'Although this page represents the culmination of my labour, it\'s more conceptually interesting than practically useful.',
+			'And with that, we\'re done!',
+			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful.',
 			'Nevertheless, I\'m glad to have done the work.',
+		],
+		[
 			'This all started from an idea for a userscript and a feeling that I ',
 			{
 				tag: 'i',

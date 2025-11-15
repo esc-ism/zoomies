@@ -183,7 +183,10 @@ export default new class {
 		},
 	};
 	
-	hooks = {ratioChange: new ActionHook()};
+	hooks = {
+		ratioChange: new ActionHook(),
+		any: new ActionHook(),
+	};
 	
 	sizesImage = {};
 	sizesViewport = {};
@@ -433,14 +436,14 @@ export default new class {
 				return listener(...args);
 			};
 		}
-	}
-	
-	clearStartPosition() {
-		if (startPosition) {
-			startPosition = undefined;
-			
-			this.target.hide();
-		}
+		
+		this.hooks.any.add(() => {
+			if (startPosition) {
+				startPosition = undefined;
+				
+				this.target.hide();
+			}
+		}, true);
 	}
 	
 	setSystem({System, text}) {
@@ -611,7 +614,7 @@ export default new class {
 			this.system.constrainPosition({ratio: true, ratioImage: true});
 			this.applyPosition();
 		} else {
-			this.clearStartPosition();
+			this.hooks.any.emit();
 		}
 	}
 	
@@ -636,7 +639,7 @@ export default new class {
 	
 	applyPosition(isStart = false) {
 		if (!isStart) {
-			this.clearStartPosition();
+			this.hooks.any.emit();
 		}
 		
 		this.elements.imageContainer.style.translate = `${-this.position.x * 100}% ${this.position.y * 100}%`;
@@ -646,7 +649,7 @@ export default new class {
 	}
 	
 	applyZoom() {
-		this.clearStartPosition();
+		this.hooks.any.emit();
 		
 		this.elements.imageContainer.style.scale = `${this.zoom}`;
 		
@@ -654,7 +657,7 @@ export default new class {
 	}
 	
 	applyRotation() {
-		this.clearStartPosition();
+		this.hooks.any.emit();
 		
 		this.elements.imageContainer.style.rotate = `${DEGREES[90] - this.rotation}rad`;
 		

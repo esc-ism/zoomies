@@ -70,7 +70,7 @@ export default {
 			'Despite its simplicity, this system works wonderfully.',
 			'Its intuitive, unrestrictive pan-limits provide a frictionless user experience, and the code is hyper-efficient.',
 			'In most cases, I think it\'s the best solution.',
-			'Its only deficiency arises when we consider snap-panning.',
+			'Only when tasked with facilitating snap-pans is it found lacking.',
 		],
 		[
 			'Say you want to fill your screen with the top-right quadrant of the image —',
@@ -99,7 +99,7 @@ export default {
 			'All future systems will be zoomful.',
 		],
 		[
-			'A sensible way to apply these systems is to pair this one with a zoomful system, using the other system solely for snap-pans.',
+			'A sensible way to apply these systems is to pair this one with a zoomful system that\'s used solely for snap-pans.',
 			'If your image can\'t be rotated, its ideal partner is the next system up.',
 		],
 	),

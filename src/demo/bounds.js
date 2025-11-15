@@ -6,10 +6,11 @@ import {Connection} from './lines/lines';
 export const setLineStyle = (() => {
 	const length = 6;
 	const gap = 8;
-	const value = `repeating-linear-gradient(transparent, white 0, white ${length}px, transparent 0, transparent ${length + gap}px)`;
+	const value = `repeating-linear-gradient(white 0, white ${length}px, transparent 0, transparent ${length + gap}px)`;
 	
 	return (element) => {
 		element.style.backgroundImage = value;
+		element.style.opacity = 0.45;
 	};
 })();
 

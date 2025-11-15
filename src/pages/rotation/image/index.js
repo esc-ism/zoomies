@@ -1,3 +1,4 @@
+import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
 import {cleanup, register as registerFunctions} from '../../code';
@@ -41,8 +42,8 @@ const getSnapTweens = (getRatio) => [
 ];
 
 const getCornerProgressTweens = (rotation) => [
-	[{ratio: 1, zoom: 1, position: 0.5}],
-	[{rotation}, {delay: 0.2}],
+	() => [{position: 0.5, ratio: demo.ratioViewport, zoom: demo.ratioViewport < 1 ? (1 / demo.ratioViewport) : demo.ratioViewport}],
+	[{rotation}, {position: '>-0.4'}],
 ];
 
 const functions = [
@@ -306,7 +307,7 @@ export default {
 			'In this system, ',
 			getButton('origin rails', [
 				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}],
-				[{position: 0.5}, {delay: 0.1}],
+				({zoomPoints}) => [{position: zoomPoints[3]}, {delay: 0.1}],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {duration: 3, position: '<'}],
 			], {getParam: () => getTraceVars()}),
 			'  follow image axes until they intersect ',
@@ -883,10 +884,18 @@ export default {
 		},
 		[
 			'This system\'s not a great pan-limiter, but it\'s an effective snap-panner.',
+			'I consider it a satisfactory complement to "Viewport Center".',
+			'The two systems synergise perfectly, covering each other\'s weakness to create a superior product.',
 		],
 		[
-			'This system achieves the goal of finding a zoomful, rotation-handling system to complement "Viewport Center".',
-			'So, uh, let\'s stop here I guess...',
+			'Good stuff!',
+			'This conclusion feels triumphal, but perhaps more second act climax than final, supreme victory.',
+			'But what\'s left to do if we already have a flawless product?',
+		],
+		[
+			'I\'d feel a lot more satisfied with this system if it wasn\'t such a weak pan-limiter.',
+			'How about we try fixing it?',
+			'Can we devise a system that handles rotation while succeeding at both pan-limiting ', {tag: 'i', content: 'and'}, ' snap-panning?',
 		],
 	),
 };
