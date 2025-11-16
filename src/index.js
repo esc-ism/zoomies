@@ -42,6 +42,15 @@ const header = (() => {
 	email.style.overflow = 'hidden';
 	email.style.textOverflow = 'ellipsis';
 	
+	const version = document.createElement('div');
+	
+	version.innerText = 'v0.1';
+	
+	version.style.opacity = '0.8';
+	version.style.position = 'absolute';
+	version.style.top = version.style.right = '4px';
+	version.style.fontSize = '0.6em';
+	
 	const buttonContainer = document.createElement('div');
 	
 	buttonContainer.style.height = '100%';
@@ -68,7 +77,7 @@ const header = (() => {
 	});
 	
 	buttonContainer.append(touchIcon, mouseIcon);
-	container.append(buttonContainer, email);
+	container.append(buttonContainer, email, version);
 	
 	return container;
 })();
