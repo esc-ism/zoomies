@@ -121,6 +121,8 @@ const tween = async (stop) => {
 				onReverseComplete();
 			});
 		})]);
+		
+		await new Promise((resolve) => window.setTimeout(resolve, 1000));
 	}
 };
 
@@ -145,21 +147,22 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Hello! I\'m Callum — a programmer.',
+			'On and off, for a few years now, I\'ve been engrossed in panning problems',
+			'(think photo editor, not gold rush).',
+			'Specifically, I\'ve been exploring how best to limit where users should be allowed to pan, and how best to facilitate "snap-panning".',
 		],
 		[
-			'For the past two years or so, I\'ve been delving into panning (the thing you do to look around after zooming in).',
-			'Specifically, I\'ve been working on  systems with rectangular content that keep all four corners viewable at all times, focusing on pan-limiting where the following are all variable:',
-			{tag: 'ul', style: {marginBlockStart: '0.5em', marginBlockEnd: '0.5em'}, content: [
+			'My scope is limited to rectangular content, keeping all four corners viewable at all times and handling the following variables:',
+			{tag: 'ul', style: {marginBlockStart: '1ex', marginBlockEnd: '0.5em'}, content: [
 				'Zoom',
-				'Rotation',
 				'Image aspect ratio',
 				'Viewport aspect ratio',
+				'Rotation',
 			].map((content) => ({tag: 'li', content}))},
 		],
 		[
 			'This website is a little interactive report of my findings.',
-			'It will walk you through the problem space and demonstrate solutions, ranging from trivial to the kind of thing that a non-mathematician might spend two years on.',
+			'It will walk you through the problems and demonstrate solutions, building from basics to the limits of my amateur capabilities.',
 		],
 		getInstruction({callback: (element) => {
 			const update = () => {

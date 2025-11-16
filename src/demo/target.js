@@ -13,10 +13,11 @@ export default class {
 	
 	constructor() {
 		this.element.style.display = 'contents';
-		
-		this.element.append(this.crosshair);
+		this.element.style.pointerEvents = 'none';
 		
 		this.line = new Connection(false, false, false, this.element);
+		
+		this.element.appendChild(this.crosshair);
 		
 		this.crosshair.style.opacity = this.line.element.style.opacity = '0.4';
 		this.crosshair.style.position = 'absolute';

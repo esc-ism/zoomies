@@ -23,7 +23,7 @@ const POINTS = [
 for (let i = 0; i < 2; ++i) {
 	const group = document.createElementNS(SVG_NAMESPACE, 'g');
 	
-	group.setAttribute('stroke', COLOURS[i]);
+	group.setAttribute('stroke', COLOURS[i + 1]);
 	
 	group.append(...POINTS.map((points) => getMirroredLine(points[i], points[i + 1])).flat());
 	

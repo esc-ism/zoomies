@@ -76,12 +76,13 @@ export default {
 			'Say you want to fill your screen with the top-right quadrant of the image —',
 			'it\'d be nice if ',
 			getButton('snap-panning', [
-				() => [{position: getSnapPosition(demo), zoom: 1}, {duration: 0}],
+				[{rotation: DEGREES[90], zoom: 1}],
+				() => [{position: getSnapPosition(demo)}, {duration: 0}],
 			]),
 			' could give you the desired view without having to ',
 			getButton('zoom', [
-				() => [{position: getSnapPosition(demo), zoom: 1}, {duration: 0}],
-				[{rotation: DEGREES[90], zoom: 2}, {delay: 0.2}],
+				() => [{rotation: DEGREES[90], position: getSnapPosition(demo), zoom: 1}, {duration: 0}],
+				[{zoom: 2}, {delay: 0.2}],
 			]),
 			' manually.',
 		],
@@ -91,16 +92,11 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'This is a perfect pan-limiting system; it can\'t be improved without also making concessions.',
-			'Unfortunately, the disregard for zoom that helps it to excel as a pan-limiter makes it unsuited to snap-panning.',
-		],
-		[
-			'I\'ll refer to systems with pan-limits affected by zoom as "zoomful".',
+			'The disregard for zoom that helps this system to excel as a pan-limiter makes it unsuited to snap-panning.',
+			'It works best paired with a "zoomful" system to cover its weakness.',
+			'Zoomful systems have zoom-dependent pan-limits.',
 			'All future systems will be zoomful.',
 		],
-		[
-			'A sensible way to apply these systems is to pair this one with a zoomful system that\'s used solely for snap-pans.',
-			'If your image can\'t be rotated, its ideal partner is the next system up.',
-		],
+		'If your image can\'t be rotated, this system\'s ideal partner is the next one up.',
 	),
 };

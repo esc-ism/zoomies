@@ -47,6 +47,18 @@ class ActionHook {
 		global: [],
 	};
 	
+	remove(listener, isGlobal = false) {
+		const listeners = this.listeners[isGlobal ? 'global' : 'local'];
+		
+		for (let i = listeners.length - 1; i >= 0; --i) {
+			if (listener === listeners[i]) {
+				listeners.splice(i, 1);
+				
+				return;
+			}
+		}
+	}
+	
 	add(listener, isGlobal = false) {
 		this.listeners[isGlobal ? 'global' : 'local'].push(listener);
 	}
@@ -433,6 +445,8 @@ export default new class {
 					this.hooks[key].emit();
 				}, 0);
 				
+				this.hooks.any.emit();
+				
 				return listener(...args);
 			};
 		}
@@ -458,7 +472,7 @@ export default new class {
 		this.page = text;
 		
 		this.system.constrainPosition({position: true, ratio: true});
-		this.applyPosition(true);
+		this.applyPosition();
 		
 		this.target.set(startPosition);
 	}
@@ -613,8 +627,6 @@ export default new class {
 		if (doApply) {
 			this.system.constrainPosition({ratio: true, ratioImage: true});
 			this.applyPosition();
-		} else {
-			this.hooks.any.emit();
 		}
 	}
 	
@@ -637,11 +649,7 @@ export default new class {
 		}
 	}
 	
-	applyPosition(isStart = false) {
-		if (!isStart) {
-			this.hooks.any.emit();
-		}
-		
+	applyPosition() {
 		this.elements.imageContainer.style.translate = `${-this.position.x * 100}% ${this.position.y * 100}%`;
 		this.elements.imageContainer.style.transformOrigin = `${(0.5 + this.position.x) * 100}% ${(0.5 - this.position.y) * 100}%`;
 		
@@ -649,16 +657,12 @@ export default new class {
 	}
 	
 	applyZoom() {
-		this.hooks.any.emit();
-		
 		this.elements.imageContainer.style.scale = `${this.zoom}`;
 		
 		this.readout.setZoom(this);
 	}
 	
 	applyRotation() {
-		this.hooks.any.emit();
-		
 		this.elements.imageContainer.style.rotate = `${DEGREES[90] - this.rotation}rad`;
 		
 		this.readout.setRotation(this);
@@ -809,6 +813,8 @@ export default new class {
 	}
 	
 	setTween(...targets) {
+		this.hooks.any.emit();
+		
 		if (this.tween) {
 			this.deleteTween();
 		}

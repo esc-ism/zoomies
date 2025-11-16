@@ -846,7 +846,7 @@ export default {
 		],
 		[
 			'It\'s possible for a lock rail to intersect with its origin rail before its connecting rail.',
-			'In these instances, the connecting rail isn\'t used.',
+			'In these instances, that corner\'s connecting rail isn\'t used.',
 		],
 		{
 			tag: 'h2',
@@ -877,7 +877,7 @@ export default {
 			], {getParam: () => getDirectVars()}),
 			', but how can we find these corners\' coordinates?',
 			'You might notice that this is reminiscent of the prior system\'s viewport midpoint problem.',
-			'Conveniently, we can re-use those maths and locate corners by summing midpoint coordinates!',
+			'Conveniently, we can re-use those maths and locate corners by summing midpoint coordinates.',
 		],
 		[
 			'Before, we calculated top and right-side midpoints at different zoom levels (used here as origin and connecting rail start zooms).',
@@ -1274,24 +1274,14 @@ export default {
 		},
 		[
 			'This is a system that succeeds on both fronts.',
-			'It does all that\'s required to be considered a success, despite my ambitious requirements.',
+			'It does all that\'s required to be considered a success, despite my creeping scope.',
 			'It\'s likely that a different approach could produce something wholly superior,',
-			'but this is the final form of my line of reasoning.',
+			'but my line of reasoning dead-ends here.',
 		],
 		[
 			'And with that, we\'re done!',
 			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful.',
-			'Nevertheless, I\'m glad to have done the work.',
-		],
-		[
-			'This all started from an idea for a userscript and a feeling that I ',
-			{
-				tag: 'i',
-				content: 'should',
-			},
-			' be able to code it.',
-			'From there, fixation became obsession and my project\'s scope ballooned way beyond what was sensible.',
-			'Still, having broke the surface of this abyss, I\'m proud to have pushed my limits so far.',
+			'Nevertheless, I\'m glad to have seen my vision through and proud to have pushed my limits so far.',
 		],
 		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
 	),

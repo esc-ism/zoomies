@@ -64,7 +64,7 @@ const instructions = [
 		validator: new Validator(
 			() => ({...demo.position}),
 			({x, y}) => Math.abs(demo.position.x - x) / demo.ratioImage + Math.abs(demo.position.y - y) / demo.ratioImageInverse,
-			0.3,
+			0.1,
 		),
 	},
 	{
@@ -79,7 +79,7 @@ const instructions = [
 		validator: new Validator(
 			() => demo.zoom,
 			(zoom) => (demo.zoom > zoom ? (demo.zoom / zoom) : (zoom / demo.zoom)) - 1,
-			0.3,
+			0.1,
 		),
 	},
 	{
@@ -89,7 +89,7 @@ const instructions = [
 		validator: new Validator(
 			() => demo.rotation,
 			(rotation) => Math.abs(getAngleDiff(demo.rotation, rotation)),
-			DEGREES[45] / 3,
+			DEGREES[45] / 9,
 		),
 	},
 	{
@@ -99,7 +99,7 @@ const instructions = [
 		validator: new Validator(
 			() => demo.ratioImage,
 			(ratioImage) => (demo.ratioImage > ratioImage ? (demo.ratioImage / ratioImage) : (ratioImage / demo.ratioImage)) - 1,
-			0.3,
+			0.1,
 		),
 	},
 	{
@@ -119,7 +119,7 @@ const instructions = [
 			return new Validator(
 				() => [resizerHorizontal.offsetLeft, resizerVertical.offsetTop],
 				([x, y]) => Math.abs(resizerHorizontal.offsetLeft - x) / window.innerWidth + Math.abs(resizerVertical.offsetTop - y) / window.innerHeight,
-				0.06,
+				0.02,
 			);
 		})(),
 	},
@@ -283,7 +283,7 @@ export default {
 		[
 			'Each page will provide a playground for a unique pan-limiting system.',
 			'To demonstrate the value of pan-limiting, I\'m starting with a system that neglects it.',
-			'It may be described like:',
+			'A formal description of the system might read:',
 		],
 		getMath({
 			content: {tag: 'mtable', xmlns, content: [
@@ -312,7 +312,6 @@ export default {
 			style: {textAlign: 'center'},
 			content: 'Effectiveness',
 		},
-		'Let\'s get into its issues.',
 		getInstruction([
 			'Notice the pink text below?',
 			getInputDependent((isMouse) =>
@@ -335,8 +334,9 @@ export default {
 			'?',
 		],
 		[
-			'You can imagine how someone might slide away from the image and become lost in the void.',
+			'A user might fall away from the image and become lost in the void.',
 			'Pan-limiting systems prevent this by keeping users from straying too far beyond the confines of the image.',
+			'Like how game developers endeavour to keep players in-bounds, a good pan-limiting system keeps the viewport attached to its content.',
 		],
 		[
 			'Pan-limits here are unaffected by zoom.',
@@ -349,9 +349,9 @@ export default {
 			content: 'Conclusion',
 		},
 		[
-			'Some degree of pan-limiting is important.',
-			'Like how game developers endeavour to keep players in-bounds, a good pan-limiting system keeps the viewport attached to its content.',
+			'In some cases, unbound panning is actually desireable.',
+			'A use case for unbound panning could be a canvas that sizes dynamically to contain new input.',
+			'In most cases, however, some degree of pan-limiting is useful.',
 		],
-		'Let\'s move on and take a look at the minimum viable product.',
 	),
 };

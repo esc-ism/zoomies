@@ -472,6 +472,8 @@ const [setTitle, removeTitle] = (() => {
 	];
 })();
 
+let unhover;
+
 const makeHoverable = (element, id, scope, meta, isVar) => {
 	if (!meta.active) {
 		return false;
@@ -488,12 +490,25 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 		setTitle(element, getTitle(scope[id].value, scope[id].type));
 	}
 	
-	element.addEventListener('mouseenter', () => {
+	const callbacks = {
+		hook: () => {
+			unhover();
+			
+			return true;
+		},
+		event: () => {
+			unhover();
+		},
+	};
+	
+	element.addEventListener('pointerenter', () => {
+		if (unhover && !unhover(element)) {
+			return;
+		}
+		
 		const ids = [id];
 		
 		element.classList.add(CLASS_NAMES.hovered);
-		
-		cleanup();
 		
 		if (isVar) {
 			const data = scope[id];
@@ -511,31 +526,41 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 			}
 		}
 		
-		if (!doShowVisuals) {
-			return;
-		}
-		
-		if (visuals.length === 0) {
-			demo.hooks.any.add(() => {
+		unhover = (newElement) => {
+			if (element.isSameNode(newElement)) {
+				return false;
+			}
+			
+			unhover = undefined;
+			
+			removeTitle();
+			
+			element.classList.remove(CLASS_NAMES.hovered);
+			
+			for (const source of hovered) {
+				source.classList.remove(CLASS_NAMES.hovered);
+			}
+			
+			if (doShowVisuals) {
 				cleanup();
-				
-				return true;
-			});
+			}
+			
+			hovered.length = 0;
+			
+			demo.hooks.any.remove(callbacks.hook);
+			element.removeEventListener('mouseleave', callbacks.event);
+			window.removeEventListener('scroll', callbacks.event, true);
+			
+			return true;
+		};
+		
+		demo.hooks.any.add(callbacks.hook);
+		window.addEventListener('scroll', callbacks.event, {once: true, capture: true});
+		element.addEventListener('mouseleave', callbacks.event, {once: true});
+		
+		if (doShowVisuals) {
+			visuals.push(visualise(scope, ...ids));
 		}
-		
-		visuals.push(visualise(scope, ...ids));
-	});
-	
-	element.addEventListener('mouseleave', () => {
-		element.classList.remove(CLASS_NAMES.hovered);
-		
-		for (const source of hovered) {
-			source.classList.remove(CLASS_NAMES.hovered);
-		}
-		
-		cleanup();
-		
-		hovered.length = 0;
 	});
 	
 	return true;

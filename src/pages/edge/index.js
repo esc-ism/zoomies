@@ -91,9 +91,9 @@ export default {
 		[
 			'Notice that the viewport\'s dimensions half as zoom ',
 			getButton('doubles', [
-				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
+				[{ratio: 1, zoom: 1, rotation: DEGREES[90], position: 0}],
 				[{zoom: 2}],
-				[{position: 0.25}],
+				[{position: 0.25}, {delay: 0.2}],
 			]),
 			'.',
 			'This reciprocal relationship between zoom and viewport size gives the following calculation for pan-limits:',
@@ -136,17 +136,23 @@ export default {
 		]),
 		[
 			{tag: 'i', content: 'boundX'}, ' is derived from widths and ', {tag: 'i', content: 'boundY'}, ' is derived from heights.',
-			'Aspect ratio dictates the zooms at which each starts growing, with ratios ',
-			getButton('over 1', [
-				[{ratio: 1, zoom: 1}],
+			'Their ascents are synchronous when the viewport and image ',
+			getButton('share', [
+				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
+				[{ratio: 1}, {ease: 'none', duration: 1}],
+			]),
+			' an aspect ratio.',
+			'Only when the viewport is ',
+			getButton('wider', [
+				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
 				[{ratio: 2}, {ease: 'none', duration: 1}],
 			]),
-			' affecting ', {tag: 'i', content: 'boundX'}, '\'s minimum zoom and ratios ',
-			getButton('below 1', [
-				[{ratio: 1, zoom: 1}],
+			' or ',
+			getButton('taller', [
+				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
 				[{ratio: 0.5}, {ease: 'none', duration: 1}],
 			]),
-			' affecting ', {tag: 'i', content: 'boundY'}, '\'s.',
+			' than the image do their ascents begin at different zoom levels.',
 		],
 		{
 			tag: 'h2',

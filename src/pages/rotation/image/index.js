@@ -800,8 +800,12 @@ export default {
 			'There\'s no huge flaw, but this system\'s user experience is pretty terrible.',
 			'Take ',
 			getButton('this', [
-				[{ratio: 0.5, rotation: DEGREES[90] + 0.5, zoom: 1, position: 0}],
-			]),
+				({ratio, rotation}) => [{ratio, rotation, zoom: 1, position: 0}],
+			], {
+				getParam: () => demo.ratioViewport < 1 ?
+						getVarGetter(DEGREES[90] - 0.5, 0.5)() :
+						getVarGetter(-DEGREES[270] + 0.5, 2)(),
+			}),
 			' state for example — see the panning path necessary to view the offscreen corner?',
 			'There\'s no way anyone would take that path naturally.',
 			'Users naturally try to take the shortest path possible, but this system doesn\'t often allow that.',

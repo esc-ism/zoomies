@@ -1140,12 +1140,11 @@ export default {
 			]},
 		]}),
 		[
-			'We need to define one line for each rail.',
-			'Each line must pass through the snap point and intersect its rail at some ', {tag: 'i', content: 't'}, '.',
-			'At the correct ', {tag: 'i', content: 't'}, ' value, the lines will be parallel.',
+			'Formalising the "line through both rails at ', {tag: 'i', content: 't'}, '" requires it to be defined as two parallel lines — one for each rail.',
+			'Each passes through the snap point and intersects its rail at some ', {tag: 'i', content: 't'}, '.',
 			'Knowing that parallel lines share a gradient, we can use ',
 			{tag: 'span', content: 'm = dY / dX', style: {whiteSpace: 'nowrap'}},
-			' to write the equation we\'re trying to solve.',
+			' to write an equation to solve for ', {tag: 'i', content: 't'}, '.',
 		],
 		getDiagrammedMath(
 			snapImage,
@@ -1176,6 +1175,58 @@ export default {
 							]},
 						]},
 					]},
+				],
+			},
+			{
+				title: {tag: 'mi', xmlns, content: 'Parallel'},
+				content: [
+					{tag: 'mtable', xmlns, content: [{tag: 'mtr', xmlns, content: [
+						{tag: 'mtr', xmlns, content: [
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'E'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'E'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'x'},
+									]},
+								]},
+							]},
+							{tag: 'mtd', xmlns, content: {
+								tag: 'mo', xmlns, content: '=',
+							}},
+							{tag: 'mtd', xmlns, content: [
+								{tag: 'mfrac', xmlns, content: [
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'F'},
+											{tag: 'mi', xmlns, content: 'y'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'y'},
+									]},
+									{tag: 'mrow', xmlns, content: [
+										{tag: 'msub', xmlns, content: [
+											{tag: 'mi', xmlns, content: 'F'},
+											{tag: 'mi', xmlns, content: 'x'},
+										]},
+										{tag: 'mo', xmlns, content: '-'},
+										{tag: 'mi', xmlns, content: 'x'},
+									]},
+								]},
+							]},
+						]},
+					]}]},
 				],
 			},
 			{
@@ -1291,51 +1342,6 @@ export default {
 				title: {tag: 'mi', xmlns, content: 't'},
 				content: [
 					{tag: 'mtable', xmlns, content: [
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mfrac', xmlns, content: [
-									{tag: 'mrow', xmlns, content: [
-										{tag: 'msub', xmlns, content: [
-											{tag: 'mi', xmlns, content: 'E'},
-											{tag: 'mi', xmlns, content: 'y'},
-										]},
-										{tag: 'mo', xmlns, content: '-'},
-										{tag: 'mi', xmlns, content: 'y'},
-									]},
-									{tag: 'mrow', xmlns, content: [
-										{tag: 'msub', xmlns, content: [
-											{tag: 'mi', xmlns, content: 'E'},
-											{tag: 'mi', xmlns, content: 'x'},
-										]},
-										{tag: 'mo', xmlns, content: '-'},
-										{tag: 'mi', xmlns, content: 'x'},
-									]},
-								]},
-							]},
-							{tag: 'mtd', xmlns, content: {
-								tag: 'mo', xmlns, content: '=',
-							}},
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mfrac', xmlns, content: [
-									{tag: 'mrow', xmlns, content: [
-										{tag: 'msub', xmlns, content: [
-											{tag: 'mi', xmlns, content: 'F'},
-											{tag: 'mi', xmlns, content: 'y'},
-										]},
-										{tag: 'mo', xmlns, content: '-'},
-										{tag: 'mi', xmlns, content: 'y'},
-									]},
-									{tag: 'mrow', xmlns, content: [
-										{tag: 'msub', xmlns, content: [
-											{tag: 'mi', xmlns, content: 'F'},
-											{tag: 'mi', xmlns, content: 'x'},
-										]},
-										{tag: 'mo', xmlns, content: '-'},
-										{tag: 'mi', xmlns, content: 'x'},
-									]},
-								]},
-							]},
-						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mfrac', xmlns, content: [
