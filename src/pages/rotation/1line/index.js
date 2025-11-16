@@ -1729,7 +1729,7 @@ export default {
 		]),
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Effectiveness',
+			content: 'Snap-Pan Effectiveness',
 			style: {textAlign: 'center'},
 		},
 		'Okay! Now that we\'ve gone through how snap-panning works, how useful is it in practise?',
