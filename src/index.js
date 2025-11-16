@@ -44,7 +44,7 @@ const header = (() => {
 	
 	const version = document.createElement('div');
 	
-	version.innerText = 'v0.1';
+	version.innerText = 'v0.2';
 	
 	version.style.opacity = '0.8';
 	version.style.position = 'absolute';
