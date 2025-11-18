@@ -2,21 +2,23 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getDiagrammedMath} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
+import * as tweens from '../../shared/tween';
 
-import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
-import System, {getSnappedZoom} from './demo';
 import * as mock from '../mock';
-import getZoomPoints from './zoomPoints';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 
+import System, {getSnappedZoom} from './demo';
+import getZoomPoints from './zoomPoints';
 import pointsImage from './pointsImage';
 
 const code = [];
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
+const getSnapTweens = (getRatio) => tweens.getSnapTweens(() => getVarGetter(Math.floor(Math.random() * 4 - 2) * DEGREES[90] - DEGREES[45], getRatio())(), getSnappedZoom);
 
 const get45Button = (rotation, ratioImage) => getButton(
 	`${rotation}°`,
@@ -63,43 +65,66 @@ const functions = [
 			]},
 		]}},
 	]},
-	{op: 'func', id: 'getCloseIntersection', args: ['targetX', 'targetY', 'backupX', 'backupY', 'axisY', 'axisZoom', 'isLeft'], type: ['x', 'y', 'zoom', 'xvp', 'yvp'], pair: [1, 0,,4, 3], and: [
+	{op: 'func', id: 'getCloseIntersection', args: ['targetX', 'targetY', 'backupX', 'backupY', 'axisY', 'axisZoom', 'isLeftCorner'], type: ['x', 'y', 'zoom', 'xvp', 'yvp'], pair: [1, 0,,4, 3], and: [
 		{op: '=', id: 'cornerX', type: 'x', and: {
-			op: '?', and: ['isLeft', -0.5, 0.5],
+			op: '?', and: ['isLeftCorner', -0.5, 0.5],
 		}},
 		'',
-		{op: 'if', and: [
-			{op: '!=', and: [
-				{op: '<', and: [
-					{op: 'abs', and: {
-						op: '/', and: [
-							{op: '-', and: [0.5, 'axisY']},
-							'cornerX',
-						],
-					}},
-					1,
+		{op: '=', multiline: true, id: ['intersectX', 'intersectY', 'intersectZoom', 'endX', 'endY', 'isRight'], and: {
+			op: '?', multiline: true, and: [
+				{op: '!=', and: [
+					{op: '<', and: [
+						{op: 'abs', and: {
+							op: '/', and: [
+								{op: '-', and: [0.5, 'axisY']},
+								'cornerX',
+							],
+						}},
+						1,
+					]},
+					{op: '<', and: [
+						{op: 'abs', and: {
+							op: '/', and: ['targetY', 'targetX'],
+						}},
+						1,
+					]},
 				]},
-				{op: '<', and: [
-					{op: 'abs', and: {
-						op: '/', and: ['targetY', 'targetX'],
+				{op: 'array', multiline: [1, 2], and: [
+					{op: '...', and: {
+						op: 'call', id: 'getIntersection', and: ['targetX', 'targetY', 'axisY', 'cornerX', 'axisZoom'],
 					}},
-					1,
+					'targetX', 'targetY', true,
 				]},
-			]},
-			{op: 'return', and: {op: 'array', multiline: [1, 2], and: [
-				{op: '...', and: {
-					op: 'call', id: 'getIntersection', and: ['targetX', 'targetY', 'axisY', 'cornerX', 'axisZoom'],
-				}},
-				'targetX', 'targetY', true,
-			]}},
-		]},
+				{op: 'array', multiline: [1, 2], and: [
+					{op: '...', and: {
+						op: 'call', id: 'getIntersection', and: ['backupX', 'backupY', 'axisY', 'cornerX', 'axisZoom'],
+					}},
+					'backupX', 'backupY', false,
+				]},
+			],
+		}},
 		'',
-		{op: 'return', and: {op: 'array', multiline: [1, 2], and: [
-			{op: '...', and: {
-				op: 'call', id: 'getIntersection', and: ['backupX', 'backupY', 'axisY', 'cornerX', 'axisZoom'],
-			}},
-			'backupX', 'backupY', false,
-		]}},
+		{op: '=', id: ['end', 'intersect'], and: {
+			op: '?', multiline: true, and: [
+				{op: '>', and: [
+					{op: 'abs', and: 'endX'},
+					{op: 'abs', and: 'endY'},
+				]},
+				{op: 'array', and: ['intersectX', 'endX']},
+				{op: 'array', and: ['intersectY', 'endY']},
+			],
+		}},
+		'',
+		{op: 'return', and: {
+			op: '?', multiline: true, and: [
+				{op: '!=', and: [
+					{op: '<', and: ['end', 0]},
+					{op: '<', and: ['intersect', 0]},
+				]},
+				{op: 'array', and: ['intersectX', 'intersectY', 'intersectZoom', {op: '-', and: 'endX'}, {op: '-', and: 'endY'}, 'isRight']},
+				{op: 'array', and: ['intersectX', 'intersectY', 'intersectZoom', 'endX', 'endY', 'isRight']},
+			],
+		}},
 	]},
 	{op: 'func', id: 'getZoomPoints', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: [6], and: [
 		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
@@ -153,14 +178,14 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			'isEvenQuadrant',
-			{op: 'return', and: {op: 'array', multiline: 2, and: [
+			{op: 'return', and: {op: 'array', multiline: [6], and: [
 				'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY',
 				'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY',
 				{op: '!=', and: ['intersectSideIsRight', 'intersectBaseIsTop']},
 			]}},
 		]},
 		'',
-		{op: 'return', and: {op: 'array', multiline: 2, and: [
+		{op: 'return', and: {op: 'array', multiline: [6], and: [
 			'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY',
 			'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY',
 			{op: '!=', and: ['intersectSideIsRight', 'intersectBaseIsTop']},
@@ -207,12 +232,12 @@ export default {
 				({zoomPoints}) => [{position: zoomPoints[2].end}, {duration: 0}],
 			], {getParam: () => getDirectVars()}),
 			'.',
-			'This can be achieved by swapping image axis for viewport axis-based origin rails.',
+			'This is achieved by swapping image axis for viewport axis-based origin rails.',
 		],
 		[
-			'Again, whichever origin rail direction minimises lock rail length is preferred, but intersections are now less reliable.',
-			'Lock rails are unchanged.',
+			'Again, whichever origin rail direction minimises lock rail length is preferred, but switching axes has made rail intersections less reliable.',
 		],
+		'Lock rails are unchanged.',
 		{
 			tag: 'h2',
 			content: 'Pan-Limit Maths',
@@ -476,7 +501,7 @@ export default {
 			' at some point along their path.',
 		],
 		[
-			'Bounds jump around when rotating into and out of these windows.',
+			'Bounds jump around when rotating into and out of these "inversion windows".',
 			'Within them, at pre-inversion zooms, the system provides ',
 			getButton('insufficiently restrictive', [
 				({ratioImage, rotation, zoomPoints}) => [{ratioImage, rotation, position: 0, zoom: zoomPoints[3].z + 0.01}],
@@ -485,7 +510,7 @@ export default {
 			' pan-limits',
 		],
 		[
-			'As image aspect ratio gets more extreme, these windows get increasingly wide and the issues get ',
+			'As image aspect ratio gets more extreme, inversion windows get increasingly wide and the issues get ',
 			getButton('increasingly severe', [
 				[{position: 0, ratioImage: 2, zoom: 1, rotation: DEGREES[90]}],
 				[{rotation: 0}, {ease: 'none', duration: 5}],
@@ -504,8 +529,8 @@ export default {
 			'For simplicity, I check every region.',
 		],
 		[
-			'The system\'s efficiency per rail pair is similar to that of the prior',
-			'but, since four rail pairs must be checked instead of just one, it ends up running around four times slower.',
+			'Although the system\'s efficiency per rail pair is similar to that of the prior,',
+			'it ends up running slower since four rail pairs must be checked instead of just one.',
 		],
 		'If there\'s more than one possible snap zoom, the higher value is used.',
 		getCode(code, [
@@ -525,14 +550,15 @@ export default {
 		},
 		[
 			'Despite its pan-limiting flaws, the system\'s a surprisingly good snap-panner!',
-			'The panning flaws are caused by crossed rails at windows of rotation around (90n+45)°.',
-			'When snap-panning, the only clue to their existence is some slight behavioural inconsistency around the rotation values at window limits.',
+			'Even when snap-panning within inversion windows, outcomes are ',
+			getButton('sensible', ...getSnapTweens(() => Math.random() / 10 + 0.2)),
+			'.',
+			'The only clue to their existence is some slight behavioural inconsistency around the rotation values at window limits.',
 		],
 		[
-			'Even inside of windows, outcomes are sensible.',
-			'I mentioned that bounds seem to invert at some point inside these windows.',
-			'Specifically, the inversion happens at the snap zoom for position (0, 0).',
-			'Using the maximum snap zoom possible means that the troublesome pre-inversion pan-limits are ignored.',
+			'How is the system producing reasonable snap zooms from bad rails?',
+			'Well, bound inversion happens at the snap zoom for position (0, 0).',
+			'Using the maximum snap zoom possible means that the troublesome pre-inversion rail segments are ignored.',
 		],
 		{
 			tag: 'h2',
@@ -548,7 +574,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Outside of the problem windows, however, it is exactly what I\'m looking for.',
+			'On the bright side, its behaviour outside of inversion windows is exactly what I\'m looking for.',
 			'The system shows that this approach to origin rails has promise, but it needs an innovation.',
 			'Let\'s see if we can find one!',
 		],

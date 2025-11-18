@@ -6,7 +6,7 @@ import {
 } from './consts';
 
 const addPseudoRule = (selector, content, {display = 'inline', ...styles} = {}) => addRule(selector, {display, ...styles, content: `"${content}"`});
-const addKeywordPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`, color: 'rgb(219 142 56)'});
+const addKeywordPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`, color: '#db8e38'});
 
 // infix binary ops
 for (const [name, content = name] of [
@@ -77,18 +77,18 @@ addPseudoRule(`.${CLASS_NAMES.indent}::after`, '  ');
 addRule(`.${CLASS_NAMES['=']} > :last-child::after`, {display: 'block'});
 
 // dynamic ops
-addRule([`.${CLASS_NAMES.bool}`, `.${CLASS_NAMES.number}`, `.${CLASS_TOOLTIP}`], {color: '#90b0f9'});
+addRule([`.${CLASS_NAMES.bool}`, `.${CLASS_NAMES.number}`, `.${CLASS_TOOLTIP}`], {color: '#9cbaff'});
 
-addRule(`.${CLASS_NAMES.evocation}`, {color: 'rgb(212 188 0)'});
+addRule(`.${CLASS_NAMES.evocation}`, {color: '#d7c430'});
 
-for (const [name, colour] of [['accept', 'rgb(0 255 0 / 10%)'], ['reject', 'rgb(255 0 0 / 10%)']]) {
+for (const [name, colour] of [['accept', '#00ff001a'], ['reject', '#ff00001a']]) {
 	addRule(`.${CLASS_NAMES.branch[name]} > :not(.${CLASS_NAMES.inactive} *)`, {'background-image': `linear-gradient(${colour}, ${colour})`});
 }
 
 addRule([
 	`.${CLASS_NAMES.hovered}:not(.${CLASS_NAMES.csv})`,
 	`.${CLASS_NAMES.hovered}.${CLASS_NAMES.csv} > *`,
-], {'background-color': 'rgb(255 255 255 / 25%)'});
+], {'background-color': '#ffffff40'});
 
 addRule(`.${CLASS_NAMES.inactive}:not(.${CLASS_NAMES.inactive} *)`, {opacity: 0.4});
 

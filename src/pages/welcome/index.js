@@ -91,11 +91,9 @@ const tween = async (stop) => {
 					delete demo.tween.data.ignorePosition;
 				},
 				onUpdate() {
-					const position = getBound(demo.zoom, first, second, third) || {x: 0, y: 0};
 					const progresses = [...otherProgresses];
 					
-					demo.position = position;
-					demo.applyPosition();
+					demo.position = getBound(demo.zoom, first, second, third) || {x: 0, y: 0};
 					
 					progresses.splice(firstIndex, 0, ...getRailProgress(demo.zoom, first, second, third));
 					
@@ -146,17 +144,18 @@ export default {
 			content: 'Zoomies',
 			style: {textAlign: 'center'},
 		},
+		'Hello! I\'m Callum.',
 		[
-			'On and off, for a few years now, I\'ve been engrossed in panning problems',
+			'I\'m a programmer who, for a few years now, has been occasionally engrossed in panning problems',
 			'(think photo editor, not gold rush).',
 			'Specifically, I\'ve been exploring how best to limit where users should be allowed to pan, and how best to facilitate "snap-panning".',
 		],
 		[
-			'My scope is limited to rectangular content, keeping all four corners viewable at all times and handling the following variables:',
+			'My scope is restricted to rectangular content, keeping all four corners viewable at all times and handling the following variables:',
 			{tag: 'ul', style: {marginBlockStart: '1ex', marginBlockEnd: '0.5em'}, content: [
-				'Zoom',
 				'Image aspect ratio',
 				'Viewport aspect ratio',
+				'Zoom',
 				'Rotation',
 			].map((content) => ({tag: 'li', content}))},
 		],

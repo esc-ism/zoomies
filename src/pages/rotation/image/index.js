@@ -6,6 +6,7 @@ import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
 import {getText, getCode, getDiagrammedMath} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
 import {xmlns} from '../../shared/math';
+import * as tweens from '../../shared/tween';
 
 import * as mock from '../mock';
 import {permissiveTweens, restrictiveTweens} from '../1line';
@@ -19,31 +20,12 @@ import getZoomPoints from './zoomPoints';
 
 const code = [];
 
-const getLimitedPosition = (limit = 0.3) => Math.max(-limit, Math.min(limit, Math.random() - 0.5));
-
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
+const getSnapTweens = (getRatio) => tweens.getSnapTweens(() => getVarGetter((Math.random() > 0.5 ? -DEGREES[270] : 0) + Math.random() * DEGREES[90], getRatio())(), getSnappedZoom);
 
-const getSnapVarGetter = (getRatio) => {
-	const position = {x: getLimitedPosition(), y: getLimitedPosition()};
-	const {zoomPoints, rotation, ratio} = getVarGetter(Math.random() * DEGREES[180], getRatio())();
-	
-	const zoom = getSnappedZoom(...zoomPoints, position);
-	
-	return {ratio, rotation, startZoom: Math.min(zoomPoints[0].z, zoomPoints[2].z), zoom, position};
-};
-
-const getSnapTweens = (getRatio) => [
-	[
-		({rotation, ratio, startZoom}) => [{rotation, ratio, zoom: startZoom, position: 0}],
-		({position}) => [{position}],
-		({zoom}) => [{zoom}, {duration: 0}],
-	],
-	{getParam: getSnapVarGetter.bind(null, getRatio)},
-];
-
-const getCornerProgressTweens = (rotation) => [
+const getCornerProgressTweens = (rotation, position = '>-0.4') => [
 	() => [{position: 0.5, ratio: demo.ratioViewport, zoom: demo.ratioViewport < 1 ? (1 / demo.ratioViewport) : demo.ratioViewport}],
-	[{rotation}, {position: '>-0.4'}],
+	[{rotation}, {position}],
 ];
 
 const functions = [
@@ -281,9 +263,8 @@ export default {
 			' is also fixed, accurately replicating the behaviour of the "Viewport Edge" system.',
 		],
 		[
-			'In the "Single-Line" system, we had no control over rail gradients; they would always be 1 or -1.',
-			'This kept us from choosing lock points.',
-			'Multi-line rails allow us to choose whatever gradients we want, providing much more flexibility.',
+			'The "Single-Line" system forbade control over rail gradients; they would always be 1 or -1.',
+			'Multi-line rails provide much more flexibility, allowing for manipulation of lock point locations.',
 		],
 		[
 			'This system places each lock point on a different viewport edge.',
@@ -294,7 +275,7 @@ export default {
 			getButton('90°', getCornerProgressTweens(0)),
 			' and travels linearly between them for ',
 			getButton('intermediate angles', [
-				...getCornerProgressTweens(DEGREES[90]),
+				...getCornerProgressTweens(DEGREES[90], '<'),
 				[{rotation: 0}, {ease: 'none', duration: 3}],
 			]),
 			'.',
@@ -305,16 +286,53 @@ export default {
 		],
 		[
 			'In this system, ',
+			// todo there are likely lots of buttons that should be doing manual position setting
 			getButton('origin rails', [
 				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}],
-				({zoomPoints}) => [{position: zoomPoints[3]}, {delay: 0.1}],
-				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {duration: 3, position: '<'}],
+				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {
+					duration: 3,
+					onStart() {
+						demo.tween.data.ignorePosition = true;
+					},
+					onReverseComplete() {
+						demo.position.x = demo.position.y = 0;
+						demo.applyPosition();
+						
+						delete demo.tween.data.ignorePosition;
+					},
+					onUpdate() {
+						if (!demo.system.bound1) {
+							return;
+						}
+						
+						demo.position.x = demo.system.bound1.x;
+						demo.position.y = demo.system.bound1.y;
+					},
+				}],
 			], {getParam: () => getTraceVars()}),
 			'  follow image axes until they intersect ',
 			getButton('lock rails', [
 				({rotation, ratio, zoomPoints}) => [{position: zoomPoints[3], ratio, rotation, zoom: zoomPoints[3].z}],
-				[{position: 0.5}, {delay: 0.1}],
-				({zoomPoints}) => [{zoom: zoomPoints[3].z * 2}, {duration: 3, position: '<'}],
+				({zoomPoints}) => [{zoom: zoomPoints[3].z * 2}, {
+					duration: 3,
+					onStart() {
+						demo.tween.data.ignorePosition = true;
+					},
+					onReverseComplete() {
+						demo.position.x = demo.position.y = 0;
+						demo.applyPosition();
+						
+						delete demo.tween.data.ignorePosition;
+					},
+					onUpdate() {
+						if (!demo.system.bound1) {
+							return;
+						}
+						
+						demo.position.x = demo.system.bound1.x;
+						demo.position.y = demo.system.bound1.y;
+					},
+				}],
 			], {getParam: () => getTraceVars()}),
 			'.',
 			'Origin rails follow whichever axis minimises lock rail length.',
@@ -327,7 +345,7 @@ export default {
 		[
 			'Each lock point must be on a different viewport edge, and adjacent corners will have lock points on adjacent edges.',
 			'Since we\'re focusing on adjacent (top-left and top-right) image corners, we can say that one will be a viewport side corner and the other a vewport base corner.',
-			'This assignment will be based off rotation, with corners alternating between base and side every 90°.',
+			'Corners will alternate between base and side every 90°.',
 		],
 		// todo define "lock angle"
 		[
@@ -335,8 +353,7 @@ export default {
 			'There are four kinds of lock rail;',
 			'they can start from either axis and end at either a side or base corner.',
 			'Each of the four variations has slightly different formulae, but they all present similar problems with similar solutions.',
-			'Demonstrated below is an x-axis, base corner problem.',
-			'The diagram is used to derive start zoom and start position formulae.',
+			'Given below are derivations of start zoom and start position formulae for the x-axis, base corner variant.',
 		],
 		getDiagrammedMath(
 			zoomImage,
@@ -802,9 +819,7 @@ export default {
 			getButton('this', [
 				({ratio, rotation}) => [{ratio, rotation, zoom: 1, position: 0}],
 			], {
-				getParam: () => demo.ratioViewport < 1 ?
-						getVarGetter(DEGREES[90] - 0.5, 0.5)() :
-						getVarGetter(-DEGREES[270] + 0.5, 2)(),
+				getParam: tweens.singleCornerGetter.bind(null, getVarGetter),
 			}),
 			' state for example — see the panning path necessary to view the offscreen corner?',
 			'There\'s no way anyone would take that path naturally.',
@@ -888,13 +903,13 @@ export default {
 		},
 		[
 			'This system\'s not a great pan-limiter, but it\'s an effective snap-panner.',
-			'I consider it a satisfactory complement to "Viewport Center".',
+			'I consider it an agreeable complement to "Viewport Center".',
 			'The two systems synergise perfectly, covering each other\'s weakness to create a superior product.',
 		],
 		[
 			'Good stuff!',
 			'This conclusion feels triumphal, but perhaps more second act climax than final, supreme victory.',
-			'But what\'s left to do if we already have a flawless product?',
+			'But what\'s left to do if we already have a acceptable, rotation-handling product?',
 		],
 		[
 			'I\'d feel a lot more satisfied with this system if it wasn\'t such a weak pan-limiter.',

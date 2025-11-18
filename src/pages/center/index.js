@@ -6,6 +6,7 @@ import {getText, getMath} from '../shared';
 import {getButton, clearButton} from '../shared/button';
 
 import System from './demo';
+import {inputListener} from '@/consts';
 
 // top right corner with zoom=2
 export const getSnapPosition = () => ({
@@ -97,6 +98,14 @@ export default {
 			'Zoomful systems have zoom-dependent pan-limits.',
 			'All future systems will be zoomful.',
 		],
-		'If your image can\'t be rotated, this system\'s ideal partner is the next one up.',
+		[
+			'If your image can\'t be rotated, this system\'s ideal partner is just one ',
+			{tag: 'span', callback: (element) => {
+				const update = () => element.innerText = inputListener.isMouse ? 'right arrow key' : 'left swipe';
+				
+				inputListener.add(update);
+			}},
+			' away.',
+		],
 	),
 };

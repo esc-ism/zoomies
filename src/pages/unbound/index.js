@@ -166,7 +166,7 @@ export default {
 			content: 'Unbound',
 		},
 		[
-			'To start, I\'d like to touch on why pan-limiting is necessary.',
+			'To start, I\'d like to expound the value of pan-limiting.',
 		],
 		{
 			style: {fontStyle: 'italic'},
@@ -334,12 +334,12 @@ export default {
 			'?',
 		],
 		[
-			'A user might fall away from the image and become lost in the void.',
+			'It\'s possible for users to fall away from the image and become lost in the void.',
 			'Pan-limiting systems prevent this by keeping users from straying too far beyond the confines of the image.',
 			'Like how game developers endeavour to keep players in-bounds, a good pan-limiting system keeps the viewport attached to its content.',
 		],
 		[
-			'Pan-limits here are unaffected by zoom.',
+			'A subtler downside is that pan-limits here are unaffected by zoom.',
 			'More advanced systems can take a position and derive an appropriate zoom level, which is useful when snap-panning.',
 			'I\'ll talk more about that later.',
 		],
@@ -350,8 +350,12 @@ export default {
 		},
 		[
 			'In some cases, unbound panning is actually desireable.',
-			'A use case for unbound panning could be a canvas that sizes dynamically to contain new input.',
+			'As an example, a canvas that sizes dynamically to contain new input would be undermined by pan limits.',
 			'In most cases, however, some degree of pan-limiting is useful.',
+		],
+		[
+			'Most importantly, unbound panning is ', {tag: 'i', content: 'boring'}, ' and pan-limiting is ', {tag: 'i', content: 'interesting'}, '!',
+			'As we progress, I hope to impart some of my appreciation for elegant pan-limiting solutions.',
 		],
 	),
 };

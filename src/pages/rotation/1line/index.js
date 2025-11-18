@@ -11,9 +11,10 @@ import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../
 import SHARED_FUNCTIONS from '../code';
 import * as mock from '../mock';
 
-import System, {getBound, getZoomPoints} from './demo';
+import System, {getZoomPoints} from './demo';
 import zoomImage from './zoomImage';
 import snapImage from './snapImage';
+import {singleCornerGetter} from '@/pages/shared/tween';
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
@@ -214,8 +215,9 @@ export default {
 		getInstruction([
 			[
 				'If maths depend on a diagram, scrolling close enough will make the diagram appear.',
-				'You may have noticed the little white ', {tag: 'span', style: {fontSize: '0.77em'/* borderWidth * 1.54 */}, content: '◤'}, ' to the left.',
-				'This is one of three threshold indicators.',
+				'The little white ',
+				{tag: 'span', style: {fontSize: '0.77em'/* borderWidth * 1.54 */}, content: '◤'},
+				' to the left is one of three threshold indicators.',
 				'Scroll it off the top of the screen to see the diagram.',
 			],
 			{callback: (element) => {
@@ -984,26 +986,29 @@ export default {
 			getButton('locked', [
 				({zoomPoints, rotation, ratio}) => [{zoom: zoomPoints[1].z, rotation, ratio, position: 0}],
 				({zoomPoints}) => [{zoom: zoomPoints[1].z * 1.5}, {
-					onUpdate() {
-						demo.tweenUpdate.then(() => {
-							demo.position = getBound(demo.zoom, zoomPoints[1], false) || demo.position;
-							
-							demo.applyPosition();
-						});
-					},
+					duration: 2.5,
+					ease: 'none',
 					onStart() {
 						demo.tween.data.ignorePosition = true;
 					},
 					onReverseComplete() {
 						demo.position.x = demo.position.y = 0;
-						
 						demo.applyPosition();
+						
+						delete demo.tween.data.ignorePosition;
 					},
-					duration: 2.5, ease: 'none',
+					onUpdate() {
+						if (!demo.system.bound1) {
+							return;
+						}
+						
+						demo.position.x = demo.system.bound1.x;
+						demo.position.y = demo.system.bound1.y;
+					},
 				}],
 			], {getParam: () => getLockVars()}),
 			' to the position on the viewport\'s rim that they first contact.',
-			'I\'ll refer to this as the corner\'s "lock point".',
+			'I\'ll refer to this position as the corner\'s "lock point".',
 			'The corner visibility issue is a problem for any rotated state with a lock point close to a viewport corner.',
 		],
 		[
@@ -1020,12 +1025,8 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'The maths for snap-panning will take a little longer to run through.',
-			'The image positions used as snap-pan targets will be referred to as "snap points".',
-		],
-		[
 			'The image is split into four "regions" by its rails.',
-			'The first step in finding a snap zoom is to find the region that the snap point lies within.',
+			'The first step in finding a snap zoom is to find the region that the target snap-pan position, or "snap point", lies within.',
 			'Specifically, we need to know which image corners enclose the region, alongside the origin.',
 		],
 		getCode(code, [
@@ -1040,9 +1041,7 @@ export default {
 				({zoomPoints, rotation, ratio}) => [{position: 0, zoom: zoomPoints[0].z, ratio, rotation}],
 				({zoomPoints}) => [{zoom: zoomPoints[1].z}, TWEEN_OPTIONS_YOYO],
 			], {
-				getParam: () => demo.ratioViewport < 1 ?
-						getVarGetter(DEGREES[90] - 0.5, 0.5)() :
-						getVarGetter(-DEGREES[270] + 0.5, 2)(),
+				getParam: singleCornerGetter.bind(null, getVarGetter),
 			}),
 			' start zoom.',
 		],
@@ -1738,22 +1737,23 @@ export default {
 			content: 'Snap-Pan Effectiveness',
 			style: {textAlign: 'center'},
 		},
-		'Okay! Now that we\'ve gone through how snap-panning works, how useful is it in practise?',
 		[
-			'Like with pan-limiting, it works perfectly until we decouple aspect ratios.',
-			'Being too restrictive isn\'t as much of an issue here, but being too permissive isn\'t ideal.',
-			'Consider ',
-			getButton('this', [
-				[{ratio: 0.5, rotation: DEGREES[90], position: 0, zoom: 1}],
+			'Okay! Now that we\'ve gone through how snap-panning works, how useful is it in practise?',
+			'In fact, what\'s even the ', {tag: 'i', content: 'point'}, ' of snap-panning?',
+		],
+		[
+			'Snap-panning\'s purpose is to allow users to quickly focus on some sub-region of content.',
+			'My snap zooms are the minimum zoom for which the snap point is legal, making them an under-estimation of how far the user wants to zoom in.',
+			'Because of this, the worst outcome for a snap-pan is being too zoomed out.',
+		],
+		[
+			'The good news is that this makes the overly restrictive pan-limits harmless — if anything they\'re beneficial!',
+			'On the other hand, unexpectedly zoomed-out ',
+			getButton('snap-pans', [
+				[{ratio: 0.25, rotation: DEGREES[90], position: 0, zoom: 1}],
 				[{y: 0.25, zoom: 2}, {duration: 0}],
 			]),
-			' snap-pan.',
-			'Not zooming in enough to hide the empty space above the image doesn\'t make much sense.',
-			getButton('Increasing', [
-				[{ratio: 0.25, rotation: DEGREES[90], position: 0}],
-				[{y: 0.25, zoom: 2}, {duration: 0}],
-			]),
-			' the differential makes it even less sensible, with empty space appearing below too.',
+			' due to permissive pan-limits are unacceptable.',
 		],
 		{
 			tag: 'h2',

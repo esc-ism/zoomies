@@ -53,6 +53,7 @@ export default class {
 		const [constrainer, bounds, tangents] = this.getPositionConstrainer();
 		
 		this.getConstrainedPosition = constrainer;
+		this.boundValues = bounds;
 		
 		this.setBounds(bounds);
 		this.setRailsProgress(bounds);

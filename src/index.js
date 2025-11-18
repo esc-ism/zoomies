@@ -128,9 +128,6 @@ demo.init().then(async () => {
 		currentPage = page;
 		
 		currentPage.text.classList.add(CLASS_ACTIVE);
-		demo.setSystem(page);
-		page.start?.();
-		
 		textContainer.scrollTop = Math.min(scrollTop, header.offsetHeight);
 		
 		if (pushState) {
@@ -139,6 +136,10 @@ demo.init().then(async () => {
 			// record page navigation in the history
 			history.pushState({index}, '', `${location.origin}${location.pathname}?${params.toString()}`);
 		}
+		
+		demo.setSystem(page).then(() => {
+			page.start?.();
+		});
 	};
 	
 	for (const page of pages) {

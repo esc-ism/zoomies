@@ -135,14 +135,22 @@ export default {
 			}},
 		]),
 		[
-			{tag: 'i', content: 'boundX'}, ' is derived from widths and ', {tag: 'i', content: 'boundY'}, ' is derived from heights.',
-			'Their ascents are synchronous when the viewport and image ',
+			'When the viewport and image ',
 			getButton('share', [
 				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
 				[{ratio: 1}, {ease: 'none', duration: 1}],
 			]),
-			' an aspect ratio.',
-			'Only when the viewport is ',
+			' an aspect ratio,', {tag: 'i', content: 'boundX'}, ' and ', {tag: 'i', content: 'boundY'}, ' are equal for all zooms.',
+			'The ',
+			{tag: 'math', xmlns, content: [
+				{tag: 'mfrac', xmlns, content: [
+					{tag: 'mi', xmlns, content: 'viewportSize'},
+					{tag: 'mi', xmlns, content: 'zoom'},
+				]},
+				{tag: 'mo', xmlns, content: '⩾'},
+				{tag: 'mi', xmlns, content: 'imageSize'},
+			]},
+			' conditions only uncouple when the viewport is ',
 			getButton('wider', [
 				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
 				[{ratio: 2}, {ease: 'none', duration: 1}],
@@ -152,7 +160,7 @@ export default {
 				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
 				[{ratio: 0.5}, {ease: 'none', duration: 1}],
 			]),
-			' than the image do their ascents begin at different zoom levels.',
+			' than the image.',
 		],
 		{
 			tag: 'h2',

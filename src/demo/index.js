@@ -471,10 +471,12 @@ export default new class {
 		this.system = new System();
 		this.page = text;
 		
-		this.system.constrainPosition({position: true, ratio: true});
-		this.applyPosition();
-		
-		this.target.set(startPosition);
+		return this.#init.then(() => {
+			this.system.constrainPosition({position: true, ratio: true});
+			this.applyPosition();
+			
+			this.target.set(startPosition);
+		});
 	}
 	
 	addPointerDownListener(element, target, {onStart, onFinish, get}) {
@@ -720,11 +722,13 @@ export default new class {
 					effects.position = true;
 				}
 				
+				const targetPosition = {...this.position};
+				
 				this.system.constrainPosition(effects);
 				this.applyPosition();
 				
 				if (!ignorePosition || !this.target.isHidden()) {
-					this.target.set(target);
+					this.target.set(targetPosition);
 				}
 				
 				effects = {};

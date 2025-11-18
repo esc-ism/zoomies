@@ -773,31 +773,21 @@ const functions = [
 	]},
 ];
 
-const useTopLeft = ({zoomPoints}) => {
-	if (zoomPoints[2].isFirstInt) {
-		return false;
-	}
-	
-	if (zoomPoints[5].isFirstInt) {
-		return true;
-	}
-	
-	return zoomPoints[2].p < zoomPoints[5].p;
-};
-
 let getDirectVars;
 
 export default {
 	System,
 	start() {
 		getDirectVars = () => {
-			const data = getVarGetter(-DEGREES[270] + DEGREES['45_2'], demo.ratioViewport / 1.5)();
-			
-			if (useTopLeft(data)) {
+			if (demo.ratioViewport < 1) {
+				const data = getVarGetter(-DEGREES[270] + DEGREES['45_2'], 0.5)();
+				
 				return {...data, third: getFlipped(data.zoomPoints[2])};
 			}
 			
-			return {...data, third: data.zoomPoints[5]};
+			const data = getVarGetter(DEGREES[90] - DEGREES['45_2'], 2)();
+			
+			return {...data, third: data.zoomPoints[2]};
 		};
 		
 		registerFunctions(functions);
@@ -839,7 +829,7 @@ export default {
 			', each keeping a ',
 			getButton('pair', [
 				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[1].z, position: third}],
-				({third}) => [{zoom: third.z}],
+				({third}) => [{zoom: third.z}, {duration: 3, ease: 'none'}],
 			], {getParam: () => getDirectVars()}),
 			' of image corners visible.',
 			'Connecting rails run until they intersect with lock rails, at which point we\'re home free.',
@@ -881,7 +871,7 @@ export default {
 		],
 		[
 			'Before, we calculated top and right-side midpoints at different zoom levels (used here as origin and connecting rail start zooms).',
-			'It\'s simpler to interpolate down the pre-calculated midpoint from origin rail start zoom to connecting rail start zoom than do more trigonometry.',
+			'It\'s simpler to interpolate down the pre-calculated midpoint at origin rail start zoom than it is to do more trigonometry.',
 			'So that\'s what you see below!',
 		],
 		getDiagrammedMath(
@@ -1236,8 +1226,8 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'It turns out that it\'s never necessary to consider origin rails in snap zoom calculation, so nothing much has changed from the two-line systems.',
-			'We still only need two or three checks per region, depending on whether adjacent corners share a connecting rail.',
+			'It turns out that it\'s never necessary to consider origin rails in snap zoom calculation.',
+			'Because of this, we still only need two or three checks per region, depending on whether adjacent corners share a connecting rail.',
 		],
 		[
 			'It\'s definitely possible to pinpoint the snap position\'s region here, but it\'d be tricky.',
@@ -1245,6 +1235,7 @@ export default {
 			'Taking an inferior approach is a little irksome, but this method is simple and avoids introducing sneaky bugs.',
 			'If you cared about efficiency, this would be the way to improve it.',
 		],
+		'Overall, the code\'s mostly unchanged from the prior system.',
 		getCode(code, [
 			{op: '=', id: 'snapZoom', type: 'zoom', and: {
 				op: 'max', multiline: true, and: [
@@ -1281,7 +1272,7 @@ export default {
 		[
 			'And with that, we\'re done!',
 			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful.',
-			'Nevertheless, I\'m glad to have seen my vision through and proud to have pushed my limits so far.',
+			'Nevertheless, I\'m glad to have seen my vision through and proud to have pushed my (pan) limits so far.',
 		],
 		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
 	),
