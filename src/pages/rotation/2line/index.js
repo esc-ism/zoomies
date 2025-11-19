@@ -487,8 +487,8 @@ export default {
 			get45Button(225, 1.25),
 			' and ',
 			get45Button(315, 1.25),
-			' where one origin rail wouldn\'t intersect its lock rail if it used the preferred axis.',
-			'The result is crossed lock rails, with bounds that seem to ',
+			' where neither lock rail has a good intersection with the preferred viewport axis.',
+			'The result is crossed rails, with bounds that seem to ',
 			getButton('invert', [
 				({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom: zoom / 1.1}],
 				({zoom}) => [{zoom: zoom * 1.1}, TWEEN_OPTIONS_YOYO],
@@ -524,7 +524,7 @@ export default {
 		},
 		[
 			'In all prior systems, it was straightforward to rule out pairs of rails that didn\'t need checking.',
-			'Here, however, the region in which the position lies is no longer obvious.',
+			'Here, however, the region in which the snap point lies is no longer obvious.',
 			'Plus, even if a snap zoom is found in one region, the bound inversion behaviour means that another valid zoom may exist in another region.',
 			'For simplicity, I check every region.',
 		],
@@ -567,7 +567,8 @@ export default {
 		},
 		[
 			'This system\'s less efficient and even worse at pan-limiting than the prior.',
-			'It\'s actually the only system I\'ve discussed that has no justifiable application - even Unbound is useful in ', {tag: 'i', content: 'some'}, ' contexts.',
+			'Notably, it behaves perfectly when the image is a square — viewport aspect ratio doesn\'t matter.',
+			'It a slightly less specific use case than the Single-Line system, but that\'s not saying much.',
 		],
 		{
 			content: 'Not ideal!',

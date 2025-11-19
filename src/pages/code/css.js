@@ -6,7 +6,7 @@ import {
 } from './consts';
 
 const addPseudoRule = (selector, content, {display = 'inline', ...styles} = {}) => addRule(selector, {display, ...styles, content: `"${content}"`});
-const addKeywordPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`, color: '#db8e38'});
+const addKeywordPseudoRule = (selector, content, display = 'inline') => addRule(selector, {display, content: `"${content}"`, color: '#d69f61'});
 
 // infix binary ops
 for (const [name, content = name] of [
@@ -79,7 +79,7 @@ addRule(`.${CLASS_NAMES['=']} > :last-child::after`, {display: 'block'});
 // dynamic ops
 addRule([`.${CLASS_NAMES.bool}`, `.${CLASS_NAMES.number}`, `.${CLASS_TOOLTIP}`], {color: '#9cbaff'});
 
-addRule(`.${CLASS_NAMES.evocation}`, {color: '#d7c430'});
+addRule(`.${CLASS_NAMES.evocation}`, {color: '#cac17d'});
 
 for (const [name, colour] of [['accept', '#00ff001a'], ['reject', '#ff00001a']]) {
 	addRule(`.${CLASS_NAMES.branch[name]} > :not(.${CLASS_NAMES.inactive} *)`, {'background-image': `linear-gradient(${colour}, ${colour})`});

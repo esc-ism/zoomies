@@ -579,7 +579,7 @@ export default new class {
 	
 	set ratioImage(ratio) {
 		this._ratioImage = ratio;
-		this.ratioImageInverse = 1 / this.ratioImage;
+		this.ratioImageInverse = 1 / this._ratioImage;
 		
 		this.updateSizesImage();
 	}
@@ -713,22 +713,27 @@ export default new class {
 			let willUpdate = false;
 			
 			const update = () => {
-				const {ignorePosition} = tween.data;
+				const {ignorePosition, moveTarget} = tween.data;
 				
-				if (!ignorePosition && (this.position.x !== target.x || this.position.y !== target.y)) {
-					this.position.x = target.x;
-					this.position.y = target.y;
+				if (moveTarget) {
+					this.target.set(target);
 					
-					effects.position = true;
-				}
-				
-				const targetPosition = {...this.position};
-				
-				this.system.constrainPosition(effects);
-				this.applyPosition();
-				
-				if (!ignorePosition || !this.target.isHidden()) {
-					this.target.set(targetPosition);
+					this.system.constrainPosition(effects);
+					this.applyPosition();
+				} else {
+					if (!ignorePosition && (this.position.x !== target.x || this.position.y !== target.y)) {
+						this.position.x = target.x;
+						this.position.y = target.y;
+						
+						effects.position = true;
+					}
+					
+					this.system.constrainPosition(effects);
+					this.applyPosition();
+					
+					if (!ignorePosition || !this.target.isHidden()) {
+						this.target.set(target);
+					}
 				}
 				
 				effects = {};
@@ -768,18 +773,21 @@ export default new class {
 		Object.defineProperty(target, 'x', getDefinition(this.position.x, (x) => {
 			doUpdate('position');
 			
-			return this.position.x = x;
+			return x;
 		}));
 		Object.defineProperty(target, 'y', getDefinition(this.position.y, (y) => {
 			doUpdate('position');
 			
-			return this.position.y = y;
+			return y;
 		}));
 		
 		Object.defineProperty(target, 'ratio', getDefinition(this.ratio, (ratio) => {
 			doUpdate('ratio');
 			
-			this.ratioImage = this.ratioViewport / ratio;
+			this._ratioImage = this.ratioViewport / ratio;
+			this.ratioImageInverse = 1 / this._ratioImage;
+			
+			this.updateSizesImage(false);
 			
 			return ratio;
 		}));
@@ -787,7 +795,10 @@ export default new class {
 		Object.defineProperty(target, 'ratioImage', getDefinition(this.ratioImage, (ratio) => {
 			doUpdate('ratio');
 			
-			this.ratioImage = ratio;
+			this._ratioImage = ratio;
+			this.ratioImageInverse = 1 / this._ratioImage;
+			
+			this.updateSizesImage(false);
 			
 			return ratio;
 		}));
@@ -829,7 +840,7 @@ export default new class {
 		
 		const effects = {};
 		
-		for (const [target, {position, ...vars} = {}] of targets) {
+		for (const [target, {position = '>', cutRotation = true, ...vars} = {}] of targets) {
 			const to = {};
 			
 			let hasTween = false;
@@ -857,7 +868,9 @@ export default new class {
 				} else if (type === 'x' || type === 'y') {
 					record(type, value, 'position');
 				} else if (type === 'rotation') {
-					if (value > this.rotation) {
+					if (!cutRotation) {
+						record(type, value);
+					} else if (value > this.rotation) {
 						record(type, value - this.rotation <= DEGREES[180] ? value : value - DEGREES[360]);
 					} else {
 						record(type, this.rotation - value <= DEGREES[180] ? value : value + DEGREES[360]);

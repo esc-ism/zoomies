@@ -1,17 +1,19 @@
 import demo from '@/demo';
+import {PADDING_VIEWPORT} from '@/demo/consts';
 import {DEGREES} from '@/shared';
+import {inputListener} from '@/consts';
 
 import {xmlns} from '../shared/math';
 import {getText, getMath} from '../shared';
 import {getButton, clearButton} from '../shared/button';
 
 import System from './demo';
-import {inputListener} from '@/consts';
+import {getSnapTween, TWEEN_OPTIONS_TARGET} from '../shared/tween';
 
 // top right corner with zoom=2
 export const getSnapPosition = () => ({
-	x: 0.5 - demo.sizesViewport.width / demo.sizesImage.width / 4,
-	y: 0.5 - demo.sizesViewport.height / demo.sizesImage.height / 4,
+	x: 0.5 - demo.sizesViewport.width / (demo.sizesViewport.width - PADDING_VIEWPORT) / 4,
+	y: 0.5 - demo.sizesViewport.height / (demo.sizesViewport.height - PADDING_VIEWPORT) / 4,
 });
 
 export default {
@@ -27,7 +29,7 @@ export default {
 		},
 		[
 			'Let\'s start ',
-			getButton('limiting panning', [
+			getButton('limiting', [
 				[{zoom: 1}],
 				() => {
 					const axis = Math.abs(demo.position.x) >= Math.abs(demo.position.y) ? 'x' : 'y';
@@ -35,7 +37,7 @@ export default {
 					return [{[axis]: demo.position[axis] <= 0 ? 0.5 : -0.5}, {ease: 'bounce.out', duration: 1.5}];
 				},
 			]),
-			'!',
+			' panning!',
 			'Here, we have the simplest reasonable system, where the center of the viewport is bound by the image.',
 			'The system may be described like:',
 		],
@@ -77,12 +79,13 @@ export default {
 			'Say you want to fill your screen with the top-right quadrant of the image —',
 			'it\'d be nice if ',
 			getButton('snap-panning', [
-				[{rotation: DEGREES[90], zoom: 1}],
-				() => [{position: getSnapPosition(demo)}, {duration: 0}],
-			]),
+				[{rotation: DEGREES[90], zoom: 1, ratio: 1, position: 0}],
+				(position) => [position, TWEEN_OPTIONS_TARGET],
+				(position) => [position, {duration: 0}],
+			], {getParam: () => getSnapPosition(demo)}),
 			' could give you the desired view without having to ',
 			getButton('zoom', [
-				() => [{rotation: DEGREES[90], position: getSnapPosition(demo), zoom: 1}, {duration: 0}],
+				() => [{rotation: DEGREES[90], zoom: 1, ratio: 1, ...getSnapPosition(demo)}, {duration: 0}],
 				[{zoom: 2}, {delay: 0.2}],
 			]),
 			' manually.',

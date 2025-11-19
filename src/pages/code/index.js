@@ -483,7 +483,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 	const hovered = [];
 	
 	if (doShowVisuals) {
-		element.style.color = '#9fd49f';
+		element.style.color = '#9bc99b';
 	}
 	
 	if (id && 'value' in scope[id]) {

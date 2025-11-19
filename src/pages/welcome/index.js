@@ -153,8 +153,8 @@ export default {
 		[
 			'My scope is restricted to rectangular content, keeping all four corners viewable at all times and handling the following variables:',
 			{tag: 'ul', style: {marginBlockStart: '1ex', marginBlockEnd: '0.5em'}, content: [
-				'Image aspect ratio',
-				'Viewport aspect ratio',
+				'Image size',
+				'Viewport size',
 				'Zoom',
 				'Rotation',
 			].map((content) => ({tag: 'li', content}))},

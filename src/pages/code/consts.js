@@ -3,25 +3,25 @@ import {getIdGetter} from '@/shared/css';
 export const ANGLE_RADIUS = 10;
 
 export const BUILT_INS = {
-	imageWidth: ({sizesImage: {width: value}}) => ({value, type: 'x', showRotation: false, isPercent: false, doCenter: true}),
-	imageHeight: ({sizesImage: {height: value}}) => ({value, type: 'y', showRotation: false, isPercent: false, doCenter: true}),
+	imageWidth: ({sizesImage: {width: value}}) => ({value, type: 'x', isPercent: false, doCenter: true}),
+	imageHeight: ({sizesImage: {height: value}}) => ({value, type: 'y', isPercent: false, doCenter: true}),
 	
-	viewportWidth: ({sizesViewport: {width: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false, doCenter: true}),
-	viewportHeight: ({sizesViewport: {height: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false, doCenter: true}),
+	viewportWidth: ({sizesViewport: {width: value}}) => ({value, type: 'xvp', isPercent: false, doCenter: true}),
+	viewportHeight: ({sizesViewport: {height: value}}) => ({value, type: 'yvp', isPercent: false, doCenter: true}),
 	
-	'½imageWidth': ({sizesImage: {halfWidth: value}}) => ({value, type: 'x', showRotation: false, isPercent: false}),
-	'½imageHeight': ({sizesImage: {halfHeight: value}}) => ({value, type: 'y', showRotation: false, isPercent: false}),
+	'½imageWidth': ({sizesImage: {halfWidth: value}}) => ({value, type: 'x', isPercent: false}),
+	'½imageHeight': ({sizesImage: {halfHeight: value}}) => ({value, type: 'y', isPercent: false}),
 	
-	'½viewportWidth': ({sizesViewport: {halfWidth: value}}) => ({value, type: 'xvp', showRotation: false, isPercent: false}),
-	'½viewportHeight': ({sizesViewport: {halfHeight: value}}) => ({value, type: 'yvp', showRotation: false, isPercent: false}),
+	'½viewportWidth': ({sizesViewport: {halfWidth: value}}) => ({value, type: 'xvp', isPercent: false}),
+	'½viewportHeight': ({sizesViewport: {halfHeight: value}}) => ({value, type: 'yvp', isPercent: false}),
 	
 	π: () => ({value: Math.PI, type: 'angle', fight: true}),
 	'½π': () => ({value: Math.PI / 2, type: 'angle', fight: true}),
 	'¼π': () => ({value: Math.PI / 4, type: 'angle', fight: true}),
 	'⅛π': () => ({value: Math.PI / 8, type: 'angle', fight: true}),
 	
-	x: ({position: {x}}) => ({value: x}),
-	y: ({position: {y}}) => ({value: y}),
+	x: ({position: {x}}) => ({value: x, type: 'x'}),
+	y: ({position: {y}}) => ({value: y, type: 'y'}),
 	
 	rotation: ({rotation: value}) => ({value, type: 'angle', fight: true}),
 	zoom: ({zoom: value}) => ({value, type: 'zoom'}),

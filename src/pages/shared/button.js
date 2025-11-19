@@ -41,6 +41,8 @@ const releaseButton = (event) => {
 };
 
 export const getButton = (text, tweens, {doReset = false, getParam = () => undefined} = {}) => {
+	// todo this could be useful but isn't currently used
+	//  might need modifying
 	const resetTweens = doReset ? TWEENS_RESET : [];
 	
 	let element;

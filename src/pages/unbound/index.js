@@ -17,6 +17,8 @@ let instruct;
 let exitPromise;
 let exitResolve;
 
+const getDialogue = (...content) => ({style: {fontStyle: 'italic', textAlign: 'right', textWrapStyle: 'balance'}, content});
+
 class Validator {
 	static succeed() {
 		demo.progress.set(1);
@@ -168,15 +170,12 @@ export default {
 		[
 			'To start, I\'d like to expound the value of pan-limiting.',
 		],
-		{
-			style: {fontStyle: 'italic'},
-			content: [
-				'Wait — before that, what\'s the thing ',
-				{tag: 'span', classList: [CLASS_HIDE_HORIZONTAL], content: 'at the top'},
-				{tag: 'span', classList: [CLASS_HIDE_VERTICAL], content: 'to the left'},
-				'?',
-			],
-		},
+		getDialogue(
+			'Wait — before that, what\'s the thing ',
+			{tag: 'span', classList: [CLASS_HIDE_HORIZONTAL], content: 'at the top'},
+			{tag: 'span', classList: [CLASS_HIDE_VERTICAL], content: 'to the left'},
+			'?',
+		),
 		[
 			'Glad you asked!',
 			'It\'s our first pan-limiting playground.',
@@ -349,13 +348,23 @@ export default {
 			content: 'Conclusion',
 		},
 		[
-			'In some cases, unbound panning is actually desireable.',
-			'As an example, a canvas that sizes dynamically to contain new input would be undermined by pan limits.',
+			'There do exist niche use cases for unbound panning.',
+			'For example, a canvas that grows to accommodate new input would be undermined by pan limits.',
 			'In most cases, however, some degree of pan-limiting is useful.',
 		],
 		[
-			'Most importantly, unbound panning is ', {tag: 'i', content: 'boring'}, ' and pan-limiting is ', {tag: 'i', content: 'interesting'}, '!',
-			'As we progress, I hope to impart some of my appreciation for elegant pan-limiting solutions.',
+			'Most importantly, unbound panning is ', {tag: 'strong', content: 'boring'}, ' and pan-limiting is ', {tag: 'strong', content: 'interesting'}, '!',
+		],
+		getDialogue(
+			'Why make me read about it if you ',
+			{tag: 'strong', content: 'agree'},
+			' that it\'s boring?!',
+		),
+		[
+			'Good question!',
+			'I\'m trying to tell a story through this website, and no story\'s ending is as impactful without context.',
+			'These early pages will help you to appreciate the complex pan-limiting coming later, and understand the steps taken to get there.',
+			'Hopefully, by the end, you\'ll think that pan-limiting is as interesting as I do!',
 		],
 	),
 };

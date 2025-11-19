@@ -10,6 +10,7 @@ import {getButton, clearButton} from '../shared/button';
 import {getSnapPosition} from '../center';
 
 import System from './demo';
+import {TWEEN_OPTIONS_TARGET} from '../shared/tween';
 
 const refreshButton = getRefreshButton();
 
@@ -100,16 +101,19 @@ export default {
 		],
 		getInstruction(
 			[
-				'Below is our first code snippet.',
-				'These are interactive versions of system internals, showing exactly how they work.',
+				'Below is our first "code snippet".',
+				'These expose internal logic through interactive source code, using playground state as input.',
 			],
 			[
-				'Greyed out code is unexecuted.',
+				'Greyed-out code is unexecuted for the current inputs.',
 				getInputDependent((isMouse) => isMouse ?
-					'Click a variable in executed code to see its value. Green variables offer playground visualisations of their values when moused over.' :
-					'Tap a variable in executed code to see its value. Green variables will provide playground visualisations of their values.'),
+					'Click a variable in executed code to see its value. Green variables offer visualisations of their values when moused over.' :
+					'Tap a variable in executed code to see its value. Green variables will provide visualisations of their values.'),
 			],
-			['After changing playground state, code won\'t be up to date until it\'s rerun via the ', refreshButton, ' button at its top-right corner.'],
+			[
+				'Code snippets run when you turn a page and don\'t keep up with state changes.',
+				'Update them via the ', refreshButton, ' button at their top-right corners.',
+			],
 		),
 		getCode(code, [
 			{op: '=', id: 'boundX', type: 'x', and: {
@@ -297,14 +301,16 @@ export default {
 			content: 'Effectiveness',
 			style: {textAlign: 'center'},
 		},
-		// todo expand
 		[
-			'Zoom is now adjusted for us automatically when ',
+			'Zoom is now adjusted automatically when ',
 			getButton('snap-panning', [
 				[{zoom: 1, position: 0}],
-				({lowAxis}) => [{[lowAxis === 'y' ? 'x' : 'y']: 0.25}],
-				({zoomPoints}) => [{zoom: zoomPoints[1].z * 2}, {duration: 0}],
-			], {getParam: () => demo.system}),
+				({position}) => [position, TWEEN_OPTIONS_TARGET],
+				({position, zoom}) => [{zoom, ...position}, {duration: 0}],
+			], {getParam: () => ({
+				zoom: demo.system.zoomPoints[1].z * 2,
+				position: {[demo.system.lowAxis === 'y' ? 'x' : 'y']: 0.25},
+			})}),
 			'.',
 			'Position will even be ',
 			getButton('corrected', [
@@ -316,12 +322,13 @@ export default {
 		[
 			'This is the perfect system for images that can\'t be rotated, but it ',
 			getButton('fails', [
-				(position) => [{position}, {duration: 0}],
-				[{zoom: 2}],
-				[{rotation: DEGREES[90] - 0.2}, {duration: 0.5}],
-				({x, y}) => [{position: {x: x - 0.05, y: y - 0.05}}, {ease: 'power1.inOut', duration: 0.2, delay: 0.6}],
-				(position) => [{position}, {ease: 'bounce.out', duration: 0.4, delay: 0.1}],
-			], {doReset: true, getParam: getSnapPosition}),
+				[{zoom: 1, position: 0, rotation: DEGREES[90], ratio: 1}, {duration: 0.3, ease: 'power1.out'}],
+				(position) => [position],
+				[{zoom: 2}, {position: '<0.3'}],
+				[{rotation: DEGREES[90] - 0.2}, {duration: 0.5, delay: 0.3}],
+				({x, y}) => [{position: {x: x - 0.05, y: y - 0.05}}, {duration: 0.2, delay: 0.6}],
+				(position) => [position, {ease: 'bounce.out', duration: 0.4, delay: 0.1}],
+			], {getParam: getSnapPosition}),
 			' when rotation is introduced.',
 		],
 		{

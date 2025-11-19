@@ -264,7 +264,7 @@ export default {
 		],
 		[
 			'The "Single-Line" system forbade control over rail gradients; they would always be 1 or -1.',
-			'Multi-line rails provide much more flexibility, allowing for manipulation of lock point locations.',
+			'Multi-line rails provide much more flexibility, enabling manipulation of lock point locations.',
 		],
 		[
 			'This system places each lock point on a different viewport edge.',
@@ -344,7 +344,7 @@ export default {
 		},
 		[
 			'Each lock point must be on a different viewport edge, and adjacent corners will have lock points on adjacent edges.',
-			'Since we\'re focusing on adjacent (top-left and top-right) image corners, we can say that one will be a viewport side corner and the other a vewport base corner.',
+			'Since we\'re focusing on adjacent (top-left and top-right) image corners, we can say that one will be a viewport side corner and the other a viewport base corner.',
 			'Corners will alternate between base and side every 90°.',
 		],
 		// todo define "lock angle"
@@ -502,7 +502,12 @@ export default {
 				],
 			},
 			{
-				title: 'Inferences',
+				title: [
+					{tag: 'mo', xmlns, content: '|'},
+					{tag: 'mi', xmlns, content: 'A'},
+					{tag: 'mi', xmlns, content: 'C'},
+					{tag: 'mo', xmlns, content: '|'},
+				],
 				content: [
 					{tag: 'mtable', xmlns, classList: [CLASS_MATH_EQUATION], content: [
 						{tag: 'mtr', xmlns, content: [
@@ -903,13 +908,13 @@ export default {
 		},
 		[
 			'This system\'s not a great pan-limiter, but it\'s an effective snap-panner.',
-			'I consider it an agreeable complement to "Viewport Center".',
+			'It complements "Viewport Center" well.',
 			'The two systems synergise perfectly, covering each other\'s weakness to create a superior product.',
 		],
 		[
 			'Good stuff!',
-			'This conclusion feels triumphal, but perhaps more second act climax than final, supreme victory.',
-			'But what\'s left to do if we already have a acceptable, rotation-handling product?',
+			'By combining systems, we now have an acceptable, rotation-handling product.',
+			'This is a win, but perhaps more second act climax than final, supreme victory.',
 		],
 		[
 			'I\'d feel a lot more satisfied with this system if it wasn\'t such a weak pan-limiter.',

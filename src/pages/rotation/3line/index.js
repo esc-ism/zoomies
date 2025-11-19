@@ -795,6 +795,12 @@ export default {
 		for (const {start} of code) {
 			start();
 		}
+		
+		window.setTimeout(() => {
+			demo.rotation = 1.250737;
+			demo.system.constrainPosition({rotation: true});
+			demo.applyRotation();
+		}, 200);
 	},
 	end() {
 		cleanup();
@@ -832,7 +838,7 @@ export default {
 				({third}) => [{zoom: third.z}, {duration: 3, ease: 'none'}],
 			], {getParam: () => getDirectVars()}),
 			' of image corners visible.',
-			'Connecting rails run until they intersect with lock rails, at which point we\'re home free.',
+			'Connecting rails run until they intersect with lock rails, which are unchanged once again.',
 		],
 		[
 			'It\'s possible for a lock rail to intersect with its origin rail before its connecting rail.',
@@ -1172,10 +1178,12 @@ export default {
 			'All of the prior system\'s pan-limiting flaws are fixed.',
 			'Bound changes are now perfectly ',
 			getButton('fluid', [
-				() => [{ratioImage: demo.ratioViewport > 1 ? 0.75 : 1.5, zoom: 1, position: 0}],
-				() => [{rotation: demo.rotation + DEGREES[180]}, {ease: 'none', duration: 4}],
-				() => [{rotation: demo.rotation - DEGREES[180]}, {duration: 0}],
-				() => [{rotation: demo.rotation - DEGREES[360]}, {ease: 'none', duration: 4}],
+				[{ratioImage: 1, zoom: 1, position: 0}],
+				() => [{rotation: demo.rotation - DEGREES[360]}, {cutRotation: false, ease: 'none', duration: 8}],
+				[{ratioImage: 0.5}, {position: '<', duration: 2}],
+				[{ratioImage: 1.5}, {duration: 2}],
+				[{ratioImage: 0.75}, {duration: 2}],
+				[{ratioImage: 2}, {duration: 2}],
 			]),
 			', providing a more consistent and reliable experience.',
 			'Besides patching issues, the connecting rails even enhance the system\'s ability to show ',
@@ -1217,7 +1225,7 @@ export default {
 			]},
 		}),
 		[
-			'to the behemoth we have here.',
+			'to the behemoth presented here.',
 			'Because of this, I still prefer "Viewport Center" as a pan-limiter.',
 		],
 		{
@@ -1272,7 +1280,9 @@ export default {
 		[
 			'And with that, we\'re done!',
 			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful.',
-			'Nevertheless, I\'m glad to have seen my vision through and proud to have pushed my (pan) limits so far.',
+			'Nevertheless, I\'m glad to have seen my vision through and proud to have pushed my ',
+			{tag: 'span', style: {fontSize: '0.6em'}, content: '(pan)'},
+			' limits so far.',
 		],
 		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
 	),

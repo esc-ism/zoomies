@@ -14,7 +14,7 @@ import * as mock from '../mock';
 import System, {getZoomPoints} from './demo';
 import zoomImage from './zoomImage';
 import snapImage from './snapImage';
-import {singleCornerGetter} from '@/pages/shared/tween';
+import {getSnapTargetTween, getSnapTween, singleCornerGetter, TWEEN_OPTIONS_TARGET} from '@/pages/shared/tween';
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
@@ -948,15 +948,9 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'You\'ll find that this system works ',
-			getButton('well', [
-				[{ratio: 1, rotation: DEGREES[90], zoom: 1, position: {x: -0.5, y: 0.5}}],
-				[{rotation: 0}, {duration: 4}],
-				[{zoom: 2}, {duration: 2, ease: 'power3.inOut', yoyo: true, repeat: 1, position: '<'}],
-			]),
-			' if the viewport and image share an aspect ratio.',
-			'The system\'s flaw is only revealed when the ratios are ',
-			getButton('decoupled', [[{ratio: restrictiveTweens.ratio}]]),
+			'You\'ll find that this system works perfectly if the viewport and image are both squares.',
+			'Its flaw is only revealed when one is ',
+			getButton('stretched', [[{ratio: restrictiveTweens.ratio}]]),
 			'.',
 		],
 		[
@@ -1751,7 +1745,8 @@ export default {
 			'On the other hand, unexpectedly zoomed-out ',
 			getButton('snap-pans', [
 				[{ratio: 0.25, rotation: DEGREES[90], position: 0, zoom: 1}],
-				[{y: 0.25, zoom: 2}, {duration: 0}],
+				[{y: 0.25}, TWEEN_OPTIONS_TARGET],
+				[{zoom: 2, y: 0.25}, {duration: 0}],
 			]),
 			' due to permissive pan-limits are unacceptable.',
 		],
@@ -1761,13 +1756,16 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Single-line rails don\'t fulfill my needs; pan-limits can be too restrictive or too permissive,',
-			'and the prior system\'s behaviour for un-rotated images isn\'t reliable reproduced.',
+			'Single-line rails don\'t fulfill my needs.',
+			'Its weak pan-limiting isn\'t so important since the Viewport Center system has that covered, but its snap-panning is equally poor.',
 		],
 		[
-			'Notably, however, these problems only apply when the image and viewport have different aspect ratios.',
-			'Oftentimes, viewports will be sized to exactly match their contents.',
-			'When said contents can be rotated, this system has a valid use case.',
+			'A valid use case would require variable rotation alongside guaranteed 1:1 aspect ratios for both image and viewport.',
+			'The situation\'s so niche that it\'s hard to say that this system is particularly useful.',
+		],
+		[
+			'Despite the disappointing final product, working through this system has provided plenty of tools that we can use moving forward.',
+			'Let\'s take the knowledge we\'ve gained and make something better!',
 		],
 	),
 };

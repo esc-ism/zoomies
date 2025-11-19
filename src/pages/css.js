@@ -48,7 +48,8 @@ addRule(`.${CLASS_CODE} code`, {
 	'font-size': '0.85em',
 	'white-space': 'pre',
 	
-	padding: '10px 1em',
+	// 3em to keep |x| clickable in Viewport Edge's snap zoom snippet
+	padding: '10px 3em 10px 1em',
 	display: 'block',
 	width: 'fit-content',
 });
@@ -137,6 +138,7 @@ addRule(`.${CLASS_BUTTON_ACTIVE}`, {
 addRule(`.${CLASS_BUTTON}`, {
 	color: buttonColour,
 	cursor: 'pointer',
+	'text-wrap-mode': 'nowrap',
 });
 
 addRule(`.${CLASS_BUTTON}:hover`, {
