@@ -542,20 +542,24 @@ export default new class {
 				moveListener(event, events, pointerCount);
 			});
 			
-			const removeStopListener = addPointerListener('pointerup', () => {
+			const stop = () => {
 				removeClickNegater?.();
 				removeMoveListener();
 				removeStopListener();
+				removeCancelListener();
+				
+				delete events[pointerId];
+				
+				if (--pointerCount === 0) {
+					onFinish?.();
+				}
+			};
+			
+			const removeStopListener = addPointerListener('pointerup', () => {
+				stop();
 				
 				if (buttons === 2) {
 					cancelRightClick();
-				}
-				
-				delete events[pointerId];
-				pointerCount--;
-				
-				if (pointerCount === 0) {
-					onFinish?.();
 				}
 				
 				if (!isClick) {
@@ -573,6 +577,12 @@ export default new class {
 				if (pointerCount === 0) {
 					clickListener(clickCount);
 				}
+			});
+			
+			const removeCancelListener = addPointerListener('pointercancel', () => {
+				stop();
+				
+				failedClick = true;
 			});
 		});
 	}
@@ -697,52 +707,69 @@ export default new class {
 		
 		if (isOngoing) {
 			window.clearTimeout(this.#tweenUpdateId);
+			
+			this.target.hide();
+		} else {
+			this.tweenUpdate.then(() => {
+				this.target.hide();
+			});
 		}
 		
 		delete this.tween;
-		
-		this.target.hide();
 	}
 	
-	getTweenTarget(tween) {
-		const target = {};
-		
+	// todo snap panning on reverse doesn't kill?
+	
+	getTweenTarget() {
+		const target = {
+			ignorePosition: 0,
+			x: this.position.x,
+			y: this.position.y,
+		};
+		let hasActions = false;
+		let hasTargetActions = false;
+		let actions = {};
 		let effects = {};
 		
 		const doUpdate = (() => {
 			let willUpdate = false;
 			
 			const update = () => {
-				const {ignorePosition, moveTarget} = tween.data;
-				
-				if (moveTarget) {
-					this.target.set(target);
+				if (hasActions) {
+					for (const action of Object.values(actions)) {
+						action();
+					}
 					
-					this.system.constrainPosition(effects);
-					this.applyPosition();
-				} else {
-					if (!ignorePosition && (this.position.x !== target.x || this.position.y !== target.y)) {
+					if (!target.ignorePosition && (this.position.x !== target.x || this.position.y !== target.y)) {
 						this.position.x = target.x;
 						this.position.y = target.y;
 						
 						effects.position = true;
 					}
 					
+					if (!hasTargetActions) {
+						target.xTarget = this.position.x;
+						target.yTarget = this.position.y;
+					}
+					
 					this.system.constrainPosition(effects);
 					this.applyPosition();
 					
-					if (!ignorePosition || !this.target.isHidden()) {
-						this.target.set(target);
-					}
+					hasActions = false;
 				}
 				
+				if (hasTargetActions) {
+					this.target.set({x: target.xTarget, y: target.yTarget});
+					
+					hasTargetActions = false;
+				}
+				
+				actions = {};
 				effects = {};
 				willUpdate = false;
 			};
 			
-			return (label) => {
-				effects[label] = true;
-				
+			return () => {
 				if (willUpdate) {
 					return;
 				}
@@ -759,69 +786,62 @@ export default new class {
 			};
 		})();
 		
-		const getDefinition = (initial, act) => (() => {
+		const getDefinition = (initial, label, act) => (() => {
 			let value = initial;
 			
 			return {
 				set: (newValue) => {
-					value = act(newValue);
+					if (act) {
+						actions[label] = act.bind(null, newValue);
+					}
+					
+					if (label) {
+						hasActions = true;
+						
+						effects[label] = true;
+					} else {
+						hasTargetActions = true;
+					}
+					
+					doUpdate();
+					
+					value = newValue;
 				},
 				get: () => value,
 			};
 		})();
 		
-		Object.defineProperty(target, 'x', getDefinition(this.position.x, (x) => {
-			doUpdate('position');
-			
-			return x;
-		}));
-		Object.defineProperty(target, 'y', getDefinition(this.position.y, (y) => {
-			doUpdate('position');
-			
-			return y;
-		}));
+		Object.defineProperty(target, 'xTarget', getDefinition(target.x));
+		Object.defineProperty(target, 'yTarget', getDefinition(target.y));
 		
-		Object.defineProperty(target, 'ratio', getDefinition(this.ratio, (ratio) => {
-			doUpdate('ratio');
-			
+		Object.defineProperty(target, 'x', getDefinition(this.position.x, 'position'));
+		Object.defineProperty(target, 'y', getDefinition(this.position.y, 'position'));
+		
+		Object.defineProperty(target, 'ratio', getDefinition(this.ratio, 'ratio', (ratio) => {
 			this._ratioImage = this.ratioViewport / ratio;
 			this.ratioImageInverse = 1 / this._ratioImage;
 			
 			this.updateSizesImage(false);
-			
-			return ratio;
 		}));
 		
-		Object.defineProperty(target, 'ratioImage', getDefinition(this.ratioImage, (ratio) => {
-			doUpdate('ratio');
-			
+		Object.defineProperty(target, 'ratioImage', getDefinition(this.ratioImage, 'ratio', (ratio) => {
 			this._ratioImage = ratio;
 			this.ratioImageInverse = 1 / this._ratioImage;
 			
 			this.updateSizesImage(false);
-			
-			return ratio;
 		}));
 		
-		Object.defineProperty(target, 'rotation', getDefinition(this.rotation, (rotation) => {
-			doUpdate('rotation');
-			
+		Object.defineProperty(target, 'rotation', getDefinition(this.rotation, 'rotation', (rotation) => {
 			this.rotation = rotation;
 			
 			this.constrainRotation();
 			this.applyRotation();
-			
-			return rotation;
 		}));
 		
-		Object.defineProperty(target, 'zoom', getDefinition(this.zoom, (zoom) => {
-			doUpdate('zoom');
-			
+		Object.defineProperty(target, 'zoom', getDefinition(this.zoom, 'zoom', (zoom) => {
 			this.zoom = zoom;
 			
 			this.applyZoom();
-			
-			return zoom;
 		}));
 		
 		return target;
@@ -836,11 +856,19 @@ export default new class {
 		
 		this.tween = gsap.timeline({paused: true, data: {}});
 		
-		this.tween.data.target = this.getTweenTarget(this.tween);
+		this.tween.data.target = this.getTweenTarget();
 		
 		const effects = {};
 		
-		for (const [target, {position = '>', cutRotation = true, ...vars} = {}] of targets) {
+		let wasIgnorePosition = false;
+		
+		for (const [target, {
+			position = '>',
+			cutRotation = true,
+			onUpdate,
+			ignorePosition = false,
+			...vars
+		} = {}] of targets) {
 			const to = {};
 			
 			let hasTween = false;
@@ -857,48 +885,124 @@ export default new class {
 			};
 			
 			for (const [type, value] of Object.entries(target)) {
-				if (type === 'position') {
-					if (typeof value === 'object') {
-						record('x', value.x, 'position');
-						record('y', value.y, 'position');
-					} else {
-						record('x', value, 'position');
-						record('y', value, 'position');
-					}
-				} else if (type === 'x' || type === 'y') {
-					record(type, value, 'position');
-				} else if (type === 'rotation') {
-					if (!cutRotation) {
+				switch (type) {
+					case 'position':
+						// todo instanceof Object?
+						if (typeof value === 'object') {
+							record('x', value.x, 'position');
+							record('y', value.y, 'position');
+						} else {
+							record('x', value, 'position');
+							record('y', value, 'position');
+						}
+						
+						break;
+					case 'target':
+						if (typeof value === 'object') {
+							record('xTarget', value.x, 'target');
+							record('yTarget', value.y, 'target');
+						} else {
+							record('xTarget', value, 'target');
+							record('yTarget', value, 'target');
+						}
+						
+						break;
+					case 'x':
+					case 'y':
+						record(type, value, 'position');
+						
+						break;
+					case 'xTarget':
+					case 'yTarget':
+						record(type, value, 'target');
+						
+						break;
+					case 'rotation':
+						if (cutRotation) {
+							if (value > this.rotation) {
+								record(type, value - this.rotation <= DEGREES[180] ? value : value - DEGREES[360]);
+							} else {
+								record(type, this.rotation - value <= DEGREES[180] ? value : value + DEGREES[360]);
+							}
+							
+							break;
+						}
+					
+					// eslint-disable-next-line no-fallthrough
+					default:
 						record(type, value);
-					} else if (value > this.rotation) {
-						record(type, value - this.rotation <= DEGREES[180] ? value : value - DEGREES[360]);
-					} else {
-						record(type, this.rotation - value <= DEGREES[180] ? value : value + DEGREES[360]);
-					}
-				} else {
-					record(type, value);
 				}
 			}
 			
 			if (!hasTween) {
+				const callbacks = [];
+				
+				if ('onStart' in vars) {
+					callbacks.push(vars.onStart);
+				}
+				
+				if (onUpdate) {
+					callbacks.push(onUpdate);
+				}
+				
+				if ('onComplete' in vars) {
+					callbacks.push(vars.onComplete);
+				}
+				
+				// todo three seperate tween.add calls wouldn't work if position was +=0.2 or something
+				this.tween.add(callbacks, position);
+				
 				continue;
 			}
 			
-			this.tween.add(gsap.to(this.tween.data.target, {...TWEEN_DEFAULT, ...to, ...vars}), position);
+			if (wasIgnorePosition) {
+				this.tween.set(this.tween.data.target, {ignorePosition: '-=1'}, '>');
+				
+				wasIgnorePosition = false;
+			}
+			
+			if (vars.duration === 0) {
+				this.tween.set(this.tween.data.target, {...TWEEN_DEFAULT, ...to, ...vars}, position);
+			} else {
+				const tween = gsap.to(this.tween.data.target, {...TWEEN_DEFAULT, ...to, ...vars});
+				
+				// todo if you assign to demo.tween.vars.target or whatever IN the button's onUpdate, this might not be necessary
+				if (onUpdate) {
+					tween.eventCallback('onUpdate', () => {
+						this.tweenUpdate.then(() => {
+							onUpdate(tween);
+						});
+					});
+				}
+				
+				if (ignorePosition) {
+					this.tween.set(this.tween.data.target, {ignorePosition: '+=1'}, position);
+					this.tween.add(tween, '>');
+					
+					wasIgnorePosition = true;
+				} else {
+					this.tween.add(tween, position);
+				}
+			}
 		}
 		
 		this.progress.reset();
 		
-		return this.tween
-			.eventCallback('onUpdate', () => {
-				this.progress.set(this.tween.totalProgress());
-			})
-			.eventCallback('onReverseComplete', () => {
-				this.tween.vars.onUpdate();
-				
+		this.tweenEnd = new Promise((resolve) => {
+			this.tween.eventCallback('onReverseComplete', () => {
 				this.tween.revert();
 				
 				this.deleteTween(false);
+				
+				this.progress.reset();
+				
+				resolve();
+			});
+		}).then(() => this.tweenUpdate);
+		
+		return this.tween
+			.eventCallback('onUpdate', () => {
+				this.progress.set(this.tween.totalProgress());
 			})
 			.play();
 	}

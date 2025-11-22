@@ -44,6 +44,9 @@ export default class {
 	set({x, y}) {
 		const {position, zoom, rotation} = demo;
 		
+		this.x = x;
+		this.y = y;
+		
 		if (x === position.x && y === position.y) {
 			this.hide();
 			

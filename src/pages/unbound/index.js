@@ -338,9 +338,8 @@ export default {
 			'Like how game developers endeavour to keep players in-bounds, a good pan-limiting system keeps the viewport attached to its content.',
 		],
 		[
-			'A subtler downside is that pan-limits here are unaffected by zoom.',
-			'More advanced systems can take a position and derive an appropriate zoom level, which is useful when snap-panning.',
-			'I\'ll talk more about that later.',
+			'A subtler deficiency exists in its snap-panning abilities.',
+			'The problem is shared by the system on the next page, where it will be discussed in more detail.',
 		],
 		{
 			tag: 'h2',
@@ -353,12 +352,12 @@ export default {
 			'In most cases, however, some degree of pan-limiting is useful.',
 		],
 		[
-			'Most importantly, unbound panning is ', {tag: 'strong', content: 'boring'}, ' and pan-limiting is ', {tag: 'strong', content: 'interesting'}, '!',
+			'Most importantly, unbound panning is ', {tag: 'i', content: 'boring'}, ' and pan-limiting is ', {tag: 'i', content: 'interesting'}, '!',
 		],
 		getDialogue(
 			'Why make me read about it if you ',
 			{tag: 'strong', content: 'agree'},
-			' that it\'s boring?!',
+			' that it\'s boring?',
 		),
 		[
 			'Good question!',

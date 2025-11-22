@@ -43,22 +43,21 @@ addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2) > :only-child`, {'margin-bott
 
 addRule(`.${CLASS_MATH_BODY} div`, {'text-wrap-style': 'balance'});
 
+addRule([`.${CLASS_MATH_BODY}`, `.${CLASS_CODE} code`], {
+	padding: '0.7em 1em',
+});
+
 addRule(`.${CLASS_CODE} code`, {
 	'font-family': 'consolas, monospace',
 	'font-size': '0.85em',
 	'white-space': 'pre',
-	
-	// 3em to keep |x| clickable in Viewport Edge's snap zoom snippet
-	padding: '10px 3em 10px 1em',
+	// keeps |x| clickable in Viewport Edge's snap zoom snippet
+	'padding-right': '3em',
 	display: 'block',
 	width: 'fit-content',
 });
 
 addRule(`.${CLASS_CODE} br + br + br`, {display: 'none'});
-
-addRule(`.${CLASS_MATH_BODY}`, {
-	padding: '0.4em',
-});
 
 addRule(`.${CLASS_MATH_TITLE} + .${CLASS_MATH_BODY}`, {
 	'padding-top': '0',
@@ -138,6 +137,7 @@ addRule(`.${CLASS_BUTTON_ACTIVE}`, {
 addRule(`.${CLASS_BUTTON}`, {
 	color: buttonColour,
 	cursor: 'pointer',
+	'user-select': 'none',
 	'text-wrap-mode': 'nowrap',
 });
 
@@ -160,7 +160,7 @@ addRule(`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}`, {
 	'font-weight': 'bold',
 	'font-size': '0.9em',
 	background: 'rgb(87 78 0)',
-	padding: '0 23px',
+	padding: '0 1em',
 	'border-radius': '10px',
 	'text-shadow': '0 0 3px black',
 });

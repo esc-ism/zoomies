@@ -17,6 +17,8 @@ import pointsImage from './pointsImage';
 
 const code = [];
 
+const getNearest45 = () => Math.round(demo.rotation / DEGREES[90] + 0.5) * DEGREES[90] - DEGREES[45];
+
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 const getSnapTweens = (getRatio) => tweens.getSnapTweens(() => getVarGetter(Math.floor(Math.random() * 4 - 2) * DEGREES[90] - DEGREES[45], getRatio())(), getSnappedZoom);
 
@@ -493,7 +495,8 @@ export default {
 				({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom: zoom / 1.1}],
 				({zoom}) => [{zoom: zoom * 1.1}, TWEEN_OPTIONS_YOYO],
 			], {getParam: () => {
-				const data = getVarGetter(DEGREES[135], demo.ratioViewport / 0.5)();
+				const rotation = getNearest45();
+				const data = getVarGetter(rotation, demo.ratioViewport / 0.5)();
 				const zoom = getSnappedZoom(...data.zoomPoints, {x: 0, y: 0});
 				
 				return {...data, zoom};
@@ -502,16 +505,22 @@ export default {
 		],
 		[
 			'Bounds jump around when rotating into and out of these "inversion windows".',
-			'Within them, at pre-inversion zooms, the system provides ',
-			getButton('insufficiently restrictive', [
-				({ratioImage, rotation, zoomPoints}) => [{ratioImage, rotation, position: 0, zoom: zoomPoints[3].z + 0.01}],
-				({zoomPoints}) => [{position: zoomPoints[3]}],
-			], {getParam: getVarGetter(DEGREES[135], 0.6)}),
+			'Within them, at pre-inversion zooms, the system provides overly ',
+			getButton('permissive', [
+				({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom}],
+				({position}) => [{position}],
+			], {getParam: () => {
+				const rotation = getNearest45();
+				const {zoomPoints, ratioImage} = getVarGetter(rotation, demo.ratioViewport / 0.5)();
+				const point = zoomPoints[zoomPoints[1].z > zoomPoints[3].z ? 3 : 1];
+				
+				return {ratioImage, rotation, position: point, zoom: point.z + 0.01};
+			}}),
 			' pan-limits',
 		],
 		[
-			'As image aspect ratio gets more extreme, inversion windows get increasingly wide and the issues get ',
-			getButton('increasingly severe', [
+			'As image aspect ratio gets more extreme, inversion windows get increasingly wide and the issues get increasingly ',
+			getButton('severe', [
 				[{position: 0, ratioImage: 2, zoom: 1, rotation: DEGREES[90]}],
 				[{rotation: 0}, {ease: 'none', duration: 5}],
 			], {getParam: () => getDirectVars()}),
@@ -558,7 +567,7 @@ export default {
 		[
 			'How is the system producing reasonable snap zooms from bad rails?',
 			'Well, bound inversion happens at the snap zoom for position (0, 0).',
-			'Using the maximum snap zoom possible means that the troublesome pre-inversion rail segments are ignored.',
+			'Using the maximum snap zoom possible means that the troublesome, pre-inversion rail segments are ignored.',
 		],
 		{
 			tag: 'h2',
@@ -568,7 +577,7 @@ export default {
 		[
 			'This system\'s less efficient and even worse at pan-limiting than the prior.',
 			'Notably, it behaves perfectly when the image is a square — viewport aspect ratio doesn\'t matter.',
-			'It a slightly less specific use case than the Single-Line system, but that\'s not saying much.',
+			'It\'s a slightly less specific use case than the Single-Line system, but that\'s not saying much.',
 		],
 		{
 			content: 'Not ideal!',

@@ -8,22 +8,35 @@ import {getText, getInstruction} from '../shared';
 import {getBound, getRailProgress, getVarGetter} from '../rotation/3line/demo';
 
 import System from './demo';
-// todo
-//  I'm thinking it'd be cooler to devote a quadrant of the screen to each corner
-//  scale and pan to zoom in on each image corner
 
 let stopResolver;
 let doStop;
 
 const tween = async (stop) => {
-	// keeps corners away from the readout
-	const getRandomRotation = gsap.utils.random(-DEGREES[180] + DEGREES[45], DEGREES[45], undefined, true);
-	const getRandomRatio = gsap.utils.random(0.5, 2, undefined, true);
+	const getRandomRotation = gsap.utils.random([
+		-DEGREES[90] - DEGREES['45_2'], -DEGREES[90] + DEGREES['45_2'],
+		-DEGREES['45_2'], DEGREES['45_2'],
+	], true);
+	
+	const ratioGetters = [
+		() => {
+			getRandomRatio = ratioGetters[1];
+			
+			return 0.5 + Math.random() * 0.25;
+		},
+		() => {
+			getRandomRatio = ratioGetters[0];
+			
+			return 2 - Math.random() * 0.5;
+		},
+	];
+	
+	let [getRandomRatio] = ratioGetters;
 	
 	while (!doStop) {
 		const {zoomPoints, rotation, ratio} = getVarGetter(
 			getRandomRotation(),
-			getRandomRatio(),
+			demo.ratioViewport / getRandomRatio(),
 		)();
 		
 		let firstIndex;
@@ -71,29 +84,30 @@ const tween = async (stop) => {
 		};
 		
 		demo.setTween(
-			[{ratio, position: 0}, {delay: 0.5}],
-			[{rotation, zoom: first.z}],
-			[{zoom: first.z * 3}, {
-				duration: 2,
+			[{ratio, position: 0, rotation, zoom: first.z}, {delay: 0.5}],
+			[{zoom: 10}, {
+				duration: 10,
+				ease: 'power1.in',
 				onStart() {
 					setZoomPoints();
+					
+					gsap.ticker.fps(30);
 					
 					demo.resizeCallback = setZoomPoints;
 					demo.tween.data.ignorePosition = true;
 				},
-				onReverseComplete() {
-					demo.system.rails.hide();
-					
-					demo.position.x = demo.position.y = 0;
-					demo.applyPosition();
-					
+				onComplete() {
 					delete demo.resizeCallback;
-					delete demo.tween.data.ignorePosition;
 				},
-				onUpdate() {
+				onUpdate(tween) {
 					const progresses = [...otherProgresses];
 					
+					tween.timeScale(1 + (Math.pow(tween.ratio, 1.2) * 2));
+					
+					demo.elements.viewport.style.filter = `brightness(${100 - tween.ratio * 100}%)`;
+					
 					demo.position = getBound(demo.zoom, first, second, third) || {x: 0, y: 0};
+					demo.applyPosition();
 					
 					progresses.splice(firstIndex, 0, ...getRailProgress(demo.zoom, first, second, third));
 					
@@ -104,29 +118,51 @@ const tween = async (stop) => {
 		
 		await Promise.race([stop, demo.tween]);
 		
+		gsap.ticker.fps(60);
+		
 		if (doStop) {
+			demo.elements.viewport.style.removeProperty('filter');
+			
 			return;
 		}
 		
-		const {onReverseComplete} = demo.tween.vars;
+		demo.system.rails.hide();
 		
-		demo.tween.reverse();
+		demo.rotation = DEGREES[90];
 		
-		await Promise.race([stop, new Promise((resolve) => {
-			demo.tween.eventCallback('onReverseComplete', () => {
-				resolve();
-				
-				onReverseComplete();
-			});
-		})]);
+		demo.setTween(
+			[{zoom: 0, position: 0}, {
+				duration: 0,
+				onComplete: () => {
+					demo.tweenUpdate.then(() => {
+						demo.elements.viewport.style.removeProperty('filter');
+					});
+				},
+			}],
+			[{zoom: 1, rotation: -DEGREES[270]}, {cutRotation: false, duration: 5}],
+			[{ratio: 0.5}, {position: '<'}],
+			[{ratio: 1.5}],
+			[{ratio: 0.75}],
+			[{ratio: 2}],
+			[{ratio: 1}],
+		);
 		
-		await new Promise((resolve) => window.setTimeout(resolve, 1000));
+		await Promise.race([stop, demo.tween.then(() => demo.tweenUpdate)]);
 	}
 };
+
+const state = {};
 
 export default {
 	System,
 	start() {
+		state.rotation = demo.rotation;
+		state.ratioImage = demo.ratioImage;
+		state.zoom = demo.zoom;
+		state.position = {...demo.position};
+		
+		demo.progress.element.style.display = 'none';
+		
 		doStop = false;
 		
 		tween(new Promise((resolve) => {
@@ -137,6 +173,15 @@ export default {
 		doStop = true;
 		
 		stopResolver();
+		
+		Object.assign(demo, state);
+		
+		demo.applyPosition();
+		demo.applyZoom();
+		demo.applyRotation();
+		demo.updateSizesImage(false);
+		
+		demo.progress.element.style.removeProperty('display');
 	},
 	text: getText(
 		{

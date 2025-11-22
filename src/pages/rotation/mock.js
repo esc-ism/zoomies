@@ -2,17 +2,23 @@ import {DEGREES} from '@/shared';
 import demo from '@/demo';
 import {PADDING_VIEWPORT} from '@/demo/consts';
 
+import {getCornerDistance} from './demo';
+
 const getRelevantDemo = ({
 	rotation,
-	sizesViewport,
+	ratio,
+	ratioInverse = 1 / ratio,
 	sizesImage,
-	ratioViewport = sizesViewport.width / sizesViewport.height,
-	ratioViewportInverse = 1 / ratioViewport,
 	ratioImage = sizesImage.width / sizesImage.height,
 	ratioImageInverse = 1 / ratioImage,
-	ratio = ratioViewport / ratioImage,
-	ratioInverse = 1 / ratio,
-}) => ({sizesViewport, ratioViewport, ratioViewportInverse, rotation, sizesImage, ratioImage, ratioImageInverse, ratio, ratioInverse});
+	sizesViewport,
+	ratioViewport = sizesViewport.width / sizesViewport.height,
+	ratioViewportInverse = 1 / ratioViewport,
+}) => ({
+	rotation, ratio, ratioInverse,
+	sizesImage, ratioImage, ratioImageInverse,
+	sizesViewport, ratioViewport, ratioViewportInverse,
+});
 
 const getDimensions = (ratio, width, height) => {
 	const dimensions = {};
@@ -32,14 +38,21 @@ const getDimensions = (ratio, width, height) => {
 	};
 };
 
+export const getImageDimensions = (ratio, {width, height}) => getDimensions(ratio, width - PADDING_VIEWPORT, height - PADDING_VIEWPORT);
+
 export const getVarGetter = (getZoomPoints, rotation = DEGREES[90], ratio = 1) => () => {
-	const {width, height} = demo.sizesViewport;
 	const mockDemo = getRelevantDemo({
 		...demo,
+		ratio,
 		rotation,
-		sizesImage: getDimensions(ratio, width - PADDING_VIEWPORT, height - PADDING_VIEWPORT),
+		sizesImage: getImageDimensions(ratio, demo.sizesViewport),
 	});
-	const zoomPoints = getZoomPoints(mockDemo);
+	
+	const zoomPoints = getZoomPoints({
+		...mockDemo,
+		cornerAngle: Math.atan(mockDemo.ratioImage),
+		cornerDistance: getCornerDistance(mockDemo.sizesImage),
+	});
 	
 	return {zoomPoints, rotation, ratio, ratioImage: mockDemo.ratioImage};
 };

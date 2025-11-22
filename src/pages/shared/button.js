@@ -3,6 +3,7 @@ import demo from '@/demo';
 import {CLASS_BUTTON, CLASS_BUTTON_ACTIVE, TWEENS_RESET} from '../consts';
 
 let activeButton;
+let isReversing = false;
 
 export const clearButton = () => {
 	if (activeButton) {
@@ -22,8 +23,9 @@ for (const action of Object.keys(demo.listeners)) {
 }
 
 const releaseButton = (event) => {
+	isReversing = true;
+	
 	activeButton.classList.remove(CLASS_BUTTON_ACTIVE);
-	activeButton = undefined;
 	
 	if (event?.relatedTarget?.classList.contains(CLASS_BUTTON)) {
 		return;
@@ -53,22 +55,42 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 		classList: [CLASS_BUTTON],
 		tabIndex: 0,
 		onclick: () => {
-			if (element.isSameNode(activeButton)) {
-				element.removeEventListener('blur', releaseButton);
+			if (activeButton) {
+				if (element.isSameNode(activeButton)) {
+					if (isReversing) {
+						activeButton.classList.add(CLASS_BUTTON_ACTIVE);
+						
+						demo.tween
+							.timeScale(1)
+							.play();
+						
+						isReversing = false;
+					} else {
+						releaseButton();
+					}
+					
+					return;
+				}
 				
-				releaseButton();
-				
-				return;
+				activeButton.removeEventListener('blur', releaseButton);
 			}
+			
+			isReversing = false;
 			
 			element.classList.add(CLASS_BUTTON_ACTIVE);
 			activeButton = element;
 			
-			element.addEventListener('blur', releaseButton, {once: true});
+			element.addEventListener('blur', releaseButton);
 			
 			const param = getParam();
 			
 			demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
+			
+			demo.tweenEnd.then(() => {
+				element.removeEventListener('blur', releaseButton);
+				
+				activeButton = undefined;
+			});
 		},
 		callback: (_element) => {
 			element = _element;

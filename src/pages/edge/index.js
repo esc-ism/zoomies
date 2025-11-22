@@ -10,7 +10,7 @@ import {getButton, clearButton} from '../shared/button';
 import {getSnapPosition} from '../center';
 
 import System from './demo';
-import {TWEEN_OPTIONS_TARGET} from '../shared/tween';
+import {getSnapOptions} from '../shared/tween';
 
 const refreshButton = getRefreshButton();
 
@@ -303,13 +303,12 @@ export default {
 		},
 		[
 			'Zoom is now adjusted automatically when ',
-			getButton('snap-panning', [
-				[{zoom: 1, position: 0}],
-				({position}) => [position, TWEEN_OPTIONS_TARGET],
-				({position, zoom}) => [{zoom, ...position}, {duration: 0}],
-			], {getParam: () => ({
+			getButton('snap-panning', getSnapOptions(), {getParam: () => ({
 				zoom: demo.system.zoomPoints[1].z * 2,
-				position: {[demo.system.lowAxis === 'y' ? 'x' : 'y']: 0.25},
+				position: {x: 0, y: 0, [demo.system.lowAxis === 'y' ? 'x' : 'y']: 0.25},
+				startZoom: 1,
+				rotation: DEGREES[90],
+				ratio: demo.ratio,
 			})}),
 			'.',
 			'Position will even be ',

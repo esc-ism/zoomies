@@ -851,17 +851,26 @@ export default {
 		},
 		[
 			'Like a movie paying off its setups in the final act, this final system relies purely on the concepts introduced earlier.',
-			'One pair of image corners ',
-			getButton('disappears', [
+			'One pair of image corners is no longer ',
+			getButton('viewable', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z * 1.05}, TWEEN_OPTIONS_YOYO],
 			], {getParam: () => getDirectVars()}),
-			' at the origin rail\'s start zoom and the other ',
-			getButton('disappears', [
-				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: 0}],
-				({zoomPoints}) => [{zoom: zoomPoints[4].z * 1.05}, TWEEN_OPTIONS_YOYO],
+			'  from the origin at the origin rail\'s start zoom.',
+			'The others are no longer ',
+			getButton('viewable', [
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}],
+				({zoomPoints}) => [{zoom: zoomPoints[4].z * 1.05}, {
+					...TWEEN_OPTIONS_YOYO,
+					onUpdate() {
+						demo.position.x = zoomPoints[4].x;
+						demo.position.y = zoomPoints[4].y;
+						
+						demo.applyPosition();
+					},
+				}],
 			], {getParam: () => getDirectVars()}),
-			' at the connecting rail\'s.',
+			' from any point along the origin rail at the connecting rail\'s start zoom.',
 			'We can find the connecting rail\'s start position by interpolating along its origin rail.',
 			'The only new wrinkle introduced is the question of its end point.',
 		],
@@ -1198,35 +1207,33 @@ export default {
 			'The changes have been successful in minimising distance to bounds\' vertices without sacrificing image visibility.',
 		],
 		[
-			'Zoomful systems have unavoidable drawbacks.',
-			'Bounds are inheritently less intuitive when they move around, and, especially when handling rotation, users are granted less viewfinding freedom.',
+			'For a zoomful system that handles rotation, I can\'t imagine anything better.',
+			'Still, such systems\' bounds are inherently unintuitive and restrictive.',
 			'Plus, there\'s obviously a huge efficiency dropoff from the good old days of',
-		],
-		getMath({
-			content: {tag: 'mtable', xmlns, content: [
-				{tag: 'mtr', xmlns, content: [
-					{tag: 'mtd', xmlns, content: [
-						{tag: 'mn', xmlns, content: '-0.5'},
-						{tag: 'mo', xmlns, content: '⩽'},
-						{tag: 'mi', xmlns, content: 'x'},
-						{tag: 'mo', xmlns, content: '⩽'},
-						{tag: 'mn', xmlns, content: '0.5'},
+			getMath({
+				content: {tag: 'mtable', xmlns, content: [
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mn', xmlns, content: '-0.5'},
+							{tag: 'mo', xmlns, content: '⩽'},
+							{tag: 'mi', xmlns, content: 'x'},
+							{tag: 'mo', xmlns, content: '⩽'},
+							{tag: 'mn', xmlns, content: '0.5'},
+						]},
+					]},
+					{tag: 'mtr', xmlns, content: [
+						{tag: 'mtd', xmlns, content: [
+							{tag: 'mn', xmlns, content: '-0.5'},
+							{tag: 'mo', xmlns, content: '⩽'},
+							{tag: 'mi', xmlns, content: 'y'},
+							{tag: 'mo', xmlns, content: '⩽'},
+							{tag: 'mn', xmlns, content: '0.5'},
+						]},
 					]},
 				]},
-				{tag: 'mtr', xmlns, content: [
-					{tag: 'mtd', xmlns, content: [
-						{tag: 'mn', xmlns, content: '-0.5'},
-						{tag: 'mo', xmlns, content: '⩽'},
-						{tag: 'mi', xmlns, content: 'y'},
-						{tag: 'mo', xmlns, content: '⩽'},
-						{tag: 'mn', xmlns, content: '0.5'},
-					]},
-				]},
-			]},
-		}),
-		[
-			'to the behemoth presented here.',
-			'Because of this, I still prefer "Viewport Center" as a pan-limiter.',
+			}),
+			'to the behemoth dwelling on this page.',
+			'Due to these unavoidable drawbacks, I still prefer "Viewport Center" as a pan-limiter.',
 		],
 		{
 			tag: 'h2',
@@ -1279,10 +1286,17 @@ export default {
 		],
 		[
 			'And with that, we\'re done!',
-			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful.',
-			'Nevertheless, I\'m glad to have seen my vision through and proud to have pushed my ',
+			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful;',
+			'It\'s outclassed by Viewport Center as a pan-limiter and has no compelling advantage over Double-Line as a span-panner.',
+			'Nevertheless, I\'m glad to have seen my vision through, and proud to have pushed my ',
 			{tag: 'span', style: {fontSize: '0.6em'}, content: '(pan)'},
 			' limits so far.',
+		],
+		[
+			'It\'s not ', {tag: 'i', content: 'just'}, ' that it\'s representative of personal triumph, though.',
+			'The way that its limits warp, the patterns formed by its rails... there\'s a kind of geometric beauty to this system.',
+			'I attempted to exhibit that aesthetic charm on the first page, but it\'s hard to convey without risking melting viewers\' CPUs.',
+			'Now, having reached the end of your journey, I hope that you\'ve gained a deeper appreciation for it, and all that went into its design.',
 		],
 		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
 	),

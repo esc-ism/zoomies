@@ -7,7 +7,7 @@ import Demo, {getAllStartZooms} from '../demo';
 import {isAbove, getProgressedLine, getIntersectProgress} from '../shared';
 import getConstrainerFromPoints from '../shared/constrain';
 
-export const getZoomPoints = (demo, startZooms = getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage)) => startZooms.map(({x, y}) => ({x: 0, y: 0, z: Math.min(x, y)}));
+export const getZoomPoints = (demo, startZooms = getAllStartZooms(demo)) => startZooms.map(({x, y}) => ({x: 0, y: 0, z: Math.min(x, y)}));
 
 export const getBound = (zoom, point, isTopLeft) => {
 	if (zoom <= point.z) {

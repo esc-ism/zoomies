@@ -1,22 +1,21 @@
-import {getTheta} from '@/shared';
 import demo from '@/demo';
 import Tangents from '@/demo/lines/tangents';
 import Bounds from '@/demo/bounds';
 
-const getCornerDistance = ({halfWidth, halfHeight}) => Math.sqrt(Math.pow(halfWidth, 2) + Math.pow(halfHeight, 2));
+export const getCornerDistance = ({halfWidth, halfHeight}) => Math.sqrt(Math.pow(halfWidth, 2) + Math.pow(halfHeight, 2));
 
-export const getAllStartZooms = (rotation, viewport, image, radius = getCornerDistance(image), offset = getTheta(image.height, image.width)) => {
-	const angle0 = rotation + offset;
-	const angle1 = rotation - offset;
+export const getAllStartZooms = ({rotation, sizesViewport, cornerDistance, cornerAngle}) => {
+	const angle0 = rotation + cornerAngle;
+	const angle1 = rotation - cornerAngle;
 	
 	return [
 		{
-			x: viewport.halfWidth / Math.abs(radius * Math.cos(angle0)),
-			y: viewport.halfHeight / Math.abs(radius * Math.sin(angle0)),
+			x: sizesViewport.halfWidth / Math.abs(cornerDistance * Math.cos(angle0)),
+			y: sizesViewport.halfHeight / Math.abs(cornerDistance * Math.sin(angle0)),
 		},
 		{
-			x: viewport.halfWidth / Math.abs(radius * Math.cos(angle1)),
-			y: viewport.halfHeight / Math.abs(radius * Math.sin(angle1)),
+			x: sizesViewport.halfWidth / Math.abs(cornerDistance * Math.cos(angle1)),
+			y: sizesViewport.halfHeight / Math.abs(cornerDistance * Math.sin(angle1)),
 		},
 	];
 };
@@ -46,7 +45,7 @@ export default class {
 	}
 	
 	getAllStartZooms() {
-		return getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage, demo.cornerDistance, demo.cornerAngle);
+		return getAllStartZooms(demo);
 	}
 	
 	applyZoomPoints() {

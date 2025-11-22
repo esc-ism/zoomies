@@ -180,7 +180,7 @@ const getAxisIntersects = ({sizesImage, sizesViewport, ratioViewport, ratioViewp
 	return intersects;
 };
 
-export default (demo, allStartZooms = getAllStartZooms(demo.rotation, demo.sizesViewport, demo.sizesImage)) => {
+export default (demo, allStartZooms = getAllStartZooms(demo)) => {
 	const startZooms = [
 		Math.min(allStartZooms[0].x, allStartZooms[1].x),
 		Math.min(allStartZooms[0].y, allStartZooms[1].y),

@@ -9,8 +9,10 @@ import {xmlns} from '../../shared/math';
 import * as tweens from '../../shared/tween';
 
 import * as mock from '../mock';
-import {permissiveTweens, restrictiveTweens} from '../1line';
+import {permissiveTweens, getRestrictiveVars} from '../1line';
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
+import {getAllStartZooms} from '../demo';
+import {getPoints, getQuadrantAngle, getZoomProgressed} from '../shared';
 
 import zoomImage from './zoomImage';
 import snapImageTrio from './snapImage/triple';
@@ -222,11 +224,33 @@ const functions = [
 ];
 
 let getTraceVars;
+let getShortPanVars;
 
 export default {
 	System,
 	start() {
 		getTraceVars = getVarGetter(DEGREES[90] - 0.4, 0.75);
+		
+		getShortPanVars = () => {
+			const {zoomPoints, axis, ...data} = tweens.singleCornerGetter(mock.getVarGetter.bind(null, (mock) => {
+				const allStartZooms = getAllStartZooms(mock);
+				const startZooms = [
+					Math.min(allStartZooms[0].x, allStartZooms[1].x),
+					Math.min(allStartZooms[0].y, allStartZooms[1].y),
+				];
+				
+				const isEvenQuadrant = Math.floor(mock.rotation / DEGREES[90]) % 2 !== 0;
+				const quadrantAngle = getQuadrantAngle(mock.rotation, isEvenQuadrant);
+				
+				return [...getZoomPoints(mock, allStartZooms), ...getPoints(mock, startZooms, quadrantAngle)];
+			}));
+			
+			const first = zoomPoints[zoomPoints[1].z > zoomPoints[3].z ? 0 : 2];
+			const end = zoomPoints[axis + 4];
+			const zoom = 1.2;
+			
+			return {first, zoom, startZoom: first.z, start: getZoomProgressed(first, end, zoom), end, ...data};
+		};
 		
 		registerFunctions(functions);
 		
@@ -255,16 +279,23 @@ export default {
 		],
 		[
 			'First, the ',
-			getButton('state', [[restrictiveTweens]]),
+			getButton('state', [
+				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, {
+					onUpdate() {
+						demo.tween.data.target.x = demo.system.bound1.x;
+						demo.tween.data.target.y = demo.system.bound1.y;
+					},
+				}],
+			], {getParam: () => getRestrictiveVars()}),
 			' that was too restrictive is way better!',
-			'The "Viewport Center" system gives users much more viewfinding flexibility, but in most situations this is good enough.',
+			'The "Viewport Center" system gives users much more viewfinding flexibility, but this seems good enough to avoid frustrating users.',
 			'The overly permissive ',
 			getButton('state', [[permissiveTweens]]),
 			' is also fixed, accurately replicating the behaviour of the "Viewport Edge" system.',
 		],
 		[
 			'The "Single-Line" system forbade control over rail gradients; they would always be 1 or -1.',
-			'Multi-line rails provide much more flexibility, enabling manipulation of lock point locations.',
+			'Multi-line rails provide much more flexibility, allowing for manipulation of lock point locations.',
 		],
 		[
 			'This system places each lock point on a different viewport edge.',
@@ -307,6 +338,7 @@ export default {
 						
 						demo.position.x = demo.system.bound1.x;
 						demo.position.y = demo.system.bound1.y;
+						demo.applyPosition();
 					},
 				}],
 			], {getParam: () => getTraceVars()}),
@@ -331,6 +363,7 @@ export default {
 						
 						demo.position.x = demo.system.bound1.x;
 						demo.position.y = demo.system.bound1.y;
+						demo.applyPosition();
 					},
 				}],
 			], {getParam: () => getTraceVars()}),
@@ -828,12 +861,33 @@ export default {
 			}),
 			' state for example — see the panning path necessary to view the offscreen corner?',
 			'There\'s no way anyone would take that path naturally.',
-			'Users naturally try to take the shortest path possible, but this system doesn\'t often allow that.',
+			'Users naturally try to take the ',
+			getButton('shortest', [
+				({rotation, ratio, startZoom}) => [{rotation, ratio, zoom: startZoom, position: 0}],
+				({start}) => [{target: start}],
+				({first, end, start, zoom}) => [{zoom, target: start}, {
+					ignorePosition: true,
+					onUpdate() {
+						const {x, y} = getZoomProgressed(first, end, demo.zoom);
+						
+						demo.position.x = x;
+						demo.position.y = y;
+						
+						demo.applyPosition();
+					},
+				}],
+			], {getParam: () => getShortPanVars()}),
+			' path possible, but this system doesn\'t often allow that.',
+			'Having to pan farther than expected, and getting ',
+			getButton('shunted', [
+				({rotation, ratio, zoom}) => [{rotation, ratio, zoom, position: 0}],
+				({start}) => [{position: start}, {delay: 0.2}],
+			], {getParam: () => getShortPanVars()}),
+			' in an unexpected direction, is frustrating for users.',
 		],
 		[
 			'The ideal pan-limiting system is one that users find so natural and unintrusive that they don\'t consciously notice it.',
 			'Some degree of intrusiveness is necessary with zoomful systems, but there\'s no attempt at mitigation here.',
-			'This system\'s pan-limiting experience is frustrating because users must bend to its will, when it ', {tag: 'i', content: 'should'}, ' bend to the will of its users.',
 		],
 		{
 			tag: 'h2',

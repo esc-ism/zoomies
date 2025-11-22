@@ -6,9 +6,9 @@ import {inputListener} from '@/consts';
 import {xmlns} from '../shared/math';
 import {getText, getMath} from '../shared';
 import {getButton, clearButton} from '../shared/button';
+import {getSnapOptions} from '../shared/tween';
 
 import System from './demo';
-import {getSnapTween, TWEEN_OPTIONS_TARGET} from '../shared/tween';
 
 // top right corner with zoom=2
 export const getSnapPosition = () => ({
@@ -78,11 +78,13 @@ export default {
 		[
 			'Say you want to fill your screen with the top-right quadrant of the image —',
 			'it\'d be nice if ',
-			getButton('snap-panning', [
-				[{rotation: DEGREES[90], zoom: 1, ratio: 1, position: 0}],
-				(position) => [position, TWEEN_OPTIONS_TARGET],
-				(position) => [position, {duration: 0}],
-			], {getParam: () => getSnapPosition(demo)}),
+			getButton('snap-panning', getSnapOptions(false), {getParam: () => ({
+				position: getSnapPosition(demo),
+				zoom: 1,
+				startZoom: 1,
+				rotation: DEGREES[90],
+				ratio: demo.ratio,
+			})}),
 			' could give you the desired view without having to ',
 			getButton('zoom', [
 				() => [{rotation: DEGREES[90], zoom: 1, ratio: 1, ...getSnapPosition(demo)}, {duration: 0}],

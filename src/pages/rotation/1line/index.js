@@ -14,7 +14,7 @@ import * as mock from '../mock';
 import System, {getZoomPoints} from './demo';
 import zoomImage from './zoomImage';
 import snapImage from './snapImage';
-import {getSnapTargetTween, getSnapTween, singleCornerGetter, TWEEN_OPTIONS_TARGET} from '@/pages/shared/tween';
+import {getSnapOptions, singleCornerGetter} from '@/pages/shared/tween';
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
@@ -22,8 +22,6 @@ const code = [];
 
 export const restrictiveTweens = {
 	ratio: 0.6,
-	position: 0.5,
-	rotation: -4.467,
 	zoom: 2,
 };
 
@@ -138,7 +136,15 @@ const functions = [
 	]},
 ];
 
+// todo do these need to be `let`s?
 let getLockVars;
+
+export const getRestrictiveVars = () => {
+	const vCornerAngle = Math.atan(demo.ratioViewport);
+	const iCornerAngle = Math.atan(demo.ratioViewport / restrictiveTweens.ratio);
+	
+	return {...restrictiveTweens, rotation: DEGREES[90] - (vCornerAngle - iCornerAngle)};
+};
 
 export default {
 	System,
@@ -215,7 +221,7 @@ export default {
 		getInstruction([
 			[
 				'If maths depend on a diagram, scrolling close enough will make the diagram appear.',
-				'The little white ',
+				'The ',
 				{tag: 'span', style: {fontSize: '0.77em'/* borderWidth * 1.54 */}, content: '◤'},
 				' to the left is one of three threshold indicators.',
 				'Scroll it off the top of the screen to see the diagram.',
@@ -949,30 +955,65 @@ export default {
 		},
 		[
 			'You\'ll find that this system works perfectly if the viewport and image are both squares.',
-			'Its flaw is only revealed when one is ',
+			'Its flaws are only revealed when one is ',
 			getButton('stretched', [[{ratio: restrictiveTweens.ratio}]]),
 			'.',
 		],
 		[
 			'Consider ',
-			getButton('this', [[{ratio: restrictiveTweens.ratio}], [restrictiveTweens]]),
+			getButton('this', [
+				[{ratio: restrictiveTweens.ratio, position: 0, rotation: DEGREES[90], zoom: 1}],
+				({rotation, zoom}) => [{rotation, zoom}, {
+					onUpdate() {
+						// todo do everywhere?
+						demo.tween.data.target.x = demo.system.bound1.x;
+						demo.tween.data.target.y = demo.system.bound1.y;
+					},
+				}],
+			], {getParam: () => getRestrictiveVars()}),
 			' demo state.',
 			'Imagine that you want to see the entirety of the image\'s top-right corner.',
 			'You\'ll find that it\'s ',
 			getButton('impossible', [
-				[restrictiveTweens],
-				[{position: {x: 0.5, y: 0.1}}, {duration: 2, ease: 'power2.out'}],
-			]),
+				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, {
+					onUpdate() {
+						demo.tween.data.target.x = demo.system.bound1.x;
+						demo.tween.data.target.y = demo.system.bound1.y;
+					},
+				}],
+				[{y: '+=0.1'}],
+				[{x: '+=0.1', y: '-=0.1'}, {repeat: 1, yoyo: true}],
+			], {getParam: () => getRestrictiveVars()}),
 			' to achieve this without ',
 			getButton('rotating', [
-				[restrictiveTweens],
-				[{rotation: Math.round(restrictiveTweens.rotation / DEGREES[90]) * DEGREES[90]}],
-			]),
+				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, {
+					onUpdate() {
+						demo.tween.data.target.x = demo.system.bound1.x;
+						demo.tween.data.target.y = demo.system.bound1.y;
+					},
+				}],
+				[{rotation: DEGREES[90]}, {
+					onUpdate() {
+						demo.tween.data.target.x = demo.system.bound1.x;
+						demo.tween.data.target.y = demo.system.bound1.y;
+					},
+				}],
+			], {getParam: () => getRestrictiveVars()}),
 			' or ',
 			getButton('zooming', [
-				[restrictiveTweens],
-				[{zoom: 1}],
-			]),
+				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, {
+					onUpdate() {
+						demo.tween.data.target.x = demo.system.bound1.x;
+						demo.tween.data.target.y = demo.system.bound1.y;
+					},
+				}],
+				[{zoom: 1}, {
+					onUpdate() {
+						demo.tween.data.target.x = demo.system.bound1.x;
+						demo.tween.data.target.y = demo.system.bound1.y;
+					},
+				}],
+			], {getParam: () => getRestrictiveVars()}),
 			' out past the point that pan-limits become one-dimensional.',
 		],
 		[
@@ -998,6 +1039,7 @@ export default {
 						
 						demo.position.x = demo.system.bound1.x;
 						demo.position.y = demo.system.bound1.y;
+						demo.applyPosition();
 					},
 				}],
 			], {getParam: () => getLockVars()}),
@@ -1020,7 +1062,7 @@ export default {
 		},
 		[
 			'The image is split into four "regions" by its rails.',
-			'The first step in finding a snap zoom is to find the region that the target snap-pan position, or "snap point", lies within.',
+			'The first step in finding a snap zoom is to find the region that the target snap-pan position, aka "snap point", lies within.',
 			'Specifically, we need to know which image corners enclose the region, alongside the origin.',
 		],
 		getCode(code, [
@@ -1737,17 +1779,19 @@ export default {
 		],
 		[
 			'Snap-panning\'s purpose is to allow users to quickly focus on some sub-region of content.',
-			'My snap zooms are the minimum zoom for which the snap point is legal, making them an under-estimation of how far the user wants to zoom in.',
+			'In my implementations, snap zoom is the minimum zoom for which a snap point is in-bounds, making it an under-estimation of how far the user wants to zoom in.',
 			'Because of this, the worst outcome for a snap-pan is being too zoomed out.',
 		],
 		[
-			'The good news is that this makes the overly restrictive pan-limits harmless — if anything they\'re beneficial!',
+			'The good news is that this makes the overly restrictive pan-limits harmless — if anything, they\'re beneficial!',
 			'On the other hand, unexpectedly zoomed-out ',
-			getButton('snap-pans', [
-				[{ratio: 0.25, rotation: DEGREES[90], position: 0, zoom: 1}],
-				[{y: 0.25}, TWEEN_OPTIONS_TARGET],
-				[{zoom: 2, y: 0.25}, {duration: 0}],
-			]),
+			getButton('snap-pans', getSnapOptions(), {getParam: () => ({
+				position: {y: 0.25, x: 0},
+				zoom: 2,
+				startZoom: 1,
+				rotation: DEGREES[90],
+				ratio: 0.25,
+			})}),
 			' due to permissive pan-limits are unacceptable.',
 		],
 		{
