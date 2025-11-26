@@ -2,21 +2,21 @@ import {SVG_NAMESPACE} from '@/shared';
 import {COLOURS, getDiagram, getLine, getText} from '../../shared/svg';
 
 const radii = {x: 25, y: 20};
-const strokeRadius = 0.4;
+const strokeDiameter = 0.4;
 
 const svg = getDiagram(
-	{x: 32, y: 25}, strokeRadius,
-	[-radii.x * 0.8 - strokeRadius, -radii.y - strokeRadius],
-	[radii.x * 1.15 + strokeRadius, -radii.y * 0.2 - strokeRadius],
+	{x: 32, y: 25}, strokeDiameter,
+	[-radii.x * 0.8, -radii.y],
+	[radii.x * 1.15, -radii.y * 0.2],
 );
 
 const points = [
 	[0, 0, 0],
 	[0, -radii.y, 0],
-	[-radii.x * 0.8 - strokeRadius, -radii.y, 2],
+	[-radii.x * 0.8, -radii.y, 2],
 	[0, 0, 1],
 	[radii.x * 0.17, radii.y * -0.6, 1],
-	[-radii.x * 0.8 - strokeRadius, -radii.y],
+	[-radii.x * 0.8, -radii.y],
 ];
 
 const curve0 = document.createElementNS(SVG_NAMESPACE, 'path');
@@ -54,7 +54,7 @@ const groups = [
 groups[0].setAttribute('stroke', COLOURS[0]);
 groups[1].setAttribute('stroke', COLOURS[1]);
 
-const dasharray = strokeRadius * 7.2;
+const dasharray = strokeDiameter * 7.2;
 
 for (let i = 0; i < points.length - 1; ++i) {
 	if (points[i][2] < 2) {
@@ -79,11 +79,11 @@ svg.append(
 	rect0,
 	rect1,
 	...groups,
-	getText('θ', [0, -7], strokeRadius, 0.3, -0.8, true),
-	getText('A', points[0], strokeRadius, -0.2, 1),
-	getText('B', points[2], strokeRadius, -0.8, -1),
-	getText('C', points[1], strokeRadius, -0.2, -1),
-	getText('D', points[4], strokeRadius, 0.2, -0.8),
+	getText('θ', [0, -7], strokeDiameter, 0.3, -0.8, true),
+	getText('A', points[0], strokeDiameter, -0.2, 1),
+	getText('B', points[2], strokeDiameter, -0.8, -1),
+	getText('C', points[1], strokeDiameter, -0.2, -1),
+	getText('D', points[4], strokeDiameter, 0.2, -0.8),
 );
 
 export default svg;

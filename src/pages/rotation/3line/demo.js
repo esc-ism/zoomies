@@ -19,22 +19,13 @@ export const getBound = (zoom, first, second, third) => {
 	
 	if (zoom <= third.z) {
 		if (third.isFirstInt || zoom <= second.z) {
-			return {
-				...getZoomProgressed(first, first.end, zoom),
-				axis: first.end.axis,
-				isFirst: true,
-			};
+			return {...getZoomProgressed(first, first.end, zoom), axis: first.end.axis, isFirst: true};
 		}
 		
 		return {...getZoomProgressed(second, second.end, zoom), axis: second.axis, isFirst: true};
 	}
 	
-	const progress = zoom / third.z;
-	
-	return {
-		x: third.end.x - (third.end.x - third.x) / progress,
-		y: third.end.y - (third.end.y - third.y) / progress,
-	};
+	return getZoomProgressed(third, third.end, zoom);
 };
 
 export const getSnappedZoom = (() => {

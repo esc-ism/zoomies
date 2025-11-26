@@ -31,7 +31,7 @@ export default class {
 		this.hide();
 	}
 	
-	isHidden() {
+	get isHidden() {
 		return this.#isHidden;
 	}
 	

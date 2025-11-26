@@ -4,7 +4,7 @@ import {xmlns} from '@/pages/shared/math';
 
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getDiagrammedMath} from '../../shared';
+import {getText, getCode, getDiagrammedMath, getDialogue} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
 import * as tweens from '../../shared/tween';
 
@@ -237,9 +237,9 @@ export default {
 			'This is achieved by swapping image axis for viewport axis-based origin rails.',
 		],
 		[
-			'Again, whichever origin rail direction minimises lock rail length is preferred, but switching axes has made rail intersections less reliable.',
+			'Again, whichever origin rail direction minimises lock rail length is preferred.',
+			'Lock rails are unchanged.',
 		],
-		'Lock rails are unchanged.',
 		{
 			tag: 'h2',
 			content: 'Pan-Limit Maths',
@@ -257,10 +257,12 @@ export default {
 				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'div', content: 'let half of the viewport\'s height at the target start zoom be'},
+							{tag: 'div', content: 'let the viewport\'s height at the target start zoom be'},
 						]},
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'd'},
+							{tag: 'mn', xmlns, content: '2'},
+							// todo "d"?
+							{tag: 'mi', xmlns, content: 'v'},
 						]},
 					]},
 					{tag: 'mtr', xmlns, content: [
@@ -311,7 +313,7 @@ export default {
 						]},
 						{tag: 'mtext', xmlns, content: 'is'},
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'mi', xmlns, content: 'd'},
+							{tag: 'mi', xmlns, content: 'v'},
 						]},
 					]},
 					{tag: 'mtr', xmlns, content: [
@@ -369,7 +371,7 @@ export default {
 							{tag: 'mo', xmlns, content: '='},
 							{tag: 'mfrac', xmlns, content: [
 								{tag: 'mi', xmlns, content: 'x'},
-								{tag: 'mi', xmlns, content: 'd'},
+								{tag: 'mi', xmlns, content: 'v'},
 							]},
 						]},
 					]},
@@ -382,7 +384,7 @@ export default {
 								{tag: 'mo', xmlns, content: ')'},
 							]},
 							{tag: 'mo', xmlns, content: '×'},
-							{tag: 'mi', xmlns, content: 'd'},
+							{tag: 'mi', xmlns, content: 'v'},
 						]},
 						{tag: 'mo', xmlns, content: '='},
 						{tag: 'mtd', xmlns, content: [
@@ -420,7 +422,7 @@ export default {
 							{tag: 'mo', xmlns, content: '='},
 							{tag: 'mfrac', xmlns, content: [
 								{tag: 'mi', xmlns, content: 'y'},
-								{tag: 'mi', xmlns, content: 'd'},
+								{tag: 'mi', xmlns, content: 'v'},
 							]},
 						]},
 					]},
@@ -433,7 +435,7 @@ export default {
 								{tag: 'mo', xmlns, content: ')'},
 							]},
 							{tag: 'mo', xmlns, content: '×'},
-							{tag: 'mi', xmlns, content: 'd'},
+							{tag: 'mi', xmlns, content: 'v'},
 						]},
 						{tag: 'mo', xmlns, content: '='},
 						{tag: 'mtd', xmlns, content: [
@@ -489,7 +491,7 @@ export default {
 			get45Button(225, 1.25),
 			' and ',
 			get45Button(315, 1.25),
-			' where neither lock rail has a good intersection with the preferred viewport axis.',
+			' where neither lock rail has a good intersection with its preferred viewport axis.',
 			'The result is crossed rails, with bounds that seem to ',
 			getButton('invert', [
 				({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom: zoom / 1.1}],
@@ -564,8 +566,8 @@ export default {
 			'.',
 			'The only clue to their existence is some slight behavioural inconsistency around the rotation values at window limits.',
 		],
+		getDialogue('How are we getting good snap zooms from bad rails?'),
 		[
-			'How is the system producing reasonable snap zooms from bad rails?',
 			'Well, bound inversion happens at the snap zoom for position (0, 0).',
 			'Using the maximum snap zoom possible means that the troublesome, pre-inversion rail segments are ignored.',
 		],
@@ -575,14 +577,13 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'This system\'s less efficient and even worse at pan-limiting than the prior.',
-			'Notably, it behaves perfectly when the image is a square — viewport aspect ratio doesn\'t matter.',
+			'This system behaves perfectly when the image is a square — viewport aspect ratio doesn\'t matter.',
 			'It\'s a slightly less specific use case than the Single-Line system, but that\'s not saying much.',
 		],
-		{
-			content: 'Not ideal!',
-			style: {textAlign: 'center'},
-		},
+		[
+			'It\'s less efficient and, for most image aspect ratios, even worse at pan-limiting than the prior system.',
+			'Not ideal!',
+		],
 		[
 			'On the bright side, its behaviour outside of inversion windows is exactly what I\'m looking for.',
 			'The system shows that this approach to origin rails has promise, but it needs an innovation.',

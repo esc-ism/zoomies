@@ -4,7 +4,7 @@ import {addRule} from '@/shared/css';
 import {
 	CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
 	CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_EQUATION, CLASS_MATH_ASSERTION,
-	CLASS_ACTIVE, CLASS_BUTTON_ACTIVE, CLASS_MATH_TITLE, CLASS_MATH_BODY,
+	CLASS_ACTIVE, CLASS_BUTTON_ACTIVE, CLASS_MATH_TITLE, CLASS_MATH_BODY, CLASS_MATH_LOOSE,
 } from './consts';
 
 addRule(`.${CLASS_FLASH_CONTAINER}`, {
@@ -178,4 +178,10 @@ addRule(`.${CLASS_WRAPPER}:not(.${CLASS_ACTIVE})`, {
 addRule(`.${CLASS_WRAPPER}.${CLASS_ACTIVE}`, {
 	height: 'fit-content',
 	'min-height': '100%',
+});
+
+addRule(`.${CLASS_MATH_LOOSE}`, {
+	'font-size': '0.9em',
+	position: 'relative',
+	top: '0.05em',
 });

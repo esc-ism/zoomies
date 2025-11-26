@@ -31,19 +31,20 @@ export const getBorder = (rX, rY, strokeDiameter) => {
 	return border;
 };
 
-export const getDiagram = (radii, strokeRadius, topLeft, topRight, transforms) => {
-	const strokeDiameter = strokeRadius * 2;
+export const getDiagram = (radii, strokeDiameter, topLeft, topRight, transforms) => {
+	const strokeRadius = strokeDiameter / 2;
+	const borderDiameter = strokeDiameter * 2;
 	
 	const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
 	
-	const rX = radii.x + strokeDiameter + strokeRadius;
-	const rY = radii.y + strokeDiameter + strokeRadius;
+	const rX = radii.x + borderDiameter + strokeRadius;
+	const rY = radii.y + borderDiameter + strokeRadius;
 	
 	svg.setAttribute('viewBox', `${-rX} ${-rY} ${rX * 2} ${rY * 2}`);
 	svg.setAttribute('fill', 'none');
 	svg.setAttribute('stroke', 'black');
 	svg.setAttribute('stroke-linecap', 'round');
-	svg.setAttribute('stroke-width', strokeRadius);
+	svg.setAttribute('stroke-width', strokeDiameter);
 	svg.setAttribute('stroke-opacity', '0.8');
 	
 	svg.style.maxHeight = '100%';
@@ -54,12 +55,12 @@ export const getDiagram = (radii, strokeRadius, topLeft, topRight, transforms) =
 	image.setAttribute('d', `M${topLeft[0]} ${topLeft[1]}L${topRight[0]} ${topRight[1]}L${-topLeft[0]} ${-topLeft[1]}L${-topRight[0]} ${-topRight[1]}Z`);
 	image.style.color = '#382f3c';
 	image.setAttribute('fill', 'currentcolor');
-	image.setAttribute('stroke-width', strokeDiameter);
+	image.setAttribute('stroke-width', strokeDiameter * 1.5);
 	
 	const axes = document.createElementNS(SVG_NAMESPACE, 'g');
 	
 	axes.setAttribute('stroke', '#aaa');
-	axes.setAttribute('stroke-dasharray', `0 ${strokeRadius * 5}`);
+	axes.setAttribute('stroke-dasharray', `0 ${strokeDiameter * 5}`);
 	axes.setAttribute('stroke-opacity', '1');
 	
 	axes.append(...[
@@ -75,7 +76,7 @@ export const getDiagram = (radii, strokeRadius, topLeft, topRight, transforms) =
 		axes.setAttribute('transform', transforms);
 	}
 	
-	svg.append(image, axes, getBorder(rX - strokeRadius, rY - strokeRadius, strokeDiameter));
+	svg.append(image, axes, getBorder(rX - borderDiameter / 2, rY - borderDiameter / 2, borderDiameter));
 	
 	return svg;
 };

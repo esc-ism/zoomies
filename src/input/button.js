@@ -1,4 +1,5 @@
 import {SVG_NAMESPACE} from '@/shared';
+import {CLASS_SEMANTIC_BUTTON} from '@/consts';
 
 import {CLASS_BUTTON} from './consts';
 
@@ -23,7 +24,7 @@ export const getSVG = () => {
 export default (child, isMouse) => {
 	const button = document.createElement('button');
 	
-	button.classList.add(CLASS_BUTTON);
+	button.classList.add(CLASS_BUTTON, CLASS_SEMANTIC_BUTTON);
 	
 	button.style.height = '100%';
 	button.style.aspectRatio = '1 / 1';
@@ -31,9 +32,6 @@ export default (child, isMouse) => {
 	button.style.display = 'flex';
 	button.style.justifyContent = 'center';
 	button.style.alignItems = 'center';
-	button.style.padding = '0';
-	button.style.color = 'inherit';
-	button.style.border = 'none';
 	button.style.borderRight = '1px solid currentcolor';
 	
 	button.setAttribute('title', `${isMouse ? 'Mouse' : 'Touchscreen'} controls`);

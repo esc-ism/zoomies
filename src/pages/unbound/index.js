@@ -3,8 +3,8 @@ import {inputListener} from '@/consts';
 import {DEGREES, getAngleDiff} from '@/shared';
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
-import {CLASS_FLASH_CONTAINER} from '../consts';
-import {getText, getInstruction, getInputDependent, getMath} from '../shared';
+import {CLASS_FLASH_CONTAINER, CLASS_MATH_LOOSE} from '../consts';
+import {getText, getInstruction, getInputDependent, getMath, getDialogue} from '../shared';
 import {getButton, clearButton} from '../shared/button';
 import {xmlns} from '../shared/math';
 import flash from '../shared/flash';
@@ -16,8 +16,6 @@ let exits = 0;
 let instruct;
 let exitPromise;
 let exitResolve;
-
-const getDialogue = (...content) => ({style: {fontStyle: 'italic', textAlign: 'right', textWrapStyle: 'balance'}, content});
 
 class Validator {
 	static succeed() {
@@ -168,7 +166,7 @@ export default {
 			content: 'Unbound',
 		},
 		[
-			'To start, I\'d like to expound the value of pan-limiting.',
+			'To begin, I\'d like to talk about why pan-limiting is useful.',
 		],
 		getDialogue(
 			'Wait — before that, what\'s the thing ',
@@ -179,8 +177,20 @@ export default {
 		[
 			'Glad you asked!',
 			'It\'s our first pan-limiting playground.',
-			// todo hook ratioImage and change square/rect
-			'The colourful, spotted square is the "image" and it\'s being seen through the "viewport".',
+			'The colourful, spotted ',
+			{tag: 'span', callback: (element) => {
+				const thresholdHigh = 1.1;
+				const thresholdLow = 1 / thresholdHigh;
+				
+				const update = () => {
+					element.innerText = (demo.ratioImage > 1 ? (demo.ratioImage < thresholdHigh) : (demo.ratioImage > thresholdLow)) ? 'square' : 'rectangle';
+				};
+				
+				demo.hooks.ratioChange.add(update);
+				
+				update();
+			}},
+			' is the "image" and it\'s being seen through the "viewport".',
 			'To the viewport\'s top-left is a readout of the playground\'s state.',
 			'Follow the instructions below to see what you can do with it.',
 		],
@@ -282,7 +292,15 @@ export default {
 		[
 			'Each page will provide a playground for a unique pan-limiting system.',
 			'To demonstrate the value of pan-limiting, I\'m starting with a system that neglects it.',
-			'A formal description of the system might read:',
+			'Where ',
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+				{tag: 'mo', xmlns, content: '('},
+				{tag: 'mi', xmlns, content: 'x'},
+				{tag: 'mo', xmlns, content: ','},
+				{tag: 'mi', xmlns, content: 'y'},
+				{tag: 'mo', xmlns, content: ')'},
+			]},
+			' is the position of the viewport\'s center, a formal description of the system might read:',
 		],
 		getMath({
 			content: {tag: 'mtable', xmlns, content: [
@@ -338,8 +356,8 @@ export default {
 			'Like how game developers endeavour to keep players in-bounds, a good pan-limiting system keeps the viewport attached to its content.',
 		],
 		[
-			'A subtler deficiency exists in its snap-panning abilities.',
-			'The problem is shared by the system on the next page, where it will be discussed in more detail.',
+			'A subtler deficiency exists in this system\'s snap-panning abilities.',
+			'The problem is shared by the system on the next page, where it will be discussed in detail.',
 		],
 		{
 			tag: 'h2',

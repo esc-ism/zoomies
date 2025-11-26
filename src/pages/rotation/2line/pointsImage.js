@@ -3,10 +3,10 @@ import {SVG_NAMESPACE} from '@/shared';
 import {COLOURS, getDiagram, getLine, getText} from '../../shared/svg';
 
 const radii = {x: 25, y: 20};
-const strokeRadius = 0.4;
+const strokeDiameter = 0.4;
 
 const svg = getDiagram(
-	radii, strokeRadius,
+	radii, strokeDiameter,
 	[-radii.x * 0.8, -radii.y],
 	[radii.x * 1.15, -radii.y * 0.2],
 );
@@ -47,10 +47,10 @@ svg.append(
 	curve,
 	rect,
 	group,
-	getText('θ', [0, -7.6], strokeRadius, 0.25, 0, true),
-	getText('A', points[0], strokeRadius, -0.2, 1),
-	getText('B', points[1], strokeRadius, 0.45, 0.2),
-	getText('C', points[2], strokeRadius, -1.5, 0.4),
+	getText('θ', [0, -7.6], strokeDiameter, 0.25, 0, true),
+	getText('A', points[0], strokeDiameter, -0.2, 1),
+	getText('B', points[1], strokeDiameter, 0.45, 0.2),
+	getText('C', points[2], strokeDiameter, -1.5, 0.4),
 );
 
 export default svg;

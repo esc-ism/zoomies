@@ -1,7 +1,7 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getMath, getDiagrammedMath} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
@@ -795,12 +795,6 @@ export default {
 		for (const {start} of code) {
 			start();
 		}
-		
-		window.setTimeout(() => {
-			demo.rotation = 1.250737;
-			demo.system.constrainPosition({rotation: true});
-			demo.applyRotation();
-		}, 200);
 	},
 	end() {
 		cleanup();
@@ -850,7 +844,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Like a movie paying off its setups in the final act, this final system relies purely on the concepts introduced earlier.',
+			'Like a movie paying off its setups in the final act, this final system relies entirely on the concepts introduced earlier.',
 			'One pair of image corners is no longer ',
 			getButton('viewable', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
@@ -894,13 +888,13 @@ export default {
 			{
 				isText: true,
 				content: [
-					{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'B'}]},
+					{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [{tag: 'mi', xmlns, content: 'B'}]},
 					' is a midpoint at origin rail start zoom, positioned on the left rather than the right for clarity. ',
-					{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'C'}]},
+					{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [{tag: 'mi', xmlns, content: 'C'}]},
 					' and ',
-					{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
+					{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [{tag: 'mi', xmlns, content: 'D'}]},
 					' are the midpoints at connecting rail start zoom, with ',
-					{tag: 'math', xmlns, content: [{tag: 'mi', xmlns, content: 'D'}]},
+					{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [{tag: 'mi', xmlns, content: 'D'}]},
 					' being the unknown.',
 				],
 			},
@@ -909,9 +903,10 @@ export default {
 				content: {tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'div', content: 'let half of the viewport\'s width at default zoom be'},
+							{tag: 'div', content: 'let the viewport\'s width at default zoom be'},
 						]},
 						{tag: 'mtd', xmlns, content: [
+							{tag: 'mn', xmlns, content: '2'},
 							{tag: 'msub', xmlns, content: [
 								{tag: 'mi', xmlns, content: 'v'},
 								{tag: 'mi', xmlns, content: 'w'},
@@ -920,9 +915,10 @@ export default {
 					]},
 					{tag: 'mtr', xmlns, content: [
 						{tag: 'mtd', xmlns, content: [
-							{tag: 'div', content: 'let half of the viewport\'s height at default zoom be'},
+							{tag: 'div', content: 'let the viewport\'s height at default zoom be'},
 						]},
 						{tag: 'mtd', xmlns, content: [
+							{tag: 'mn', xmlns, content: '2'},
 							{tag: 'msub', xmlns, content: [
 								{tag: 'mi', xmlns, content: 'v'},
 								{tag: 'mi', xmlns, content: 'h'},
@@ -1287,16 +1283,15 @@ export default {
 		[
 			'And with that, we\'re done!',
 			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful;',
-			'It\'s outclassed by Viewport Center as a pan-limiter and has no compelling advantage over Double-Line as a span-panner.',
+			'it\'s outclassed by Viewport Center as a pan-limiter and has no compelling advantage over Double-Line as a span-panner.',
 			'Nevertheless, I\'m glad to have seen my vision through, and proud to have pushed my ',
 			{tag: 'span', style: {fontSize: '0.6em'}, content: '(pan)'},
 			' limits so far.',
 		],
 		[
-			'It\'s not ', {tag: 'i', content: 'just'}, ' that it\'s representative of personal triumph, though.',
-			'The way that its limits warp, the patterns formed by its rails... there\'s a kind of geometric beauty to this system.',
-			'I attempted to exhibit that aesthetic charm on the first page, but it\'s hard to convey without risking melting viewers\' CPUs.',
-			'Now, having reached the end of your journey, I hope that you\'ve gained a deeper appreciation for it, and all that went into its design.',
+			'There\'s a kind of geometric beauty to this system.',
+			'I find the way that its limits warp, and the patterns formed by its rails, a little mesmerising.',
+			'Having reached the end of your journey through my site, I hope that you\'ve gained an appreciation for that aesthetic charm, and all that went into its design.',
 		],
 		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
 	),

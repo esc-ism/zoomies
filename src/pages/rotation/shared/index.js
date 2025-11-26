@@ -73,7 +73,7 @@ export const getQuadrantAngle = (rotation, isEvenQuadrant) => {
 };
 
 export const getProgressAngles = (quadrantAngle, viewportRatio, viewportRatioInverse) => {
-	const progress = quadrantAngle / DEGREES[90] * -2 + 1;
+	const progress = -quadrantAngle / DEGREES[45] + 1;
 	
 	return {
 		side: Math.atan(progress * viewportRatioInverse),

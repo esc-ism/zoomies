@@ -21,9 +21,9 @@ addRule(`.${CLASS_CONTAINER}`, {
 	'margin-right': '10px',
 });
 
-addRule(`.${CLASS_CONTAINER} > svg`, {
+addRule(`.${CLASS_CONTAINER} > *`, {
 	cursor: 'pointer',
 	padding: '0 3px',
 });
 
-addRule(`.${CLASS_CONTAINER} > svg:not(:hover)`, {opacity: 0.4});
+addRule(`.${CLASS_CONTAINER} > :not(:hover)`, {opacity: 0.4});

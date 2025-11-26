@@ -3,10 +3,10 @@ import {DEGREES} from '@/shared';
 import {isVertical} from '@/shared/orientation';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getInstruction, getInputDependent, getMath, getDiagrammedMath} from '../../shared';
+import {getText, getCode, getInstruction, getInputDependent, getMath, getDiagrammedMath, getDialogue} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
 import {xmlns, opSpace, getOverlined} from '../../shared/math';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_YOYO} from '../../consts';
 
 import SHARED_FUNCTIONS from '../code';
 import * as mock from '../mock';
@@ -215,7 +215,7 @@ export default {
 		],
 		[
 			'Finding the start zooms requires some trigonometry.',
-			'We need to find the viewport sizes at which its edges might contact the image corner.',
+			'We need to find the viewport scales at which its edges might contact image corners.',
 			'A solution is given below, using the top-left image corner as an example.',
 		],
 		getInstruction([
@@ -274,9 +274,10 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'div', content: 'let half of the image\'s width be'},
+								{tag: 'div', content: 'let the image\'s width be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '2'},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'i'},
 									{tag: 'mi', xmlns, content: 'w'},
@@ -285,9 +286,10 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'div', content: 'let half of the image\'s height be'},
+								{tag: 'div', content: 'let the image\'s height be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '2'},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'i'},
 									{tag: 'mi', xmlns, content: 'h'},
@@ -296,9 +298,10 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'div', content: 'let half of the viewport\'s width at default zoom be'},
+								{tag: 'div', content: 'let the viewport\'s width at default zoom be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '2'},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'v'},
 									{tag: 'mi', xmlns, content: 'w'},
@@ -307,9 +310,10 @@ export default {
 						]},
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'div', content: 'let half of the viewport\'s height at default zoom be'},
+								{tag: 'div', content: 'let the viewport\'s height at default zoom be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
+								{tag: 'mn', xmlns, content: '2'},
 								{tag: 'msub', xmlns, content: [
 									{tag: 'mi', xmlns, content: 'v'},
 									{tag: 'mi', xmlns, content: 'h'},
@@ -906,9 +910,10 @@ export default {
 			' and has a default value of ',
 			{
 				tag: 'span',
+				// keeps the "." connected
 				style: {'white-space': 'nowrap'},
 				content: [
-					{tag: 'math', xmlns, content: [
+					{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 						{tag: 'mn', xmlns, content: '½'},
 						{tag: 'mi', xmlns, content: 'π'},
 					]},
@@ -956,7 +961,10 @@ export default {
 		[
 			'You\'ll find that this system works perfectly if the viewport and image are both squares.',
 			'Its flaws are only revealed when one is ',
-			getButton('stretched', [[{ratio: restrictiveTweens.ratio}]]),
+			getButton('stretched', [
+				() => [{ratio: demo.ratioViewport, rotation: DEGREES[90], zoom: 1, position: 0}],
+				[{ratio: restrictiveTweens.ratio}],
+			]),
 			'.',
 		],
 		[
@@ -1774,25 +1782,26 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Okay! Now that we\'ve gone through how snap-panning works, how useful is it in practise?',
-			'In fact, what\'s even the ', {tag: 'i', content: 'point'}, ' of snap-panning?',
+			'Now that we\'ve gone through how snap-panning works, let\'s talk about how useful it is in practise.',
 		],
+		
+		getDialogue('Okay... but what\'s the ', {tag: 'strong', content: 'point'}, ' of snap-panning?'),
 		[
 			'Snap-panning\'s purpose is to allow users to quickly focus on some sub-region of content.',
-			'In my implementations, snap zoom is the minimum zoom for which a snap point is in-bounds, making it an under-estimation of how far the user wants to zoom in.',
+			'In my implementations, snap zoom is the minimum zoom for which a snap point is in-bounds, making it an underestimation of how far the user wants to zoom in.',
 			'Because of this, the worst outcome for a snap-pan is being too zoomed out.',
 		],
 		[
 			'The good news is that this makes the overly restrictive pan-limits harmless — if anything, they\'re beneficial!',
-			'On the other hand, unexpectedly zoomed-out ',
-			getButton('snap-pans', getSnapOptions(), {getParam: () => ({
+			'On the other hand, unexpectedly ',
+			getButton('zoomed-out', getSnapOptions(), {getParam: () => ({
 				position: {y: 0.25, x: 0},
 				zoom: 2,
 				startZoom: 1,
 				rotation: DEGREES[90],
 				ratio: 0.25,
 			})}),
-			' due to permissive pan-limits are unacceptable.',
+			' snap-pans caused by permissive pan-limits are unacceptable.',
 		],
 		{
 			tag: 'h2',
@@ -1801,7 +1810,7 @@ export default {
 		},
 		[
 			'Single-line rails don\'t fulfill my needs.',
-			'Its weak pan-limiting isn\'t so important since the Viewport Center system has that covered, but its snap-panning is equally poor.',
+			'The system\'s weak pan-limiting isn\'t so important since the "Viewport Center" system has that covered, but its snap-panning is also poor.',
 		],
 		[
 			'A valid use case would require variable rotation alongside guaranteed 1:1 aspect ratios for both image and viewport.',

@@ -9,6 +9,8 @@ export const CLASS_WRAPPER = getTextId('wrapper');
 
 export const CLASS_CODE = getTextId('code');
 
+export const CLASS_MATH_LOOSE = getTextId('math', 'loose');
+
 export const CLASS_MATH_WRAPPER = getTextId('math', 'wrapper');
 export const CLASS_MATH_CONTAINER = getTextId('math', 'container');
 export const CLASS_MATH_TITLE = getTextId('math', 'title');

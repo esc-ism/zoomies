@@ -69,6 +69,8 @@ const getNode = (description) => {
 	return node;
 };
 
+export const getDialogue = (...content) => ({style: {fontStyle: 'italic', textAlign: 'right', textWrapStyle: 'balance'}, content});
+
 export const getCode = (callbacks, statements) => {
 	return {
 		content: {

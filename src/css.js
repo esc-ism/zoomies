@@ -1,4 +1,4 @@
-import {CLASS_WRAPPER} from './consts';
+import {CLASS_WRAPPER, CLASS_SEMANTIC_BUTTON} from './consts';
 import {addRule} from './shared/css';
 import {addVerticalRule} from './shared/orientation';
 
@@ -16,6 +16,13 @@ addRule(':root', {
 });
 
 addRule('a', {color: '#badfdf'});
+
+addRule(`.${CLASS_SEMANTIC_BUTTON}`, {
+	'background-color': 'unset',
+	padding: '0',
+	color: 'inherit',
+	border: 'none',
+});
 
 addRule(`.${CLASS_WRAPPER}`, {
 	width: '100%',

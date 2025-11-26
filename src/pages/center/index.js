@@ -3,8 +3,9 @@ import {PADDING_VIEWPORT} from '@/demo/consts';
 import {DEGREES} from '@/shared';
 import {inputListener} from '@/consts';
 
-import {xmlns} from '../shared/math';
+import {CLASS_MATH_LOOSE} from '../consts';
 import {getText, getMath} from '../shared';
+import {xmlns} from '../shared/math';
 import {getButton, clearButton} from '../shared/button';
 import {getSnapOptions} from '../shared/tween';
 
@@ -63,6 +64,21 @@ export default {
 				]},
 			]},
 		}),
+		[
+			'Note that coordinates are based on image axis.',
+			'Regardless of rotation and aspect ratio, image corners are at ',
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+				{tag: 'mo', xmlns, content: '('},
+				{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: '±'},
+				{tag: 'mn', xmlns, content: '0.5'},
+				{tag: 'mo', xmlns, content: ','},
+				{tag: 'mo', xmlns, setAttributes: {rspace: '0'}, content: '±'},
+				{tag: 'mn', xmlns, content: '0.5'},
+				{tag: 'mo', xmlns, content: ')'},
+			]},
+			'.',
+			'This remains constant throughout my work.',
+		],
 		{
 			tag: 'h2',
 			content: 'Effectiveness',

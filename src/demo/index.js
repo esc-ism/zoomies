@@ -814,8 +814,13 @@ export default new class {
 		Object.defineProperty(target, 'xTarget', getDefinition(target.x));
 		Object.defineProperty(target, 'yTarget', getDefinition(target.y));
 		
-		Object.defineProperty(target, 'x', getDefinition(this.position.x, 'position'));
-		Object.defineProperty(target, 'y', getDefinition(this.position.y, 'position'));
+		if (this.target.isHidden) {
+			Object.defineProperty(target, 'x', getDefinition(this.position.x, 'position'));
+			Object.defineProperty(target, 'y', getDefinition(this.position.y, 'position'));
+		} else {
+			Object.defineProperty(target, 'x', getDefinition(this.target.x, 'position'));
+			Object.defineProperty(target, 'y', getDefinition(this.target.y, 'position'));
+		}
 		
 		Object.defineProperty(target, 'ratio', getDefinition(this.ratio, 'ratio', (ratio) => {
 			this._ratioImage = this.ratioViewport / ratio;
@@ -851,7 +856,9 @@ export default new class {
 		this.hooks.any.emit();
 		
 		if (this.tween) {
-			this.deleteTween();
+			this.tween.kill();
+			
+			window.clearTimeout(this.#tweenUpdateId);
 		}
 		
 		this.tween = gsap.timeline({paused: true, data: {}});
@@ -873,8 +880,11 @@ export default new class {
 			
 			let hasTween = false;
 			
-			const record = (type, value, label = type) => {
-				if (!effects[label] && Math.abs(this.tween.data.target[type] - value) < ALLOWANCE_ERROR) {
+			const record = (type, value, label = type, altLabel = false) => {
+				if (
+					!effects[label] && (!altLabel || !effects[altLabel]) &&
+					Math.abs(this.tween.data.target[type] - value) < ALLOWANCE_ERROR
+				) {
 					return;
 				}
 				
@@ -899,11 +909,11 @@ export default new class {
 						break;
 					case 'target':
 						if (typeof value === 'object') {
-							record('xTarget', value.x, 'target');
-							record('yTarget', value.y, 'target');
+							record('xTarget', value.x, 'target', 'position');
+							record('yTarget', value.y, 'target', 'position');
 						} else {
-							record('xTarget', value, 'target');
-							record('yTarget', value, 'target');
+							record('xTarget', value, 'target', 'position');
+							record('yTarget', value, 'target', 'position');
 						}
 						
 						break;
@@ -949,7 +959,7 @@ export default new class {
 					callbacks.push(vars.onComplete);
 				}
 				
-				// todo three seperate tween.add calls wouldn't work if position was +=0.2 or something
+				// three seperate tween.add calls wouldn't work if position was +=0.2 or something
 				this.tween.add(callbacks, position);
 				
 				continue;

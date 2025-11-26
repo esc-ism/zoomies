@@ -2,7 +2,7 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
-import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../consts';
+import {CLASS_BUTTON, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
 import {getText, getCode, getInstruction, getMath, getInputDependent} from '../shared';
@@ -45,10 +45,8 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'In the interest of building complexity slowly, this first zoomful system doesn\'t consider rotation.',
-		],
-		[
-			'When possible, the viewport is kept wholly within the image.',
+			'This first zoomful system doesn\'t consider rotation.',
+			'When possible, it keeps the viewport wholly within the image.',
 			'Panning is prevented along axes where the viewport is ',
 			getButton('larger', [
 				[{rotation: DEGREES[90], zoom: 0.8}],
@@ -70,17 +68,26 @@ export default {
 			{tag: 'a', content: 'rhombus', href: 'https://en.wikipedia.org/wiki/Rhombus'},
 			' in upcoming systems, but not this one).',
 			'The new playground ',
-			// todo rubbish; flash white lines over rails or make them brighter when you click this
-			getButton('lines', [
-				[{zoom: 1, position: 0}],
-				({zoomPoints}) => [{position: zoomPoints[1]}, {duration: 0}],
-				({zoomPoints}) => [{position: zoomPoints[1]}, {delay: 0.5, duration: 0}],
-				({zoomPoints}) => [{zoom: zoomPoints[1].z, position: zoomPoints[1]}, {delay: 0.5}],
-				() => [{position: 0.5}, {duration: 0}],
-				({lowAxis}) => [{[lowAxis === 'y' ? 'x' : 'y']: -0.5}, {delay: 0.5, duration: 0}],
-				() => [{position: -0.5}, {delay: 0.5, duration: 0}],
-				({lowAxis}) => [{[lowAxis === 'y' ? 'x' : 'y']: 0.5}, {delay: 0.5, duration: 0}],
-			], {getParam: () => demo.system}),
+			(() => {
+				const off = {filter: 'brightness(1) drop-shadow(0 0 0px white)'};
+				const on = {filter: 'brightness(2.6) drop-shadow(0 0 1px white)'};
+				const animation = [
+					[off, on, off, on, off],
+					{duration: 1200},
+				];
+				
+				return {
+					tag: 'span',
+					content: 'lines',
+					classList: [CLASS_BUTTON],
+					tabIndex: 0,
+					onclick() {
+						for (const line of demo.elements.rail.children) {
+							line.animate(...animation);
+						}
+					},
+				};
+			})(),
 			' plot all possible positions of line segment endpoints and parallelogram corners.',
 			'I will refer to them as "rails", since bounds appear to travel along them.',
 		],
@@ -142,11 +149,10 @@ export default {
 			'When the viewport and image ',
 			getButton('share', [
 				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
-				[{ratio: 1}, {ease: 'none', duration: 1}],
 			]),
 			' an aspect ratio,', {tag: 'i', content: 'boundX'}, ' and ', {tag: 'i', content: 'boundY'}, ' are equal for all zooms.',
 			'The ',
-			{tag: 'math', xmlns, content: [
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 				{tag: 'mfrac', xmlns, content: [
 					{tag: 'mi', xmlns, content: 'viewportSize'},
 					{tag: 'mi', xmlns, content: 'zoom'},

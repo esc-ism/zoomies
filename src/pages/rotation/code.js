@@ -276,10 +276,7 @@ export const MULTI_LINE = [
 	{op: 'func', id: 'getProgressAngles', args: ['quadrantAngle'], type: ['angle', 'angle'], isBase: [false, true], and: [
 		{op: '=', id: 'progress', and: {
 			op: '+', and: [
-				{op: '*', and: [
-					{op: '/', and: ['quadrantAngle', '½π']},
-					-2,
-				]},
+				{op: '/', and: [{op: '-', and: 'quadrantAngle'}, '¼π']},
 				1,
 			],
 		}},

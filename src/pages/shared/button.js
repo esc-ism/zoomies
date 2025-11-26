@@ -1,5 +1,7 @@
 import demo from '@/demo';
 
+import {CLASS_CONTAINER as CLASS_CODE_BUTTON_CONTAINER} from '../code/buttons/consts';
+
 import {CLASS_BUTTON, CLASS_BUTTON_ACTIVE, TWEENS_RESET} from '../consts';
 
 let activeButton;
@@ -27,8 +29,18 @@ const releaseButton = (event) => {
 	
 	activeButton.classList.remove(CLASS_BUTTON_ACTIVE);
 	
-	if (event?.relatedTarget?.classList.contains(CLASS_BUTTON)) {
-		return;
+	if (event?.relatedTarget) {
+		const {relatedTarget} = event;
+		
+		if (relatedTarget.classList.contains(CLASS_BUTTON)) {
+			return;
+		}
+		
+		if (relatedTarget.parentElement.classList.contains(CLASS_CODE_BUTTON_CONTAINER)) {
+			clearButton();
+			
+			return;
+		}
 	}
 	
 	if (demo.tween.totalDuration() > 0 && demo.tween.time() > 0) {

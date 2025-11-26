@@ -5,11 +5,11 @@ import {getDiagram, COLOURS, getSplit} from '../../../shared/svg';
 import {getMirroredLine} from './shared';
 
 const radii = {x: 20, y: 20};
-const strokeRadius = 0.4;
+const strokeDiameter = 0.4;
 const topLeft = [-radii.x * 0.26, -radii.y];
 const topRight = [radii.x, -radii.y * 0.3];
 
-const svg = getDiagram(radii, strokeRadius, topLeft, topRight);
+const svg = getDiagram(radii, strokeDiameter, topLeft, topRight);
 
 svg.style.marginLeft = '0.5em';
 
