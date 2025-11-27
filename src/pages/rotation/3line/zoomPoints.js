@@ -91,8 +91,7 @@ const makeFirstInt = (first, {z}, third, yIntersect) => {
 	third.isFirstInt = true;
 };
 
-// todo rename
-const mod = (first, second, third, firstFlipped, secondFlipped, yIntersect) => {
+const connect = (first, second, third, firstFlipped, secondFlipped, yIntersect) => {
 	if (third.z >= second.z) {
 		return;
 	}
@@ -144,9 +143,9 @@ const getAll = (data) => {
 			Object.assign(thirdBase, getIntersection([secondBaseFlipped, secondBaseFlipped.end], [data.yIntersectBase, data.cornerBase]));
 		}
 	} else if (thirdBase.z <= thirdSide.z) {
-		mod(firstBase, secondBase, thirdBase, firstBaseFlipped, secondBaseFlipped, [data.yIntersectBase, data.cornerBase]);
+		connect(firstBase, secondBase, thirdBase, firstBaseFlipped, secondBaseFlipped, [data.yIntersectBase, data.cornerBase]);
 	} else {
-		mod(firstSide, secondSide, thirdSide, firstSideFlipped, secondSideFlipped, [data.yIntersectSide, data.cornerSide]);
+		connect(firstSide, secondSide, thirdSide, firstSideFlipped, secondSideFlipped, [data.yIntersectSide, data.cornerSide]);
 	}
 	
 	return [firstSide, secondSide, thirdSide, firstBase, secondBase, thirdBase];

@@ -261,7 +261,6 @@ export default {
 						]},
 						{tag: 'mtd', xmlns, content: [
 							{tag: 'mn', xmlns, content: '2'},
-							// todo "d"?
 							{tag: 'mi', xmlns, content: 'v'},
 						]},
 					]},

@@ -1189,7 +1189,6 @@ export default {
 			content: 'Snap-Pan Effectiveness',
 			style: {textAlign: 'center'},
 		},
-		// todo expand?
 		[
 			'As a snap-panning facilitator, this system is hard to fault.',
 			'Of course, it performs fine with ',

@@ -213,7 +213,6 @@ const getFunction = (getValue) => (statement, scope, meta, indent) => {
 	
 	args.append(...csvs.elements);
 	
-	// todo make hoverable & add titles
 	return {value: getValue(...csvs.values), elements: [func, args]};
 };
 

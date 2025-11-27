@@ -81,7 +81,6 @@ class ActionHook {
 let startPosition;
 
 export default new class {
-	// todo necessary?
 	elements = elements;
 	element = this.elements.wrapper;
 	
@@ -717,8 +716,6 @@ export default new class {
 		
 		delete this.tween;
 	}
-	
-	// todo snap panning on reverse doesn't kill?
 	
 	getTweenTarget() {
 		const target = {

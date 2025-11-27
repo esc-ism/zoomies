@@ -272,7 +272,6 @@ export const MULTI_LINE = [
 			]},
 		]}},
 	]},
-	// todo check if isBase works
 	{op: 'func', id: 'getα', args: ['θ'], type: ['angle', 'angle'], fight: [true, true], isBase: [false, true], and: [
 		{op: '=', id: 'progress', and: {
 			op: '+', and: [

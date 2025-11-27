@@ -22,7 +22,6 @@ const code = [];
 export default {
 	System,
 	start() {
-		// todo rename
 		registerFunctions();
 		
 		for (const {start} of code) {

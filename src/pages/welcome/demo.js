@@ -19,7 +19,6 @@ export default class extends Demo {
 		elements.viewport.style.pointerEvents = 'none';
 	}
 	
-	// todo CSS transition from one rail state to the next
 	applyZoomPoints() {}
 	getConstrainedPosition(position) {
 		return position;
