@@ -64,9 +64,9 @@ export default {
 			{tag: 'a', content: 'line segment', href: 'https://en.wikipedia.org/wiki/Line_segment'},
 			' or a ',
 			{tag: 'a', content: 'parallelogram', href: 'https://en.wikipedia.org/wiki/Parallelogram'},
-			' (they can be a ',
-			{tag: 'a', content: 'rhombus', href: 'https://en.wikipedia.org/wiki/Rhombus'},
-			' in upcoming systems, but not this one).',
+			' (',
+			{tag: 'a', content: 'rhombuses', href: 'https://en.wikipedia.org/wiki/Rhombus'},
+			' are possible in upcoming systems, but not this one).',
 			'The new playground ',
 			(() => {
 				const off = {filter: 'brightness(1) drop-shadow(0 0 0px white)'};
@@ -179,7 +179,7 @@ export default {
 		},
 		[
 			'Snap-panning now requires an accommodating zoom adjustment.',
-			'We can derive the formula by solving the pan-limiting calculation for zoom, replacing "boundX" and "boundY" with the target position.',
+			'We can derive the formula by solving the pan-limiting calculation for zoom, replacing "boundX" and "boundY" with a coordinate.',
 		],
 		getMath(
 			{
@@ -290,6 +290,10 @@ export default {
 				],
 			},
 		),
+		[
+			'This gives one zoom for the x-coordinate and another for the y-coordinate.',
+			'The position will only be contained by ', {tag: 'strong', content: 'both'}, ' axes\' bounds at the larger of the two zooms.',
+		],
 		getCode(code, [
 			{op: '=', id: 'zoomX', type: 'zoom', and: {
 				op: '/', and: ['½viewportWidth', 'imageWidth', {op: '-', and: [0.5, {op: 'abs', and: 'x'}]}],

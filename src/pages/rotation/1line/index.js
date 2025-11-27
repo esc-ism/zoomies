@@ -1787,7 +1787,7 @@ export default {
 		
 		getDialogue('Okay... but what\'s the ', {tag: 'strong', content: 'point'}, ' of snap-panning?'),
 		[
-			'Snap-panning\'s purpose is to allow users to quickly focus on some sub-region of content.',
+			'Snap-panning\'s purpose is to allow users to quickly focus on some small feature of the image.',
 			'In my implementations, snap zoom is the minimum zoom for which a snap point is in-bounds, making it an underestimation of how far the user wants to zoom in.',
 			'Because of this, the worst outcome for a snap-pan is being too zoomed out.',
 		],
@@ -1813,7 +1813,8 @@ export default {
 			'The system\'s weak pan-limiting isn\'t so important since the "Viewport Center" system has that covered, but its snap-panning is also poor.',
 		],
 		[
-			'A valid use case would require variable rotation alongside guaranteed 1:1 aspect ratios for both image and viewport.',
+			'A valid use case would require variable rotation alongside guaranteed 1:1 aspect ratios for both image and viewport —',
+			'any other shared ratio will work fine at default zoom, but give permissive limits when rotated 90°.',
 			'The situation\'s so niche that it\'s hard to say that this system is particularly useful.',
 		],
 		[

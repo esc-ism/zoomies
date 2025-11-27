@@ -130,22 +130,22 @@ const functions = [
 			{op: '+', and: [{op: '*', and: ['firstEndY', 'mult']}, 'offsetY', 'secondY']},
 		]}},
 	]},
-	{op: 'func', id: 'getAxisIntersects', args: ['isEvenQuadrant', 'quadrantAngle'], type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [2, 1, 5, 4], and: [
-		{op: '=', id: ['angleSide', 'angleBase'], and: {
-			op: 'call', id: 'getProgressAngles', and: ['quadrantAngle'],
+	{op: 'func', id: 'getAxisIntersects', args: ['isEvenQuadrant', 'θ'], type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [2, 1, 5, 4], and: [
+		{op: '=', id: ['αSide', 'αBase'], and: {
+			op: 'call', id: 'getα', and: ['θ'],
 		}},
 		'',
 		{op: 'if', and: [
-			{op: '>=', and: ['quadrantAngle', '¼π']},
+			{op: '>=', and: ['θ', '¼π']},
 			{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideY'], and: {op: 'call', id: 'getYIntersect', and: [
 				'½viewportWidth',
-				{op: '+', and: ['quadrantAngle', 'angleSide']},
-				'angleSide',
+				{op: '+', and: ['θ', 'αSide']},
+				'αSide',
 			]}},
 			{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseY'], and: {op: 'call', id: 'getYIntersect', and: [
 				'½viewportHeight',
-				{op: '-', and: ['½π', 'quadrantAngle', 'angleBase']},
-				'angleBase',
+				{op: '-', and: ['½π', 'θ', 'αBase']},
+				'αBase',
 			]}},
 			'',
 			{op: 'return', and: {op: 'array', multiline: 2, and: [
@@ -157,15 +157,15 @@ const functions = [
 		{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideX'], and: {
 			op: 'call', id: 'getXIntersect', and: [
 				'½viewportWidth',
-				{op: '-', and: ['½π', 'quadrantAngle', 'angleSide']},
-				'angleSide',
+				{op: '-', and: ['½π', 'θ', 'αSide']},
+				'αSide',
 			],
 		}},
 		{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseX'], and: {
 			op: 'call', id: 'getXIntersect', and: [
 				'½viewportHeight',
-				{op: '+', and: ['quadrantAngle', 'angleBase']},
-				'angleBase',
+				{op: '+', and: ['θ', 'αBase']},
+				'αBase',
 			],
 		}},
 		'',
@@ -372,15 +372,15 @@ const functions = [
 			op: 'call', id: 'getViewportPoints', and: ['zoomSide', 'zoomBase'],
 		}},
 		'',
-		{op: '=', id: 'quadrantAngle', type: 'angle', and: {
-			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
+		{op: '=', id: 'θ', type: 'angle', and: {
+			op: 'call', id: 'getθ', and: ['isEvenQuadrant'],
 		}},
 		'',
 		{op: '=', multiline: 3, id: [
 			'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide',
 			'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase',
 		], and: {
-			op: 'call', id: 'getAxisIntersects', and: ['isEvenQuadrant', 'quadrantAngle'],
+			op: 'call', id: 'getAxisIntersects', and: ['isEvenQuadrant', 'θ'],
 		}},
 		'',
 		{op: '=', id: ['cornerXSide', 'cornerXBase'], type: ['x', 'x'], and: {
@@ -428,7 +428,7 @@ const functions = [
 			]},
 			{op: 'if', and: [
 				{op: '>', and: [
-					{op: 'abs', and: {op: '-', and: ['quadrantAngle', '¼π']}},
+					{op: 'abs', and: {op: '-', and: ['θ', '¼π']}},
 					'⅛π',
 				]},
 				{op: 'return', and: {op: 'array', multiline: [1, 1, 5], and: [
@@ -1130,6 +1130,7 @@ export default {
 			},
 		),
 		[
+			'You\'ll see that math in the ', {tag: 'i', content: 'getSecond'}, ' function.',
 			'The other main additions are conditions to identify which of the two possible corners connecting rails should point towards.',
 			'I\'ve also had to include special case checks for when corner rails and connecting rails have identical gradients, or when they\'re similar enough that rounding errors keep my code from finding accurate intersections.',
 		],
@@ -1289,7 +1290,8 @@ export default {
 			' limits so far.',
 		],
 		[
-			'There\'s a kind of geometric beauty to this system.',
+			'Let\'s end on a less ...clinical note.',
+			'There\'s a kind of geometric beauty to this system, isn\'t there?',
 			'I find the way that its limits warp, and the patterns formed by its rails, a little mesmerising.',
 			'Having reached the end of your journey through my site, I hope that you\'ve gained an appreciation for that aesthetic charm, and all that went into its design.',
 		],

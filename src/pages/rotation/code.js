@@ -227,7 +227,7 @@ export const MULTI_LINE = [
 			]},
 		]}},
 	]},
-	{op: 'func', id: 'getQuadrantAngle', args: ['isEvenQuadrant'], type: 'angle', and: [
+	{op: 'func', id: 'getθ', args: ['isEvenQuadrant'], type: 'angle', and: [
 		{op: '=', id: 'angle', type: 'angle', and: {
 			op: '%', and: [
 				{op: '+', and: [
@@ -273,15 +273,15 @@ export const MULTI_LINE = [
 		]}},
 	]},
 	// todo check if isBase works
-	{op: 'func', id: 'getProgressAngles', args: ['quadrantAngle'], type: ['angle', 'angle'], isBase: [false, true], and: [
+	{op: 'func', id: 'getα', args: ['θ'], type: ['angle', 'angle'], fight: [true, true], isBase: [false, true], and: [
 		{op: '=', id: 'progress', and: {
 			op: '+', and: [
-				{op: '/', and: [{op: '-', and: 'quadrantAngle'}, '¼π']},
+				{op: '/', and: [{op: '-', and: 'θ'}, '¼π']},
 				1,
 			],
 		}},
 		'',
-		{op: '=', id: 'angleSide', type: 'angle', and: {
+		{op: '=', id: 'αSide', type: 'angle', and: {
 			op: 'atan', and: {
 				op: '*', and: [
 					'progress',
@@ -289,7 +289,7 @@ export const MULTI_LINE = [
 				],
 			},
 		}},
-		{op: '=', id: 'angleBase', type: 'angle', isBase: true, and: {
+		{op: '=', id: 'αBase', type: 'angle', isBase: true, and: {
 			op: 'atan', and: {
 				op: '*', and: [
 					'progress',
@@ -298,14 +298,14 @@ export const MULTI_LINE = [
 			},
 		}},
 		'',
-		{op: 'return', and: {op: 'array', and: ['angleSide', 'angleBase']}},
+		{op: 'return', and: {op: 'array', and: ['αSide', 'αBase']}},
 	]},
-	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['zoom', 'y'], and: [
+	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'α'], type: ['zoom', 'y'], and: [
 		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '/', and: [
 				'viewportSize',
 				{op: '*', and: [
-					{op: 'cos', and: 'progressAngle'},
+					{op: 'cos', and: 'α'},
 					{op: 'abs', and: {
 						op: '/', and: ['½imageWidth', {op: 'cos', and: 'cornerAngle'}],
 					}},
@@ -320,12 +320,12 @@ export const MULTI_LINE = [
 			]},
 		]}},
 	]},
-	{op: 'func', id: 'getXIntersect', args: ['viewportSize', 'cornerAngle', 'progressAngle'], type: ['zoom', 'x'], and: [
+	{op: 'func', id: 'getXIntersect', args: ['viewportSize', 'cornerAngle', 'α'], type: ['zoom', 'x'], and: [
 		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '/', and: [
 				'viewportSize',
 				{op: '*', and: [
-					{op: 'cos', and: 'progressAngle'},
+					{op: 'cos', and: 'α'},
 					{op: 'abs', and: {
 						op: '/', and: ['½imageHeight', {op: 'cos', and: 'cornerAngle'}],
 					}},

@@ -32,22 +32,22 @@ const getCornerProgressTweens = (rotation, position = '>-0.4') => [
 
 const functions = [
 	...SHARED_FUNCTIONS,
-	{op: 'func', id: 'getIntersectSide', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
+	{op: 'func', id: 'getIntersectSide', args: ['cornerAngle', 'α', 'θ', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
 		{op: '=', id: 'lockAngle', type: 'angle', and: {
-			op: '+', and: ['progressAngle', 'quadrantAngle'],
+			op: '+', and: ['α', 'θ'],
 		}},
 		'',
 		{op: 'if', and: [
 			{op: '<', and: ['lockAngle', 'cornerAngle']},
 			{op: '=', id: ['intersectZoom', 'intersectY'], and: {
-				op: 'call', id: 'getYIntersect', and: ['½viewportWidth', 'lockAngle', 'progressAngle'],
+				op: 'call', id: 'getYIntersect', and: ['½viewportWidth', 'lockAngle', 'α'],
 			}},
 			'',
 			{op: 'return', and: {op: 'array', and: ['intersectZoom', 0, 'intersectY']}},
 		]},
 		'',
 		{op: '=', id: ['intersectZoom', 'intersectX'], and: {
-			op: 'call', id: 'getXIntersect', and: ['½viewportWidth', {op: '-', and: ['½π', 'quadrantAngle', 'progressAngle']}, 'progressAngle'],
+			op: 'call', id: 'getXIntersect', and: ['½viewportWidth', {op: '-', and: ['½π', 'θ', 'α']}, 'α'],
 		}},
 		'',
 		{op: 'return', and: {op: 'array', and: [
@@ -56,22 +56,22 @@ const functions = [
 			0,
 		]}},
 	]},
-	{op: 'func', id: 'getIntersectBase', args: ['cornerAngle', 'progressAngle', 'quadrantAngle', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
+	{op: 'func', id: 'getIntersectBase', args: ['cornerAngle', 'α', 'θ', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
 		{op: '=', id: 'lockAngle', type: 'angle', and: {
-			op: '-', and: ['½π', 'quadrantAngle', 'progressAngle'],
+			op: '-', and: ['½π', 'θ', 'α'],
 		}},
 		'',
 		{op: 'if', and: [
 			{op: '<', and: ['lockAngle', 'cornerAngle']},
 			{op: '=', id: ['intersectZoom', 'intersectY'], and: {
-				op: 'call', id: 'getYIntersect', and: ['½viewportHeight', 'lockAngle', 'progressAngle'],
+				op: 'call', id: 'getYIntersect', and: ['½viewportHeight', 'lockAngle', 'α'],
 			}},
 			'',
 			{op: 'return', and: {op: 'array', and: ['intersectZoom', 0, 'intersectY']}},
 		]},
 		'',
 		{op: '=', id: ['intersectZoom', 'intersectX'], and: {
-			op: 'call', id: 'getXIntersect', and: ['½viewportHeight', {op: '+', and: ['progressAngle', 'quadrantAngle']}, 'progressAngle'],
+			op: 'call', id: 'getXIntersect', and: ['½viewportHeight', {op: '+', and: ['α', 'θ']}, 'α'],
 		}},
 		'',
 		{op: 'return', and: {op: 'array', and: [
@@ -117,12 +117,12 @@ const functions = [
 				0,
 			],
 		}},
-		{op: '=', id: 'quadrantAngle', type: 'angle', and: {
-			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
+		{op: '=', id: 'θ', type: 'angle', and: {
+			op: 'call', id: 'getθ', and: ['isEvenQuadrant'],
 		}},
 		'',
-		{op: '=', id: ['angleSide', 'angleBase'], and: {
-			op: 'call', id: 'getProgressAngles', and: ['quadrantAngle'],
+		{op: '=', id: ['αSide', 'αBase'], and: {
+			op: 'call', id: 'getα', and: ['θ'],
 		}},
 		'',
 		{op: '=', id: 'cornerAngle', type: 'angle', and: {
@@ -134,16 +134,16 @@ const functions = [
 		{op: '=', id: ['intersectSideZoom', 'intersectSideX', 'intersectSideY'], and: {
 			op: 'call', id: 'getIntersectSide', and: [
 				'cornerAngle',
-				'angleSide',
-				'quadrantAngle',
+				'αSide',
+				'θ',
 				'isEvenQuadrant',
 			],
 		}},
 		{op: '=', id: ['intersectBaseZoom', 'intersectBaseX', 'intersectBaseY'], and: {
 			op: 'call', id: 'getIntersectBase', and: [
 				'cornerAngle',
-				'angleBase',
-				'quadrantAngle',
+				'αBase',
+				'θ',
 				'isEvenQuadrant',
 			],
 		}},
@@ -380,7 +380,6 @@ export default {
 			'Since we\'re focusing on adjacent (top-left and top-right) image corners, we can say that one will be a viewport side corner and the other a viewport base corner.',
 			'Corners will alternate between base and side every 90°.',
 		],
-		// todo define "lock angle"
 		[
 			'Like origin rail start zooms, lock rails are found through trigonometry.',
 			'There are four kinds of lock rail;',
@@ -1057,6 +1056,10 @@ export default {
 				],
 			},
 		),
+		[
+			'That math is used by ', {tag: 'i', content: 'getZoomPoints'}, ' below, which returns rail endpoints and start zooms.',
+			'If you want to know how the other lock rail variants are handled, see ', {tag: 'i', content: 'getIntersectSide'}, ' and ', {tag: 'i', content: 'getIntersectBase'}, '.',
+		],
 		getCode(code, [
 			{op: '=', id: [
 				'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',
@@ -1145,7 +1148,6 @@ export default {
 			'The final product may have either two or three segments, as seen below.',
 			'Segments are coloured to show pairings.',
 		],
-		// todo give the single-line system an image?
 		{tag: 'div', style: {
 			display: 'flex',
 			maxHeight: 'calc(var(--text-height) - 2em - var(--scrollbar-width))',

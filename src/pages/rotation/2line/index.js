@@ -2,7 +2,7 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getDiagrammedMath, getDialogue} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
@@ -148,26 +148,26 @@ const functions = [
 				0,
 			],
 		}},
-		{op: '=', id: 'quadrantAngle', type: 'angle', and: {
-			op: 'call', id: 'getQuadrantAngle', and: ['isEvenQuadrant'],
+		{op: '=', id: 'θ', type: 'angle', and: {
+			op: 'call', id: 'getθ', and: ['isEvenQuadrant'],
 		}},
 		'',
-		{op: '=', id: ['angleSide', 'angleBase'], and: {
-			op: 'call', id: 'getProgressAngles', and: ['quadrantAngle'],
+		{op: '=', id: ['αSide', 'αBase'], and: {
+			op: 'call', id: 'getα', and: ['θ'],
 		}},
 		'',
 		{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideY'], and: {
 			op: 'call', id: 'getYIntersect', multiline: true, and: [
 				'½viewportWidth',
-				{op: '+', and: ['quadrantAngle', 'angleSide']},
-				'angleSide',
+				{op: '+', and: ['θ', 'αSide']},
+				'αSide',
 			],
 		}},
 		{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseY'], and: {
 			op: 'call', id: 'getYIntersect', multiline: true, and: [
 				'½viewportHeight',
-				{op: '-', and: ['½π', 'quadrantAngle', 'angleBase']},
-				'angleBase',
+				{op: '-', and: ['½π', 'θ', 'αBase']},
+				'αBase',
 			],
 		}},
 		'',
@@ -445,6 +445,10 @@ export default {
 				]},
 			},
 		),
+		[
+			'That calculation is done by ', {tag: 'i', content: 'getViewportPoints'}, ', within ', {tag: 'i', content: 'getZoomPoints'}, '.',
+			'Otherwise, things aren\'t dissimilar from the prior system\'s code.',
+		],
 		getCode(code, [
 			{op: '=', id: [
 				'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',
@@ -523,7 +527,7 @@ export default {
 		[
 			'As image aspect ratio gets more extreme, inversion windows get increasingly wide and the issues get increasingly ',
 			getButton('severe', [
-				[{position: 0, ratioImage: 2, zoom: 1, rotation: DEGREES[90]}],
+				[{position: 0.5, ratioImage: 2, zoom: 1, rotation: DEGREES[90]}],
 				[{rotation: 0}, {ease: 'none', duration: 5}],
 			], {getParam: () => getDirectVars()}),
 			'.',
@@ -568,8 +572,29 @@ export default {
 		],
 		getDialogue('How are we getting good snap zooms from bad rails?'),
 		[
-			'Well, bound inversion happens at the snap zoom for position (0, 0).',
-			'Using the maximum snap zoom possible means that the troublesome, pre-inversion rail segments are ignored.',
+			'Well, using the maximum snap zoom possible means that the permissive, pre-inversion rail segments are skipped.',
+			'Within inversion windows, snap-panning to ',
+			getButton(
+				{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+					{tag: 'mo', xmlns, content: '('},
+					{tag: 'mn', xmlns, content: '0'},
+					{tag: 'mo', xmlns, content: ','},
+					{tag: 'mn', xmlns, content: '0'},
+					{tag: 'mo', xmlns, content: ')'},
+				]},
+				tweens.getSnapOptions(),
+				{getParam: () => {
+					const position = {x: 0, y: 0};
+					
+					const rotation = getNearest45();
+					const data = getVarGetter(rotation, demo.ratioViewport / 0.5)();
+					const zoom = getSnappedZoom(...data.zoomPoints, position);
+					
+					return {...data, position, zoom, startZoom: 1};
+				}},
+			),
+			' gives the exact snap zoom where inversion happens.',
+			'No other snap point can give a lower, pre-inversion zoom.',
 		],
 		{
 			tag: 'h2',

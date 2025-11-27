@@ -370,7 +370,8 @@ export default {
 			'In most cases, however, some degree of pan-limiting is useful.',
 		],
 		[
-			'Most importantly, unbound panning is ', {tag: 'i', content: 'boring'}, ' and pan-limiting is ', {tag: 'i', content: 'interesting'}, '!',
+			'Utility doesn\'t ', {tag: 'i', content: 'really'}, ' matter to me, though.',
+			'More important is that unbound panning is ', {tag: 'i', content: 'boring'}, ' and pan-limiting is ', {tag: 'i', content: 'interesting'}, '!',
 		],
 		getDialogue(
 			'Why make me read about it if you ',
