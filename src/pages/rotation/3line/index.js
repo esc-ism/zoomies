@@ -5,6 +5,7 @@ import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIO
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getMath, getDiagrammedMath} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
+import {getPageButton, IDS} from '../../shared/page';
 import {xmlns} from '../../shared/math';
 
 import {getFlipped} from '../shared';
@@ -372,7 +373,7 @@ const functions = [
 			op: 'call', id: 'getViewportPoints', and: ['zoomSide', 'zoomBase'],
 		}},
 		'',
-		{op: '=', id: 'θ', type: 'angle', and: {
+		{op: '=', id: 'θ', and: {
 			op: 'call', id: 'getθ', and: ['isEvenQuadrant'],
 		}},
 		'',
@@ -840,7 +841,7 @@ export default {
 		],
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Maths',
+			content: 'Bound Maths',
 			style: {textAlign: 'center'},
 		},
 		[
@@ -875,7 +876,7 @@ export default {
 				({zoomPoints}) => [{position: zoomPoints[4].end}],
 			], {getParam: () => getDirectVars()}),
 			', but how can we find these corners\' coordinates?',
-			'You might notice that this is reminiscent of the prior system\'s viewport midpoint problem.',
+			'You might notice that this is reminiscent of ', getPageButton(IDS.DOUBLE), '\'s viewport midpoint problem.',
 			'Conveniently, we can re-use those maths and locate corners by summing midpoint coordinates.',
 		],
 		[
@@ -1177,11 +1178,11 @@ export default {
 		]),
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Effectiveness',
+			content: 'Bound Effectiveness',
 			style: {textAlign: 'center'},
 		},
 		[
-			'All of the prior system\'s pan-limiting flaws are fixed.',
+			'All of ', getPageButton(IDS.DOUBLE), '\'s bounding flaws are fixed.',
 			'Bound changes are now perfectly ',
 			getButton('fluid', [
 				[{ratioImage: 1, zoom: 1, position: 0}],
@@ -1200,12 +1201,12 @@ export default {
 			' simultaneously!',
 		],
 		[
-			'I find this system to be a satisfactory improvement over "Double-Line" too.',
-			'The changes have been successful in minimising distance to bounds\' vertices without sacrificing image visibility.',
+			'I find this system to be a satisfactory improvement over ', getPageButton(IDS.IMAGE), ' too.',
+			'The changes have been successful in facilitating natural panning paths; bounds are relatively unintrusive.',
 		],
 		[
-			'For a zoomful system that handles rotation, I can\'t imagine anything better.',
-			'Still, such systems\' bounds are inherently unintuitive and restrictive.',
+			'For a zoomful rotation handler, this system\'s behaviour is hard to criticise.',
+			'Still, compared to systems with fixed bounds, zoomful bounding is inherently unintuitive and restrictive.',
 			'Plus, there\'s obviously a huge efficiency dropoff from the good old days of',
 			getMath({
 				content: {tag: 'mtable', xmlns, content: [
@@ -1229,8 +1230,8 @@ export default {
 					]},
 				]},
 			}),
-			'to the behemoth dwelling on this page.',
-			'Due to these unavoidable drawbacks, I still prefer "Viewport Center" as a pan-limiter.',
+			'to the behemoth on this page.',
+			'For me, these tradeoffs make the humble ', getPageButton(IDS.CENTER), ' a better bounder.',
 		],
 		{
 			tag: 'h2',
@@ -1239,7 +1240,7 @@ export default {
 		},
 		[
 			'It turns out that it\'s never necessary to consider origin rails in snap zoom calculation.',
-			'Because of this, we still only need two or three checks per region, depending on whether adjacent corners share a connecting rail.',
+			'Because of this, we still only need two or three checks per region, depending on whether each corner has its own connecting rail.',
 		],
 		[
 			'It\'s definitely possible to pinpoint the snap position\'s region here, but it\'d be tricky.',
@@ -1247,7 +1248,9 @@ export default {
 			'Taking an inferior approach is a little irksome, but this method is simple and avoids introducing sneaky bugs.',
 			'If you cared about efficiency, this would be the way to improve it.',
 		],
-		'Overall, the code\'s mostly unchanged from the prior system.',
+		[
+			'Overall, the code\'s mostly unchanged from ', getPageButton(IDS.DOUBLE), '.',
+		],
 		getCode(code, [
 			{op: '=', id: 'snapZoom', type: 'zoom', and: {
 				op: 'max', multiline: true, and: [
@@ -1264,11 +1267,11 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'This system fixes the prior\'s inconsistency;',
+			'This system fixes ', getPageButton(IDS.DOUBLE), '\'s inconsistency;',
 			'I\'d be comfortable calling it an improved snap-panning system.',
-			'"Double-Line", on the other hand, has no obvious flaw to fix.',
-			'Even if I added region-checking code to this system, it would be more complex and inefficient than Double-Line\'s.',
-			'Since both exhibit acceptable behaviour, Double-Line\'s efficiency makes it the preferable standalone snap-panner.',
+			' ', getPageButton(IDS.IMAGE), ', on the other hand, has no obvious flaw to fix, and finds rails more efficiently.',
+			'Even if I added region-checking code to this system, it would be more complex and run slower.',
+			'Since both systems exhibit acceptable behaviour, ', getPageButton(IDS.IMAGE), '\'s faster code makes it the preferable standalone snap-panner.',
 		],
 		{
 			tag: 'h2',
@@ -1284,16 +1287,16 @@ export default {
 		[
 			'And with that, we\'re done!',
 			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful;',
-			'it\'s outclassed by Viewport Center as a pan-limiter and has no compelling advantage over Double-Line as a span-panner.',
+			'Its bounding is outclassed by ', getPageButton(IDS.CENTER), ' and its snap-panning has no compelling advantage over ', getPageButton(IDS.IMAGE), '.',
 			'Nevertheless, I\'m glad to have seen my vision through, and proud to have pushed my ',
 			{tag: 'span', style: {fontSize: '0.6em'}, content: '(pan)'},
 			' limits so far.',
 		],
 		[
-			'Let\'s end on a less ...clinical note.',
+			'Let\'s end on a less clinical note.',
 			'There\'s a kind of geometric beauty to this system, isn\'t there?',
-			'I find the way that its limits warp, and the patterns formed by its rails, a little mesmerising.',
-			'Having reached the end of your journey through my site, I hope that you\'ve gained an appreciation for that aesthetic charm, and all that went into its design.',
+			'I find the way that its bounds warp, and the patterns formed by its rails, a little mesmerising.',
+			'Having reached the end of my site, I hope that you\'ve gained an appreciation for that aesthetic charm, and all that went into its design.',
 		],
 		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
 	),

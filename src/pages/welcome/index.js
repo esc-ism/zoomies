@@ -88,13 +88,13 @@ const tween = async (stop) => {
 			[{zoom: 10}, {
 				duration: 10,
 				ease: 'power1.in',
+				isPositionUpdate: true,
 				onStart() {
 					setZoomPoints();
 					
 					gsap.ticker.fps(30);
 					
 					demo.resizeCallback = setZoomPoints;
-					demo.tween.data.ignorePosition = true;
 				},
 				onComplete() {
 					delete demo.resizeCallback;
@@ -193,13 +193,13 @@ export default {
 		[
 			'I\'m a programmer who, for a few years now, has been occasionally engrossed in panning problems',
 			'(think photo editor, not gold rush).',
-			'Specifically, I\'ve been exploring how best to limit where users should be allowed to pan, and how best to facilitate "snap-panning".',
+			'Specifically, I\'ve been exploring how best to bound where users should be allowed to pan, and how best to facilitate "snap-panning".',
 		],
 		[
-			'My scope is restricted to rectangular content, keeping all four corners viewable at all times and handling the following variables:',
+			'My scope is restricted to standard, rectangular shapes, keeping all four corners viewable at all times and handling the following variables:',
 			{tag: 'ul', style: {marginBlockStart: '1ex', marginBlockEnd: '0.5em'}, content: [
-				'Image size',
-				'Viewport size',
+				'Image aspect ratio',
+				'Viewport aspect ratio',
 				'Zoom',
 				'Rotation',
 			].map((content) => ({tag: 'li', content}))},
@@ -208,14 +208,17 @@ export default {
 			'This website is a little interactive report of my findings.',
 			'It will walk you through the problems and demonstrate solutions, building from basics to the limits of my amateur capabilities.',
 		],
-		getInstruction({callback: (element) => {
-			const update = () => {
-				element.innerText = inputListener.isMouse ?
-					'Hit your right arrow key to see the next page. If you\'re not using keyboard and mouse, scroll up to select touchscreen controls.' :
-					'Swipe left to see the next page. If you\'re using keyboard and mouse, scroll up to select that control scheme.';
-			};
-			
-			inputListener.add(update);
-		}}),
+		getInstruction([
+			{tag: 'span', callback: (element) => {
+				const update = () => {
+					element.innerText = inputListener.isMouse ?
+						'Hit your right arrow key to see the next page. Not using keyboard and mouse?' :
+						'Swipe left to see the next page. Using keyboard and mouse?';
+				};
+				
+				inputListener.add(update);
+			}},
+			' Scroll up and use the buttons on the header\'s left to switch control scheme.',
+		]),
 	),
 };

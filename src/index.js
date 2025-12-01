@@ -9,6 +9,7 @@ import {addRule} from './shared/css';
 
 import './css';
 
+const {host, pathname} = location;
 const params = new URLSearchParams(location.search);
 
 const wrapper = document.createElement('div');
@@ -108,17 +109,47 @@ document.body.appendChild(wrapper);
 
 textContainer.focus();
 
-let currentIndex = Math.max(0, Math.min(pages.length - 1, Number.parseInt(params.get('page')) || 0));
+// `|| 0` to replace NaN
+let currentIndex = Number.parseInt(params.get('page')) || 0;
+
+if (currentIndex < 0) {
+	currentIndex = 0;
+} else if (currentIndex > pages.length - 1) {
+	currentIndex = pages.length - 1;
+}
+
+params.set('page', currentIndex);
+
+history.replaceState({index: currentIndex}, '', `${location.origin}${location.pathname}?${params.toString()}${location.hash}`);
+
 let currentPage = pages[currentIndex];
 
-demo.setSystem(currentPage);
-currentPage.text.classList.add(CLASS_ACTIVE);
+const setTabIndexes = (value = 0, {text} = currentPage) => {
+	for (const button of text.querySelectorAll('[tabindex]')) {
+		button.tabIndex = value;
+	}
+};
 
-demo.init().then(async () => {
+currentPage.text.classList.add(CLASS_ACTIVE);
+demo.setSystem(currentPage).then(async () => {
+	for (const page of pages) {
+		textContainer.appendChild(page.text);
+	}
+	
+	currentPage.text.scrollIntoView();
+	
 	currentPage.start?.();
+	
+	setTabIndexes();
+	
+	if (location.hash) {
+		document.querySelector(location.hash)?.focus();
+	}
 	
 	const setPage = (index, page, pushState = true) => {
 		const {scrollTop} = textContainer;
+		
+		setTabIndexes(-1);
 		
 		currentPage.text.classList.remove(CLASS_ACTIVE);
 		currentPage.end?.();
@@ -130,23 +161,22 @@ demo.init().then(async () => {
 		currentPage.text.classList.add(CLASS_ACTIVE);
 		textContainer.scrollTop = Math.min(scrollTop, header.offsetHeight);
 		
+		setTabIndexes();
+		
+		// kill focus on any links
+		textContainer.focus();
+		
 		if (pushState) {
 			params.set('page', index);
 			
-			// record page navigation in the history
+			// record page navigation in history
 			history.pushState({index}, '', `${location.origin}${location.pathname}?${params.toString()}`);
 		}
 		
-		demo.setSystem(page).then(() => {
+		return demo.setSystem(page).then(() => {
 			page.start?.();
 		});
 	};
-	
-	for (const page of pages) {
-		textContainer.appendChild(page.text);
-	}
-	
-	currentPage.text.scrollIntoView();
 	
 	(() => {
 		const styleNode = document.createElement('style');
@@ -185,13 +215,23 @@ demo.init().then(async () => {
 	
 	// handle history navigation without reloading the site
 	window.addEventListener('popstate', (event) => {
-		if (typeof event.state?.index !== 'number') {
+		if (!event.state || location.host !== host || location.pathname !== pathname) {
 			return;
 		}
 		
-		setPage(event.state.index, pages[event.state.index], false);
+		const load = setPage(event.state.index, pages[event.state.index], false);
 		
 		pages[event.state.index].text.scrollIntoView();
+		
+		if (location.hash) {
+			// wait for `setSystem` to call page `start` callback to generate code
+			load.then(() => {
+				const target = document.querySelector(location.hash);
+				
+				target.blur();
+				target.focus({focusVisible: true});
+			});
+		}
 		
 		event.preventDefault();
 	});
@@ -254,6 +294,7 @@ demo.init().then(async () => {
 		}
 		
 		textContainer.addEventListener('scrollsnapchange', ({snapTargetInline: target}) => {
+			// prevents a second setPage call in popstate handler
 			if (currentPage.text.isSameNode(target)) {
 				return;
 			}
@@ -285,6 +326,7 @@ demo.init().then(async () => {
 				return;
 			}
 			
+			// prevents a second setPage call in popstate handler
 			if (!pages[index].text.isSameNode(currentPage.text)) {
 				setPage(index, pages[index]);
 			}

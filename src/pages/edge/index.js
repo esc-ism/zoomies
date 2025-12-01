@@ -2,15 +2,18 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
-import {CLASS_BUTTON, CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE} from '../consts';
+import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
-import {getText, getCode, getInstruction, getMath, getInputDependent} from '../shared';
+import {getText, getCode, getInstruction, getMath, getInputDependent, getLink} from '../shared';
 import {getButton, clearButton} from '../shared/button';
+import {CLASS_BUTTON} from '../shared/button/consts';
+import {getSnapOptions} from '../shared/tween';
+import {getPageButton, IDS} from '../shared/page';
 import {getSnapPosition} from '../center';
 
 import System from './demo';
-import {getSnapOptions} from '../shared/tween';
+import {CLASS_SEMANTIC_BUTTON} from '@/consts';
 
 const refreshButton = getRefreshButton();
 
@@ -52,19 +55,26 @@ export default {
 			]),
 			' than the image.',
 		],
+		getInstruction(
+			[
+				'Any orange text is a link to a previous system.',
+				'After using the link, ', getInputDependent((isMouse) => isMouse ? 'click your browser' : 'tap your phone'), '\'s back button to return.',
+			],
+			['Links to external sites are blue. They will open in new tabs.'],
+		),
 		[
-			'Whereas the prior system had fixed pan-limits, from now on bounds will ',
+			'Whereas ', getPageButton(IDS.CENTER), ' had fixed bounds, from now on they will ',
 			getButton('grow and shrink', [
-				[{zoom: 1, position: 0}, {duration: 0}],
+				[{zoom: 1, position: 0}],
 				[{zoom: 1.25}, TWEEN_OPTIONS_YOYO],
 			]),
 			' alongside zoom.',
 			'Bounds may be a point at the image\'s origin, a ',
-			{tag: 'a', content: 'line segment', href: 'https://en.wikipedia.org/wiki/Line_segment'},
-			' or a ',
-			{tag: 'a', content: 'parallelogram', href: 'https://en.wikipedia.org/wiki/Parallelogram'},
+			getLink('line segment', 'https://en.wikipedia.org/wiki/Line_segment'),
+			', or a ',
+			getLink('parallelogram', 'https://en.wikipedia.org/wiki/Parallelogram'),
 			' (',
-			{tag: 'a', content: 'rhombuses', href: 'https://en.wikipedia.org/wiki/Rhombus'},
+			getLink('rhombuses', 'https://en.wikipedia.org/wiki/Rhombus'),
 			' are possible in upcoming systems, but not this one).',
 			'The new playground ',
 			(() => {
@@ -76,11 +86,13 @@ export default {
 				];
 				
 				return {
-					tag: 'span',
+					tag: 'button',
+					tabIndex: -1,
 					content: 'lines',
-					classList: [CLASS_BUTTON],
-					tabIndex: 0,
+					classList: [CLASS_BUTTON, CLASS_SEMANTIC_BUTTON],
 					onclick() {
+						clearButton();
+						
 						for (const line of demo.elements.rail.children) {
 							line.animate(...animation);
 						}
@@ -92,7 +104,7 @@ export default {
 		],
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Maths',
+			content: 'Bound Maths',
 			style: {textAlign: 'center'},
 		},
 		[
@@ -103,12 +115,12 @@ export default {
 				[{position: 0.25}, {delay: 0.2}],
 			]),
 			'.',
-			'This reciprocal relationship between zoom and viewport size gives the following calculation for pan-limits:',
+			'This reciprocal relationship between zoom and viewport size gives the following calculation for bounds:',
 		],
 		getInstruction(
 			[
 				'Below is our first "code snippet".',
-				'These expose internal logic through interactive source code, using playground state as input.',
+				'These expose system logic through interactive source code, using playground state as input.',
 			],
 			[
 				'Greyed-out code is unexecuted for the current inputs.',
@@ -178,7 +190,7 @@ export default {
 		},
 		[
 			'Snap-panning now requires an accommodating zoom adjustment.',
-			'We can derive the formula by solving the pan-limiting calculation for zoom, replacing "boundX" and "boundY" with a coordinate.',
+			'We can derive the formula by solving the bounds calculation for zoom, replacing "boundX" and "boundY" with a coordinate.',
 		],
 		getMath(
 			{
@@ -290,7 +302,7 @@ export default {
 			},
 		),
 		[
-			'This gives one zoom for the x-coordinate and another for the y-coordinate.',
+			'This gives one zoom for a position\'s x-coordinate and another for its y-coordinate.',
 			'The position will only be contained by ', {tag: 'strong', content: 'both'}, ' axes\' bounds at the larger of the two zooms.',
 		],
 		getCode(code, [
@@ -332,7 +344,7 @@ export default {
 			getButton('fails', [
 				[{zoom: 1, position: 0, rotation: DEGREES[90], ratio: 1}, {duration: 0.3, ease: 'power1.out'}],
 				(position) => [position],
-				[{zoom: 2}, {position: '<0.3'}],
+				[{zoom: 2}, {position: '<30%'}],
 				[{rotation: DEGREES[90] - 0.2}, {duration: 0.5, delay: 0.3}],
 				({x, y}) => [{position: {x: x - 0.05, y: y - 0.05}}, {duration: 0.2, delay: 0.6}],
 				(position) => [position, {ease: 'bounce.out', duration: 0.4, delay: 0.1}],
@@ -346,7 +358,7 @@ export default {
 		},
 		[
 			'That\'s all for our first zoomful system!',
-			'Hopefully you can see its advantages for snap-panning, even if its pan-limiting isn\'t as universally preferable.',
+			'Hopefully you can see its advantages for snap-panning, even if its bounding isn\'t as universally preferable.',
 		],
 		[
 			'From now on, we\'ll only be looking at systems built for rotation.',

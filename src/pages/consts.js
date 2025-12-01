@@ -1,9 +1,9 @@
-import {DEGREES} from '@/shared';
+import demo from '@/demo';
 import {getId, getIdGetter} from '@/shared/css';
 
 export const CLASS_FLASH_CONTAINER = getId('flash', 'container');
 
-const getTextId = getIdGetter('text');
+export const getTextId = getIdGetter('text');
 
 export const CLASS_WRAPPER = getTextId('wrapper');
 
@@ -21,14 +21,7 @@ export const CLASS_MATH_ASSERTION = getTextId('math', 'assertion');
 
 export const CLASS_INSTRUCTION = getTextId('instruction');
 
-export const CLASS_BUTTON = getTextId('button');
-export const CLASS_BUTTON_ACTIVE = getTextId('button', 'active');
-
 export const CLASS_ACTIVE = getTextId('active');
-
-export const TWEENS_RESET = [
-	[{rotation: DEGREES[90], position: 0, zoom: 1}, {duration: 0}],
-];
 
 export const CORNERS = {
 	TOP_LEFT: {x: -0.5, y: 0.5},
@@ -38,3 +31,22 @@ export const CORNERS = {
 };
 
 export const TWEEN_OPTIONS_YOYO = {duration: 0.5, repeat: 3, yoyo: true};
+
+export const getTweenOptionsBound = (pointIndex = 1) => ({
+	isPositionUpdate: true,
+	onUpdate({parent}) {
+		const {x, y} = demo.system.bound1 || demo.system.zoomPoints[pointIndex];
+		
+		if (parent === demo.tween) {
+			const {target} = parent.data;
+			
+			target.x = x;
+			target.y = y;
+		} else {
+			demo.position.x = x;
+			demo.position.y = y;
+			
+			demo.applyPosition();
+		}
+	},
+});

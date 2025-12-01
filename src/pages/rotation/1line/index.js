@@ -3,10 +3,12 @@ import {DEGREES} from '@/shared';
 import {isVertical} from '@/shared/orientation';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getInstruction, getInputDependent, getMath, getDiagrammedMath, getDialogue} from '../../shared';
+import {getText, getCode, getInstruction, getInputDependent, getMath, getDiagrammedMath, getDialogue, getLink} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
 import {xmlns, opSpace, getOverlined} from '../../shared/math';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {getPageButton, IDS} from '../../shared/page';
+import {bound1Setter, getSnapOptions, singleCornerGetter} from '../../shared/tween';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound, TWEEN_OPTIONS_YOYO} from '../../consts';
 
 import SHARED_FUNCTIONS from '../code';
 import * as mock from '../mock';
@@ -14,7 +16,6 @@ import * as mock from '../mock';
 import System, {getZoomPoints} from './demo';
 import zoomImage from './zoomImage';
 import snapImage from './snapImage';
-import {getSnapOptions, singleCornerGetter} from '@/pages/shared/tween';
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
@@ -178,7 +179,7 @@ export default {
 		],
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Maths',
+			content: 'Bound Maths',
 			style: {textAlign: 'center'},
 		},
 		[
@@ -211,11 +212,7 @@ export default {
 				[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
 			]),
 			' (top/bottom).',
-			'I find both zooms and disregard whichever\'s larger.',
-		],
-		[
-			'Finding the start zooms requires some trigonometry.',
-			'We need to find the viewport scales at which its edges might contact image corners.',
+			'Finding these requires some trigonometry.',
 			'A solution is given below, using the top-left image corner as an example.',
 		],
 		getInstruction([
@@ -896,17 +893,28 @@ export default {
 			},
 		),
 		[
-			'Here it is implemented as a code snippet:',
+			'The larger of ',
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+				{tag: 'msub', xmlns, content: [
+					{tag: 'mi', xmlns, content: 'z'},
+					{tag: 'mi', xmlns, content: 'x'},
+				]},
+			]},
+			' and ',
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+				{tag: 'msub', xmlns, content: [
+					{tag: 'mi', xmlns, content: 'z'},
+					{tag: 'mi', xmlns, content: 'y'},
+				]},
+			]},
+			' is disregarded.',
+			'The full start zoom calculation is given in the code snippet below.',
 		],
 		getInstruction([
 			'This code snippet includes custom functions. ',
 			getInputDependent((isMouse) => `${isMouse ? 'Click' : 'Tap'} "getStartZooms" to unfold it and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
 			'Note that the "rotation" value\'s unit is ',
-			{
-				tag: 'a',
-				content: 'radians',
-				href: 'https://en.wikipedia.org/wiki/Radian',
-			},
+			getLink('radians', 'https://en.wikipedia.org/wiki/Radian'),
 			' and has a default value of ',
 			{
 				tag: 'span',
@@ -927,7 +935,7 @@ export default {
 			}},
 		]),
 		[
-			'Given these zoom values, deriving pan-limits is straightforward.',
+			'Given these zoom values, deriving bounds is straightforward.',
 			'The calculation is demonstrated below.',
 		],
 		getCode(code, [
@@ -955,7 +963,7 @@ export default {
 		]),
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Effectiveness',
+			content: 'Bound Effectiveness',
 			style: {textAlign: 'center'},
 		},
 		[
@@ -971,85 +979,36 @@ export default {
 			'Consider ',
 			getButton('this', [
 				[{ratio: restrictiveTweens.ratio, position: 0, rotation: DEGREES[90], zoom: 1}],
-				({rotation, zoom}) => [{rotation, zoom}, {
-					onUpdate() {
-						// todo do everywhere?
-						demo.tween.data.target.x = demo.system.bound1.x;
-						demo.tween.data.target.y = demo.system.bound1.y;
-					},
-				}],
+				({rotation, zoom}) => [{rotation, zoom}, getTweenOptionsBound()],
 			], {getParam: () => getRestrictiveVars()}),
 			' demo state.',
 			'Imagine that you want to see the entirety of the image\'s top-right corner.',
 			'You\'ll find that it\'s ',
 			getButton('impossible', [
-				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, {
-					onUpdate() {
-						demo.tween.data.target.x = demo.system.bound1.x;
-						demo.tween.data.target.y = demo.system.bound1.y;
-					},
-				}],
+				() => [{position: demo.system.bound1 || {x: 0, y: 0}}],
+				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, getTweenOptionsBound()],
 				[{y: '+=0.1'}],
 				[{x: '+=0.1', y: '-=0.1'}, {repeat: 1, yoyo: true}],
 			], {getParam: () => getRestrictiveVars()}),
 			' to achieve this without ',
 			getButton('rotating', [
-				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, {
-					onUpdate() {
-						demo.tween.data.target.x = demo.system.bound1.x;
-						demo.tween.data.target.y = demo.system.bound1.y;
-					},
-				}],
-				[{rotation: DEGREES[90]}, {
-					onUpdate() {
-						demo.tween.data.target.x = demo.system.bound1.x;
-						demo.tween.data.target.y = demo.system.bound1.y;
-					},
-				}],
+				() => [{position: demo.system.bound1 || {x: 0, y: 0}}],
+				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, getTweenOptionsBound()],
+				[{rotation: DEGREES[90]}, getTweenOptionsBound()],
 			], {getParam: () => getRestrictiveVars()}),
 			' or ',
 			getButton('zooming', [
-				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, {
-					onUpdate() {
-						demo.tween.data.target.x = demo.system.bound1.x;
-						demo.tween.data.target.y = demo.system.bound1.y;
-					},
-				}],
-				[{zoom: 1}, {
-					onUpdate() {
-						demo.tween.data.target.x = demo.system.bound1.x;
-						demo.tween.data.target.y = demo.system.bound1.y;
-					},
-				}],
+				() => [{position: demo.system.bound1 || {x: 0, y: 0}}],
+				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, getTweenOptionsBound()],
+				[{zoom: 1}, getTweenOptionsBound()],
 			], {getParam: () => getRestrictiveVars()}),
-			' out past the point that pan-limits become one-dimensional.',
+			' out past the point that bounds become one-dimensional.',
 		],
 		[
 			'A consequence of using single-line rails is that image corners get ',
 			getButton('locked', [
 				({zoomPoints, rotation, ratio}) => [{zoom: zoomPoints[1].z, rotation, ratio, position: 0}],
-				({zoomPoints}) => [{zoom: zoomPoints[1].z * 1.5}, {
-					duration: 2.5,
-					ease: 'none',
-					onStart() {
-						demo.tween.data.ignorePosition = true;
-					},
-					onReverseComplete() {
-						demo.position.x = demo.position.y = 0;
-						demo.applyPosition();
-						
-						delete demo.tween.data.ignorePosition;
-					},
-					onUpdate() {
-						if (!demo.system.bound1) {
-							return;
-						}
-						
-						demo.position.x = demo.system.bound1.x;
-						demo.position.y = demo.system.bound1.y;
-						demo.applyPosition();
-					},
-				}],
+				({zoomPoints}) => [{zoom: zoomPoints[1].z * 1.5}, {duration: 2.5, ease: 'none', ...getTweenOptionsBound()}],
 			], {getParam: () => getLockVars()}),
 			' to the position on the viewport\'s rim that they first contact.',
 			'I\'ll refer to this position as the corner\'s "lock point".',
@@ -1110,20 +1069,12 @@ export default {
 		[
 			'The final step is to find some fraction "', {tag: 'i', content: 't'}, '" of rail length such that a line through both rails at ', {tag: 'i', content: 't'}, ' also passes through the snap point.',
 			'A kindred spirit gives a more detailed description of the problem ',
-			{
-				tag: 'a',
-				href: 'https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point',
-				content: 'here',
-			},
+			getLink('here', 'https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point'),
 			', including an excellent diagram that you may find helpful.',
 		],
 		[
 			'We can write out a definition of rail points at ', {tag: 'i', content: 't'}, ' using ',
-			{
-				tag: 'a',
-				href: 'https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support',
-				content: 'linear interpolation',
-			},
+			getLink('linear interpolation', 'https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support'),
 			'.',
 		],
 		getMath({content: [
@@ -1753,7 +1704,7 @@ export default {
 		),
 		[
 			'We end up with a quadratic expression and solve it with the ',
-			{tag: 'a', content: 'quadratic formula', href: 'https://en.wikipedia.org/wiki/Quadratic_formula'},
+			getLink('quadratic formula', 'https://en.wikipedia.org/wiki/Quadratic_formula'),
 			' to find ', {tag: 'i', content: 't'}, '.',
 			'From here, it\'s a simple calculation using the un-snipped rail\'s start zoom to find our final snap zoom.',
 		],
@@ -1792,8 +1743,8 @@ export default {
 			'Because of this, the worst outcome for a snap-pan is being too zoomed out.',
 		],
 		[
-			'The good news is that this makes the overly restrictive pan-limits harmless — if anything, they\'re beneficial!',
-			'On the other hand, unexpectedly ',
+			'The good news is that this makes the overly restrictive bounds harmless — if anything, they\'re beneficial!',
+			'Permissive bounds, on the other hand, are unacceptable because they cause unexpectedly ',
 			getButton('zoomed-out', getSnapOptions(), {getParam: () => ({
 				position: {y: 0.25, x: 0},
 				zoom: 2,
@@ -1801,7 +1752,7 @@ export default {
 				rotation: DEGREES[90],
 				ratio: 0.25,
 			})}),
-			' snap-pans caused by permissive pan-limits are unacceptable.',
+			' snap-pans.',
 		],
 		{
 			tag: 'h2',
@@ -1810,15 +1761,15 @@ export default {
 		},
 		[
 			'Single-line rails don\'t fulfill my needs.',
-			'The system\'s weak pan-limiting isn\'t so important since the "Viewport Center" system has that covered, but its snap-panning is also poor.',
+			'The system\'s weak bounding isn\'t so important since ', getPageButton(IDS.CENTER), ' has that covered, but its snap-panning is also poor.',
 		],
 		[
 			'A valid use case would require variable rotation alongside guaranteed 1:1 aspect ratios for both image and viewport —',
-			'any other shared ratio will work fine at default zoom, but give permissive limits when rotated 90°.',
-			'The situation\'s so niche that it\'s hard to say that this system is particularly useful.',
+			'any other shared ratio will work fine at default zoom, but give permissive bounds when rotated 90°.',
+			'With such specific preconditions, it\'s hard to call this system particularly useful.',
 		],
 		[
-			'Despite the disappointing final product, working through this system has provided plenty of tools that we can use moving forward.',
+			'Despite the disappointing final product, this work has provided plenty of tools that we can use moving forward.',
 			'Let\'s take the knowledge we\'ve gained and make something better!',
 		],
 	),

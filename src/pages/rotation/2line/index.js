@@ -6,7 +6,8 @@ import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIO
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getDiagrammedMath, getDialogue} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
-import * as tweens from '../../shared/tween';
+import {getPageButton, IDS} from '../../shared/page';
+import {getSnapTweens, getSnapOptions} from '../../shared/tween';
 
 import * as mock from '../mock';
 import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
@@ -20,7 +21,8 @@ const code = [];
 const getNearest45 = () => Math.round(demo.rotation / DEGREES[90] + 0.5) * DEGREES[90] - DEGREES[45];
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
-const getSnapTweens = (getRatio) => tweens.getSnapTweens(() => getVarGetter(Math.floor(Math.random() * 4 - 2) * DEGREES[90] - DEGREES[45], getRatio())(), getSnappedZoom);
+
+const boundGetSnapTweens = (getRatio) => getSnapTweens(() => getVarGetter(Math.floor(Math.random() * 4 - 2) * DEGREES[90] - DEGREES[45], getRatio())(), getSnappedZoom);
 
 const get45Button = (rotation, ratioImage) => getButton(
 	`${rotation}°`,
@@ -148,7 +150,7 @@ const functions = [
 				0,
 			],
 		}},
-		{op: '=', id: 'θ', type: 'angle', and: {
+		{op: '=', id: 'θ', and: {
 			op: 'call', id: 'getθ', and: ['isEvenQuadrant'],
 		}},
 		'',
@@ -224,8 +226,8 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'The prior system\'s inadequacies stemmed from my approach to origin rails.',
-			'Tracing along image axes allowed for efficient code and passable snap-panning, but provided an unsatisfactory pan-limiting experience.',
+			getPageButton(IDS.IMAGE), '\'s inadequacies stemmed from my approach to origin rails.',
+			'Tracing along image axes allowed for efficient code and passable snap-panning, but provided an unsatisfactory bounding experience.',
 			'The ideal system would always allow users to see what they want in the shortest pan possible, since that\'s their natural inclination.',
 			'For example, to see the rightmost image corner, travel directly ',
 			getButton('right', [
@@ -242,7 +244,7 @@ export default {
 		],
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Maths',
+			content: 'Bound Maths',
 			style: {textAlign: 'center'},
 		},
 		[
@@ -446,7 +448,7 @@ export default {
 		),
 		[
 			'That calculation is done by ', {tag: 'i', content: 'getViewportPoints'}, ', within ', {tag: 'i', content: 'getZoomPoints'}, '.',
-			'Otherwise, things aren\'t dissimilar from the prior system\'s code.',
+			'Otherwise, things aren\'t dissimilar from ', getPageButton(IDS.IMAGE), '\'s code.',
 		],
 		getCode(code, [
 			{op: '=', id: [
@@ -481,7 +483,7 @@ export default {
 		]),
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Effectiveness',
+			content: 'Bound Effectiveness',
 			style: {textAlign: 'center'},
 		},
 		[
@@ -521,10 +523,10 @@ export default {
 				
 				return {ratioImage, rotation, position: point, zoom: point.z + 0.01};
 			}}),
-			' pan-limits',
+			' bounds',
 		],
 		[
-			'As image aspect ratio gets more extreme, inversion windows get increasingly wide and the issues get increasingly ',
+			'As image aspect ratio gets more extreme, inversion windows grow and the issues get increasingly ',
 			getButton('severe', [
 				[{position: 0.5, ratioImage: 2, zoom: 1, rotation: DEGREES[90]}],
 				[{rotation: 0}, {ease: 'none', duration: 5}],
@@ -543,7 +545,7 @@ export default {
 			'For simplicity, I check every region.',
 		],
 		[
-			'Although the system\'s efficiency per rail pair is similar to that of the prior,',
+			'Although the system\'s efficiency per rail pair is similar to ', getPageButton(IDS.IMAGE), '\'s,',
 			'it ends up running slower since four rail pairs must be checked instead of just one.',
 		],
 		'If there\'s more than one possible snap zoom, the higher value is used.',
@@ -563,9 +565,9 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Despite its pan-limiting flaws, the system\'s a surprisingly good snap-panner!',
+			'Despite its bounding flaws, the system\'s a surprisingly good snap-panner!',
 			'Even when snap-panning within inversion windows, outcomes are ',
-			getButton('sensible', ...getSnapTweens(() => Math.random() / 10 + 0.2)),
+			getButton('sensible', ...boundGetSnapTweens(() => Math.random() / 10 + 0.2)),
 			'.',
 			'The only clue to their existence is some slight behavioural inconsistency around the rotation values at window limits.',
 		],
@@ -581,7 +583,7 @@ export default {
 					{tag: 'mn', xmlns, content: '0'},
 					{tag: 'mo', xmlns, content: ')'},
 				]},
-				tweens.getSnapOptions(),
+				getSnapOptions(),
 				{getParam: () => {
 					const position = {x: 0, y: 0};
 					
@@ -605,7 +607,7 @@ export default {
 			'It\'s a slightly less specific use case than the Single-Line system, but that\'s not saying much.',
 		],
 		[
-			'It\'s less efficient and, for most image aspect ratios, even worse at pan-limiting than the prior system.',
+			'It\'s less efficient and, for most image aspect ratios, even worse at bounding than ', getPageButton(IDS.IMAGE), '.',
 			'Not ideal!',
 		],
 		[

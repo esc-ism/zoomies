@@ -15,6 +15,7 @@ export const getSvg = () => svg.cloneNode();
 
 const button = document.createElement('button');
 
+button.tabIndex = -1;
 button.classList.add(CLASS_SEMANTIC_BUTTON);
 
 export const getWrapper = () => button.cloneNode();

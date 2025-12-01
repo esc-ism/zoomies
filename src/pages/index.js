@@ -7,6 +7,12 @@ import image from './rotation/image';
 import double from './rotation/2line';
 import triple from './rotation/3line';
 
+import {setPages} from './shared/page';
+
 import './css';
 
-export default [welcome, unbound, center, edge, single, image, double, triple];
+const pages = [welcome, unbound, center, edge, single, image, double, triple];
+
+setPages(pages);
+
+export default pages;

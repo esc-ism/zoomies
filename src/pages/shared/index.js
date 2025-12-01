@@ -71,21 +71,23 @@ const getNode = (description) => {
 
 export const getDialogue = (...content) => ({style: {fontStyle: 'italic', textAlign: 'right', textWrapStyle: 'balance'}, content});
 
+export const getLink = (content, href) => ({tag: 'a', tabIndex: -1, content, href, target: '_blank'});
+
 export const getCode = (callbacks, statements) => {
 	return {
 		content: {
 			tag: 'div',
+			tabIndex: -1,
 			content: {
 				tag: 'code',
-				content: '',
-				callback: (node) => {
+				callback: (element) => {
 					callbacks.push({
-						start: generateCode.bind(null, node, statements),
+						start: generateCode.bind(null, element, statements),
 						end: () => {
-							node.previousSibling.remove();
+							element.previousSibling.remove();
 							
-							while (node.firstChild) {
-								node.firstChild.remove();
+							while (element.firstChild) {
+								element.firstChild.remove();
 							}
 						},
 					});
@@ -185,7 +187,7 @@ export const getMath = (...sections) => {
 		}
 	}
 	
-	return {tag: 'p', classList: [CLASS_MATH_WRAPPER], content: [
+	return {tag: 'p', tabIndex: -1, classList: [CLASS_MATH_WRAPPER], content: [
 		{tag: 'div', classList: [CLASS_MATH_CONTAINER], content},
 	]};
 };

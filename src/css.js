@@ -1,4 +1,5 @@
 import {CLASS_WRAPPER, CLASS_SEMANTIC_BUTTON} from './consts';
+import {SUB_PIXEL_BS} from './shared';
 import {addRule} from './shared/css';
 import {addVerticalRule} from './shared/orientation';
 
@@ -22,6 +23,11 @@ addRule(`.${CLASS_SEMANTIC_BUTTON}`, {
 	padding: '0',
 	color: 'inherit',
 	border: 'none',
+	font: 'inherit',
+});
+
+addRule(['button:hover', 'a:hover'], {
+	filter: 'brightness(1.2)',
 });
 
 addRule(`.${CLASS_WRAPPER}`, {

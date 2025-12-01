@@ -2,11 +2,12 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION} from '../../consts';
-import {getText, getCode, getDiagrammedMath} from '../../shared';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound} from '../../consts';
+import {getText, getCode, getDiagrammedMath, getInstruction} from '../../shared';
+import {getPageButton, IDS} from '../../shared/page';
 import {getButton, clearButton} from '../../shared/button';
 import {xmlns} from '../../shared/math';
-import * as tweens from '../../shared/tween';
+import {singleCornerGetter, getSnapTweens} from '../../shared/tween';
 
 import * as mock from '../mock';
 import {permissiveTweens, getRestrictiveVars} from '../1line';
@@ -23,9 +24,10 @@ import getZoomPoints from './zoomPoints';
 const code = [];
 
 const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
-const getSnapTweens = (getRatio) => tweens.getSnapTweens(() => getVarGetter((Math.random() > 0.5 ? -DEGREES[270] : 0) + Math.random() * DEGREES[90], getRatio())(), getSnappedZoom);
 
-const getCornerProgressTweens = (rotation, position = '>-0.4') => [
+const boundGetSnapTweens = (getRatio) => getSnapTweens(() => getVarGetter((Math.random() > 0.5 ? -DEGREES[270] : 0) + Math.random() * DEGREES[90], getRatio())(), getSnappedZoom);
+
+const getCornerProgressTweens = (rotation, position = '>-40%') => [
 	() => [{position: 0.5, ratio: demo.ratioViewport, zoom: demo.ratioViewport < 1 ? (1 / demo.ratioViewport) : demo.ratioViewport}],
 	[{rotation}, {position}],
 ];
@@ -117,7 +119,7 @@ const functions = [
 				0,
 			],
 		}},
-		{op: '=', id: 'θ', type: 'angle', and: {
+		{op: '=', id: 'θ', and: {
 			op: 'call', id: 'getθ', and: ['isEvenQuadrant'],
 		}},
 		'',
@@ -232,7 +234,7 @@ export default {
 		getTraceVars = getVarGetter(DEGREES[90] - 0.4, 0.75);
 		
 		getShortPanVars = () => {
-			const {zoomPoints, axis, ...data} = tweens.singleCornerGetter(mock.getVarGetter.bind(null, (mock) => {
+			const {zoomPoints, axis, ...data} = singleCornerGetter(mock.getVarGetter.bind(null, (mock) => {
 				const allStartZooms = getAllStartZooms(mock);
 				const startZooms = [
 					Math.min(allStartZooms[0].x, allStartZooms[1].x),
@@ -274,27 +276,40 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'In the prior system, there were two playground states that revealed issues.',
+			'In ', getPageButton('Single-Line'), ', there were two playground states that revealed issues.',
 			'Let\'s start by seeing how they look here.',
 		],
 		[
 			'First, the ',
 			getButton('state', [
-				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, {
-					onUpdate() {
-						demo.tween.data.target.x = demo.system.bound1.x;
-						demo.tween.data.target.y = demo.system.bound1.y;
-					},
-				}],
+				() => [{position: demo.system.zoomPoints[3]}],
+				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, getTweenOptionsBound(3)],
 			], {getParam: () => getRestrictiveVars()}),
 			' that was too restrictive is way better!',
-			'The "Viewport Center" system gives users much more viewfinding flexibility, but this seems good enough to avoid frustrating users.',
+			' ', getPageButton(IDS.CENTER), ' gives users much more viewfinding flexibility, but this seems good enough to avoid frustrating users.',
 			'The overly permissive ',
 			getButton('state', [[permissiveTweens]]),
-			' is also fixed, accurately replicating the behaviour of the "Viewport Edge" system.',
+			' is also fixed, accurately replicating the behaviour of ', getPageButton(IDS.EDGE), '.',
 		],
 		[
-			'The "Single-Line" system forbade control over rail gradients; they would always be 1 or -1.',
+			getPageButton('Single-Line'),
+			' forbade control over rail gradients; ',
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+				{tag: 'mi', xmlns, content: 'y'},
+				{tag: 'mo', xmlns, content: '='},
+				{tag: 'mi', xmlns, content: 'm'},
+				{tag: 'mi', xmlns, content: 'x'},
+				{tag: 'mo', xmlns, content: '+'},
+				{tag: 'mi', xmlns, content: 'c'},
+			]},
+			' always simplified to ',
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+				{tag: 'mi', xmlns, content: 'y'},
+				{tag: 'mo', xmlns, content: '='},
+				{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: '±'},
+				{tag: 'mi', xmlns, content: 'x'},
+			]},
+			'.',
 			'Multi-line rails provide much more flexibility, allowing for manipulation of lock point locations.',
 		],
 		[
@@ -307,7 +322,7 @@ export default {
 			' and travels linearly between them for ',
 			getButton('intermediate angles', [
 				...getCornerProgressTweens(DEGREES[90], '<'),
-				[{rotation: 0}, {ease: 'none', duration: 3}],
+				[{rotation: 0}, {ease: 'none', duration: 3, position: '+=0'}],
 			]),
 			'.',
 		],
@@ -320,59 +335,19 @@ export default {
 			// todo there are likely lots of buttons that should be doing manual position setting
 			getButton('origin rails', [
 				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}],
-				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {
-					duration: 3,
-					onStart() {
-						demo.tween.data.ignorePosition = true;
-					},
-					onReverseComplete() {
-						demo.position.x = demo.position.y = 0;
-						demo.applyPosition();
-						
-						delete demo.tween.data.ignorePosition;
-					},
-					onUpdate() {
-						if (!demo.system.bound1) {
-							return;
-						}
-						
-						demo.position.x = demo.system.bound1.x;
-						demo.position.y = demo.system.bound1.y;
-						demo.applyPosition();
-					},
-				}],
+				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {...getTweenOptionsBound(2), duration: 3}],
 			], {getParam: () => getTraceVars()}),
 			'  follow image axes until they intersect ',
 			getButton('lock rails', [
 				({rotation, ratio, zoomPoints}) => [{position: zoomPoints[3], ratio, rotation, zoom: zoomPoints[3].z}],
-				({zoomPoints}) => [{zoom: zoomPoints[3].z * 2}, {
-					duration: 3,
-					onStart() {
-						demo.tween.data.ignorePosition = true;
-					},
-					onReverseComplete() {
-						demo.position.x = demo.position.y = 0;
-						demo.applyPosition();
-						
-						delete demo.tween.data.ignorePosition;
-					},
-					onUpdate() {
-						if (!demo.system.bound1) {
-							return;
-						}
-						
-						demo.position.x = demo.system.bound1.x;
-						demo.position.y = demo.system.bound1.y;
-						demo.applyPosition();
-					},
-				}],
+				({zoomPoints}) => [{zoom: zoomPoints[3].z * 2}, {...getTweenOptionsBound(3), duration: 3}],
 			], {getParam: () => getTraceVars()}),
 			'.',
 			'Origin rails follow whichever axis minimises lock rail length.',
 		],
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Maths',
+			content: 'Bound Maths',
 			style: {textAlign: 'center'},
 		},
 		[
@@ -1092,7 +1067,7 @@ export default {
 		]),
 		{
 			tag: 'h2',
-			content: 'Pan-Limit Effectiveness',
+			content: 'Bound Effectiveness',
 			style: {textAlign: 'center'},
 		},
 		[
@@ -1101,7 +1076,7 @@ export default {
 			getButton('this', [
 				({ratio, rotation}) => [{ratio, rotation, zoom: 1, position: 0}],
 			], {
-				getParam: tweens.singleCornerGetter.bind(null, getVarGetter),
+				getParam: singleCornerGetter.bind(null, getVarGetter),
 			}),
 			' state for example — see the panning path necessary to view the offscreen corner?',
 			'There\'s no way anyone would take that path naturally.',
@@ -1110,7 +1085,7 @@ export default {
 				({rotation, ratio, startZoom}) => [{rotation, ratio, zoom: startZoom, position: 0}],
 				({start}) => [{target: start}],
 				({first, end, start, zoom}) => [{zoom, target: start}, {
-					ignorePosition: true,
+					isPositionUpdate: true,
 					onUpdate() {
 						const {x, y} = getZoomProgressed(first, end, demo.zoom);
 						
@@ -1130,7 +1105,7 @@ export default {
 			' in an unexpected direction, is frustrating for users.',
 		],
 		[
-			'The ideal pan-limiting system is one that users find so natural and unintrusive that they don\'t consciously notice it.',
+			'The ideal bounding system is one that users find so natural and unintrusive that they don\'t consciously notice it.',
 			'Some degree of intrusiveness is necessary with zoomful systems, but there\'s no attempt at mitigation here.',
 		],
 		{
@@ -1189,12 +1164,16 @@ export default {
 			content: 'Snap-Pan Effectiveness',
 			style: {textAlign: 'center'},
 		},
+		getInstruction([
+			'If pink text has a ', {tag: 'span', style: {textDecoration: 'wavy underline'}, content: 'wavy underline'}, ', its behaviour is randomised.',
+			'Each visualisation will be unique unless retriggered while rewinding.',
+		]),
 		[
 			'As a snap-panning facilitator, this system is hard to fault.',
 			'Of course, it performs fine with ',
-			getButton('similar', ...getSnapTweens(() => Math.random() / 5 + 0.9)),
+			getButton('similar', ...boundGetSnapTweens(() => Math.random() / 5 + 0.9)),
 			' aspect ratios, but it performs equally well with ',
-			getButton('distant', ...getSnapTweens(() => Math.random() / 10 + 0.2)),
+			getButton('distant', ...boundGetSnapTweens(() => Math.random() / 10 + 0.2)),
 			' aspect ratios.',
 		],
 		{
@@ -1204,18 +1183,20 @@ export default {
 		},
 		[
 			'This system\'s not a great pan-limiter, but it\'s an effective snap-panner.',
-			'It complements "Viewport Center" well.',
+			'It complements ', getPageButton(IDS.CENTER), ' well.',
 			'The two systems synergise perfectly, covering each other\'s weakness to create a superior product.',
 		],
+		{
+			tag: 'div', style: {textAlign: 'center', fontSize: '1.8em'}, content: '🥳',
+		},
 		[
-			'Good stuff!',
 			'By combining systems, we now have an acceptable, rotation-handling product.',
 			'This is a win, but perhaps more second act climax than final, supreme victory.',
 		],
 		[
 			'I\'d feel a lot more satisfied with this system if it weren\'t such a weak pan-limiter.',
 			'How about we try fixing it?',
-			'Can we devise a system that handles rotation while succeeding at both pan-limiting ', {tag: 'i', content: 'and'}, ' snap-panning?',
+			'Can we devise a system that handles rotation while succeeding at both bounding ', {tag: 'i', content: 'and'}, ' snap-panning?',
 		],
 	),
 };

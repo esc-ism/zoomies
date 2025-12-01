@@ -1,13 +1,13 @@
 import {gsap} from 'gsap';
 
+import {getTheta, DEGREES, getAngleDiff} from '@/shared';
 import {isVertical, list as orientation} from '@/shared/orientation';
-import {getTheta, DEGREES, ALLOWANCE_ERROR, getAngleDiff} from '@/shared';
 
 import Readout from './readout';
 import Target from './target';
 import Progress from './progress';
 import elements from './elements';
-import {ALLOWANCE_CLICK, MULTIPLIERS_SCROLL, TWEEN_DEFAULT} from './consts';
+import {ALLOWANCE_CLICK, DURATION_CAP_GETTERS, MULTIPLIERS_SCROLL} from './consts';
 
 import './css';
 
@@ -719,7 +719,6 @@ export default new class {
 	
 	getTweenTarget() {
 		const target = {
-			ignorePosition: 0,
 			x: this.position.x,
 			y: this.position.y,
 		};
@@ -737,7 +736,7 @@ export default new class {
 						action();
 					}
 					
-					if (!target.ignorePosition && (this.position.x !== target.x || this.position.y !== target.y)) {
+					if (this.position.x !== target.x || this.position.y !== target.y) {
 						this.position.x = target.x;
 						this.position.y = target.y;
 						
@@ -858,37 +857,40 @@ export default new class {
 			window.clearTimeout(this.#tweenUpdateId);
 		}
 		
-		this.tween = gsap.timeline({paused: true, data: {}});
+		const timeline = gsap.timeline({paused: true, data: {}});
 		
-		this.tween.data.target = this.getTweenTarget();
+		timeline.data.target = this.getTweenTarget();
 		
 		const effects = {};
 		
-		let wasIgnorePosition = false;
-		
 		for (const [target, {
+			duration: targetDuration = 1,
 			position = '>',
 			cutRotation = true,
+			isPositionUpdate = false,
 			onUpdate,
-			ignorePosition = false,
 			...vars
 		} = {}] of targets) {
 			const to = {};
 			
-			let hasTween = false;
+			let maxDuration = 0;
 			
-			const record = (type, value, label = type, altLabel = false) => {
-				if (
-					!effects[label] && (!altLabel || !effects[altLabel]) &&
-					Math.abs(this.tween.data.target[type] - value) < ALLOWANCE_ERROR
-				) {
-					return;
+			if (isPositionUpdate) {
+				effects.x = true;
+				effects.y = true;
+			}
+			
+			const record = (type, value, altType = false) => {
+				if (typeof value === 'number' && !effects[type] && (!altType || !effects[altType])) {
+					const cappedDuration = DURATION_CAP_GETTERS[type](value, timeline.data.target[type]);
+					
+					maxDuration = Math.max(maxDuration, cappedDuration);
+				} else {
+					maxDuration = Infinity;
 				}
 				
 				to[type] = value;
-				effects[label] = true;
-				
-				hasTween = true;
+				effects[type] = true;
 			};
 			
 			for (const [type, value] of Object.entries(target)) {
@@ -896,32 +898,35 @@ export default new class {
 					case 'position':
 						// todo instanceof Object?
 						if (typeof value === 'object') {
-							record('x', value.x, 'position');
-							record('y', value.y, 'position');
+							record('x', value.x);
+							record('y', value.y);
 						} else {
-							record('x', value, 'position');
-							record('y', value, 'position');
-						}
-						
-						break;
-					case 'target':
-						if (typeof value === 'object') {
-							record('xTarget', value.x, 'target', 'position');
-							record('yTarget', value.y, 'target', 'position');
-						} else {
-							record('xTarget', value, 'target', 'position');
-							record('yTarget', value, 'target', 'position');
+							record('x', value);
+							record('y', value);
 						}
 						
 						break;
 					case 'x':
 					case 'y':
-						record(type, value, 'position');
+						record(type, value);
+						
+						break;
+					case 'target':
+						if (typeof value === 'object') {
+							record('xTarget', value.x, 'x');
+							record('yTarget', value.y, 'y');
+						} else {
+							record('xTarget', value, 'x');
+							record('yTarget', value, 'y');
+						}
 						
 						break;
 					case 'xTarget':
+						record(type, value, 'x');
+						
+						break;
 					case 'yTarget':
-						record(type, value, 'target');
+						record(type, value, 'y');
 						
 						break;
 					case 'rotation':
@@ -941,39 +946,21 @@ export default new class {
 				}
 			}
 			
-			if (!hasTween) {
-				const callbacks = [];
-				
-				if ('onStart' in vars) {
-					callbacks.push(vars.onStart);
-				}
+			const duration = Math.min(targetDuration, maxDuration);
+			
+			if (duration === 0) {
+				timeline.set(timeline.data.target, {...to, ...vars}, position);
 				
 				if (onUpdate) {
-					callbacks.push(onUpdate);
+					timeline.add(() => {
+						this.tweenUpdate.then(() => {
+							onUpdate({ratio: 1, parent: timeline});
+						});
+					}, '>');
 				}
-				
-				if ('onComplete' in vars) {
-					callbacks.push(vars.onComplete);
-				}
-				
-				// three seperate tween.add calls wouldn't work if position was +=0.2 or something
-				this.tween.add(callbacks, position);
-				
-				continue;
-			}
-			
-			if (wasIgnorePosition) {
-				this.tween.set(this.tween.data.target, {ignorePosition: '-=1'}, '>');
-				
-				wasIgnorePosition = false;
-			}
-			
-			if (vars.duration === 0) {
-				this.tween.set(this.tween.data.target, {...TWEEN_DEFAULT, ...to, ...vars}, position);
 			} else {
-				const tween = gsap.to(this.tween.data.target, {...TWEEN_DEFAULT, ...to, ...vars});
+				const tween = gsap.to(timeline.data.target, {ease: 'power1.inOut', ...to, ...vars, duration});
 				
-				// todo if you assign to demo.tween.vars.target or whatever IN the button's onUpdate, this might not be necessary
 				if (onUpdate) {
 					tween.eventCallback('onUpdate', () => {
 						this.tweenUpdate.then(() => {
@@ -982,22 +969,15 @@ export default new class {
 					});
 				}
 				
-				if (ignorePosition) {
-					this.tween.set(this.tween.data.target, {ignorePosition: '+=1'}, position);
-					this.tween.add(tween, '>');
-					
-					wasIgnorePosition = true;
-				} else {
-					this.tween.add(tween, position);
-				}
+				timeline.add(tween, position);
 			}
 		}
 		
 		this.progress.reset();
 		
 		this.tweenEnd = new Promise((resolve) => {
-			this.tween.eventCallback('onReverseComplete', () => {
-				this.tween.revert();
+			timeline.eventCallback('onReverseComplete', () => {
+				timeline.revert();
 				
 				this.deleteTween(false);
 				
@@ -1007,9 +987,9 @@ export default new class {
 			});
 		}).then(() => this.tweenUpdate);
 		
-		return this.tween
+		return this.tween = timeline
 			.eventCallback('onUpdate', () => {
-				this.progress.set(this.tween.totalProgress());
+				this.progress.set(timeline.totalProgress());
 			})
 			.play();
 	}

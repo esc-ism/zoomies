@@ -30,7 +30,7 @@ export default {
 		},
 		[
 			'Let\'s start ',
-			getButton('limiting', [
+			getButton('bounding', [
 				[{zoom: 1}],
 				() => {
 					const axis = Math.abs(demo.position.x) >= Math.abs(demo.position.y) ? 'x' : 'y';
@@ -38,8 +38,8 @@ export default {
 					return [{[axis]: demo.position[axis] <= 0 ? 0.5 : -0.5}, {ease: 'bounce.out', duration: 1.5}];
 				},
 			]),
-			' panning!',
-			'Here, we have the simplest reasonable system, where the center of the viewport is bound by the image.',
+			'!',
+			'Here, we have the simplest system that meets my requirements, where the center of the viewport is bound by the image.',
 			'The system may be described like:',
 		],
 		getMath({
@@ -87,7 +87,7 @@ export default {
 		[
 			// todo you're unsure about "wonderfully"
 			'Despite its simplicity, this system works wonderfully.',
-			'Its intuitive, unrestrictive pan-limits provide a frictionless user experience, and the code is hyper-efficient.',
+			'Its intuitive, unrestrictive bounds provide a frictionless user experience, and the code is hyper-efficient.',
 			'In most cases, I think it\'s the best solution.',
 			'Only when tasked with facilitating snap-pans is it found lacking.',
 		],
@@ -114,15 +114,15 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'The disregard for zoom that helps this system to excel as a pan-limiter makes it unsuited to snap-panning.',
+			'The disregard for zoom that helps this system to excel at bounding makes it unsuited to snap-panning.',
 			'It works best paired with a "zoomful" system to cover its weakness.',
-			'Zoomful systems have zoom-dependent pan-limits.',
+			'Zoomful systems have zoom-dependent bounds.',
 			'All future systems will be zoomful.',
 		],
 		[
 			'If your image can\'t be rotated, this system\'s ideal partner is just one ',
 			{tag: 'span', callback: (element) => {
-				const update = () => element.innerText = inputListener.isMouse ? 'right arrow key' : 'left swipe';
+				const update = () => element.innerText = inputListener.isMouse ? 'right arrow key press' : 'left swipe';
 				
 				inputListener.add(update);
 			}},

@@ -33,7 +33,7 @@ export default [
 	},
 	...compat.extends('eslint:recommended'),
 	stylistic.configs.customize({
-		semi: (true),
+		semi: true,
 		braceStyle: '1tbs',
 		indent: 'tab',
 	}),

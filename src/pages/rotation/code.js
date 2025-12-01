@@ -1,4 +1,4 @@
-const SINGLE_LINE = [
+const SINGLE = [
 	{op: 'func', id: 'getT', args: ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'isInverse'], and: [
 		{op: '=', id: 'a', and: {
 			op: '-', and: [
@@ -81,16 +81,16 @@ const SINGLE_LINE = [
 		}},
 	]},
 	{op: 'func', id: 'getAllStartZooms', type: ['zoom', 'zoom', 'zoom', 'zoom'], and: [
-		{op: '=', id: 'offset', type: 'angle', and: {
+		{op: '=', id: 'offset', type: 'angle', isBase: true, and: {
 			op: 'atan', and: {
 				op: '/', and: ['imageWidth', 'imageHeight'],
 			},
 		}},
 		'',
-		{op: '=', id: 'topLeftAngle', type: 'angle', and: {
+		{op: '=', id: 'topLeftAngle', type: 'angle', fight: true, and: {
 			op: '+', and: ['rotation', 'offset'],
 		}},
-		{op: '=', id: 'topRightAngle', type: 'angle', and: {
+		{op: '=', id: 'topRightAngle', type: 'angle', fight: true, and: {
 			op: '-', and: ['rotation', 'offset'],
 		}},
 		'',
@@ -144,10 +144,10 @@ const SINGLE_LINE = [
 	]},
 ];
 
-export default SINGLE_LINE;
+export default SINGLE;
 
 export const MULTI_LINE = [
-	...SINGLE_LINE,
+	...SINGLE,
 	{op: 'func', id: 'getIntersectZoom', args: ['startZoom', 'fromX0', 'fromY0', 'toX0', 'toY0', 'fromX1', 'fromY1', 'toX1', 'toY1', 'isInverse', 'maxT'], type: 'zoom', and: [
 		{op: 'if', and: [
 			{op: '>=', and: ['maxT', 0]},
@@ -227,8 +227,8 @@ export const MULTI_LINE = [
 			]},
 		]}},
 	]},
-	{op: 'func', id: 'getθ', args: ['isEvenQuadrant'], type: 'angle', and: [
-		{op: '=', id: 'angle', type: 'angle', and: {
+	{op: 'func', id: 'getθ', args: ['isEvenQuadrant'], type: 'angle', isBase: true, and: [
+		{op: '=', id: 'angle', type: 'angle', isBase: true, and: {
 			op: '%', and: [
 				{op: '+', and: [
 					'rotation',

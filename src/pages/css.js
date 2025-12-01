@@ -2,9 +2,9 @@ import {SUB_PIXEL_BS} from '@/shared';
 import {addRule} from '@/shared/css';
 
 import {
-	CLASS_WRAPPER, CLASS_CODE, CLASS_BUTTON, CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
+	CLASS_WRAPPER, CLASS_CODE, CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
 	CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_EQUATION, CLASS_MATH_ASSERTION,
-	CLASS_ACTIVE, CLASS_BUTTON_ACTIVE, CLASS_MATH_TITLE, CLASS_MATH_BODY, CLASS_MATH_LOOSE,
+	CLASS_ACTIVE, CLASS_MATH_TITLE, CLASS_MATH_BODY, CLASS_MATH_LOOSE,
 } from './consts';
 
 addRule(`.${CLASS_FLASH_CONTAINER}`, {
@@ -125,28 +125,6 @@ addRule(`.${CLASS_MATH_TITLE}`, {
 	'max-width': '100%',
 	'text-overflow': 'ellipsis',
 	color: 'var(--border-color)',
-});
-
-const buttonColour = '#eaacfd';
-
-addRule(`.${CLASS_BUTTON_ACTIVE}`, {
-	'background-color': buttonColour,
-	color: 'black',
-});
-
-addRule(`.${CLASS_BUTTON}`, {
-	color: buttonColour,
-	cursor: 'pointer',
-	'user-select': 'none',
-	'text-wrap-mode': 'nowrap',
-});
-
-addRule(`.${CLASS_BUTTON}:hover`, {
-	'text-shadow': 'currentcolor 0 0 1px',
-});
-
-addRule(`.${CLASS_BUTTON_ACTIVE}:hover`, {
-	'text-shadow': 'currentcolor 0 0 0.5px',
 });
 
 addRule([`.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::before`, `.${CLASS_WRAPPER} .${CLASS_INSTRUCTION}::after`], {

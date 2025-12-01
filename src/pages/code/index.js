@@ -1,3 +1,5 @@
+import {gsap} from 'gsap';
+
 import demo from '@/demo';
 import elements from '@/demo/elements';
 import {Line} from '@/demo/lines/lines';
@@ -297,6 +299,7 @@ const getLine = ({value: length, doCenter = false, isPercent = true}, rotation, 
 	return () => line.remove();
 };
 
+let p;
 const visualisers = {
 	zoom: (scope, id) => {
 		const {zoom} = demo;
@@ -316,11 +319,11 @@ const visualisers = {
 	yvp: (scope, id) => getLine(scope[id], DEGREES[180] - demo.rotation),
 	position: (scope, id) => getLine(scope[id], scope[id].angle ?? 0),
 	angle: (scope, id) => {
-		// todo doesn't work correctly with negative angles?
-		const value = scope[id].value;
-		const curveX = ANGLE_RADIUS * Math.cos(value) * Math.max(1, demo.ratioImage);
-		const curveY = -ANGLE_RADIUS * Math.sin(value) * Math.max(1, demo.ratioImageInverse);
-		const sweep = value >= 0 ? 0 : 1;
+		p?.remove();
+		const value = scope[id].value % DEGREES[360];
+		const curveX = ANGLE_RADIUS * Math.cos(value);
+		const curveY = -ANGLE_RADIUS * Math.sin(value);
+		
 		let rotation = 0;
 		
 		if (scope[id].fight ?? false) {
@@ -345,15 +348,15 @@ const visualisers = {
 		const path = document.createElementNS(SVG_NAMESPACE, 'path');
 		
 		path.setAttribute('fill', 'white');
-		// path.setAttribute('stroke-linecap', 'round');
-		// path.setAttribute('stroke-width', '2.5');
-		path.setAttribute('d', `M0 0L${ANGLE_RADIUS} 0A${ANGLE_RADIUS} ${ANGLE_RADIUS} 0 ${sweep} ${sweep} ${curveX} ${curveY}Z`);
+		path.setAttribute('d', `M0 0L${ANGLE_RADIUS} 0A${ANGLE_RADIUS} ${ANGLE_RADIUS} 0 ${Math.abs(value) > DEGREES[180] ? 1 : 0} ${value >= 0 ? 0 : 1} ${curveX} ${curveY}Z`);
 		
 		svg.append(path);
 		
 		elements.imageContainer.appendChild(svg);
 		
-		return () => svg.remove();
+		p = svg;
+		
+		return () => {};
 	},
 };
 

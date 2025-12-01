@@ -1,8 +1,11 @@
+import {CLASS_SEMANTIC_BUTTON} from '@/consts';
 import demo from '@/demo';
 
-import {CLASS_CONTAINER as CLASS_CODE_BUTTON_CONTAINER} from '../code/buttons/consts';
+import {CLASS_CONTAINER as CLASS_CODE_BUTTON_CONTAINER} from '../../code/buttons/consts';
 
-import {CLASS_BUTTON, CLASS_BUTTON_ACTIVE, TWEENS_RESET} from '../consts';
+import {CLASS_BUTTON, CLASS_BUTTON_ACTIVE, TWEENS_RESET} from './consts';
+
+import './css';
 
 let activeButton;
 let isReversing = false;
@@ -45,7 +48,7 @@ const releaseButton = (event) => {
 	
 	if (demo.tween.totalDuration() > 0 && demo.tween.time() > 0) {
 		demo.tween
-			.timeScale(3)
+			.timeScale(5)
 			.reverse();
 	} else {
 		demo.tween.revert();
@@ -54,18 +57,25 @@ const releaseButton = (event) => {
 	}
 };
 
-export const getButton = (text, tweens, {doReset = false, getParam = () => undefined} = {}) => {
+export const getButton = (text, tweens, {doReset = false, getParam = () => undefined, isRandom = false} = {}) => {
 	// todo this could be useful but isn't currently used
 	//  might need modifying
 	const resetTweens = doReset ? TWEENS_RESET : [];
 	
 	let element;
 	
+	const extras = {};
+	
+	if (isRandom) {
+		extras.style = {textDecoration: 'wavy underline'};
+	}
+	
 	return {
-		tag: 'span',
+		...extras,
+		tag: 'button',
 		content: text,
-		classList: [CLASS_BUTTON],
-		tabIndex: 0,
+		tabIndex: -1,
+		classList: [CLASS_BUTTON, CLASS_SEMANTIC_BUTTON],
 		onclick: () => {
 			if (activeButton) {
 				if (element.isSameNode(activeButton)) {

@@ -22,7 +22,7 @@ export const getSnapOptions = (doPullback = true) => [
 
 export const getSnapTweens = (...args) => [
 	getSnapOptions(),
-	{getParam: getSnapVarGetter.bind(null, ...args)},
+	{getParam: getSnapVarGetter.bind(null, ...args), isRandom: true},
 ];
 
 export const singleCornerGetter = (getVarGetter) => demo.ratioViewport < 1 ?
