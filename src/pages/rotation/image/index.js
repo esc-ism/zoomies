@@ -2,7 +2,7 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound, TWEEN_OPTIONS_SETUP} from '../../consts';
 import {getText, getCode, getDiagrammedMath, getInstruction} from '../../shared';
 import {getPageButton, IDS} from '../../shared/page';
 import {getButton, clearButton} from '../../shared/button';
@@ -282,7 +282,7 @@ export default {
 		[
 			'First, the ',
 			getButton('state', [
-				() => [{position: demo.system.zoomPoints[3]}],
+				() => [{position: demo.system.bound1 || {x: 0, y: 0}}, TWEEN_OPTIONS_SETUP],
 				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, getTweenOptionsBound(3)],
 			], {getParam: () => getRestrictiveVars()}),
 			' that was too restrictive is way better!',

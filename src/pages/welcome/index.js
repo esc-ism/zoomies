@@ -193,7 +193,7 @@ export default {
 		[
 			'I\'m a programmer who, for a few years now, has been occasionally engrossed in panning problems',
 			'(think photo editor, not gold rush).',
-			'Specifically, I\'ve been exploring how best to bound where users should be allowed to pan, and how best to facilitate "snap-panning".',
+			'Specifically, I\'ve been exploring how best to limit where users should be allowed to pan, and how best to facilitate "snap-panning".',
 		],
 		[
 			'My scope is restricted to standard, rectangular shapes, keeping all four corners viewable at all times and handling the following variables:',

@@ -31,6 +31,8 @@ export const CORNERS = {
 };
 
 export const TWEEN_OPTIONS_YOYO = {duration: 0.5, repeat: 3, yoyo: true};
+// todo use everywhere
+export const TWEEN_OPTIONS_SETUP = {duration: 0.3, ease: 'power1.out'};
 
 export const getTweenOptionsBound = (pointIndex = 1) => ({
 	isPositionUpdate: true,

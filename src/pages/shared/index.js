@@ -9,6 +9,9 @@ import {
 
 import * as move from './svg/move';
 import {xmlns} from './math';
+import {CLASS_DIALOGUE, CLASS_DIALOGUE_CONTAINER} from './consts';
+
+import './css';
 
 const addContent = (parent, content) => {
 	if (typeof content === 'object') {
@@ -69,7 +72,11 @@ const getNode = (description) => {
 	return node;
 };
 
-export const getDialogue = (...content) => ({style: {fontStyle: 'italic', textAlign: 'right', textWrapStyle: 'balance'}, content});
+export const getDialogue = (...content) => ({
+	classList: [CLASS_DIALOGUE_CONTAINER], content: [
+		{tag: 'span', classList: [CLASS_DIALOGUE], content},
+	],
+});
 
 export const getLink = (content, href) => ({tag: 'a', tabIndex: -1, content, href, target: '_blank'});
 

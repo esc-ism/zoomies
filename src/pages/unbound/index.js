@@ -166,10 +166,10 @@ export default {
 			content: 'Unbound',
 		},
 		[
-			'To begin, I\'d like to talk about why bounds are useful.',
+			'To begin, I\'d like to talk about why it\'s helpful to limit panning.',
 		],
 		getDialogue(
-			'Wait — before that, what\'s the thing ',
+			'before that, what\'s the thing ',
 			{tag: 'span', classList: [CLASS_HIDE_HORIZONTAL], content: 'at the top'},
 			{tag: 'span', classList: [CLASS_HIDE_VERTICAL], content: 'to the left'},
 			'?',
@@ -192,7 +192,7 @@ export default {
 			}},
 			' is the "image" and it\'s being seen through the "viewport".',
 			'To the viewport\'s top-left is a readout of the playground\'s state.',
-			'Follow the instructions below to see what you can do with it.',
+			'Follow the instructions below to learn the controls.',
 		],
 		{
 			...getInstruction({classList: [CLASS_HIDE_VERTICAL]}, {classList: [CLASS_HIDE_HORIZONTAL]}, getRestartButton()),
@@ -291,7 +291,7 @@ export default {
 		},
 		[
 			'Each page will provide a playground for a unique bounding system.',
-			'To demonstrate the value of bounding, I\'m starting with a system that neglects it.',
+			'To demonstrate the value of bounds, I\'m starting with a system that neglects them.',
 			'Where ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 				{tag: 'mo', xmlns, content: '('},
@@ -343,7 +343,7 @@ export default {
 				[{position: {x: -0.2, y: -0.3}}],
 				[{position: {x: -0.4, y: 0.2}}],
 			]),
-			' a bounding algorithm to keep their bearings.',
+			' bounds to keep their bearings.',
 			'But what if their ',
 			getButton('finger slips', [
 				[{position: 2, zoom: 1}],
@@ -352,8 +352,8 @@ export default {
 		],
 		[
 			'It\'s possible for users to fall away from the image and become lost in the void.',
-			'Bounding systems prevent this by keeping users from straying too far beyond the confines of the image.',
-			'Like how game developers endeavour to keep players from clipping out of levels, a good bounding system keeps the viewport attached to its content.',
+			'Bounds prevent this by keeping users from straying too far beyond the confines of the image.',
+			'Like how game developers endeavour to keep players from clipping out of levels, effective bounds keep the viewport attached to its content.',
 		],
 		[
 			'A subtler deficiency exists in this system\'s snap-panning abilities.',
@@ -366,22 +366,22 @@ export default {
 		},
 		[
 			'There do exist niche use cases for unbound panning.',
-			'For example, a canvas that grows to accommodate new input would be undermined by pan limits.',
-			'In most cases, however, some degree of bounding is useful.',
+			'For example, bounds would undermine a canvas that grows to accommodate new input.',
+			'In most cases, however, bounds are useful.',
 		],
 		[
 			'Utility doesn\'t ', {tag: 'i', content: 'really'}, ' matter to me, though.',
 			'More important is that unbound panning is ', {tag: 'strong', content: 'boring'}, ' and bound panning is ', {tag: 'strong', content: 'interesting'}, '!',
 		],
 		getDialogue(
-			'Why make me read about it if you ',
+			'why make me read about something you ',
 			{tag: 'strong', content: 'agree'},
-			' that it\'s boring?',
+			' is boring?',
 		),
 		[
 			'I\'m trying to tell a story through this website, and no story\'s ending is as impactful without context.',
 			'These early pages will help you to appreciate the complex bounding coming later, and understand the steps taken to get there.',
-			'Hopefully, by the end, you\'ll think that bound panning is as interesting as I do!',
+			'Hopefully, by the end, you\'ll find this stuff as interesting as I do!',
 		],
 	),
 };

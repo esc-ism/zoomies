@@ -248,7 +248,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Origin rails retain the same start zooms, but now travel directly towards viewport edge midpoints.',
+			'Origin rail start zooms are unchanged, but now travel directly towards viewport edge midpoints.',
 			'This requires us to find the coordinates of these midpoints.',
 			'A solution is given below, using the base image corners and the viewport\'s top edge as an example.',
 		],

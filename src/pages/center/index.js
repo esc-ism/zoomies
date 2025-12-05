@@ -65,7 +65,7 @@ export default {
 			]},
 		}),
 		[
-			'Note that coordinates are based on image axis.',
+			'Note that coordinates are based on image axes.',
 			'Regardless of rotation and aspect ratio, image corners are at ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 				{tag: 'mo', xmlns, content: '('},
@@ -115,18 +115,12 @@ export default {
 		},
 		[
 			'The disregard for zoom that helps this system to excel at bounding makes it unsuited to snap-panning.',
-			'It works best paired with a "zoomful" system to cover its weakness.',
-			'Zoomful systems have zoom-dependent bounds.',
-			'All future systems will be zoomful.',
+			'It works best paired with a system that has zoom-dependent bounds to cover its weakness, aka a "zoomful" system.',
 		],
 		[
-			'If your image can\'t be rotated, this system\'s ideal partner is just one ',
-			{tag: 'span', callback: (element) => {
-				const update = () => element.innerText = inputListener.isMouse ? 'right arrow key press' : 'left swipe';
-				
-				inputListener.add(update);
-			}},
-			' away.',
+			'All future systems will be zoomful.',
+			'For now, the focus will be on snap-panning effectiveness;',
+			'systems will be judged on how well they pair with this one.',
 		],
 	),
 };

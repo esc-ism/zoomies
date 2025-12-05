@@ -1287,10 +1287,8 @@ export default {
 		[
 			'And with that, we\'re done!',
 			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful;',
-			'Its bounding is outclassed by ', getPageButton(IDS.CENTER), ' and its snap-panning has no compelling advantage over ', getPageButton(IDS.IMAGE), '.',
-			'Nevertheless, I\'m glad to have seen my vision through, and proud to have pushed my ',
-			{tag: 'span', style: {fontSize: '0.6em'}, content: '(pan)'},
-			' limits so far.',
+			'its bounding is outclassed by ', getPageButton(IDS.CENTER), ' and its snap-panning has no compelling advantage over ', getPageButton(IDS.IMAGE), '.',
+			'Nevertheless, I\'m glad to have seen my vision through, and proud to have pushed my limits so far.',
 		],
 		[
 			'Let\'s end on a less clinical note.',

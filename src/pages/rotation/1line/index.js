@@ -174,7 +174,16 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'This is the simplest possible zoomful system that can handle image rotation.',
+			'We can address the problems with ', getPageButton(IDS.EDGER), ' by handling each corner seperately.',
+			'Bounds can now grow towards one pair of corners independently of the other.',
+			'Checking the ',
+			getButton('state', [
+				() => [{ratio: demo.ratioViewport, rotation: DEGREES[45], zoom: 1, position: 0}],
+			]),
+			' that caused issues with non-square viewports, you\'ll see that it\'s now handled perfectly.',
+		],
+		[
+			'For a zoomful system built to handle rotation in its bounding, it takes the most rudimentary approach possible.',
 			'The rail to each image corner is a direct, single line (hence the page\'s title) from the image\'s origin.',
 		],
 		{
@@ -186,7 +195,7 @@ export default {
 			'A rail\'s "start zoom" is the zoom at which bounds ',
 			getButton('start progressing', [
 				(zoom) => [{zoom, position: 0}],
-				(zoom) => [{zoom: zoom * 1.05}, TWEEN_OPTIONS_YOYO],
+				(zoom) => [{zoom: zoom * 1.1}, TWEEN_OPTIONS_YOYO],
 			], {
 				getParam: () => {
 					const {zoomPoints} = demo.system;
@@ -1733,18 +1742,12 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Now that we\'ve gone through how snap-panning works, let\'s talk about how useful it is in practise.',
-		],
-		
-		getDialogue('Okay... but what\'s the ', {tag: 'strong', content: 'point'}, ' of snap-panning?'),
-		[
-			'Snap-panning\'s purpose is to allow users to quickly focus on some small feature of the image.',
-			'In my implementations, snap zoom is the minimum zoom for which a snap point is in-bounds, making it an underestimation of how far the user wants to zoom in.',
-			'Because of this, the worst outcome for a snap-pan is being too zoomed out.',
+			'As mentioned in ', getPageButton(IDS.EDGE), ', my approach to snap-panning underestimates how far the user wants to zoom in.',
+			'The worst outcome is being too zoomed out.',
 		],
 		[
 			'The good news is that this makes the overly restrictive bounds harmless — if anything, they\'re beneficial!',
-			'Permissive bounds, on the other hand, are unacceptable because they cause unexpectedly ',
+			'Permissive bounds, on the other hand, are unacceptable, because they cause unexpectedly ',
 			getButton('zoomed-out', getSnapOptions(), {getParam: () => ({
 				position: {y: 0.25, x: 0},
 				zoom: 2,

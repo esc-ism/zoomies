@@ -1,11 +1,12 @@
+import {CLASS_SEMANTIC_BUTTON} from '@/consts';
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
-import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE} from '../consts';
+import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
-import {getText, getCode, getInstruction, getMath, getInputDependent, getLink} from '../shared';
+import {getText, getCode, getInstruction, getMath, getInputDependent, getLink, getDialogue} from '../shared';
 import {getButton, clearButton} from '../shared/button';
 import {CLASS_BUTTON} from '../shared/button/consts';
 import {getSnapOptions} from '../shared/tween';
@@ -13,7 +14,6 @@ import {getPageButton, IDS} from '../shared/page';
 import {getSnapPosition} from '../center';
 
 import System from './demo';
-import {CLASS_SEMANTIC_BUTTON} from '@/consts';
 
 const refreshButton = getRefreshButton();
 
@@ -57,13 +57,13 @@ export default {
 		],
 		getInstruction(
 			[
-				'Any orange text is a link to a previous system.',
+				'Orange text is a link to a previous system.',
 				'After using the link, ', getInputDependent((isMouse) => isMouse ? 'click your browser' : 'tap your phone'), '\'s back button to return.',
 			],
 			['Links to external sites are blue. They will open in new tabs.'],
 		),
 		[
-			'Whereas ', getPageButton(IDS.CENTER), ' had fixed bounds, from now on they will ',
+			'Whereas bounds in ', getPageButton(IDS.CENTER), ' were fixed, from now on they will ',
 			getButton('grow and shrink', [
 				[{zoom: 1, position: 0}],
 				[{zoom: 1.25}, TWEEN_OPTIONS_YOYO],
@@ -129,7 +129,7 @@ export default {
 					'Tap a variable in executed code to see its value. Green variables will provide visualisations of their values.'),
 			],
 			[
-				'Code snippets run when you turn a page and don\'t keep up with state changes.',
+				'Code snippets run when you turn a page, and don\'t keep up with state changes.',
 				'Update them via the ', refreshButton, ' button at their top-right corners.',
 			],
 		),
@@ -157,11 +157,11 @@ export default {
 			}},
 		]),
 		[
-			'When the viewport and image ',
-			getButton('share', [
+			{tag: 'i', content: 'boundX'}, ' and ', {tag: 'i', content: 'boundY'}, ' are equal for all states with ',
+			getButton('shared', [
 				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
 			]),
-			' an aspect ratio,', {tag: 'i', content: 'boundX'}, ' and ', {tag: 'i', content: 'boundY'}, ' are equal for all zooms.',
+			' image and viewport aspect ratio.',
 			'The ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 				{tag: 'mfrac', xmlns, content: [
@@ -185,12 +185,61 @@ export default {
 		],
 		{
 			tag: 'h2',
+			content: 'Bound Effectiveness',
+			style: {textAlign: 'center'},
+		},
+		[
+			'Although it isn\'t the focus, this approach to bounding has some possible advantages over ', getPageButton(IDS.CENTER), '.',
+			'For example, the user\'s position will be ',
+			getButton('corrected', [
+				[{ratio: 1, zoom: 1.5, position: 0.5}],
+				[{ratio: 1.5}, {duration: 2.5, ease: 'none'}],
+			]),
+			' if aspect ratios change, and they\'re protected from ',
+			getButton('overshooting', [
+				[{zoom: 1, position: 0, rotation: DEGREES[90], ratio: 1}],
+				[{zoom: 2}, {position: '<30%'}],
+				() => [{position: 0.25}, {ease: 'bounce.out', duration: 1, delay: 0.1}],
+			]),
+			' a perfect corner view.',
+		],
+		[
+			'I call these ', {tag: 'i', content: 'possible'}, ' advantages because they aren\'t necessarily desireable.',
+			'In general, the more freedom given to users, the better their experience;',
+			'being restricted is frustrating.',
+		],
+		[
+			'Still, if you want zoom-dependent bounds for whatever reason, this system\'s perfect.',
+			'Though, of course, it ',
+			getButton('fails', [
+				// todo always use this ease for resets
+				[{zoom: 1, position: 0, rotation: DEGREES[90], ratio: 1}, TWEEN_OPTIONS_SETUP],
+				(position) => [position],
+				[{zoom: 2}, {position: '<30%'}],
+				[{rotation: DEGREES[90] - 0.2}, {duration: 0.5, delay: 0.3}],
+				({x, y}) => [{position: {x: x - 0.05, y: y - 0.05}}, {duration: 0.2, delay: 0.6}],
+				(position) => [position, {ease: 'bounce.out', duration: 0.4, delay: 0.1}],
+			], {getParam: getSnapPosition}),
+			' when rotation is introduced.',
+			'At least, it fails ', {tag: 'i', content: 'most'}, ' of the time...',
+		],
+		[
+			'Surprisingly, as long as the viewport height and width are equal, this system handles 90° rotations perfectly!',
+			'Image aspect ratio doesn\'t matter.',
+			'This is because the viewport\'s height and width are equal, so when rotation causes bounds to depend on a different viewport dimension, the size doesn\'t change.',
+		],
+		{
+			tag: 'h2',
 			content: 'Snap-Pan Maths',
 			style: {textAlign: 'center'},
 		},
 		[
-			'Snap-panning now requires an accommodating zoom adjustment.',
-			'We can derive the formula by solving the bounds calculation for zoom, replacing "boundX" and "boundY" with a coordinate.',
+			'Snap-panning now requires an accommodating zoom adjustment... but how can we find the right zoom?',
+		],
+		[
+			'We can derive it from the bounds formula — it just needs some re-arranging.',
+			'By replacing ', {tag: 'i', content: 'boundX'}, ' and ', {tag: 'i', content: 'boundY'}, ' with a point\'s coordinates and solving for zoom,',
+			'we get the minimum zoom for which the point is in-bounds.',
 		],
 		getMath(
 			{
@@ -302,8 +351,9 @@ export default {
 			},
 		),
 		[
-			'This gives one zoom for a position\'s x-coordinate and another for its y-coordinate.',
-			'The position will only be contained by ', {tag: 'strong', content: 'both'}, ' axes\' bounds at the larger of the two zooms.',
+			'This gives one zoom for the point\'s x-coordinate and another for its y-coordinate.',
+			'The position will only be in-bounds at the larger of the two zooms.',
+			'This is the final "snap zoom"',
 		],
 		getCode(code, [
 			{op: '=', id: 'zoomX', type: 'zoom', and: {
@@ -319,11 +369,22 @@ export default {
 		]),
 		{
 			tag: 'h2',
-			content: 'Effectiveness',
+			content: 'Snap-Pan Effectiveness',
 			style: {textAlign: 'center'},
 		},
 		[
-			'Zoom is now adjusted automatically when ',
+			'So, what do you think? Do you see why zoomful snap-panning is better?',
+		],
+		getDialogue('not really... what\'s the ', {tag: 'strong', content: 'point'}, ' of snap-panning?'),
+		[
+			'Ah, I\'m getting ahead of myself.',
+			'Snap-panning allows users to quickly focus on some small feature of the image.',
+			'In my implementations, the snap zoom is the minimum zoom for which a point is in-bounds, making it an underestimation of how far the user wants to zoom in.',
+			'Because of this, the worst outcome for a snap-pan is being too zoomed out.',
+		],
+		[
+			'This system can\'t be accused of low snap zooms for un-rotated images;',
+			'if snap zooms were any higher, the image\'s edge wouldn\'t be visible when ',
 			getButton('snap-panning', getSnapOptions(), {getParam: () => ({
 				zoom: demo.system.zoomPoints[1].z * 2,
 				position: {x: 0, y: 0, [demo.system.lowAxis === 'y' ? 'x' : 'y']: 0.25},
@@ -331,25 +392,20 @@ export default {
 				rotation: DEGREES[90],
 				ratio: demo.ratio,
 			})}),
-			'.',
-			'Position will even be ',
-			getButton('corrected', [
-				[{ratio: 1, zoom: 1.5, position: 0.5}],
-				[{ratio: 1.5}, {duration: 2.5, ease: 'none'}],
-			]),
-			' if aspect ratios change!',
+			' to a side.',
 		],
 		[
-			'This is the perfect system for images that can\'t be rotated, but it ',
-			getButton('fails', [
-				[{zoom: 1, position: 0, rotation: DEGREES[90], ratio: 1}, {duration: 0.3, ease: 'power1.out'}],
-				(position) => [position],
-				[{zoom: 2}, {position: '<30%'}],
-				[{rotation: DEGREES[90] - 0.2}, {duration: 0.5, delay: 0.3}],
-				({x, y}) => [{position: {x: x - 0.05, y: y - 0.05}}, {duration: 0.2, delay: 0.6}],
-				(position) => [position, {ease: 'bounce.out', duration: 0.4, delay: 0.1}],
-			], {getParam: getSnapPosition}),
-			' when rotation is introduced.',
+			'As mentioned, 90° rotations cause issues for non-square viewports, which manifest as bad snap-zooms.',
+			{tag: 'i', content: 'With'}, ' square viewports, however, rotation doesn\'t really cause any issues!',
+			'It\'s true that, when rotation isn\'t a multiple of 90°, snap zooms will always be ',
+			getButton('too high', getSnapOptions(), {getParam: () => ({
+				zoom: demo.system.zoomPoints[1].z * 2,
+				position: {x: 0.25, y: 0.25},
+				startZoom: 1,
+				rotation: DEGREES[45],
+				ratio: demo.ratio,
+			})}),
+			' to see image corners, but that overestimation mitigates the fundamental underestimation.',
 		],
 		{
 			tag: 'h2',
@@ -358,11 +414,15 @@ export default {
 		},
 		[
 			'That\'s all for our first zoomful system!',
-			'Hopefully you can see its advantages for snap-panning, even if its bounding isn\'t as universally preferable.',
+			'Hopefully you can see its advantages for snap-panning, even if you think its bounding is worse.',
 		],
 		[
-			'From now on, we\'ll only be looking at systems built for rotation.',
+			'It\'s pretty obvious that, without a change in approach, this system\'s snap-panning can\'t be improved for un-rotated images.',
+			'So, in the name of progress, we\'ll only be looking at systems built for rotation from now on.',
+		],
+		[
 			'All upcoming systems will be based on this one, taking various approaches to generalising its behaviour.',
+			'The next system will be ', {tag: 'i', content: 'especially'}, ' similar...',
 		],
 	),
 };
