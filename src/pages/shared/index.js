@@ -78,7 +78,7 @@ export const getDialogue = (...content) => ({
 	],
 });
 
-export const getLink = (content, href) => ({tag: 'a', tabIndex: -1, content, href, target: '_blank'});
+export const getLink = (content, href) => ({tag: 'a', style: {textWrapMode: 'nowrap'}, tabIndex: -1, content, href, target: '_blank'});
 
 export const getCode = (callbacks, statements) => {
 	return {

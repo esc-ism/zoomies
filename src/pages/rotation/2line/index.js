@@ -130,7 +130,7 @@ const functions = [
 			],
 		}},
 	]},
-	{op: 'func', id: 'getZoomPoints', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: [6], and: [
+	{op: 'func', id: 'getRails', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: [6], and: [
 		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
@@ -447,7 +447,7 @@ export default {
 			},
 		),
 		[
-			'That calculation is done by ', {tag: 'i', content: 'getViewportPoints'}, ', within ', {tag: 'i', content: 'getZoomPoints'}, '.',
+			'That calculation is done by ', {tag: 'i', content: 'getViewportPoints'}, ', within ', {tag: 'i', content: 'getRails'}, '.',
 			'Otherwise, things aren\'t dissimilar from ', getPageButton(IDS.IMAGE), '\'s code.',
 		],
 		getCode(code, [
@@ -456,7 +456,7 @@ export default {
 				'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1',
 				'match0',
 			], and: {
-				op: 'call', id: 'getZoomPoints',
+				op: 'call', id: 'getRails',
 			}},
 			'',
 			{op: '=', id: ['topLeftX', 'topLeftY'], and: {

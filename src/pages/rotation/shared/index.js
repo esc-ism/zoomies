@@ -44,7 +44,7 @@ export const getZoomPairSecond = ([z, ...pair], position, doFlip, maxP = 1) => {
 // line with progressed start point
 export const getProgressedLine = (line, {z}) => [getZoomProgressed(...line, z), line[1]];
 
-export const getBound = (zoom, first, second, isTopLeft) => {
+export const getBound = (zoom, first, second, isTopLeft = false) => {
 	if (zoom > second.z) {
 		const progress = zoom / second.z;
 		

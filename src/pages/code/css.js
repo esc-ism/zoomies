@@ -117,7 +117,7 @@ addRule(`.${CLASS_TOOLTIP}`, {
 	'font-size': '0.85em',
 	padding: '3px 1ch',
 	'border-radius': '1ch',
-	'white-space': 'nowrap',
+	'text-wrap-mode': 'nowrap',
 	position: 'absolute',
 	'z-index': '3',
 	'background-color': '#343a45',

@@ -3,11 +3,11 @@ import {DEGREES} from '@/shared';
 import {isVertical} from '@/shared/orientation';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getInstruction, getInputDependent, getMath, getDiagrammedMath, getDialogue, getLink} from '../../shared';
+import {getText, getCode, getInstruction, getInputDependent, getMath, getDiagrammedMath, getLink} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
 import {xmlns, opSpace, getOverlined} from '../../shared/math';
 import {getPageButton, IDS} from '../../shared/page';
-import {bound1Setter, getSnapOptions, singleCornerGetter} from '../../shared/tween';
+import {getSnapOptions, singleCornerGetter} from '../../shared/tween';
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound, TWEEN_OPTIONS_YOYO} from '../../consts';
 
 import SHARED_FUNCTIONS from '../code';
@@ -919,25 +919,6 @@ export default {
 			' is disregarded.',
 			'The full start zoom calculation is given in the code snippet below.',
 		],
-		getInstruction([
-			'This code snippet includes custom functions. ',
-			getInputDependent((isMouse) => `${isMouse ? 'Click' : 'Tap'} "getStartZooms" to unfold it and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
-			'Note that the "rotation" value\'s unit is ',
-			getLink('radians', 'https://en.wikipedia.org/wiki/Radian'),
-			' and has a default value of ',
-			{
-				tag: 'span',
-				// keeps the "." connected
-				style: {'white-space': 'nowrap'},
-				content: [
-					{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
-						{tag: 'mn', xmlns, content: '½'},
-						{tag: 'mi', xmlns, content: 'π'},
-					]},
-					'.',
-				],
-			},
-		]),
 		getCode(code, [
 			{op: '=', id: ['topLeftZoom', 'topRightZoom'], and: {
 				op: 'call', id: 'getStartZooms',
@@ -1082,9 +1063,7 @@ export default {
 			', including an excellent diagram that you may find helpful.',
 		],
 		[
-			'We can write out a definition of rail points at ', {tag: 'i', content: 't'}, ' using ',
-			getLink('linear interpolation', 'https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support'),
-			'.',
+			'We can write out a definition of rail points at ', {tag: 'i', content: 't'}, ' using linear interpolation.',
 		],
 		getMath({content: [
 			{tag: 'mtable', xmlns, content: [
@@ -1146,7 +1125,8 @@ export default {
 			'Formalising the "line through both rails at ', {tag: 'i', content: 't'}, '" requires it to be defined as two parallel lines — one for each rail.',
 			'Each passes through the snap point and intersects its rail at some ', {tag: 'i', content: 't'}, '.',
 			'Knowing that parallel lines share a gradient, we can use ',
-			{tag: 'span', content: 'm = dY / dX', style: {whiteSpace: 'nowrap'}},
+			// todo make math?
+			{tag: 'span', content: 'm = dY / dX', style: {textWrapMode: 'nowrap'}},
 			' to write an equation to solve for ', {tag: 'i', content: 't'}, '.',
 		],
 		getDiagrammedMath(

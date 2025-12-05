@@ -1,7 +1,6 @@
 import demo from '@/demo';
 import {PADDING_VIEWPORT} from '@/demo/consts';
 import {DEGREES} from '@/shared';
-import {inputListener} from '@/consts';
 
 import {CLASS_MATH_LOOSE} from '../consts';
 import {getText, getMath} from '../shared';

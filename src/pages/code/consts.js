@@ -15,6 +15,7 @@ export const BUILT_INS = {
 	'½viewportWidth': ({sizesViewport: {halfWidth: value}}) => ({value, type: 'xvp', isPercent: false}),
 	'½viewportHeight': ({sizesViewport: {halfHeight: value}}) => ({value, type: 'yvp', isPercent: false}),
 	
+	'2π': () => ({value: Math.PI * 2, type: 'angle', fight: true}),
 	π: () => ({value: Math.PI, type: 'angle', fight: true}),
 	'½π': () => ({value: Math.PI / 2, type: 'angle', fight: true}),
 	'¼π': () => ({value: Math.PI / 4, type: 'angle', fight: true}),

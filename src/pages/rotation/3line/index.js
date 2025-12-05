@@ -514,7 +514,7 @@ const functions = [
 			true, 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
 		]}},
 	]},
-	{op: 'func', id: 'getZoomPoints', type: [
+	{op: 'func', id: 'getRails', type: [
 		'zoom', 'x', 'y', 'zoom', 'x', 'y',
 		'zoom', 'xvp', 'yvp', 'xvp', 'yvp',
 		'zoom',,,
@@ -1143,7 +1143,7 @@ export default {
 				'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
 				'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
 			], and: {
-				op: 'call', id: 'getZoomPoints',
+				op: 'call', id: 'getRails',
 			}},
 			'',
 			{op: '=', id: ['topLeftX', 'topLeftY'], and: {

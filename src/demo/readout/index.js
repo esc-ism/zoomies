@@ -15,7 +15,7 @@ export default class {
 		this.element.style.top = this.element.style.left = '0';
 		this.element.style.userSelect = 'none';
 		this.element.style.pointerEvents = 'none';
-		this.element.style.whiteSpace = 'nowrap';
+		this.element.style.textWrapMode = 'nowrap';
 		this.element.style.borderCollapse = 'collapse';
 		this.element.style.font = 'bold 16px "courier new", monospace';
 		this.element.style.color = '#e5e5e5';

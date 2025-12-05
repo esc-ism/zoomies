@@ -160,6 +160,7 @@ addRule(`.${CLASS_WRAPPER}.${CLASS_ACTIVE}`, {
 
 addRule(`.${CLASS_MATH_LOOSE}`, {
 	'font-size': '0.9em',
+	// todo good? it doesn't really work for the "...½π" text
 	position: 'relative',
 	top: '0.05em',
 });

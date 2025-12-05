@@ -103,7 +103,7 @@ const functions = [
 			]},
 		]}},
 	]},
-	{op: 'func', id: 'getZoomPoints', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: 2, and: [
+	{op: 'func', id: 'getRails', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: 2, and: [
 		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
@@ -1032,7 +1032,7 @@ export default {
 			},
 		),
 		[
-			'That math is used by ', {tag: 'i', content: 'getZoomPoints'}, ' below, which returns rail endpoints and start zooms.',
+			'That math is used by ', {tag: 'i', content: 'getRails'}, ' below, which returns rail endpoints and start zooms.',
 			'If you want to know how the other lock rail variants are handled, see ', {tag: 'i', content: 'getIntersectSide'}, ' and ', {tag: 'i', content: 'getIntersectBase'}, '.',
 		],
 		getCode(code, [
@@ -1040,7 +1040,7 @@ export default {
 				'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',
 				'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1',
 			], and: {
-				op: 'call', id: 'getZoomPoints',
+				op: 'call', id: 'getRails',
 			}},
 			'',
 			{op: '=', id: ['topLeftX', 'topLeftY'], and: {

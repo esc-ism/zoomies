@@ -299,7 +299,6 @@ const getLine = ({value: length, doCenter = false, isPercent = true}, rotation, 
 	return () => line.remove();
 };
 
-let p;
 const visualisers = {
 	zoom: (scope, id) => {
 		const {zoom} = demo;
@@ -319,8 +318,8 @@ const visualisers = {
 	yvp: (scope, id) => getLine(scope[id], DEGREES[180] - demo.rotation),
 	position: (scope, id) => getLine(scope[id], scope[id].angle ?? 0),
 	angle: (scope, id) => {
-		p?.remove();
-		const value = scope[id].value % DEGREES[360];
+		// || keeps 360° from becoming 0
+		const value = (scope[id].value % DEGREES[360]) || Math.min(Math.abs(scope[id].value), DEGREES[360]);
 		const curveX = ANGLE_RADIUS * Math.cos(value);
 		const curveY = -ANGLE_RADIUS * Math.sin(value);
 		
@@ -354,9 +353,7 @@ const visualisers = {
 		
 		elements.imageContainer.appendChild(svg);
 		
-		p = svg;
-		
-		return () => {};
+		return () => svg.remove();
 	},
 };
 

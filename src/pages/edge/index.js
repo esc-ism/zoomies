@@ -353,7 +353,7 @@ export default {
 		[
 			'This gives one zoom for the point\'s x-coordinate and another for its y-coordinate.',
 			'The position will only be in-bounds at the larger of the two zooms.',
-			'This is the final "snap zoom"',
+			'This is the final "snap zoom".',
 		],
 		getCode(code, [
 			{op: '=', id: 'zoomX', type: 'zoom', and: {

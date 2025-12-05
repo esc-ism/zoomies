@@ -1,3 +1,26 @@
+export const LERP = [
+	{op: 'func', id: 'getProgressed', args: ['fromX', 'fromY', 'toX', 'toY', 'lowZoom', 'highZoom'], pair: [1, 0], and: [
+		{op: '=', id: 't', and: {op: '-', and: [1, {op: '/', and: ['lowZoom', 'highZoom']}]}},
+		'',
+		{op: 'return', and: {op: 'array', and: [
+			{op: '+', and: ['fromX', {op: '*', and: ['t', {op: '-', and: ['toX', 'fromX']}]}]},
+			{op: '+', and: ['fromY', {op: '*', and: ['t', {op: '-', and: ['toY', 'fromY']}]}]},
+		]}},
+	]},
+	{op: 'func', id: 'getθ', args: ['isEvenQuadrant'], type: 'angle', isBase: true, and: [
+		{op: '=', id: 'angle', type: 'angle', isBase: true, and: {
+			op: '%', and: [{op: '+', and: ['rotation', {op: '*', and: ['π', 2]}]}, '½π'],
+		}},
+		'',
+		{op: 'if', and: [
+			'isEvenQuadrant',
+			{op: 'return', and: 'angle'},
+		]},
+		'',
+		{op: 'return', and: {op: '-', and: ['½π', 'angle']}},
+	]},
+];
+
 const SINGLE = [
 	{op: 'func', id: 'getT', args: ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'isInverse'], and: [
 		{op: '=', id: 'a', and: {
@@ -147,6 +170,7 @@ const SINGLE = [
 export default SINGLE;
 
 export const MULTI_LINE = [
+	...LERP,
 	...SINGLE,
 	{op: 'func', id: 'getIntersectZoom', args: ['startZoom', 'fromX0', 'fromY0', 'toX0', 'toY0', 'fromX1', 'fromY1', 'toX1', 'toY1', 'isInverse', 'maxT'], type: 'zoom', and: [
 		{op: 'if', and: [
@@ -224,51 +248,6 @@ export const MULTI_LINE = [
 					{op: 'sin', and: 'topTheta'},
 				]},
 				'imageHeight',
-			]},
-		]}},
-	]},
-	{op: 'func', id: 'getθ', args: ['isEvenQuadrant'], type: 'angle', isBase: true, and: [
-		{op: '=', id: 'angle', type: 'angle', isBase: true, and: {
-			op: '%', and: [
-				{op: '+', and: [
-					'rotation',
-					{op: '*', and: ['π', 2]},
-				]},
-				'½π',
-			],
-		}},
-		'',
-		{op: 'if', and: [
-			'isEvenQuadrant',
-			{op: 'return', and: 'angle'},
-		]},
-		'',
-		{op: 'return', and: {
-			op: '-', and: ['½π', 'angle'],
-		}},
-	]},
-	{op: 'func', id: 'getProgressed', args: ['fromX', 'fromY', 'toX', 'toY', 'lowZoom', 'highZoom'], pair: [1, 0], and: [
-		{op: '=', id: 't', and: {
-			op: '-', and: [
-				1,
-				{op: '/', and: ['lowZoom', 'highZoom']},
-			],
-		}},
-		'',
-		{op: 'return', and: {op: 'array', and: [
-			{op: '+', and: [
-				'fromX',
-				{op: '*', and: [
-					't',
-					{op: '-', and: ['toX', 'fromX']},
-				]},
-			]},
-			{op: '+', and: [
-				'fromY',
-				{op: '*', and: [
-					't',
-					{op: '-', and: ['toY', 'fromY']},
-				]},
 			]},
 		]}},
 	]},
@@ -376,11 +355,7 @@ export const DOUBLE_LINE = [
 			{op: 'return', and: {op: 'array', and: [0, 0]}},
 		]},
 		'',
-		{op: '=', id: ['boundX', 'boundY'], type: ['x', 'y'], and: {
-			op: 'call', id: 'getProgressed', and: [0, 0, 'endX', 'endY', 'originZoom', 'zoom'],
-		}},
-		'',
-		{op: 'return', and: {op: 'array', and: ['boundX', 'boundY']}},
+		{op: 'return', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'endX', 'endY', 'originZoom', 'zoom']}},
 	]},
 	{op: 'func', id: 'getDirected', args: ['endX', 'endY', 'midX', 'midY', 'flip', 'cX'], type: ['x', 'y', 'x', 'y', 'x', 'y'], pair: [1, 0, 3, 2, 5, 4], and: [
 		{op: 'return', and: {
