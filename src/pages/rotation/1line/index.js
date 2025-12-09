@@ -170,11 +170,11 @@ export default {
 	text: getText(
 		{
 			tag: 'h1',
-			content: 'Single-Line Rotation',
+			content: 'Single-Line',
 			style: {textAlign: 'center'},
 		},
 		[
-			'We can address the problems with ', getPageButton(IDS.EDGER), ' by handling each corner seperately.',
+			'This system addresses the problems with ', getPageButton(IDS.EDGER), ' by handling each corner seperately.',
 			'Bounds can now grow towards one pair of corners independently of the other.',
 			'Checking the ',
 			getButton('state', [
@@ -183,7 +183,7 @@ export default {
 			' that caused issues with non-square viewports, you\'ll see that it\'s now handled perfectly.',
 		],
 		[
-			'For a zoomful system built to handle rotation in its bounding, it takes the most rudimentary approach possible.',
+			'For a zoomful system built to handle rotation in its bounding, this one takes the most rudimentary approach possible.',
 			'The rail to each image corner is a direct, single line (hence the page\'s title) from the image\'s origin.',
 		],
 		{
@@ -1752,8 +1752,8 @@ export default {
 			'With such specific preconditions, it\'s hard to call this system particularly useful.',
 		],
 		[
-			'Despite the disappointing final product, this work has provided plenty of tools that we can use moving forward.',
-			'Let\'s take the knowledge we\'ve gained and make something better!',
+			'Despite the disappointing final product, at least this system fails differently to ', getPageButton(IDS.EDGER), '.',
+			'Maybe the system we\'re looking for is some combination of the two..?',
 		],
 	),
 };

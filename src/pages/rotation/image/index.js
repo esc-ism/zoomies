@@ -272,7 +272,7 @@ export default {
 	text: getText(
 		{
 			tag: 'h1',
-			content: 'Double-Line Rotation',
+			content: 'Double-Line',
 			style: {textAlign: 'center'},
 		},
 		[
@@ -331,19 +331,19 @@ export default {
 			'I\'ll call rail segments that determine lock points "lock rails" and the other segments "origin rails".',
 		],
 		[
-			'In this system, ',
+			'Similarly to ', getPageButton(IDS.EDGER), ', ',
 			// todo there are likely lots of buttons that should be doing manual position setting
 			getButton('origin rails', [
 				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {...getTweenOptionsBound(2), duration: 3}],
 			], {getParam: () => getTraceVars()}),
-			'  follow image axes until they intersect ',
+			'  follow image axes.',
+			'They end at their intersection with ',
 			getButton('lock rails', [
 				({rotation, ratio, zoomPoints}) => [{position: zoomPoints[3], ratio, rotation, zoom: zoomPoints[3].z}],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z * 2}, {...getTweenOptionsBound(3), duration: 3}],
 			], {getParam: () => getTraceVars()}),
-			'.',
-			'Origin rails follow whichever axis minimises lock rail length.',
+			', following whichever axis minimises lock rail length.',
 		],
 		{
 			tag: 'h2',

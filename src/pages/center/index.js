@@ -98,7 +98,7 @@ export default {
 				zoom: 1,
 				startZoom: 1,
 				rotation: DEGREES[90],
-				ratio: demo.ratio,
+				ratio: 1,
 			})}),
 			' could give you the desired view without having to ',
 			getButton('zoom', [
@@ -114,7 +114,7 @@ export default {
 		},
 		[
 			'The disregard for zoom that helps this system to excel at bounding makes it unsuited to snap-panning.',
-			'It works best paired with a system that has zoom-dependent bounds to cover its weakness, aka a "zoomful" system.',
+			'To cover this weakness, it\'s best paired with a system that has zoom-dependent bounds, aka a "zoomful" system.',
 		],
 		[
 			'All future systems will be zoomful.',

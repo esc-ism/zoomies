@@ -224,9 +224,9 @@ export default {
 			'At least, it fails ', {tag: 'i', content: 'most'}, ' of the time...',
 		],
 		[
-			'Surprisingly, as long as the viewport height and width are equal, this system handles 90° rotations perfectly!',
-			'Image aspect ratio doesn\'t matter.',
-			'This is because the viewport\'s height and width are equal, so when rotation causes bounds to depend on a different viewport dimension, the size doesn\'t change.',
+			'To handle 90° rotations, bounds would swap the viewport dimension used in their calculations.',
+			'If both dimensions are of equal length, this swap isn\'t necessary.',
+			'Because of this, as long as viewport height and width are equal, this system handles 90° rotations perfectly!',
 		],
 		{
 			tag: 'h2',
@@ -234,10 +234,8 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Snap-panning now requires an accommodating zoom adjustment... but how can we find the right zoom?',
-		],
-		[
-			'We can derive it from the bounds formula — it just needs some re-arranging.',
+			'Snap-panning now requires an accommodating zoom adjustment.',
+			'An appropriate zoom can be derived from the bounds formula — it just needs some re-arranging.',
 			'By replacing ', {tag: 'i', content: 'boundX'}, ' and ', {tag: 'i', content: 'boundY'}, ' with a point\'s coordinates and solving for zoom,',
 			'we get the minimum zoom for which the point is in-bounds.',
 		],

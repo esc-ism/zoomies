@@ -141,10 +141,10 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Now that rotation is incorporated into calculations, it\'s useful to split bounds calculation into two steps:',
+			'Now that rotation is a factor in calculations, it\'s useful to split the process of finding bounds into two steps:',
 			{tag: 'ol', content: [
 				{tag: 'li', content: 'When rotation or aspect ratios change, calculate rail data (endpoints and start zooms).'},
-				{tag: 'li', content: 'When the first step runs or zoom is changed, use rail data to produce bounds.'},
+				{tag: 'li', content: 'When the first step runs or zoom is changed, use rail data to set bounds.'},
 			]},
 			'This approach allows systems to handle zoom changes efficiently.',
 			'Snap-pans can also be made more efficient, as long as the system is used for bounding as well.',
@@ -157,8 +157,15 @@ export default {
 			' determines progress from ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: {tag: 'mi', xmlns, content: 'start'}},
 			' to ',
-			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: {tag: 'mi', xmlns, content: 'end'}},
-			'.',
+			{
+				tag: 'span',
+				// keeps the "." connected
+				style: {textWrapMode: 'nowrap'},
+				content: [
+					{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: {tag: 'mi', xmlns, content: 'end'}},
+					'.',
+				],
+			},
 			getMath({
 				content: {tag: 'mtable', xmlns, content: [
 					{tag: 'mtr', xmlns, content: [
@@ -278,7 +285,7 @@ export default {
 			]),
 			' state.',
 			'As the viewport gets less square, you\'ll find that one pair of corners becomes visible.',
-			'Since bounds must grow towards both corners in tandem, they fail to adequately restrict pans towards this corner.',
+			'Since bounds must grow towards both corners in tandem, they fail to adequately restrict pans towards the one that\'s unobscured.',
 			'If you ',
 			getButton('snap-pan', getSnapOptions(), {getParam: () => {
 				const data = getVarGetter(DEGREES[45], demo.ratioViewport)();
@@ -300,7 +307,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'The modifications have given this system a ', {tag: 'i', content: 'slightly'}, ' broader use-case, but they haven\'t achieved their purpose.',
+			'The modifications have given this system a ', {tag: 'i', content: 'slightly'}, ' broader use case, but they haven\'t achieved their purpose.',
 			'Bounding effectiveness is no longer limited by aspect ratio, but snap-panning still only works well with square viewports.',
 		],
 		[

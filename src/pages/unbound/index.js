@@ -290,7 +290,9 @@ export default {
 			},
 		},
 		[
-			'Each page will provide a playground for a unique bounding system.',
+			'Panning is limited through the enforcement of "bounds".',
+			'Bounds define an area in which the user may move around, and keep everywhere else off-limits.',
+			'Each page on this site will showcase a unique approach to setting bounds, providing a playground for your panning pleasure.',
 			'To demonstrate the value of bounds, I\'m starting with a system that neglects them.',
 			'Where ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [

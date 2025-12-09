@@ -1,5 +1,6 @@
 import demo from './demo';
 import pages from './pages';
+import {IDS} from './pages/shared/page';
 import {CLASS_WRAPPER, inputListener} from './consts';
 import touchIcon from './input/touch';
 import mouseIcon from './input/mouse';
@@ -124,6 +125,12 @@ history.replaceState({index: currentIndex}, '', `${location.origin}${location.pa
 
 let currentPage = pages[currentIndex];
 
+const setTitle = () => {
+	document.title = `${IDS[currentIndex]} | Zoomies`;
+};
+
+setTitle();
+
 const setTabIndexes = (value = 0, {text} = currentPage) => {
 	for (const button of text.querySelectorAll('[tabindex]')) {
 		button.tabIndex = value;
@@ -157,6 +164,8 @@ demo.setSystem(currentPage).then(async () => {
 		
 		currentIndex = index;
 		currentPage = page;
+		
+		setTitle();
 		
 		currentPage.text.classList.add(CLASS_ACTIVE);
 		textContainer.scrollTop = Math.min(scrollTop, header.offsetHeight);

@@ -9,7 +9,7 @@ import {
 
 import * as move from './svg/move';
 import {xmlns} from './math';
-import {CLASS_DIALOGUE, CLASS_DIALOGUE_CONTAINER} from './consts';
+import {CLASS_DIALOGUE, CLASS_DIALOGUE_BACKGROUND, CLASS_DIALOGUE_CONTAINER} from './consts';
 
 import './css';
 
@@ -73,9 +73,23 @@ const getNode = (description) => {
 };
 
 export const getDialogue = (...content) => ({
-	classList: [CLASS_DIALOGUE_CONTAINER], content: [
-		{tag: 'span', classList: [CLASS_DIALOGUE], content},
-	],
+	tag: 'div',
+	classList: [CLASS_DIALOGUE_CONTAINER],
+	content: {tag: 'span', classList: [CLASS_DIALOGUE], content},
+	// awful hack because styling inline elements is weird
+	callback: (container) => {
+		const element = container.firstChild;
+		const background = document.createElement('div');
+		
+		background.classList.add(CLASS_DIALOGUE_BACKGROUND);
+		
+		new ResizeObserver(() => {
+			background.style.width = `${element.offsetWidth}px`;
+			background.style.height = `${element.offsetHeight}px`;
+		}).observe(container);
+		
+		container.insertBefore(background, element);
+	},
 });
 
 export const getLink = (content, href) => ({tag: 'a', style: {textWrapMode: 'nowrap'}, tabIndex: -1, content, href, target: '_blank'});
