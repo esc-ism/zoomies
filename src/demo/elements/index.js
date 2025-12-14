@@ -37,7 +37,6 @@ const elements = {
 		style: {
 			display: 'flex',
 			position: 'relative',
-			overflow: 'hidden',
 		},
 	}),
 };
@@ -80,9 +79,6 @@ elements.image = generate({
 	parent: elements.imageContainer,
 	id: ID_IMAGE,
 	style: {
-		// ensure rim visibility
-		padding: `${4 - PADDING_VIEWPORT}px`,
-		boxSizing: 'border-box',
 		height: '100%',
 		width: '100%',
 		display: 'flex',
@@ -100,7 +96,8 @@ elements.resizerHorizontal = generate({
 		right: 0,
 		height: '100%',
 		width: '1lh',
-		'border-right': '1px solid white',
+		'border-right': '1px solid currentcolor',
+		'border-left': '1px solid currentcolor',
 		cursor: 'col-resize',
 	},
 });
@@ -113,7 +110,8 @@ elements.resizerVertical = generate({
 		bottom: 0,
 		width: '100%',
 		height: '1lh',
-		'border-bottom': '1px solid white',
+		'border-top': '1px solid currentcolor',
+		'border-bottom': '1px solid currentcolor',
 		cursor: 'row-resize',
 	},
 });
@@ -129,7 +127,7 @@ elements.resizerVertical = generate({
 		{
 			backgroundImage: 'radial-gradient(at -100% center, rgb(0 200 160), transparent), radial-gradient(at center 300%, rgb(255 0 0), transparent), radial-gradient(at 130% center, rgb(160 200 0), transparent), radial-gradient(at center -200%, rgb(0 0 255), transparent)',
 			backgroundBlendMode: 'overlay',
-			boxShadow: 'white 0 0 6px 1px',
+			outline: '2px solid currentcolor',
 		},
 		{
 			backgroundImage: 'radial-gradient(circle, black, black 1.5px, transparent 0)',

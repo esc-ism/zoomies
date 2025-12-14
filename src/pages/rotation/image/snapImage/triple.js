@@ -2,7 +2,7 @@ import {SVG_NAMESPACE} from '@/shared';
 
 import {getDiagram, COLOURS, getSplit} from '../../../shared/svg';
 
-import {getMirroredLine} from './shared';
+import {getMirroredLine} from '../../shared/doubleImage';
 
 const radii = {x: 20, y: 20};
 const strokeDiameter = 0.4;

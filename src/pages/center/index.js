@@ -3,7 +3,7 @@ import {PADDING_VIEWPORT} from '@/demo/consts';
 import {DEGREES} from '@/shared';
 
 import {CLASS_MATH_LOOSE} from '../consts';
-import {getText, getMath} from '../shared';
+import {getText, getMath, getConnectedPunctuation} from '../shared';
 import {xmlns} from '../shared/math';
 import {getButton, clearButton} from '../shared/button';
 import {getSnapOptions} from '../shared/tween';
@@ -29,17 +29,16 @@ export default {
 		},
 		[
 			'Let\'s start ',
-			getButton('bounding', [
+			getConnectedPunctuation(getButton('bounding', [
 				[{zoom: 1}],
 				() => {
 					const axis = Math.abs(demo.position.x) >= Math.abs(demo.position.y) ? 'x' : 'y';
 					
 					return [{[axis]: demo.position[axis] <= 0 ? 0.5 : -0.5}, {ease: 'bounce.out', duration: 1.5}];
 				},
-			]),
-			'!',
-			'Here, we have the simplest system that meets my requirements, where the center of the viewport is bound by the image.',
-			'The system may be described like:',
+			]), '!'),
+			' Showcased here is the simplest system that actually applies bounds.',
+			'It may be described like:',
 		],
 		getMath({
 			content: {tag: 'mtable', xmlns, content: [

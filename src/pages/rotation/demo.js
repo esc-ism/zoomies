@@ -31,7 +31,7 @@ export default class {
 			demo.cornerDistance = getCornerDistance(demo.sizesImage);
 		};
 		
-		demo.hooks.ratioChange.add(setCornerData);
+		demo.hooks.ratio.add(setCornerData);
 		
 		setCornerData();
 	}

@@ -6,7 +6,7 @@ import {xmlns} from '@/pages/shared/math';
 import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
-import {getText, getCode, getInstruction, getMath, getInputDependent, getLink, getDialogue} from '../shared';
+import {getText, getCode, getInstruction, getMath, getInputDependent, getLink, getDialogue, getConnectedPunctuation} from '../shared';
 import {getButton, clearButton} from '../shared/button';
 import {CLASS_BUTTON} from '../shared/button/consts';
 import {getSnapOptions} from '../shared/tween';
@@ -58,7 +58,7 @@ export default {
 		getInstruction(
 			[
 				'Orange text is a link to a previous system.',
-				'After using the link, ', getInputDependent((isMouse) => isMouse ? 'click your browser' : 'tap your phone'), '\'s back button to return.',
+				'After using the link, ', getInputDependent((isMouse) => isMouse ? 'click your browser' : 'tap your device'), '\'s back button to return.',
 			],
 			['Links to external sites are blue. They will open in new tabs.'],
 		),
@@ -77,28 +77,20 @@ export default {
 			getLink('rhombuses', 'https://en.wikipedia.org/wiki/Rhombus'),
 			' are possible in upcoming systems, but not this one).',
 			'The new playground ',
-			(() => {
-				const off = {filter: 'brightness(1) drop-shadow(0 0 0px white)'};
-				const on = {filter: 'brightness(2.6) drop-shadow(0 0 1px white)'};
-				const animation = [
-					[off, on, off, on, off],
-					{duration: 1200},
-				];
-				
-				return {
-					tag: 'button',
-					tabIndex: -1,
-					content: 'lines',
-					classList: [CLASS_BUTTON, CLASS_SEMANTIC_BUTTON],
-					onclick() {
-						clearButton();
-						
-						for (const line of demo.elements.rail.children) {
-							line.animate(...animation);
-						}
-					},
-				};
-			})(),
+			getButton('lines', [
+				[{zoom: 1, position: 0}, {onComplete: () => {
+					const off = {filter: 'brightness(1) drop-shadow(0 0 0px white)'};
+					const on = {filter: 'brightness(2.6) drop-shadow(0 0 1px white)'};
+					const animation = [
+						[off, on, off, on, off],
+						{duration: 1200},
+					];
+					
+					for (const line of demo.elements.rail.children) {
+						line.animate(...animation);
+					}
+				}}],
+			]),
 			' plot all possible positions of line segment endpoints and parallelogram corners.',
 			'I will refer to them as "rails", since bounds appear to travel along them.',
 		],
@@ -108,14 +100,13 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Notice that the viewport\'s dimensions half as zoom ',
-			getButton('doubles', [
+			'Notice that the viewport\'s dimensions halve as zoom ',
+			getConnectedPunctuation(getButton('doubles', [
 				[{ratio: 1, zoom: 1, rotation: DEGREES[90], position: 0}],
 				[{zoom: 2}],
 				[{position: 0.25}, {delay: 0.2}],
-			]),
-			'.',
-			'This reciprocal relationship between zoom and viewport size gives the following calculation for bounds:',
+			]), '.'),
+			' This reciprocal relationship between zoom and viewport size gives the following calculation for bounds:',
 		],
 		getInstruction(
 			[
@@ -157,11 +148,12 @@ export default {
 			}},
 		]),
 		[
-			{tag: 'i', content: 'boundX'}, ' and ', {tag: 'i', content: 'boundY'}, ' are equal for all states with ',
-			getButton('shared', [
+			{tag: 'i', content: 'boundX'}, ' and ', {tag: 'i', content: 'boundY'},
+			' are equal for all states where image and viewport ',
+			getButton('share', [
 				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
 			]),
-			' image and viewport aspect ratio.',
+			' an aspect ratio.',
 			'The ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 				{tag: 'mfrac', xmlns, content: [
@@ -224,9 +216,12 @@ export default {
 			'At least, it fails ', {tag: 'i', content: 'most'}, ' of the time...',
 		],
 		[
-			'To handle 90° rotations, bounds would swap the viewport dimension used in their calculations.',
-			'If both dimensions are of equal length, this swap isn\'t necessary.',
-			'Because of this, as long as viewport height and width are equal, this system handles 90° rotations perfectly!',
+			'In a system made for images rotated 90°,',
+			' the viewport\'s height would be used to calculate ', {tag: 'i', content: 'boundX'},
+			' and its width would be used for ', {tag: 'i', content: 'boundY'}, '.',
+			'That\'s the opposite of what we\'re doing here.',
+			'If width and height are equal, however, they\'re interchangeable.',
+			'So, if this system has a square-shaped viewport, it handles 90° rotations perfectly!',
 		],
 		{
 			tag: 'h2',
@@ -375,8 +370,12 @@ export default {
 		],
 		getDialogue('not really... what\'s the ', {tag: 'strong', content: 'point'}, ' of snap-panning?'),
 		[
-			'Ah, I\'m getting ahead of myself.',
-			'Snap-panning allows users to quickly focus on some small feature of the image.',
+			'For me, snap-panning is for focusing on some feature of the image —',
+			'something small enough that you need to zoom in to see it clearly.',
+			'Arguably, this is the main purpose of zooming and panning in general.',
+			'The advantage of snap-panning is that, by combining those operations into a single click, it allows users to achieve their desired view faster.',
+		],
+		[
 			'In my implementations, the snap zoom is the minimum zoom for which a point is in-bounds, making it an underestimation of how far the user wants to zoom in.',
 			'Because of this, the worst outcome for a snap-pan is being too zoomed out.',
 		],
@@ -415,12 +414,14 @@ export default {
 			'Hopefully you can see its advantages for snap-panning, even if you think its bounding is worse.',
 		],
 		[
-			'It\'s pretty obvious that, without a change in approach, this system\'s snap-panning can\'t be improved for un-rotated images.',
+			'This system, made to handle un-rotated images, fulfills its role perfectly.',
+			'Every design problem had a single, unambiguous solution, leaving no scope for innovation.',
 			'So, in the name of progress, we\'ll only be looking at systems built for rotation from now on.',
 		],
 		[
-			'All upcoming systems will be based on this one, taking various approaches to generalising its behaviour.',
-			'The next system will be ', {tag: 'i', content: 'especially'}, ' similar...',
+			'All upcoming systems will be based on this one, each trying to generalise its behaviour.',
+			'But what to try first..?',
+			'Before we start exerting too much effort, let\'s see if the lazy option works.',
 		],
 	),
 };

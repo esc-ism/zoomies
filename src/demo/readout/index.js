@@ -5,16 +5,20 @@ import {IDS, POSTFIXES, FORMATTERS, ID} from './consts';
 import './css';
 
 export default class {
+	container = document.createElement('div');
 	element = document.createElement('table');
 	#valueElements = {};
 	
 	constructor() {
 		this.element.id = ID;
 		
-		this.element.style.position = 'absolute';
-		this.element.style.top = this.element.style.left = '0';
-		this.element.style.userSelect = 'none';
-		this.element.style.pointerEvents = 'none';
+		this.container.style.position = 'absolute';
+		this.container.style.top = this.container.style.left = '0';
+		this.container.style.userSelect = 'none';
+		this.container.style.pointerEvents = 'none';
+		this.container.style.maxWidth = '100%';
+		this.container.style.overflow = 'hidden';
+		
 		this.element.style.textWrapMode = 'nowrap';
 		this.element.style.borderCollapse = 'collapse';
 		this.element.style.font = 'bold 16px "courier new", monospace';
@@ -37,8 +41,9 @@ export default class {
 		}
 		
 		this.element.appendChild(body);
+		this.container.appendChild(this.element);
 		
-		elements.viewport.insertAdjacentElement('afterend', this.element);
+		elements.viewport.insertAdjacentElement('afterend', this.container);
 	}
 	
 	#set(label, value) {

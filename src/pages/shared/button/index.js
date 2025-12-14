@@ -57,7 +57,7 @@ const releaseButton = (event) => {
 	}
 };
 
-export const getButton = (text, tweens, {doReset = false, getParam = () => undefined, isRandom = false} = {}) => {
+export const getButton = (text, tweens, {doReset = false, getParam = () => undefined, isRandom = false, callback} = {}) => {
 	// todo this could be useful but isn't currently used
 	//  might need modifying
 	const resetTweens = doReset ? TWEENS_RESET : [];
@@ -115,6 +115,8 @@ export const getButton = (text, tweens, {doReset = false, getParam = () => undef
 			});
 		},
 		callback: (_element) => {
+			callback?.(_element);
+			
 			element = _element;
 		},
 	};

@@ -3,12 +3,20 @@ import {addRule} from '@/shared/css';
 import {CLASS_DIALOGUE_CONTAINER, CLASS_DIALOGUE_BACKGROUND, CLASS_DIALOGUE} from './consts';
 
 addRule(`.${CLASS_DIALOGUE_CONTAINER}`, {
-	padding: '0.3em 0.6em',
+	padding: '0.4em 0.7em',
 	'font-style': 'italic',
 	'text-align': 'right',
 	position: 'relative',
 	'text-wrap-style': 'balance',
 });
+
+addRule(`.${CLASS_DIALOGUE}`, {
+	position: 'relative',
+	color: 'black',
+	'text-shadow': '0 0 1px #ffff00',
+});
+
+const background = '#ccc';
 
 addRule(`.${CLASS_DIALOGUE_BACKGROUND}`, {
 	padding: 'inherit',
@@ -16,14 +24,8 @@ addRule(`.${CLASS_DIALOGUE_BACKGROUND}`, {
 	right: '0',
 	top: '0',
 	'border-radius': '9px',
-	background: 'var(--color)',
+	background,
 	'box-shadow': 'inset 0 0 3px 1px black',
-});
-
-addRule(`.${CLASS_DIALOGUE}`, {
-	position: 'relative',
-	color: 'black',
-	'text-shadow': '0 0 1px #ffff00',
 });
 
 addRule(`.${CLASS_DIALOGUE_BACKGROUND}::before`, {
@@ -35,9 +37,9 @@ addRule(`.${CLASS_DIALOGUE_BACKGROUND}::before`, {
 	width: '0',
 	height: '0',
 	'border-width': '9px',
-	'border-color': 'var(--color) var(--color) transparent transparent',
+	'border-color': `${background} ${background} transparent transparent`,
 	'border-style': 'solid',
 	rotate: '342deg',
 	'transform-origin': 'left',
-	filter: 'blur(1.2px)',
+	filter: 'blur(1.1px)',
 });

@@ -3,7 +3,7 @@ import {DEGREES} from '@/shared';
 
 import {CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP} from '../../consts';
 import {register as registerFunctions, cleanup} from '../../code';
-import {getText, getCode, getInstruction, getMath, getInputDependent, getLink} from '../../shared';
+import {getText, getCode, getInstruction, getMath, getInputDependent, getLink, getConnectedPunctuation} from '../../shared';
 import {xmlns} from '../../shared/math';
 import {getPageButton, IDS} from '../../shared/page';
 import {getButton, clearButton} from '../../shared/button';
@@ -146,8 +146,7 @@ export default {
 				{tag: 'li', content: 'When rotation or aspect ratios change, calculate rail data (endpoints and start zooms).'},
 				{tag: 'li', content: 'When the first step runs or zoom is changed, use rail data to set bounds.'},
 			]},
-			'This approach allows systems to handle zoom changes efficiently.',
-			'Snap-pans can also be made more efficient, as long as the system is used for bounding as well.',
+			'By precalculating rail data for zooms and snap-pans, those operations can be handled more efficiently.',
 		],
 		[
 			'The transition between 0° and 90° bounds is done via the ',
@@ -157,15 +156,7 @@ export default {
 			' determines progress from ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: {tag: 'mi', xmlns, content: 'start'}},
 			' to ',
-			{
-				tag: 'span',
-				// keeps the "." connected
-				style: {textWrapMode: 'nowrap'},
-				content: [
-					{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: {tag: 'mi', xmlns, content: 'end'}},
-					'.',
-				],
-			},
+			getConnectedPunctuation({tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: {tag: 'mi', xmlns, content: 'end'}}, '.'),
 			getMath({
 				content: {tag: 'mtable', xmlns, content: [
 					{tag: 'mtr', xmlns, content: [
@@ -188,28 +179,20 @@ export default {
 			}),
 		],
 		[
-			'In the code snippet below, the linear interpolation formula is used in ',
+			'In the code snippet below, linear interpolation is used in ',
 			{tag: 'i', content: 'getRailsProgressed'},
 			' to find the minimum and maximum zooms for which bounds are 1-dimensional.',
+			'Note that angles are measured in ', getLink('radians', 'https://en.wikipedia.org/wiki/Radian'), '.',
+			'The "rotation" variable holds the angle between the image\'s positive y-axis and an un-rotated positive x-axis, which is ',
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+				{tag: 'mn', xmlns, content: '½'},
+				{tag: 'mi', xmlns, content: 'π'},
+			]},
+			' at zero rotation.',
 		],
 		getInstruction([
 			'This code snippet includes custom functions. ',
-			getInputDependent((isMouse) => `${isMouse ? 'Click' : 'Tap'} a function's name (e.g. "getRails") to unfold it and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
-			' Note that the "rotation" value\'s unit is ',
-			getLink('radians', 'https://en.wikipedia.org/wiki/Radian'),
-			' and has a default value of ',
-			{
-				tag: 'span',
-				// keeps the "." connected
-				style: {textWrapMode: 'nowrap'},
-				content: [
-					{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
-						{tag: 'mn', xmlns, content: '½'},
-						{tag: 'mi', xmlns, content: 'π'},
-					]},
-					'.',
-				],
-			},
+			getInputDependent((isMouse) => `${isMouse ? 'Click' : 'Tap'} a function's name (e.g. "getRails") to unfold it, and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
 		]),
 		getCode(code, [
 			{op: '=', id: ['z0', 'x0', 'y0', 'z1', 'x1', 'y1'], and: {op: 'call', id: 'getRails'}},
@@ -224,7 +207,9 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'As expected, bounds work perfectly with rotation values that are multiples of 90°, but ',
+			'The outcome here is exactly as expected.',
+			'Bounds now work perfectly with rotation values that are multiples of 90°, regardless of viewport aspect ratio.',
+			'They still ',
 			getButton('fail', [
 				({ratio}) => [{zoom: 1, position: 0, rotation: DEGREES[90], ratio}, TWEEN_OPTIONS_SETUP],
 				({x, y}) => [{x, y}],
@@ -246,7 +231,7 @@ export default {
 			}}),
 			' elsewhere.',
 		],
-		['A bad outcome, but not the priority.',
+		['A minor improvement, but not the priority.',
 			'Let\'s see if the system can succeed where it matters...'],
 		{
 			tag: 'h2',
@@ -298,7 +283,7 @@ export default {
 		],
 		[
 			'This isn\'t an insignificant issue;',
-			'in ', {tag: 'i', content: 'any'}, ' state with non-90°-multiple rotation and a non-square viewport, one corner will be easier to see than the other.',
+			'in ', {tag: 'i', content: 'any'}, ' state with non-90°-multiple rotation and a non-square viewport, one corner will be less obscured than the other.',
 			'Snap-pans are inconsistent in all such states.',
 		],
 		{

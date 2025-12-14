@@ -6,7 +6,7 @@ export const PREFIX_ID = getTextId('button', 'page', '');
 
 // todo redo; single source of truth
 export const IDS = {
-	SPLASH: 'Welcome',
+	SPLASH: 'Introduction',
 	UNBOUND: 'Unbound',
 	CENTER: 'Viewport Center',
 	EDGE: 'Viewport Edge',

@@ -3,7 +3,7 @@ import {DEGREES} from '@/shared';
 
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getMath, getDiagrammedMath} from '../../shared';
+import {getText, getCode, getMath, getDiagrammedMath, getConnectedPunctuation} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
 import {getPageButton, IDS} from '../../shared/page';
 import {xmlns} from '../../shared/math';
@@ -13,6 +13,9 @@ import {MULTI_LINE as SHARED_FUNCTIONS} from '../code';
 
 import System, {getVarGetter} from './demo';
 import pointsImage from './pointsImage';
+import snapImageTrio from './snapImage/triple';
+import snapImageDuo from './snapImage/double';
+import {getDoubleImage} from '../shared/doubleImage';
 
 const code = [];
 
@@ -816,18 +819,17 @@ export default {
 		[
 			'This time, the top-left and top-right image corners always share an origin rail.',
 			'Its job is to keep both corners viewable for as ',
-			getButton('long as possible', [
+			getConnectedPunctuation(getButton('long as possible', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
 				({zoomPoints}) => [{position: zoomPoints[4], zoom: zoomPoints[4].z}],
-			], {getParam: () => getDirectVars()}),
-			'.',
-			'When this fails, enter the "connecting rail"!',
+			], {getParam: () => getDirectVars()}), '.'),
+			' When this fails, enter the "connecting rail"!',
 			'Connecting rails are pointed directly towards ',
-			getButton('viewport corners', [
+			getConnectedPunctuation(getButton('viewport corners', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}],
 				({zoomPoints}) => [{position: zoomPoints[4].end}],
-			], {getParam: () => getDirectVars()}),
-			', each keeping a ',
+			], {getParam: () => getDirectVars()}), ','),
+			' each keeping a ',
 			getButton('pair', [
 				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[1].z, position: third}],
 				({third}) => [{zoom: third.z}, {duration: 3, ease: 'none'}],
@@ -871,11 +873,11 @@ export default {
 		],
 		[
 			'I\'ve stated that connecting rails are pointed at ',
-			getButton('viewport corners', [
+			getConnectedPunctuation(getButton('viewport corners', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}],
 				({zoomPoints}) => [{position: zoomPoints[4].end}],
-			], {getParam: () => getDirectVars()}),
-			', but how can we find these corners\' coordinates?',
+			], {getParam: () => getDirectVars()}), ','),
+			' but how can we find these corners\' coordinates?',
 			'You might notice that this is reminiscent of ', getPageButton(IDS.DOUBLE), '\'s viewport midpoint problem.',
 			'Conveniently, we can re-use those maths and locate corners by summing midpoint coordinates.',
 		],
@@ -1184,15 +1186,15 @@ export default {
 		[
 			'All of ', getPageButton(IDS.DOUBLE), '\'s bounding flaws are fixed.',
 			'Bound changes are now perfectly ',
-			getButton('fluid', [
+			getConnectedPunctuation(getButton('fluid', [
 				[{ratioImage: 1, zoom: 1, position: 0}],
 				() => [{rotation: demo.rotation - DEGREES[360]}, {cutRotation: false, ease: 'none', duration: 8}],
 				[{ratioImage: 0.5}, {position: '<', duration: 2}],
 				[{ratioImage: 1.5}, {duration: 2}],
 				[{ratioImage: 0.75}, {duration: 2}],
 				[{ratioImage: 2}, {duration: 2}],
-			]),
-			', providing a more consistent and reliable experience.',
+			]), ','),
+			' providing a more consistent and reliable experience.',
 			'Besides patching issues, the connecting rails even enhance the system\'s ability to show ',
 			getButton('two corners', [
 				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: third}],
@@ -1242,6 +1244,7 @@ export default {
 			'It turns out that it\'s never necessary to consider origin rails in snap zoom calculation.',
 			'Because of this, we still only need two or three checks per region, depending on whether each corner has its own connecting rail.',
 		],
+		getDoubleImage(snapImageDuo, snapImageTrio),
 		[
 			'It\'s definitely possible to pinpoint the snap position\'s region here, but it\'d be tricky.',
 			'I\'ve elected to just check every region again.',
@@ -1285,7 +1288,7 @@ export default {
 			'but my line of reasoning dead-ends here.',
 		],
 		[
-			'And with that, we\'re done!',
+			'And, with that, we\'re done!',
 			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful;',
 			'its bounding is outclassed by ', getPageButton(IDS.CENTER), ' and its snap-panning has no compelling advantage over ', getPageButton(IDS.IMAGE), '.',
 			'Nevertheless, I\'m glad to have seen my vision through, and proud to have pushed my limits so far.',

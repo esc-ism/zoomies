@@ -3,7 +3,7 @@ import {DEGREES} from '@/shared';
 
 import {cleanup, register as registerFunctions} from '../../code';
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound, TWEEN_OPTIONS_SETUP} from '../../consts';
-import {getText, getCode, getDiagrammedMath, getInstruction} from '../../shared';
+import {getText, getCode, getDiagrammedMath, getInstruction, getConnectedPunctuation} from '../../shared';
 import {getPageButton, IDS} from '../../shared/page';
 import {getButton, clearButton} from '../../shared/button';
 import {xmlns} from '../../shared/math';
@@ -20,6 +20,7 @@ import snapImageTrio from './snapImage/triple';
 import snapImageDuo from './snapImage/double';
 import System, {getSnappedZoom} from './demo';
 import getZoomPoints from './zoomPoints';
+import {getDoubleImage} from '../shared/doubleImage';
 
 const code = [];
 
@@ -247,9 +248,9 @@ export default {
 				return [...getZoomPoints(mock, allStartZooms), ...getPoints(mock, startZooms, quadrantAngle)];
 			}));
 			
-			const first = zoomPoints[zoomPoints[1].z > zoomPoints[3].z ? 0 : 2];
+			const first = zoomPoints[zoomPoints[0].z > zoomPoints[2].z ? 2 : 0];
 			const end = zoomPoints[axis + 4];
-			const zoom = 1.2;
+			const zoom = zoomPoints[3].z;
 			
 			return {first, zoom, startZoom: first.z, start: getZoomProgressed(first, end, zoom), end, ...data};
 		};
@@ -276,7 +277,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'In ', getPageButton('Single-Line'), ', there were two playground states that revealed issues.',
+			'In ', getPageButton(IDS.SINGLE), ', there were two playground states that revealed issues.',
 			'Let\'s start by seeing how they look here.',
 		],
 		[
@@ -292,7 +293,7 @@ export default {
 			' is also fixed, accurately replicating the behaviour of ', getPageButton(IDS.EDGE), '.',
 		],
 		[
-			getPageButton('Single-Line'),
+			getPageButton(IDS.SINGLE),
 			' forbade control over rail gradients; ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 				{tag: 'mi', xmlns, content: 'y'},
@@ -303,14 +304,13 @@ export default {
 				{tag: 'mi', xmlns, content: 'c'},
 			]},
 			' always simplified to ',
-			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+			getConnectedPunctuation({tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 				{tag: 'mi', xmlns, content: 'y'},
 				{tag: 'mo', xmlns, content: '='},
 				{tag: 'mo', xmlns, setAttributes: {rspace: '0', lspace: '0'}, content: '±'},
 				{tag: 'mi', xmlns, content: 'x'},
-			]},
-			'.',
-			'Multi-line rails provide much more flexibility, allowing for manipulation of lock point locations.',
+			]}, '.'),
+			' Multi-line rails provide much more flexibility, allowing for manipulation of lock point locations.',
 		],
 		[
 			'This system places each lock point on a different viewport edge.',
@@ -318,13 +318,12 @@ export default {
 			'For example, it lies on the expected viewport corners at ',
 			getButton('0°', getCornerProgressTweens(DEGREES[90])),
 			' and ',
-			getButton('90°', getCornerProgressTweens(0)),
+			getConnectedPunctuation(getButton('90°', getCornerProgressTweens(0)), ','),
 			' and travels linearly between them for ',
-			getButton('intermediate angles', [
+			getConnectedPunctuation(getButton('intermediate angles', [
 				...getCornerProgressTweens(DEGREES[90], '<'),
 				[{rotation: 0}, {ease: 'none', duration: 3, position: '+=0'}],
-			]),
-			'.',
+			]), '.'),
 		],
 		[
 			'Now that we\'re messing with rail gradients, we need another rail segment to connect back to the origin.',
@@ -337,13 +336,13 @@ export default {
 				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {...getTweenOptionsBound(2), duration: 3}],
 			], {getParam: () => getTraceVars()}),
-			'  follow image axes.',
+			' follow image axes.',
 			'They end at their intersection with ',
-			getButton('lock rails', [
+			getConnectedPunctuation(getButton('lock rails', [
 				({rotation, ratio, zoomPoints}) => [{position: zoomPoints[3], ratio, rotation, zoom: zoomPoints[3].z}],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z * 2}, {...getTweenOptionsBound(3), duration: 3}],
-			], {getParam: () => getTraceVars()}),
-			', following whichever axis minimises lock rail length.',
+			], {getParam: () => getTraceVars()}), ','),
+			' following whichever axis minimises lock rail length.',
 		],
 		{
 			tag: 'h2',
@@ -356,7 +355,7 @@ export default {
 			'Corners will alternate between base and side every 90°.',
 		],
 		[
-			'Like origin rail start zooms, lock rails are found through trigonometry.',
+			'Like origin rail start zooms, which are found via the same maths as in ', getPageButton(IDS.SINGLE), ', lock rails are found through trigonometry.',
 			'There are four kinds of lock rail;',
 			'they can start from either axis and end at either a side or base corner.',
 			'Each of the four variations has slightly different formulae, but they all present similar problems with similar solutions.',
@@ -1123,25 +1122,7 @@ export default {
 			'The final product may have either two or three segments, as seen below.',
 			'Segments are coloured to show pairings.',
 		],
-		{tag: 'div', style: {
-			display: 'flex',
-			maxHeight: 'calc(var(--text-height) - 2em - var(--scrollbar-width))',
-			// avoids a weird scroll snap when resizing viewport with page top inside the images
-			overflowAnchor: 'none',
-		}, content: [
-			snapImageDuo,
-			snapImageTrio,
-		].map((image) => {
-			const container = document.createElement('div');
-			
-			container.style.display = 'flex';
-			container.style.justifyContent = 'center';
-			container.style.flexGrow = `${image.viewBox.baseVal.width / image.viewBox.baseVal.height}`;
-			
-			container.appendChild(image);
-			
-			return container;
-		})},
+		getDoubleImage(snapImageDuo, snapImageTrio),
 		[
 			'As before, we need to find a line that intersects the snap point and two adjacent rails.',
 			'Here, with the additional segment pairs, the maximum number of checks required is tripled.',
@@ -1190,7 +1171,7 @@ export default {
 			tag: 'div', style: {textAlign: 'center', fontSize: '1.8em'}, content: '🥳',
 		},
 		[
-			'By combining systems, we now have an acceptable, rotation-handling product.',
+			'By combining systems, we\'ve finally conquered rotation.',
 			'This is a win, but perhaps more second act climax than final, supreme victory.',
 		],
 		[

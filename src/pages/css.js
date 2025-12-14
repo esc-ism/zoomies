@@ -21,6 +21,7 @@ addRule([`.${CLASS_MATH_WRAPPER}`, `.${CLASS_CODE}`], {
 addRule([`.${CLASS_MATH_WRAPPER}`, `.${CLASS_CODE} > *`], {
 	overflow: 'auto',
 	'overscroll-behavior-x': 'contain',
+	'overflow-anchor': 'none',
 	'max-height': 'calc(var(--text-height) - 2em - var(--scrollbar-width))',
 });
 

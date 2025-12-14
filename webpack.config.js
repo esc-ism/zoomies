@@ -12,6 +12,7 @@ const shared = {
 	entry: './src/index.js',
 	plugins: [new FileCopy({patterns: [
 		{from: './src/index.html'},
+		{from: './src/pages/welcome/pokeball.png'},
 		{from: './fonts/*'},
 	]})],
 };

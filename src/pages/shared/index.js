@@ -232,3 +232,12 @@ export const getDiagrammedMath = (diagram, ...sections) => {
 		}, {threshold: 0.5}).observe(element);
 	}};
 };
+
+export const getConnectedPunctuation = (main, punctuation) => ({
+	tag: 'span',
+	style: {textWrapMode: 'nowrap'},
+	content: [
+		main,
+		punctuation,
+	],
+});

@@ -1,192 +1,173 @@
-import gsap from 'gsap';
-
-import {inputListener} from '@/consts';
 import demo from '@/demo';
-import {DEGREES} from '@/shared';
+import {inputListener} from '@/consts';
+import {DEGREES, getAngleDiff} from '@/shared';
+import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
-import {getText, getInstruction} from '../shared';
-import {getBound, getRailProgress, getVarGetter} from '../rotation/3line/demo';
+import {CLASS_FLASH_CONTAINER} from '../consts';
+import {getText, getInstruction, getDialogue, getInputDependent} from '../shared';
+import {clearButton} from '../shared/button';
+import flash from '../shared/flash';
 
+import getRestartButton from './restart';
 import System from './demo';
 
-let stopResolver;
-let doStop;
+let exits = 0;
+let instruct;
+let exitPromise;
+let exitResolve;
 
-const tween = async (stop) => {
-	const getRandomRotation = gsap.utils.random([
-		-DEGREES[90] - DEGREES['45_2'], -DEGREES[90] + DEGREES['45_2'],
-		-DEGREES['45_2'], DEGREES['45_2'],
-	], true);
-	
-	const ratioGetters = [
-		() => {
-			getRandomRatio = ratioGetters[1];
-			
-			return 0.5 + Math.random() * 0.25;
-		},
-		() => {
-			getRandomRatio = ratioGetters[0];
-			
-			return 2 - Math.random() * 0.5;
-		},
-	];
-	
-	let [getRandomRatio] = ratioGetters;
-	
-	while (!doStop) {
-		const {zoomPoints, rotation, ratio} = getVarGetter(
-			getRandomRotation(),
-			demo.ratioViewport / getRandomRatio(),
-		)();
+class Validator {
+	static succeed() {
+		demo.progress.set(1);
+		demo.progress.complete();
 		
-		let firstIndex;
-		let firstIndexRaw;
-		let otherProgresses;
-		
-		const setFirstIndex = (zoomPoints) => {
-			if (zoomPoints[2].z > zoomPoints[5].z) {
-				firstIndex = firstIndexRaw = 0;
-				
-				otherProgresses = zoomPoints[5].isFirstInt ? [0, 0] : [0, 0, 0];
-				
-				return;
-			}
-			
-			firstIndexRaw = 3;
-			
-			otherProgresses = zoomPoints[2].isFirstInt ? [0, 0] : [0, 0, 0];
-			
-			if (zoomPoints[2].isFirstInt) {
-				firstIndex = 2;
-			} else {
-				firstIndex = 3;
-			}
-		};
-		
-		setFirstIndex(zoomPoints);
-		
-		let [first, second, third] = zoomPoints.slice(firstIndexRaw);
-		
-		const setZoomPoints = () => {
-			demo.system.constrainPosition({ratio: true}, true);
-			
-			setFirstIndex(demo.system.zoomPoints);
-			[first, second, third] = demo.system.zoomPoints.slice(firstIndexRaw);
-			
-			demo.system.rails.hide();
-			
-			demo.system.rails[firstIndex].show();
-			demo.system.rails[firstIndex + 1].show();
-			
-			if (!third.isFirstInt) {
-				demo.system.rails[firstIndex + 2].show();
-			}
-		};
-		
-		demo.setTween(
-			[{ratio, position: 0, rotation, zoom: first.z}, {delay: 0.5}],
-			[{zoom: 10}, {
-				duration: 10,
-				ease: 'power1.in',
-				isPositionUpdate: true,
-				onStart() {
-					setZoomPoints();
-					
-					gsap.ticker.fps(30);
-					
-					demo.resizeCallback = setZoomPoints;
-				},
-				onComplete() {
-					delete demo.resizeCallback;
-				},
-				onUpdate(tween) {
-					const progresses = [...otherProgresses];
-					
-					tween.timeScale(1 + (Math.pow(tween.ratio, 1.2) * 2));
-					
-					demo.elements.viewport.style.filter = `brightness(${100 - tween.ratio * 100}%)`;
-					
-					demo.position = getBound(demo.zoom, first, second, third) || {x: 0, y: 0};
-					demo.applyPosition();
-					
-					progresses.splice(firstIndex, 0, ...getRailProgress(demo.zoom, first, second, third));
-					
-					demo.system.rails.setProgress(...progresses);
-				},
-			}],
-		);
-		
-		await Promise.race([stop, demo.tween]);
-		
-		gsap.ticker.fps(60);
-		
-		if (doStop) {
-			demo.elements.viewport.style.removeProperty('filter');
-			
-			return;
-		}
-		
-		demo.system.rails.hide();
-		
-		demo.rotation = DEGREES[90];
-		
-		demo.setTween(
-			[{zoom: 0, position: 0}, {
-				duration: 0,
-				onComplete: () => {
-					demo.tweenUpdate.then(() => {
-						demo.elements.viewport.style.removeProperty('filter');
-					});
-				},
-			}],
-			[{zoom: 1, rotation: -DEGREES[270]}, {cutRotation: false, duration: 5}],
-			[{ratio: 0.5}, {position: '<'}],
-			[{ratio: 1.5}],
-			[{ratio: 0.75}],
-			[{ratio: 2}],
-			[{ratio: 1}],
-		);
-		
-		await Promise.race([stop, demo.tween.then(() => demo.tweenUpdate)]);
+		return true;
 	}
-};
+	
+	#getValue;
+	#getChange;
+	#threshold;
+	
+	constructor(getValue, getChange, threshold) {
+		this.#getValue = getValue;
+		this.#getChange = getChange;
+		this.#threshold = threshold;
+	}
+	
+	get() {
+		let value = this.#getValue();
+		let change = 0;
+		
+		return () => {
+			change += this.#getChange(value);
+			value = this.#getValue();
+			
+			const progress = change / this.#threshold;
+			
+			if (progress >= 1) {
+				return Validator.succeed();
+			}
+			
+			demo.progress.set(progress);
+			
+			return false;
+		};
+	}
+}
 
-const state = {};
+const instructions = [
+	{
+		mouse: ['Drag the viewport with your left mouse button to pan.'],
+		touch: ['Drag the viewport to pan.'],
+		key: 'pan',
+		validator: new Validator(
+			() => ({...demo.position}),
+			({x, y}) => Math.abs(demo.position.x - x) / demo.ratioImage + Math.abs(demo.position.y - y) / demo.ratioImageInverse,
+			0.1,
+		),
+	},
+	{
+		mouse: ['Left click on the image to snap-pan.'],
+		touch: ['Tap the image to snap-pan.'],
+		key: 'snap',
+	},
+	{
+		mouse: ['Use your scroll wheel to zoom in and out.'],
+		touch: ['Pinch in and out to zoom.'],
+		key: 'zoom',
+		validator: new Validator(
+			() => demo.zoom,
+			(zoom) => (demo.zoom > zoom ? (demo.zoom / zoom) : (zoom / demo.zoom)) - 1,
+			0.1,
+		),
+	},
+	{
+		mouse: ['Drag with your right mouse button to rotate.'],
+		touch: ['Drag horizontally with two fingers to rotate.'],
+		key: 'rotate',
+		validator: new Validator(
+			() => demo.rotation,
+			(rotation) => Math.abs(getAngleDiff(demo.rotation, rotation)),
+			DEGREES[45] / 9,
+		),
+	},
+	{
+		mouse: ['Use your scroll wheel while holding "ctrl" on your keyboard to adjust image aspect ratio.'],
+		touch: ['Drag vertically with two fingers to adjust image aspect ratio.'],
+		key: 'resizeImage',
+		validator: new Validator(
+			() => demo.ratioImage,
+			(ratioImage) => (demo.ratioImage > ratioImage ? (demo.ratioImage / ratioImage) : (ratioImage / demo.ratioImage)) - 1,
+			0.1,
+		),
+	},
+	{
+		mouse: [
+			['Drag the vertical bar at the right side of the viewport to adjust its aspect ratio.'],
+			['Drag the horizontal bar below the viewport to adjust its aspect ratio.'],
+		],
+		touch: [
+			['Drag the vertical bar at the right side of the viewport to adjust its aspect ratio.'],
+			['Drag the horizontal bar below the viewport to adjust its aspect ratio.'],
+		],
+		key: 'resizeViewport',
+		hasAlt: true,
+		validator: (() => {
+			const {resizerHorizontal, resizerVertical} = demo.elements;
+			
+			return new Validator(
+				() => [resizerHorizontal.offsetLeft, resizerVertical.offsetTop],
+				([x, y]) => Math.abs(resizerHorizontal.offsetLeft - x) / window.innerWidth + Math.abs(resizerVertical.offsetTop - y) / window.innerHeight,
+				0.02,
+			);
+		})(),
+	},
+	{
+		mouse: [
+			['Click the vertical bar to reset viewport aspect ratio.'],
+			['Click the horizontal bar to reset viewport aspect ratio.'],
+		],
+		touch: [
+			['Tap the vertical bar to reset viewport aspect ratio.'],
+			['Tap the horizontal bar to reset viewport aspect ratio.'],
+		],
+		key: 'resetViewport',
+		hasAlt: true,
+	},
+	{
+		mouse: ['Right click on the viewport to reset everything else.'],
+		touch: ['Tap the viewport with two fingers to reset everything else.'],
+		key: 'resetImage',
+	},
+];
 
 export default {
 	System,
-	start() {
-		state.rotation = demo.rotation;
-		state.ratioImage = demo.ratioImage;
-		state.zoom = demo.zoom;
-		state.position = {...demo.position};
+	start: () => {
+		instruct();
 		
-		demo.progress.element.style.display = 'none';
-		
-		doStop = false;
-		
-		tween(new Promise((resolve) => {
-			stopResolver = resolve;
-		}));
+		exitPromise = new Promise((resolve) => {
+			exitResolve = resolve;
+		});
 	},
-	end() {
-		doStop = true;
+	end: () => {
+		exits++;
+		exitResolve();
 		
-		stopResolver();
+		demo.progress.reset();
 		
-		Object.assign(demo, state);
-		
-		demo.applyPosition();
-		demo.applyZoom();
-		demo.applyRotation();
-		demo.updateSizesImage(false);
-		
-		demo.progress.element.style.removeProperty('display');
+		clearButton();
 	},
 	text: getText(
+		getInstruction([
+			getInputDependent((isMouse) => isMouse ?
+				'Not using keyboard and mouse?' :
+				'Using keyboard and mouse?'),
+			' Scroll up and use the buttons on the header\'s left to switch control scheme.',
+		]),
 		{
 			tag: 'h1',
-			content: 'Zoomies',
+			content: 'Introduction',
 			style: {textAlign: 'center'},
 		},
 		'Hello! I\'m Callum.',
@@ -208,17 +189,178 @@ export default {
 			'This website is a little interactive report of my findings.',
 			'It will walk you through the problems and demonstrate solutions, building from basics to the limits of my amateur capabilities.',
 		],
-		getInstruction([
+		getDialogue(
+			'sounds good. what\'s the thing ',
+			{tag: 'span', classList: [CLASS_HIDE_HORIZONTAL], content: 'at the top'},
+			{tag: 'span', classList: [CLASS_HIDE_VERTICAL], content: 'to the left'},
+			'?',
+		),
+		[
+			'Glad you asked!',
+			'That\'s our first playground.',
+			'The colourful, spotted ',
 			{tag: 'span', callback: (element) => {
+				const thresholdHigh = 1.1;
+				const thresholdLow = 1 / thresholdHigh;
+				
 				const update = () => {
-					element.innerText = inputListener.isMouse ?
-						'Hit your right arrow key to see the next page. Not using keyboard and mouse?' :
-						'Swipe left to see the next page. Using keyboard and mouse?';
+					element.innerText = (demo.ratioImage > 1 ? (demo.ratioImage < thresholdHigh) : (demo.ratioImage > thresholdLow)) ? 'square' : 'rectangle';
+				};
+				
+				demo.hooks.ratio.add(update);
+				
+				update();
+			}},
+			' is the "image" and it\'s being seen through the "viewport".',
+			'To the viewport\'s top-left is a readout of the playground\'s state.',
+			'Follow the instructions below to learn the controls.',
+		],
+		{
+			...getInstruction({classList: [CLASS_HIDE_VERTICAL]}, {classList: [CLASS_HIDE_HORIZONTAL]}, getRestartButton()),
+			callback: (container) => {
+				const [horizontal, vertical, button] = container.children;
+				
+				let [instruction] = instructions;
+				
+				const update = () => {
+					if (!instruction) {
+						return;
+					}
+					
+					const text = instruction[inputListener.isMouse ? 'mouse' : 'touch'];
+					
+					if (instruction.hasAlt) {
+						[horizontal.innerText, vertical.innerText] = text;
+					} else {
+						horizontal.innerText = vertical.innerText = text;
+					}
 				};
 				
 				inputListener.add(update);
-			}},
-			' Scroll up and use the buttons on the header\'s left to switch control scheme.',
+				
+				container.classList.add(CLASS_FLASH_CONTAINER);
+				
+				button.style.display = 'none';
+				
+				container.style.position = 'relative';
+				
+				instruct = async () => {
+					const id = exits;
+					
+					while (true) {
+						for (instruction of instructions) {
+							update();
+							
+							const validator = instruction.validator?.get() ?? Validator.succeed;
+							let isFirst = true;
+							
+							do {
+								await Promise.race([
+									new Promise((resolve) => {
+										demo.hooks[instruction.key].add(() => {
+											resolve();
+											
+											return true;
+										}, true);
+									}),
+									exitPromise,
+								]);
+								
+								if (id !== exits) {
+									[instruction] = instructions;
+									
+									update();
+									
+									return;
+								}
+								
+								if (isFirst) {
+									demo.progress.reset();
+									
+									isFirst = false;
+								}
+							} while (!validator());
+							
+							flash(container);
+						}
+						
+						instruction = undefined;
+						
+						horizontal.style.display = vertical.style.display = 'none';
+						
+						button.style.removeProperty('display');
+						
+						container.style.cursor = 'pointer';
+						await Promise.race([
+							new Promise((resolve) => {
+								container.addEventListener('click', resolve, {once: true});
+							}),
+							exitPromise,
+						]);
+						
+						if (id === exits) {
+							flash(container);
+						}
+						
+						container.style.removeProperty('cursor');
+						horizontal.style.removeProperty('display');
+						vertical.style.removeProperty('display');
+						button.style.display = 'none';
+					}
+				};
+			},
+		},
+		[
+			'Each page on this site will provide a playground for your panning ple',
+			{tag: 'span', style: {'font-size': '0.63em', position: 'relative', top: '0.06em'}, content: '♡'},
+			'sure.',
+			'This one just provides a fun visual (panning in a circle around the image\'s center looks pretty neat), but all future pages will showcase a unique approach to pan-limiting.',
+		],
+		(() => {
+			const getBall = (isTop, isLeft) => ({
+				tag: 'img', src: './pokeball.png', style: {
+					height: '24px',
+					imageRendering: 'pixelated',
+					position: 'absolute',
+					[isLeft ? 'left' : 'right']: '0',
+					[isTop ? 'top' : 'bottom']: '0',
+					[`border${isTop ? 'Top' : 'Bottom'}${isLeft ? 'Left' : 'Right'}Radius`]: '10px',
+					[`border${isTop ? 'Bottom' : 'Top'}${isLeft ? 'Right' : 'Left'}Radius`]: '10px',
+					translate: `${isLeft ? '-' : ''}12px ${isTop ? '-' : ''}12px`,
+					backgroundColor: 'inherit',
+					border: '3px solid black',
+					userSelect: 'none',
+					boxShadow: 'inherit',
+				},
+			});
+			
+			// https://fontmeme.com/fonts/pokemon-classic-font/
+			// https://bulbapedia.bulbagarden.net/wiki/Professor_Oak/Quotes#Pok%C3%A9mon_Red,_Blue,_and_Yellow
+			return {style: {
+				fontFamily: 'Pokemon',
+				fontSize: '0.6em',
+				textAlign: 'center',
+				lineHeight: '2',
+				position: 'relative',
+				padding: '14px',
+				border: '9px double black',
+				color: 'black',
+				backgroundColor: '#cfcfcf',
+				boxShadow: '0 0 5px white',
+			}, content: [
+				getBall(true, true),
+				getBall(true, false),
+				'Your very own PANNING legend is about to unfold!',
+				'A world of dreams and adventures with BOUNDS awaits!',
+				'Let\'s go!',
+				getBall(false, true),
+				getBall(false, false),
+			]};
+		})(),
+		getInstruction([
+			getInputDependent((isMouse) => isMouse ?
+				'Hit your right arrow key to see the next page.' :
+				'Swipe left to see the next page.'),
 		]),
 	),
 };

@@ -195,7 +195,7 @@ export default new class {
 	};
 	
 	hooks = {
-		ratioChange: new ActionHook(),
+		ratio: new ActionHook(),
 		any: new ActionHook(),
 	};
 	
@@ -633,7 +633,7 @@ export default new class {
 		
 		this.readout.setRatio(this);
 		
-		this.hooks.ratioChange.emit();
+		this.hooks.ratio.emit();
 		
 		if (doApply) {
 			this.system.constrainPosition({ratio: true, ratioImage: true});

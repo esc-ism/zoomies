@@ -93,6 +93,8 @@ textContainer.style.paddingTop = '3em';
 textContainer.style.position = 'relative';
 textContainer.style.flexGrow = '1';
 textContainer.style.boxSizing = 'border-box';
+// prevents :focus-visible outline
+textContainer.style.outline = 'none';
 textContainer.tabIndex = 0;
 
 // Without this, snap scroll breaks after scrolling down 🤷‍♂️

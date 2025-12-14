@@ -4,7 +4,7 @@ import {xmlns} from '@/pages/shared/math';
 
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getDiagrammedMath, getDialogue} from '../../shared';
+import {getText, getCode, getDiagrammedMath, getDialogue, getConnectedPunctuation, getInputDependent} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
 import {getPageButton, IDS} from '../../shared/page';
 import {getSnapTweens, getSnapOptions} from '../../shared/tween';
@@ -15,6 +15,7 @@ import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 import System, {getSnappedZoom} from './demo';
 import getZoomPoints from './zoomPoints';
 import pointsImage from './pointsImage';
+import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
 const code = [];
 
@@ -197,13 +198,9 @@ const functions = [
 	]},
 ];
 
-let getDirectVars;
-
 export default {
 	System,
 	start() {
-		getDirectVars = getVarGetter(DEGREES[90] - 0.4);
-		
 		registerFunctions(functions);
 		
 		for (const {start} of code) {
@@ -229,14 +226,45 @@ export default {
 			getPageButton(IDS.IMAGE), '\'s inadequacies stemmed from my approach to origin rails.',
 			'Tracing along image axes allowed for efficient code and passable snap-panning, but provided an unsatisfactory bounding experience.',
 			'The ideal system would always allow users to see what they want in the shortest pan possible, since that\'s their natural inclination.',
-			'For example, to see the rightmost image corner, travel directly ',
-			getButton('right', [
-				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
-				({zoomPoints}) => [{position: zoomPoints[3]}, {delay: 0.5}],
-				({zoomPoints}) => [{position: zoomPoints[2].end}, {duration: 0}],
-			], {getParam: () => getDirectVars()}),
-			'.',
-			'This is achieved by swapping image axis for viewport axis-based origin rails.',
+			(() => {
+				const ratioListeners = [];
+				let isWide;
+				
+				demo.hooks.resizeViewport.add(() => {
+					isWide = demo.ratioViewport > 1;
+					
+					for (const listener of ratioListeners) {
+						listener();
+					}
+				}, true);
+				
+				return {
+					tag: 'span',
+					content: [
+						'For example, to see the ',
+						{tag: 'span', callback: (element) => {
+							ratioListeners.push(() => element.innerText = isWide ? 'top' : 'right');
+						}},
+						'most image corner, travel directly ',
+						getConnectedPunctuation(getButton('right', [
+							({rotation, ratio, second}) => [{rotation, ratio, zoom: second.z, position: 0}],
+							({second}) => [{position: second}, {delay: 0.5}],
+							({first}) => [{position: first.end}, {duration: 0}],
+						], {
+							getParam: () => {
+								const data = getVarGetter(DEGREES[90] - 0.4, demo.ratioViewport)();
+								const [first, second] = data.zoomPoints.slice(isWide ? 0 : 2);
+								
+								return {...data, first, second};
+							},
+							callback: (element) => {
+								ratioListeners.push(() => element.innerText = isWide ? 'up' : 'right');
+							},
+						}), '.'),
+					],
+				};
+			})(),
+			' This is achieved by swapping image axis for viewport axis-based origin rails.',
 		],
 		[
 			'Again, whichever origin rail direction minimises lock rail length is preferred.',
@@ -489,10 +517,8 @@ export default {
 		[
 			'There\'s an issue with this approach;',
 			'for any image aspect ratio other than 1:1, there are windows of rotation values around ',
-			get45Button(45, 0.8),
-			', ',
-			get45Button(135, 0.8),
-			', ',
+			getConnectedPunctuation(get45Button(45, 0.8), ', '),
+			getConnectedPunctuation(get45Button(135, 0.8), ', '),
 			get45Button(225, 1.25),
 			' and ',
 			get45Button(315, 1.25),
@@ -527,11 +553,10 @@ export default {
 		],
 		[
 			'As image aspect ratio gets more extreme, inversion windows grow and the issues get increasingly ',
-			getButton('severe', [
+			getConnectedPunctuation(getButton('severe', [
 				[{position: 0.5, ratioImage: 2, zoom: 1, rotation: DEGREES[90]}],
 				[{rotation: 0}, {ease: 'none', duration: 5}],
-			], {getParam: () => getDirectVars()}),
-			'.',
+			]), '.'),
 		],
 		{
 			tag: 'h2',
@@ -571,7 +596,7 @@ export default {
 			'.',
 			'The only clue to their existence is some slight behavioural inconsistency around the rotation values at window limits.',
 		],
-		getDialogue('How are we getting good snap zooms from bad rails?'),
+		getDialogue('how aren\'t the bad rails causing issues?'),
 		[
 			'Well, using the maximum snap zoom possible means that the permissive, pre-inversion rail segments are skipped.',
 			'Within inversion windows, snap-panning to ',

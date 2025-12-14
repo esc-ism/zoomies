@@ -3,7 +3,7 @@ import {DEGREES} from '@/shared';
 import {isVertical} from '@/shared/orientation';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {getText, getCode, getInstruction, getInputDependent, getMath, getDiagrammedMath, getLink} from '../../shared';
+import {getText, getCode, getInstruction, getInputDependent, getMath, getDiagrammedMath, getLink, getConnectedPunctuation} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
 import {xmlns, opSpace, getOverlined} from '../../shared/math';
 import {getPageButton, IDS} from '../../shared/page';
@@ -210,12 +210,12 @@ export default {
 		],
 		[
 			'For a given corner, there are two possible start zooms —',
-			'one if the corner disappears off the ',
+			'one if the corner disappears off the viewport\'s ',
 			getButton('"side"', [
 				[{rotation: DEGREES[90], ratio: 0.5, zoom: 1, position: 0}],
 				[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
 			]),
-			' (left/right) of the viewport, and another if it disappears off its ',
+			' (left/right), and another if it disappears off its ',
 			getButton('"base"', [
 				[{rotation: DEGREES[90], ratio: 2, zoom: 1, position: 0}],
 				[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
@@ -959,11 +959,10 @@ export default {
 		[
 			'You\'ll find that this system works perfectly if the viewport and image are both squares.',
 			'Its flaws are only revealed when one is ',
-			getButton('stretched', [
+			getConnectedPunctuation(getButton('stretched', [
 				() => [{ratio: demo.ratioViewport, rotation: DEGREES[90], zoom: 1, position: 0}],
 				[{ratio: restrictiveTweens.ratio}],
-			]),
-			'.',
+			]), '.'),
 		],
 		[
 			'Consider ',
@@ -1743,7 +1742,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Single-line rails don\'t fulfill my needs.',
+			'Single-line rails aren\'t up to scratch.',
 			'The system\'s weak bounding isn\'t so important since ', getPageButton(IDS.CENTER), ' has that covered, but its snap-panning is also poor.',
 		],
 		[

@@ -13,11 +13,11 @@ const svg = getDiagram(radii, strokeDiameter, topLeft, topRight);
 
 svg.style.marginRight = '0.5em';
 
-const split = [radii.x * 0.132, radii.y * -0.32];
+const split = [radii.x * 0.232, radii.y * -0.32];
 
 const POINTS = [
-	[split, [radii.x * 0.21, radii.y * -0.5], topLeft],
-	getSplit(split, topRight, 0.2),
+	[split, [radii.x * 0.43, radii.y * -0.5], topRight],
+	getSplit(split, topLeft, 0.24),
 ];
 
 for (let i = 0; i < 2; ++i) {

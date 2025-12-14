@@ -28,7 +28,7 @@ export const getIntersectProgress = ({x, y}, [{x: d, y: e}, {x: f, y: g}], [{x: 
 	return (doFlip ? -b - Math.sqrt(b * b - 4 * a * c) : -b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
 };
 
-export const getZoomPairSecond = ([z, ...pair], position, doFlip, maxP = 1) => {
+export const getZoomPairSecond = ([z, ...pair], position, doFlip = false, maxP = 1) => {
 	if (maxP >= 0) {
 		const p = getIntersectProgress(position, ...pair, doFlip);
 		
