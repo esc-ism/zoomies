@@ -7,6 +7,7 @@ import {CLASS_FLASH_CONTAINER} from '../consts';
 import {getText, getInstruction, getDialogue, getInputDependent} from '../shared';
 import {clearButton} from '../shared/button';
 import flash from '../shared/flash';
+import {IDS} from '../shared/page';
 
 import getRestartButton from './restart';
 import System from './demo';
@@ -167,7 +168,7 @@ export default {
 		]),
 		{
 			tag: 'h1',
-			content: 'Introduction',
+			content: IDS.SPLASH,
 			style: {textAlign: 'center'},
 		},
 		'Hello! I\'m Callum.',

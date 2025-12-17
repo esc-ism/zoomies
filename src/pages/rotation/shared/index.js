@@ -104,6 +104,11 @@ export const getGenericIntersection = (line0, line1) => {
 	
 	const d = a0 * b1 - b0 * a1;
 	
+	// parallel, I think?
+	if (Math.abs(d) <= Number.EPSILON) {
+		return {...line1[0], parallel: true};
+	}
+	
 	return {
 		x: (c0 * b1 - b0 * c1) / d,
 		y: (a0 * c1 - c0 * a1) / d,

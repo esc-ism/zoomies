@@ -1,6 +1,6 @@
 import {gsap} from 'gsap';
 
-import {getTheta, DEGREES, getAngleDiff} from '@/shared';
+import {getTheta, DEGREES, getAngleDiff, SUB_PIXEL_BS} from '@/shared';
 import {isVertical, list as orientation} from '@/shared/orientation';
 
 import Readout from './readout';
@@ -436,6 +436,8 @@ export default new class {
 		this.readout.setRotation(this);
 		this.readout.setRatio(this);
 		
+		this.setOutline();
+		
 		for (const [key, listener] of Object.entries(this.listeners)) {
 			this.hooks[key] = new ActionHook();
 			
@@ -667,8 +669,14 @@ export default new class {
 		this.readout.setPosition(this);
 	}
 	
+	setOutline() {
+		this.elements.image.style.outline = `round(up, ${1 / this.zoom}px, ${SUB_PIXEL_BS}px) solid currentcolor`;
+	}
+	
 	applyZoom() {
 		this.elements.imageContainer.style.scale = `${this.zoom}`;
+		
+		this.setOutline();
 		
 		this.readout.setZoom(this);
 	}

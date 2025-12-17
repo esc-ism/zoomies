@@ -122,7 +122,7 @@ export default {
 	text: getText(
 		{
 			tag: 'h1',
-			content: 'Viewport Edge+',
+			content: IDS.EDGER,
 			style: {textAlign: 'center'},
 		},
 		[
@@ -183,7 +183,7 @@ export default {
 			{tag: 'i', content: 'getRailsProgressed'},
 			' to find the minimum and maximum zooms for which bounds are 1-dimensional.',
 			'Note that angles are measured in ', getLink('radians', 'https://en.wikipedia.org/wiki/Radian'), '.',
-			'The "rotation" variable holds the angle between the image\'s positive y-axis and an un-rotated positive x-axis, which is ',
+			'The ', {tag: 'i', content: 'rotation'}, ' variable holds the angle between the image\'s positive y-axis and an un-rotated positive x-axis, which is ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 				{tag: 'mn', xmlns, content: '½'},
 				{tag: 'mi', xmlns, content: 'π'},
@@ -192,7 +192,10 @@ export default {
 		],
 		getInstruction([
 			'This code snippet includes custom functions. ',
-			getInputDependent((isMouse) => `${isMouse ? 'Click' : 'Tap'} a function's name (e.g. "getRails") to unfold it, and ${isMouse ? 'click' : 'tap'} the "function" text to re-fold.`),
+			getInputDependent((isMouse) => isMouse ? 'Click' : 'Tap'),
+			' a function\'s name (e.g. ', {tag: 'i', content: 'getRails'}, ') to unfold it, and ',
+			getInputDependent((isMouse) => isMouse ? 'click' : 'tap'),
+			' the ', {tag: 'i', content: 'function'}, ' text to re-fold.',
 		]),
 		getCode(code, [
 			{op: '=', id: ['z0', 'x0', 'y0', 'z1', 'x1', 'y1'], and: {op: 'call', id: 'getRails'}},

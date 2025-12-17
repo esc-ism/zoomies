@@ -50,7 +50,7 @@ for (const notch of notchContainer.children) {
 	notch.style.borderColor = 'transparent';
 	notch.style.borderStyle = 'solid';
 	notch.style.borderWidth = '0.5em';
-	notch.style.borderLeftColor = 'white';
+	notch.style.borderLeftColor = 'currentcolor';
 }
 
 notchContainer.children[0].style.borderTop = notchContainer.children[2].style.borderBottom = 'none';

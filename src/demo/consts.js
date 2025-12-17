@@ -6,6 +6,7 @@ const getId = getIdGetter('demo');
 export const ID_WRAPPER = getId('wrapper');
 
 export const ID_WRAPPER_IMAGE = getId('wrapper', 'image');
+export const ID_CONTAINER_IMAGE = getId('container', 'image');
 
 export const ID_IMAGE = getId('image');
 
@@ -23,7 +24,7 @@ inputListener.add(() => {
 export const MULTIPLIERS_SCROLL = [1, 40, 800];
 
 // gives rounding error leeway for zoom=1 angle=0 states to ensure 0D bounds
-export const PADDING_VIEWPORT = 1;
+export const PADDING_VIEWPORT = 2;
 
 export const DURATION_CAP_GETTERS = {
 	rotation: (to, from) => Math.abs(to - from) / 0.1,

@@ -219,7 +219,7 @@ export default {
 	text: getText(
 		{
 			tag: 'h1',
-			content: 'Doubled Down',
+			content: IDS.DOUBLE,
 			style: {textAlign: 'center'},
 		},
 		[

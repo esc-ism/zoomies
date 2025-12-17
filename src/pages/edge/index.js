@@ -43,7 +43,7 @@ export default {
 	text: getText(
 		{
 			tag: 'h1',
-			content: 'Viewport Edge',
+			content: IDS.EDGE,
 			style: {textAlign: 'center'},
 		},
 		[
@@ -220,7 +220,7 @@ export default {
 			' the viewport\'s height would be used to calculate ', {tag: 'i', content: 'boundX'},
 			' and its width would be used for ', {tag: 'i', content: 'boundY'}, '.',
 			'That\'s the opposite of what we\'re doing here.',
-			'If width and height are equal, however, they\'re interchangeable.',
+			'If width and height are equal, however, both systems yield the same results.',
 			'So, if this system has a square-shaped viewport, it handles 90° rotations perfectly!',
 		],
 		{

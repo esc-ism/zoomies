@@ -5,20 +5,16 @@ import {IDS, POSTFIXES, FORMATTERS, ID} from './consts';
 import './css';
 
 export default class {
-	container = document.createElement('div');
 	element = document.createElement('table');
 	#valueElements = {};
 	
 	constructor() {
 		this.element.id = ID;
 		
-		this.container.style.position = 'absolute';
-		this.container.style.top = this.container.style.left = '0';
-		this.container.style.userSelect = 'none';
-		this.container.style.pointerEvents = 'none';
-		this.container.style.maxWidth = '100%';
-		this.container.style.overflow = 'hidden';
-		
+		this.element.style.position = 'absolute';
+		this.element.style.top = this.element.style.left = '0';
+		this.element.style.userSelect = 'none';
+		this.element.style.pointerEvents = 'none';
 		this.element.style.textWrapMode = 'nowrap';
 		this.element.style.borderCollapse = 'collapse';
 		this.element.style.font = 'bold 16px "courier new", monospace';
@@ -41,13 +37,18 @@ export default class {
 		}
 		
 		this.element.appendChild(body);
-		this.container.appendChild(this.element);
 		
-		elements.viewport.insertAdjacentElement('afterend', this.container);
+		elements.viewport.appendChild(this.element);
 	}
 	
 	#set(label, value) {
-		this.#valueElements[label].innerText = `${FORMATTERS[label](value)}${POSTFIXES[label] ?? ''}`;
+		const children = FORMATTERS[label](value);
+		
+		if (POSTFIXES[label]) {
+			children.push(document.createTextNode(POSTFIXES[label]));
+		}
+		
+		this.#valueElements[label].replaceChildren(...children);
 	}
 	
 	setPosition({position: {x, y}}) {

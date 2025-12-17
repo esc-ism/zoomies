@@ -170,7 +170,7 @@ export default {
 	text: getText(
 		{
 			tag: 'h1',
-			content: 'Single-Line',
+			content: IDS.SINGLE,
 			style: {textAlign: 'center'},
 		},
 		[

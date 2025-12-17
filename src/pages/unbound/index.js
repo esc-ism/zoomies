@@ -2,6 +2,7 @@ import {CLASS_MATH_LOOSE} from '../consts';
 import {getText, getInstruction, getInputDependent, getMath, getDialogue, getConnectedPunctuation} from '../shared';
 import {getButton} from '../shared/button';
 import {xmlns} from '../shared/math';
+import {IDS} from '../shared/page';
 
 import System from './demo';
 
@@ -11,7 +12,7 @@ export default {
 		{
 			tag: 'h1',
 			style: {textAlign: 'center'},
-			content: 'Unbound',
+			content: IDS.UNBOUND,
 		},
 		[
 			'Panning is limited through the enforcement of "bounds".',

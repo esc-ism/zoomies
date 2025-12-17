@@ -1,8 +1,8 @@
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
 import {
-	ID_WRAPPER, ID_WRAPPER_IMAGE, ID_IMAGE, ID_CROSSHAIR,
-	ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL, PADDING_VIEWPORT,
+	ID_WRAPPER, ID_WRAPPER_IMAGE, ID_CONTAINER_IMAGE, ID_IMAGE,
+	ID_CROSSHAIR, ID_RESIZER_HORIZONTAL, ID_RESIZER_VERTICAL,
 } from '../consts';
 
 import crosshairImage from './crosshair';
@@ -54,20 +54,23 @@ elements.viewport = generate({
 });
 
 elements.imageWrapper = generate({
+	id: ID_WRAPPER_IMAGE,
 	parent: elements.viewport,
 	style: {
-		padding: `${PADDING_VIEWPORT}px`,
 		boxSizing: 'border-box',
 		height: '100%',
 		width: '100%',
 		display: 'flex',
 		flexWrap: 'wrap',
 		placeContent: 'center center',
+		border: '1px solid transparent',
+		borderRightColor: 'currentcolor',
+		position: 'relative',
 	},
 });
 
 elements.imageContainer = generate({
-	id: ID_WRAPPER_IMAGE,
+	id: ID_CONTAINER_IMAGE,
 	parent: elements.imageWrapper,
 	style: {
 		aspectRatio: '1',
@@ -79,6 +82,8 @@ elements.image = generate({
 	parent: elements.imageContainer,
 	id: ID_IMAGE,
 	style: {
+		position: 'absolute',
+		boxSizing: 'border-box',
 		height: '100%',
 		width: '100%',
 		display: 'flex',
@@ -97,7 +102,6 @@ elements.resizerHorizontal = generate({
 		height: '100%',
 		width: '1lh',
 		'border-right': '1px solid currentcolor',
-		'border-left': '1px solid currentcolor',
 		cursor: 'col-resize',
 	},
 });
@@ -110,7 +114,6 @@ elements.resizerVertical = generate({
 		bottom: 0,
 		width: '100%',
 		height: '1lh',
-		'border-top': '1px solid currentcolor',
 		'border-bottom': '1px solid currentcolor',
 		cursor: 'row-resize',
 	},
@@ -123,29 +126,50 @@ elements.resizerVertical = generate({
 	childContainer.style.position = 'relative';
 	childContainer.style.pointerEvents = 'none';
 	
-	childContainer.append(...[
-		{
-			backgroundImage: 'radial-gradient(at -100% center, rgb(0 200 160), transparent), radial-gradient(at center 300%, rgb(255 0 0), transparent), radial-gradient(at 130% center, rgb(160 200 0), transparent), radial-gradient(at center -200%, rgb(0 0 255), transparent)',
-			backgroundBlendMode: 'overlay',
-			outline: '2px solid currentcolor',
-		},
-		{
-			backgroundImage: 'radial-gradient(circle, black, black 1.5px, transparent 0)',
-			backgroundSize: '18px 18px',
-			backgroundRepeat: 'round',
-		},
-	].map((styles) => {
-		const element = document.createElement('div');
-		
-		element.style.position = 'absolute';
-		element.style.width = element.style.height = '100%';
-		
-		for (const [property, value] of Object.entries(styles)) {
-			element.style[property] = value;
-		}
-		
-		return element;
-	}));
+	const dotSize = '18px';
+	
+	childContainer.append(
+		...[
+			{
+				backgroundImage: 'linear-gradient(to right, #666, #666), radial-gradient(at -100% center, rgb(0 200 160), transparent), radial-gradient(at center 300%, rgb(255 0 0), transparent), radial-gradient(at 130% center, rgb(160 200 0), transparent), radial-gradient(at center -200%, rgb(0 0 255), transparent)',
+				backgroundBlendMode: 'overlay',
+				boxSizing: 'border-box',
+			},
+			{
+				backgroundImage: 'radial-gradient(circle, black, black 1.5px, transparent 0)',
+				backgroundSize: `${dotSize} ${dotSize}`,
+				backgroundRepeat: 'round',
+			},
+		].map((styles) => {
+			const element = document.createElement('div');
+			
+			element.style.position = 'absolute';
+			element.style.width = element.style.height = '100%';
+			
+			for (const [property, value] of Object.entries(styles)) {
+				element.style[property] = value;
+			}
+			
+			return element;
+		}),
+		...[
+			['width', 'height', 'right'],
+			['width', 'height', 'left'],
+			['height', 'width', 'top'],
+			['height', 'width', 'bottom'],
+		].map(([small, large, edge]) => {
+			const element = document.createElement('div');
+			
+			element.style.position = 'absolute';
+			element.style.backgroundColor = '#ffffff50';
+			element.style[small] = `min(50%, ${dotSize})`;
+			element.style[large] = '100%';
+			element.style[edge] = '0';
+			
+			return element;
+		}),
+	);
+	
 	elements.image.appendChild(childContainer);
 })();
 

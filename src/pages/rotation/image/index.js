@@ -273,7 +273,7 @@ export default {
 	text: getText(
 		{
 			tag: 'h1',
-			content: 'Double-Line',
+			content: IDS.IMAGE,
 			style: {textAlign: 'center'},
 		},
 		[

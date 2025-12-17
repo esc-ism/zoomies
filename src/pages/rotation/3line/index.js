@@ -58,6 +58,11 @@ const functions = [
 			],
 		}},
 		'',
+		{op: 'if', and: [
+			{op: '<=', and: [{op: 'abs', and: 'd'}, Number.EPSILON]},
+			{op: 'return', and: {op: 'array', and: ['to1X', 'to1Y', true]}},
+		]},
+		'',
 		{op: 'return', and: {op: 'array', and: [
 			{op: '/', and: [
 				{op: '-', and: [
@@ -73,6 +78,7 @@ const functions = [
 				]},
 				'd',
 			]},
+			false,
 		]}},
 	]},
 	{op: 'func', id: 'getIntersection', args: [
@@ -186,15 +192,22 @@ const functions = [
 			'axisIntersectBaseZoom', {op: '-', and: 'axisIntersectBaseX'}, 0,
 		]}},
 	]},
-	{op: 'func', id: 'getDoFlip', args: [
-	], and: [
+	{op: 'func', id: 'getDoFlip', and: [
 		{op: '=', id: 'isXAxis', and: {
 			op: '>', and: [{op: 'abs', and: 'firstEndX'}, {op: 'abs', and: 'firstEndY'}],
 		}},
 		'',
-		{op: '=', id: ['farX', 'farY'], and: {
+		{op: '=', id: ['farX', 'farY', 'isParallel'], and: {
 			op: 'call', id: 'getGenericIntersection', and: [0, 0, 'firstEndX', 'firstEndY', 'thirdX', 'thirdY', 'thirdEndX', 0.5],
 		}},
+		'',
+		{op: 'if', and: [
+			'isParallel',
+			{op: 'return', and: {op: '||', and: [
+				{op: '<', and: ['thirdX', 0]},
+				{op: '<', and: ['thirdY', 0]},
+			]}},
+		]},
 		'',
 		{op: '=', id: 'mThird', and: {
 			op: '/', and: [
@@ -390,6 +403,19 @@ const functions = [
 		{op: '=', id: ['cornerXSide', 'cornerXBase'], type: ['x', 'x'], and: {
 			op: '?', and: ['isEvenQuadrant', {op: 'array', and: [-0.5, 0.5]}, {op: 'array', and: [0.5, -0.5]}],
 		}},
+		'',
+		{op: 'if', and: [
+			{op: '&&', and: [
+				{op: '<', and: [{op: 'abs', and: 'axisIntersectXSide'}, 'ε']},
+				{op: '<', and: [{op: 'abs', and: 'axisIntersectYSide'}, 'ε']},
+				{op: '<', and: [{op: 'abs', and: 'axisIntersectXBase'}, 'ε']},
+				{op: '<', and: [{op: 'abs', and: 'axisIntersectYBase'}, 'ε']},
+			]},
+			{op: 'return', and: {op: 'array', and: [
+				'axisIntersectZoomSide', 0, 0, 'axisIntersectZoomBase', 0, 0,
+				'∞', 0, 0, 0, 0,
+			]}},
+		]},
 		'',
 		{op: '=', id: [
 			'firstZoom', 'secondZoom',
@@ -812,7 +838,7 @@ export default {
 	text: getText(
 		{
 			tag: 'h1',
-			content: 'Tripled Down',
+			content: IDS.TRIPLE,
 			style: {textAlign: 'center'},
 		},
 		'Single-line rails don\'t work too well, double-line has issues... is third line the charm?',

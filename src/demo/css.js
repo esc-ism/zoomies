@@ -20,6 +20,5 @@ addRule(`#${ID_WRAPPER_IMAGE} > *`, {position: 'absolute'});
 addRule([`#${ID_RESIZER_HORIZONTAL}`, `#${ID_RESIZER_VERTICAL}`], {
 	'box-sizing': 'border-box',
 	position: 'absolute',
-	'background-color': 'var(--background)',
 	'touch-action': 'none',
 });

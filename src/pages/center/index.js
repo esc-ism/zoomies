@@ -7,6 +7,7 @@ import {getText, getMath, getConnectedPunctuation} from '../shared';
 import {xmlns} from '../shared/math';
 import {getButton, clearButton} from '../shared/button';
 import {getSnapOptions} from '../shared/tween';
+import {IDS} from '../shared/page';
 
 import System from './demo';
 
@@ -24,7 +25,7 @@ export default {
 	text: getText(
 		{
 			tag: 'h1',
-			content: 'Viewport Center',
+			content: IDS.CENTER,
 			style: {textAlign: 'center'},
 		},
 		[

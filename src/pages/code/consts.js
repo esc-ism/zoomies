@@ -26,6 +26,9 @@ export const BUILT_INS = {
 	
 	rotation: ({rotation: value}) => ({value, type: 'angle', fight: true}),
 	zoom: ({zoom: value}) => ({value, type: 'zoom'}),
+	
+	'∞': () => ({value: Infinity}),
+	ε: () => ({value: Number.EPSILON}),
 };
 
 const getId = getIdGetter('codegen');

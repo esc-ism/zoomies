@@ -13,12 +13,12 @@ const getP = ({end, ...first}, point) => {
 	return (end[axis] - first[axis]) / (point[axis] - first[axis]);
 };
 
-const getIntersection = (lineFirst, lineSecond, z) => {
+const getIntersection = (lineFirst, lineSecond) => {
 	const point = getGenericIntersection(lineFirst, lineSecond);
 	const progress = (point.y - lineSecond[0].y) / (lineSecond[1].y - lineSecond[0].y);
 	
 	point.p = getP(lineFirst[0], point);
-	point.z = z ?? (lineSecond[0].z / (1 - progress));
+	point.z = lineSecond[0].z / (1 - progress);
 	point.end = lineSecond[1];
 	
 	return point;
@@ -27,12 +27,18 @@ const getIntersection = (lineFirst, lineSecond, z) => {
 const getDoFlip = (firstEnd, second, third) => {
 	const {axis} = firstEnd;
 	
-	const {[axis]: position} = getGenericIntersection([{x: 0, y: 0}, firstEnd], third);
+	const {[axis]: position, parallel = false} = getGenericIntersection([{x: 0, y: 0}, firstEnd], third);
+	
+	if (parallel) {
+		const {x, y} = third[0];
+		
+		return x < 0 || y < 0;
+	}
 	
 	const mThird = getM(...third);
 	const mFirst = firstEnd.y / firstEnd.x;
 	
-	return ((mFirst > 0) === (mThird < mFirst)) === ((second[axis] > 0) === (position < second[axis]));
+	return ((mFirst >= 0) === (mThird < mFirst)) === ((second[axis] > 0) === (position < second[axis]));
 };
 
 const getSecond = (first, z, offset) => {
@@ -82,13 +88,15 @@ const getShared = ({startZooms: [zoomSide, zoomBase], ...data}) => {
 			];
 };
 
-const makeFirstInt = (first, {z}, third, yIntersect) => {
+const makeFirstInt = (first, {z}, yIntersect, third = {end: yIntersect[1]}) => {
 	Object.assign(third, getGenericIntersection([first, first.end], yIntersect));
 	
 	third.p = getP(first, third);
 	// avoid calculating since rounding errors can make x≈y≈0 snap zooms impossible
 	third.z = z;
 	third.isFirstInt = true;
+	
+	return third;
 };
 
 const connect = (first, second, third, firstFlipped, secondFlipped, yIntersect) => {
@@ -105,10 +113,20 @@ const connect = (first, second, third, firstFlipped, secondFlipped, yIntersect) 
 		return;
 	}
 	
-	makeFirstInt(first, second, third, yIntersect);
+	makeFirstInt(first, second, yIntersect, third);
 };
 
 const getAll = (data) => {
+	if (
+		Math.abs(data.yIntersectSide.x) < Number.EPSILON && Math.abs(data.yIntersectSide.y) < Number.EPSILON &&
+		Math.abs(data.yIntersectBase.x) < Number.EPSILON && Math.abs(data.yIntersectBase.y) < Number.EPSILON
+	) {
+		const side = {...data.yIntersectSide, isFirstInt: true, end: data.cornerSide};
+		const base = {...data.yIntersectBase, isFirstInt: true, end: data.cornerBase};
+		
+		return [side, {}, side, base, {}, base];
+	}
+	
 	const [
 		firstSide, secondSide, firstBase, secondBase,
 		firstSideFlipped, secondSideFlipped, firstBaseFlipped, secondBaseFlipped,
@@ -119,29 +137,10 @@ const getAll = (data) => {
 	
 	// deal with rounding errors
 	if (thirdSide.z <= secondSide.z && thirdBase.z <= secondBase.z) {
-		// true if 90n multiple, false if 90n+45 multiple
-		if (Math.abs(data.quadrantAngle - DEGREES[45]) > DEGREES['45_2']) {
-			// don't know why this happens 🤷‍♂️
-			if ((firstSide.end[firstSide.end.axis] < 0) !== (data.cornerSide[firstSide.end.axis] < 0)) {
-				Object.assign(firstSide, firstSideFlipped);
-			}
-			
-			if ((firstBase.end[firstBase.end.axis] < 0) !== (data.cornerBase[firstBase.end.axis] < 0)) {
-				Object.assign(firstBase, firstBaseFlipped);
-			}
-			
-			makeFirstInt(firstSide, secondSide, thirdSide, [data.yIntersectSide, data.cornerSide]);
-			makeFirstInt(firstBase, secondBase, thirdBase, [data.yIntersectBase, data.cornerBase]);
-		} else {
-			Object.assign(firstSide, firstSideFlipped);
-			Object.assign(firstBase, firstBaseFlipped);
-			
-			Object.assign(secondSide, secondSideFlipped);
-			Object.assign(secondBase, secondBaseFlipped);
-			
-			Object.assign(thirdSide, getIntersection([secondSideFlipped, secondSideFlipped.end], [data.yIntersectSide, data.cornerSide]));
-			Object.assign(thirdBase, getIntersection([secondBaseFlipped, secondBaseFlipped.end], [data.yIntersectBase, data.cornerBase]));
-		}
+		const thirdSide = makeFirstInt(firstSide, secondSide, [data.yIntersectSide, data.cornerSide]);
+		const thirdBase = makeFirstInt(firstBase, secondBase, [data.yIntersectBase, data.cornerBase]);
+		
+		return [firstSide, {}, thirdSide, firstBase, {}, thirdBase];
 	} else if (thirdBase.z <= thirdSide.z) {
 		connect(firstBase, secondBase, thirdBase, firstBaseFlipped, secondBaseFlipped, [data.yIntersectBase, data.cornerBase]);
 	} else {
