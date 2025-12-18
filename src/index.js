@@ -320,8 +320,8 @@ demo.setSystem(currentPage).then(async () => {
 		
 		new ResizeObserver(() => {
 			scrollLeft = textContainer.scrollLeft;
-			width = textContainer.getBoundingClientRect().width;
-		}).observe(textContainer);
+			width = header.getBoundingClientRect().width;
+		}).observe(header);
 		
 		textContainer.addEventListener('scroll', () => {
 			if (textContainer.scrollLeft === scrollLeft) {
