@@ -315,7 +315,7 @@ export default {
 		[
 			'This system places each lock point on a different viewport edge.',
 			'A point\'s distance along its edge is based on rotation angle.',
-			'For example, it lies on the expected viewport corners at ',
+			'Specifically, it lies on the expected viewport corners at ',
 			getButton('0°', getCornerProgressTweens(DEGREES[90])),
 			' and ',
 			getConnectedPunctuation(getButton('90°', getCornerProgressTweens(0)), ','),
@@ -1171,7 +1171,7 @@ export default {
 			tag: 'div', style: {textAlign: 'center', fontSize: '1.8em'}, content: '🥳',
 		},
 		[
-			'By combining systems, we\'ve finally conquered rotation.',
+			'By combining systems, we\'ve finally conquered rotation!',
 			'This is a win, but perhaps more second act climax than final, supreme victory.',
 		],
 		[

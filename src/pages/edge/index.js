@@ -1,4 +1,3 @@
-import {CLASS_SEMANTIC_BUTTON} from '@/consts';
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
@@ -8,7 +7,6 @@ import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
 import {getText, getCode, getInstruction, getMath, getInputDependent, getLink, getDialogue, getConnectedPunctuation} from '../shared';
 import {getButton, clearButton} from '../shared/button';
-import {CLASS_BUTTON} from '../shared/button/consts';
 import {getSnapOptions} from '../shared/tween';
 import {getPageButton, IDS} from '../shared/page';
 import {getSnapPosition} from '../center';
@@ -391,7 +389,7 @@ export default {
 			' to a side.',
 		],
 		[
-			'As mentioned, 90° rotations cause issues for non-square viewports, which manifest as bad snap-zooms.',
+			'As mentioned, 90° rotations cause issues for non-square viewports, which manifest as bad snap zooms.',
 			{tag: 'i', content: 'With'}, ' square viewports, however, rotation doesn\'t really cause any issues!',
 			'It\'s true that, when rotation isn\'t a multiple of 90°, snap zooms will always be ',
 			getButton('too high', getSnapOptions(), {getParam: () => ({
@@ -410,7 +408,7 @@ export default {
 		},
 		[
 			'That\'s all for our first zoomful system!',
-			'Hopefully you can see its advantages for snap-panning, even if you think its bounding is worse.',
+			'Hopefully you can see its advantages for snap-panning, even if you find its bounding worse.',
 		],
 		[
 			'This system, made to handle un-rotated images, fulfills its role perfectly.',
@@ -419,8 +417,7 @@ export default {
 		],
 		[
 			'All upcoming systems will be based on this one, each trying to generalise its behaviour.',
-			'But what to try first..?',
-			'Before we start exerting too much effort, let\'s see if the lazy option works.',
+			'Before we start toiling away at grand designs, let\'s see if the lazy option works!',
 		],
 	),
 };

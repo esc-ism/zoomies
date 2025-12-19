@@ -126,7 +126,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'First, let\'s see if we can modify ', getPageButton(IDS.EDGE), ' to make its snap-panning work for any rotation.',
+			'Let\'s see if we can modify ', getPageButton(IDS.EDGE), ' to make its snap-panning work for any rotation.',
 			'Its bounding won\'t be useful, but we can ignore that for now.',
 		],
 		[
@@ -144,7 +144,7 @@ export default {
 			'Now that rotation is a factor in calculations, it\'s useful to split the process of finding bounds into two steps:',
 			{tag: 'ol', content: [
 				{tag: 'li', content: 'When rotation or aspect ratios change, calculate rail data (endpoints and start zooms).'},
-				{tag: 'li', content: 'When the first step runs or zoom is changed, use rail data to set bounds.'},
+				{tag: 'li', content: 'When either the first step runs or zoom is changed, use rail data to set bounds.'},
 			]},
 			'By precalculating rail data for zooms and snap-pans, those operations can be handled more efficiently.',
 		],
