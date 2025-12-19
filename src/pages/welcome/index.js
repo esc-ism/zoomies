@@ -175,7 +175,7 @@ export default {
 		[
 			'I\'m a programmer who, for a few years now, has been occasionally engrossed in panning problems',
 			'(think photo editor, not gold rush).',
-			'Specifically, I\'ve been exploring how best to limit where users should be allowed to pan, and how best to facilitate "snap-panning".',
+			'Specifically, I\'ve been exploring how best to limit where users should be allowed to pan, and how best to implement "snap-panning".',
 		],
 		[
 			'My scope is restricted to standard, rectangular shapes, keeping all four corners viewable at all times and handling the following variables:',
@@ -312,9 +312,7 @@ export default {
 			},
 		},
 		[
-			'Each page on this site will provide a playground for your panning ple',
-			{tag: 'span', style: {'font-size': '0.63em', position: 'relative', top: '0.06em'}, content: '♡'},
-			'sure.',
+			'Each page on this site will include a playground for you to interact with.',
 			'This one just provides a fun visual (panning in a circle around the image\'s center looks pretty neat), but all future pages will showcase a unique approach to pan-limiting.',
 		],
 		(() => {

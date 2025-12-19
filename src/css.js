@@ -15,6 +15,12 @@ addRule(':root', {
 	'scrollbar-color': 'var(--color) transparent',
 });
 
+addRule('body', {
+	// otherwise bottom pixel isn't shown for me on chrome 🤷‍♂️
+	height: `round(down, 100dvh, ${window.devicePixelRatio}px)`,
+	width: `round(down, 100dvw, ${window.devicePixelRatio}px)`,
+});
+
 addRule('a', {color: '#badfdf'});
 
 addRule(`.${CLASS_SEMANTIC_BUTTON}`, {

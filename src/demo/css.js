@@ -15,7 +15,10 @@ addVerticalRule(`#${ID_WRAPPER}`, {
 	'padding-bottom': '1lh',
 });
 
-addRule(`#${ID_WRAPPER_IMAGE} > *`, {position: 'absolute'});
+addRule(`#${ID_WRAPPER_IMAGE}`, {border: '1px solid transparent'});
+
+addHorizontalRule(`#${ID_WRAPPER_IMAGE}`, {'border-right-color': 'currentcolor'});
+addVerticalRule(`#${ID_WRAPPER_IMAGE}`, {'border-bottom-color': 'currentcolor'});
 
 addRule([`#${ID_RESIZER_HORIZONTAL}`, `#${ID_RESIZER_VERTICAL}`], {
 	'box-sizing': 'border-box',

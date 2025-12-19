@@ -63,8 +63,6 @@ elements.imageWrapper = generate({
 		display: 'flex',
 		flexWrap: 'wrap',
 		placeContent: 'center center',
-		border: '1px solid transparent',
-		borderRightColor: 'currentcolor',
 		position: 'relative',
 	},
 });
@@ -72,10 +70,7 @@ elements.imageWrapper = generate({
 elements.imageContainer = generate({
 	id: ID_CONTAINER_IMAGE,
 	parent: elements.imageWrapper,
-	style: {
-		aspectRatio: '1',
-		position: 'relative',
-	},
+	style: {position: 'relative'},
 });
 
 elements.image = generate({

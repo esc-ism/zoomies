@@ -217,7 +217,6 @@ export default new class {
 	
 	#init = dock(this.element)
 		.then(() => new Promise((resolve) => {
-			// todo can this be a 0 delay settimeout?
 			const resizeObserver = new ResizeObserver(() => {
 				if (!this.isRemoved) {
 					this.elements.viewport.style.aspectRatio = `${this.ratioViewport}`;
@@ -904,7 +903,6 @@ export default new class {
 			for (const [type, value] of Object.entries(target)) {
 				switch (type) {
 					case 'position':
-						// todo instanceof Object?
 						if (typeof value === 'object') {
 							record('x', value.x);
 							record('y', value.y);

@@ -204,7 +204,6 @@ export default {
 			'Still, if you want zoom-dependent bounds for whatever reason, this system\'s perfect.',
 			'Though, of course, it ',
 			getButton('fails', [
-				// todo always use this ease for resets
 				[{zoom: 1, position: 0, rotation: DEGREES[90], ratio: 1}, TWEEN_OPTIONS_SETUP],
 				(position) => [position],
 				[{zoom: 2}, {position: '<30%'}],

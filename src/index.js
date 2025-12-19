@@ -323,7 +323,7 @@ demo.setSystem(currentPage).then(async () => {
 			width = header.getBoundingClientRect().width;
 		}).observe(header);
 		
-		textContainer.addEventListener('scroll', () => {
+		textContainer.addEventListener('onscrollend' in textContainer ? 'scrollend' : 'scroll', () => {
 			if (textContainer.scrollLeft === scrollLeft) {
 				return;
 			}
