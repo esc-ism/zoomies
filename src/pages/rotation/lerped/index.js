@@ -79,7 +79,7 @@ const functions = [
 			]},
 		]}},
 	]},
-	{op: 'func', id: 'getBound', args: ['z0', 'x0', 'y0', 'z1', 'x1', 'y1'], type: ['x', 'y'], pair: [1, 0], and: [
+	{op: 'func', id: 'getBound', type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '>', and: ['zoom', 'z1']},
 			{op: '=', id: 'progress', and: {op: '/', and: ['zoom', 'z1']}},
@@ -201,7 +201,7 @@ export default {
 			{op: '=', id: ['z0', 'x0', 'y0', 'z1', 'x1', 'y1'], and: {op: 'call', id: 'getRails'}},
 			'',
 			{op: '=', id: ['boundX', 'boundY'], and: {
-				op: 'call', id: 'getBound', and: ['z0', 'x0', 'y0', 'z1', 'x1', 'y1'],
+				op: 'call', id: 'getBound',
 			}},
 		]),
 		{
@@ -269,7 +269,7 @@ export default {
 		[
 			'Consider ',
 			getButton('this', [
-				() => [{ratio: demo.ratioViewport, rotation: DEGREES[45], zoom: 1, position: 0}],
+				() => [{ratio: demo.ratioViewport, rotation: DEGREES[45], zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
 			]),
 			' state.',
 			'As the viewport gets less square, you\'ll find that one pair of corners becomes visible.',

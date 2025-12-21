@@ -32,8 +32,6 @@ export default class {
 		};
 		
 		demo.hooks.ratio.add(setCornerData);
-		
-		setCornerData();
 	}
 	
 	setBounds(bounds) {

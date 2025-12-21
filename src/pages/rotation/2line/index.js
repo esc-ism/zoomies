@@ -2,7 +2,7 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getDiagrammedMath, getDialogue, getConnectedPunctuation, getInputDependent} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
@@ -15,7 +15,6 @@ import {DOUBLE_LINE as SHARED_FUNCTIONS} from '../code';
 import System, {getSnappedZoom} from './demo';
 import getZoomPoints from './zoomPoints';
 import pointsImage from './pointsImage';
-import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
 const code = [];
 
@@ -27,7 +26,7 @@ const boundGetSnapTweens = (getRatio) => getSnapTweens(() => getVarGetter(Math.f
 
 const get45Button = (rotation, ratioImage) => getButton(
 	`${rotation}°`,
-	[({zoomPoints}) => [{zoom: Math.max(zoomPoints[0].z, zoomPoints[3].z), position: 0, rotation: DEGREES[rotation], ratioImage}]],
+	[({zoomPoints}) => [{zoom: Math.max(zoomPoints[0].z, zoomPoints[3].z), position: 0, rotation: DEGREES[rotation], ratioImage}, TWEEN_OPTIONS_SETUP]],
 	{getParam: () => getVarGetter(DEGREES[rotation], demo.ratioViewport / ratioImage)()},
 );
 
@@ -227,7 +226,16 @@ export default {
 			'Tracing along image axes allowed for efficient code and passable snap-panning, but provided an unsatisfactory bounding experience.',
 			'The ideal system would always allow users to see what they want in the shortest pan possible, since that\'s their natural inclination.',
 			(() => {
-				const ratioListeners = [];
+				const ratioListeners = new class extends Array {
+					push(...callbacks) {
+						for (const callback of callbacks) {
+							callback();
+						}
+						
+						super.push(...callbacks);
+					}
+				}();
+				
 				let isWide;
 				
 				demo.hooks.resizeViewport.add(() => {
@@ -246,8 +254,8 @@ export default {
 							ratioListeners.push(() => element.innerText = isWide ? 'top' : 'right');
 						}},
 						'most image corner, travel directly ',
-						getConnectedPunctuation(getButton('right', [
-							({rotation, ratio, second}) => [{rotation, ratio, zoom: second.z, position: 0}],
+						getConnectedPunctuation(getButton('', [
+							({rotation, ratio, second}) => [{rotation, ratio, zoom: second.z, position: 0}, TWEEN_OPTIONS_SETUP],
 							({second}) => [{position: second}, {delay: 0.5}],
 							({first}) => [{position: first.end}, {duration: 0}],
 						], {
@@ -525,7 +533,7 @@ export default {
 			' where neither lock rail has a good intersection with its preferred viewport axis.',
 			'The result is crossed rails, with bounds that seem to ',
 			getButton('invert', [
-				({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom: zoom / 1.1}],
+				({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom: zoom / 1.1}, TWEEN_OPTIONS_SETUP],
 				({zoom}) => [{zoom: zoom * 1.1}, TWEEN_OPTIONS_YOYO],
 			], {getParam: () => {
 				const rotation = getNearest45();
@@ -540,7 +548,7 @@ export default {
 			'Bounds jump around when rotating into and out of these "inversion windows".',
 			'Within them, at pre-inversion zooms, the system provides overly ',
 			getButton('permissive', [
-				({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom}],
+				({ratioImage, rotation, zoom}) => [{ratioImage, rotation, position: 0, zoom}, TWEEN_OPTIONS_SETUP],
 				({position}) => [{position}],
 			], {getParam: () => {
 				const rotation = getNearest45();
@@ -554,7 +562,7 @@ export default {
 		[
 			'As image aspect ratio gets more extreme, inversion windows grow and the issues get increasingly ',
 			getConnectedPunctuation(getButton('severe', [
-				[{position: 0.5, ratioImage: 2, zoom: 1, rotation: DEGREES[90]}],
+				[{position: 0.5, ratioImage: 2, zoom: 1, rotation: DEGREES[90]}, TWEEN_OPTIONS_SETUP],
 				[{rotation: 0}, {ease: 'none', duration: 5}],
 			]), '.'),
 		],

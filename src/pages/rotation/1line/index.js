@@ -8,7 +8,7 @@ import {getButton, clearButton} from '../../shared/button';
 import {xmlns, opSpace, getOverlined} from '../../shared/math';
 import {getPageButton, IDS} from '../../shared/page';
 import {getSnapOptions, singleCornerGetter} from '../../shared/tween';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound, TWEEN_OPTIONS_SETUP, TWEEN_OPTIONS_YOYO} from '../../consts';
 
 import SHARED_FUNCTIONS from '../code';
 import * as mock from '../mock';
@@ -194,7 +194,7 @@ export default {
 		[
 			'A rail\'s "start zoom" is the zoom at which bounds ',
 			getButton('start progressing', [
-				(zoom) => [{zoom, position: 0}],
+				(zoom) => [{zoom, position: 0}, TWEEN_OPTIONS_SETUP],
 				(zoom) => [{zoom: zoom * 1.1}, TWEEN_OPTIONS_YOYO],
 			], {
 				getParam: () => {
@@ -212,12 +212,12 @@ export default {
 			'For a given corner, there are two possible start zooms —',
 			'one if the corner disappears off the viewport\'s ',
 			getButton('"side"', [
-				[{rotation: DEGREES[90], ratio: 0.5, zoom: 1, position: 0}],
+				[{rotation: DEGREES[90], ratio: 0.5, zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
 				[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
 			]),
 			' (left/right), and another if it disappears off its ',
 			getButton('"base"', [
-				[{rotation: DEGREES[90], ratio: 2, zoom: 1, position: 0}],
+				[{rotation: DEGREES[90], ratio: 2, zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
 				[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
 			]),
 			' (top/bottom).',
@@ -960,34 +960,34 @@ export default {
 			'You\'ll find that this system works perfectly if the viewport and image are both squares.',
 			'Its flaws are only revealed when one is ',
 			getConnectedPunctuation(getButton('stretched', [
-				() => [{ratio: demo.ratioViewport, rotation: DEGREES[90], zoom: 1, position: 0}],
+				() => [{ratio: demo.ratioViewport, rotation: DEGREES[90], zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
 				[{ratio: restrictiveTweens.ratio}],
 			]), '.'),
 		],
 		[
 			'Consider ',
 			getButton('this', [
-				[{ratio: restrictiveTweens.ratio, position: 0, rotation: DEGREES[90], zoom: 1}],
+				[{ratio: restrictiveTweens.ratio, position: 0, rotation: DEGREES[90], zoom: 1}, TWEEN_OPTIONS_SETUP],
 				({rotation, zoom}) => [{rotation, zoom}, getTweenOptionsBound()],
 			], {getParam: () => getRestrictiveVars()}),
 			' demo state.',
 			'Imagine that you want to see the entirety of the image\'s top-right corner.',
 			'You\'ll find that it\'s ',
 			getButton('impossible', [
-				() => [{position: demo.system.bound1 || {x: 0, y: 0}}],
+				() => [{position: demo.system.bound1 || {x: 0, y: 0}}, TWEEN_OPTIONS_SETUP],
 				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, getTweenOptionsBound()],
 				[{y: '+=0.1'}],
 				[{x: '+=0.1', y: '-=0.1'}, {repeat: 1, yoyo: true}],
 			], {getParam: () => getRestrictiveVars()}),
 			' to achieve this without ',
 			getButton('rotating', [
-				() => [{position: demo.system.bound1 || {x: 0, y: 0}}],
+				() => [{position: demo.system.bound1 || {x: 0, y: 0}}, TWEEN_OPTIONS_SETUP],
 				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, getTweenOptionsBound()],
 				[{rotation: DEGREES[90]}, getTweenOptionsBound()],
 			], {getParam: () => getRestrictiveVars()}),
 			' or ',
 			getButton('zooming', [
-				() => [{position: demo.system.bound1 || {x: 0, y: 0}}],
+				() => [{position: demo.system.bound1 || {x: 0, y: 0}}, TWEEN_OPTIONS_SETUP],
 				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, getTweenOptionsBound()],
 				[{zoom: 1}, getTweenOptionsBound()],
 			], {getParam: () => getRestrictiveVars()}),
@@ -996,8 +996,8 @@ export default {
 		[
 			'A consequence of using single-line rails is that image corners get ',
 			getButton('locked', [
-				({zoomPoints, rotation, ratio}) => [{zoom: zoomPoints[1].z, rotation, ratio, position: 0}],
-				({zoomPoints}) => [{zoom: zoomPoints[1].z * 1.5}, {duration: 2.5, ease: 'none', ...getTweenOptionsBound()}],
+				({zoomPoints, rotation, ratio}) => [{zoom: zoomPoints[1].z / 1.1, rotation, ratio, position: 0}, TWEEN_OPTIONS_SETUP],
+				({zoomPoints}) => [{zoom: zoomPoints[1].z * 2}, {duration: 2.7, ease: 'power2.inOut', ...getTweenOptionsBound()}],
 			], {getParam: () => getLockVars()}),
 			' to the position on the viewport\'s rim that they first contact.',
 			'I\'ll refer to this position as the corner\'s "lock point".',
@@ -1030,11 +1030,9 @@ export default {
 			'The next step is to define two rails with matching start zooms that border the region.',
 			'For this, we take the existing rails and trim the one with a ',
 			getButton('lower', [
-				({zoomPoints, rotation, ratio}) => [{position: 0, zoom: zoomPoints[0].z, ratio, rotation}],
-				({zoomPoints}) => [{zoom: zoomPoints[1].z}, TWEEN_OPTIONS_YOYO],
-			], {
-				getParam: singleCornerGetter.bind(null, getVarGetter),
-			}),
+				({zoomPoints, rotation, ratio}) => [{position: 0, zoom: Math.min(zoomPoints[0].z, zoomPoints[1].z), ratio, rotation}, TWEEN_OPTIONS_SETUP],
+				({zoomPoints}) => [{zoom: Math.max(zoomPoints[0].z, zoomPoints[1].z)}, TWEEN_OPTIONS_YOYO],
+			], {getParam: singleCornerGetter.bind(null, getVarGetter)}),
 			' start zoom.',
 		],
 		getCode(code, [

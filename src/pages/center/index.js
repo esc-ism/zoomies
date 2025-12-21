@@ -2,7 +2,7 @@ import demo from '@/demo';
 import {PADDING_VIEWPORT} from '@/demo/consts';
 import {DEGREES} from '@/shared';
 
-import {CLASS_MATH_LOOSE} from '../consts';
+import {CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP} from '../consts';
 import {getText, getMath, getConnectedPunctuation} from '../shared';
 import {xmlns} from '../shared/math';
 import {getButton, clearButton} from '../shared/button';
@@ -31,7 +31,7 @@ export default {
 		[
 			'Let\'s start ',
 			getConnectedPunctuation(getButton('bounding', [
-				[{zoom: 1}],
+				[{zoom: 1}, TWEEN_OPTIONS_SETUP],
 				() => {
 					const axis = Math.abs(demo.position.x) >= Math.abs(demo.position.y) ? 'x' : 'y';
 					
@@ -102,7 +102,7 @@ export default {
 			})}),
 			' could give you the desired view without having to ',
 			getButton('zoom', [
-				() => [{rotation: DEGREES[90], zoom: 1, ratio: 1, ...getSnapPosition(demo)}, {duration: 0}],
+				() => [{rotation: DEGREES[90], zoom: 1, ratio: 1, ...getSnapPosition(demo)}, TWEEN_OPTIONS_SETUP],
 				[{zoom: 2}, {delay: 0.2}],
 			]),
 			' manually.',

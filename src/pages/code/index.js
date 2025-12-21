@@ -495,7 +495,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 			
 			return true;
 		},
-		event: () => {
+		leave: () => {
 			unhover();
 		},
 	};
@@ -546,16 +546,14 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 			
 			hovered.length = 0;
 			
-			demo.hooks.any.remove(callbacks.hook);
-			element.removeEventListener('mouseleave', callbacks.event);
-			window.removeEventListener('scroll', callbacks.event, true);
+			demo.hooks.any.remove(callbacks.hook, false, false);
+			element.removeEventListener('mouseleave', callbacks.leave);
 			
 			return true;
 		};
 		
-		demo.hooks.any.add(callbacks.hook);
-		window.addEventListener('scroll', callbacks.event, {once: true, capture: true});
-		element.addEventListener('mouseleave', callbacks.event, {once: true});
+		demo.hooks.any.add(callbacks.hook, false, false);
+		element.addEventListener('mouseleave', callbacks.leave, {once: true});
 		
 		if (doShowVisuals) {
 			visuals.push(visualise(scope, ...ids));

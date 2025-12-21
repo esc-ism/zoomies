@@ -1,7 +1,7 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getMath, getDiagrammedMath, getConnectedPunctuation} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
@@ -846,18 +846,18 @@ export default {
 			'This time, the top-left and top-right image corners always share an origin rail.',
 			'Its job is to keep both corners viewable for as ',
 			getConnectedPunctuation(getButton('long as possible', [
-				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{position: zoomPoints[4], zoom: zoomPoints[4].z}],
 			], {getParam: () => getDirectVars()}), '.'),
 			' When this fails, enter the "connecting rail"!',
 			'Connecting rails are pointed directly towards ',
 			getConnectedPunctuation(getButton('viewport corners', [
-				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}],
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{position: zoomPoints[4].end}],
 			], {getParam: () => getDirectVars()}), ','),
 			' each keeping a ',
 			getButton('pair', [
-				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[1].z, position: third}],
+				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[1].z, position: third}, TWEEN_OPTIONS_SETUP],
 				({third}) => [{zoom: third.z}, {duration: 3, ease: 'none'}],
 			], {getParam: () => getDirectVars()}),
 			' of image corners visible.',
@@ -876,13 +876,13 @@ export default {
 			'Like a movie paying off its setups in the final act, this final system relies entirely on the concepts introduced earlier.',
 			'One pair of image corners is no longer ',
 			getButton('viewable', [
-				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}],
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z * 1.05}, TWEEN_OPTIONS_YOYO],
 			], {getParam: () => getDirectVars()}),
 			'  from the origin at the origin rail\'s start zoom.',
 			'The others are no longer ',
 			getButton('viewable', [
-				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}],
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{zoom: zoomPoints[4].z * 1.05}, {
 					...TWEEN_OPTIONS_YOYO,
 					onUpdate() {
@@ -900,7 +900,7 @@ export default {
 		[
 			'I\'ve stated that connecting rails are pointed at ',
 			getConnectedPunctuation(getButton('viewport corners', [
-				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}],
+				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{position: zoomPoints[4].end}],
 			], {getParam: () => getDirectVars()}), ','),
 			' but how can we find these corners\' coordinates?',
@@ -1213,7 +1213,7 @@ export default {
 			'All of ', getPageButton(IDS.DOUBLE), '\'s bounding flaws are fixed.',
 			'Bound changes are now perfectly ',
 			getConnectedPunctuation(getButton('fluid', [
-				[{ratioImage: 1, zoom: 1, position: 0}],
+				[{ratioImage: 1, zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
 				() => [{rotation: demo.rotation - DEGREES[360]}, {cutRotation: false, ease: 'none', duration: 8}],
 				[{ratioImage: 0.5}, {position: '<', duration: 2}],
 				[{ratioImage: 1.5}, {duration: 2}],
@@ -1223,7 +1223,7 @@ export default {
 			' providing a more consistent and reliable experience.',
 			'Besides patching issues, the connecting rails even enhance the system\'s ability to show ',
 			getButton('two corners', [
-				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: third}],
+				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: third}, TWEEN_OPTIONS_SETUP],
 				({third}) => [{zoom: third.z}, TWEEN_OPTIONS_YOYO],
 			], {getParam: () => getDirectVars()}),
 			' simultaneously!',

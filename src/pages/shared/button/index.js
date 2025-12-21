@@ -3,7 +3,7 @@ import demo from '@/demo';
 
 import {CLASS_CONTAINER as CLASS_CODE_BUTTON_CONTAINER} from '../../code/buttons/consts';
 
-import {CLASS_BUTTON, CLASS_BUTTON_ACTIVE, TWEENS_RESET} from './consts';
+import {CLASS_BUTTON, CLASS_BUTTON_ACTIVE} from './consts';
 
 import './css';
 
@@ -24,7 +24,7 @@ export const clearButton = () => {
 };
 
 for (const action of Object.keys(demo.listeners)) {
-	demo.hooks[action].add(clearButton, true);
+	demo.hooks[action].add(clearButton, true, false);
 }
 
 const releaseButton = (event) => {
@@ -57,11 +57,7 @@ const releaseButton = (event) => {
 	}
 };
 
-export const getButton = (text, tweens, {doReset = false, getParam = () => undefined, isRandom = false, callback} = {}) => {
-	// todo this could be useful but isn't currently used
-	//  might need modifying
-	const resetTweens = doReset ? TWEENS_RESET : [];
-	
+export const getButton = (text, tweens, {getParam = () => undefined, isRandom = false, callback} = {}) => {
 	let element;
 	
 	const extras = {};

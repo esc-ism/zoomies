@@ -28,9 +28,9 @@ const getVarGetter = mock.getVarGetter.bind(null, getZoomPoints);
 
 const boundGetSnapTweens = (getRatio) => getSnapTweens(() => getVarGetter((Math.random() > 0.5 ? -DEGREES[270] : 0) + Math.random() * DEGREES[90], getRatio())(), getSnappedZoom);
 
-const getCornerProgressTweens = (rotation, position = '>-40%') => [
-	() => [{position: 0.5, ratio: demo.ratioViewport, zoom: demo.ratioViewport < 1 ? (1 / demo.ratioViewport) : demo.ratioViewport}],
-	[{rotation}, {position}],
+const getCornerProgressTweens = (rotation) => [
+	() => [{position: 0.5, ratio: demo.ratioViewport, zoom: demo.ratioViewport < 1 ? (1 / demo.ratioViewport) : demo.ratioViewport}, TWEEN_OPTIONS_SETUP],
+	[{rotation}, {position: '<'}],
 ];
 
 const functions = [
@@ -289,7 +289,7 @@ export default {
 			' that was too restrictive is way better!',
 			' ', getPageButton(IDS.CENTER), ' gives users much more viewfinding flexibility, but this seems good enough to avoid frustrating users.',
 			'The overly permissive ',
-			getButton('state', [[permissiveTweens]]),
+			getButton('state', [[permissiveTweens, TWEEN_OPTIONS_SETUP]]),
 			' is also fixed, accurately replicating the behaviour of ', getPageButton(IDS.EDGE), '.',
 		],
 		[
@@ -321,7 +321,7 @@ export default {
 			getConnectedPunctuation(getButton('90°', getCornerProgressTweens(0)), ','),
 			' and travels linearly between them for ',
 			getConnectedPunctuation(getButton('intermediate angles', [
-				...getCornerProgressTweens(DEGREES[90], '<'),
+				...getCornerProgressTweens(DEGREES[90]),
 				[{rotation: 0}, {ease: 'none', duration: 3, position: '+=0'}],
 			]), '.'),
 		],
@@ -333,13 +333,13 @@ export default {
 			'Similarly to ', getPageButton(IDS.EDGER), ', ',
 			// todo there are likely lots of buttons that should be doing manual position setting
 			getButton('origin rails', [
-				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}],
+				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {...getTweenOptionsBound(2), duration: 3}],
 			], {getParam: () => getTraceVars()}),
 			' follow image axes.',
 			'They end at their intersection with ',
 			getConnectedPunctuation(getButton('lock rails', [
-				({rotation, ratio, zoomPoints}) => [{position: zoomPoints[3], ratio, rotation, zoom: zoomPoints[3].z}],
+				({rotation, ratio, zoomPoints}) => [{position: zoomPoints[3], ratio, rotation, zoom: zoomPoints[3].z}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z * 2}, {...getTweenOptionsBound(3), duration: 3}],
 			], {getParam: () => getTraceVars()}), ','),
 			' following whichever axis minimises lock rail length.',
@@ -1073,15 +1073,13 @@ export default {
 			'There\'s no huge flaw, but this system\'s user experience is pretty terrible.',
 			'Take ',
 			getButton('this', [
-				({ratio, rotation}) => [{ratio, rotation, zoom: 1, position: 0}],
-			], {
-				getParam: singleCornerGetter.bind(null, getVarGetter),
-			}),
+				({ratio, rotation}) => [{ratio, rotation, zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
+			], {getParam: singleCornerGetter.bind(null, getVarGetter)}),
 			' state for example — see the panning path necessary to view the offscreen corner?',
 			'There\'s no way anyone would take that path naturally.',
 			'Users naturally try to take the ',
 			getButton('shortest', [
-				({rotation, ratio, startZoom}) => [{rotation, ratio, zoom: startZoom, position: 0}],
+				({rotation, ratio, startZoom}) => [{rotation, ratio, zoom: startZoom, position: 0}, TWEEN_OPTIONS_SETUP],
 				({start}) => [{target: start}],
 				({first, end, start, zoom}) => [{zoom, target: start}, {
 					isPositionUpdate: true,
@@ -1098,7 +1096,7 @@ export default {
 			' path possible, but this system doesn\'t often allow that.',
 			'Having to pan farther than expected, and getting ',
 			getButton('shunted', [
-				({rotation, ratio, zoom}) => [{rotation, ratio, zoom, position: 0}],
+				({rotation, ratio, zoom}) => [{rotation, ratio, zoom, position: 0}, TWEEN_OPTIONS_SETUP],
 				({start}) => [{position: start}, {delay: 0.2}],
 			], {getParam: () => getShortPanVars()}),
 			' in an unexpected direction, is frustrating for users.',

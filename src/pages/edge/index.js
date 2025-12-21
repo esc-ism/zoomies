@@ -63,7 +63,7 @@ export default {
 		[
 			'Whereas bounds in ', getPageButton(IDS.CENTER), ' were fixed, from now on they will ',
 			getButton('grow and shrink', [
-				[{zoom: 1, position: 0}],
+				[{zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
 				[{zoom: 1.25}, TWEEN_OPTIONS_YOYO],
 			]),
 			' alongside zoom.',
@@ -76,7 +76,7 @@ export default {
 			' are possible in upcoming systems, but not this one).',
 			'The new playground ',
 			getButton('lines', [
-				[{zoom: 1, position: 0}, {onComplete: () => {
+				[{zoom: 1, position: 0}, {...TWEEN_OPTIONS_SETUP, onComplete: () => {
 					const off = {filter: 'brightness(1) drop-shadow(0 0 0px white)'};
 					const on = {filter: 'brightness(2.6) drop-shadow(0 0 1px white)'};
 					const animation = [
@@ -100,7 +100,7 @@ export default {
 		[
 			'Notice that the viewport\'s dimensions halve as zoom ',
 			getConnectedPunctuation(getButton('doubles', [
-				[{ratio: 1, zoom: 1, rotation: DEGREES[90], position: 0}],
+				[{ratio: 1, zoom: 1, rotation: DEGREES[90], position: 0}, TWEEN_OPTIONS_SETUP],
 				[{zoom: 2}],
 				[{position: 0.25}, {delay: 0.2}],
 			]), '.'),
@@ -114,8 +114,8 @@ export default {
 			[
 				'Greyed-out code is unexecuted for the current inputs.',
 				getInputDependent((isMouse) => isMouse ?
-					'Click a variable in executed code to see its value. Green variables offer visualisations of their values when moused over.' :
-					'Tap a variable in executed code to see its value. Green variables will provide visualisations of their values.'),
+					'Click a variable in executed code to see its value. Mouse over a green variable to see its value visualised in the playground.' :
+					'Tap a variable in executed code to see its value. If the variable is green, its value will be visualised in the playground.'),
 			],
 			[
 				'Code snippets run when you turn a page, and don\'t keep up with state changes.',
@@ -163,12 +163,12 @@ export default {
 			]},
 			' conditions only uncouple when the viewport is ',
 			getButton('wider', [
-				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
+				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}, TWEEN_OPTIONS_SETUP],
 				[{ratio: 2}, {ease: 'none', duration: 1}],
 			]),
 			' or ',
 			getButton('taller', [
-				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}],
+				[{ratio: 1, zoom: 1, rotation: DEGREES[90]}, TWEEN_OPTIONS_SETUP],
 				[{ratio: 0.5}, {ease: 'none', duration: 1}],
 			]),
 			' than the image.',
@@ -187,7 +187,7 @@ export default {
 			]),
 			' if aspect ratios change, and they\'re protected from ',
 			getButton('overshooting', [
-				[{zoom: 1, position: 0, rotation: DEGREES[90], ratio: 1}],
+				() => [{...demo.zoom >= 1 ? {} : {zoom: 1}, position: 0, rotation: DEGREES[90], ratio: 1}, TWEEN_OPTIONS_SETUP],
 				[{zoom: 2}, {position: '<30%'}],
 				() => [{position: 0.25}, {ease: 'bounce.out', duration: 1, delay: 0.1}],
 			]),

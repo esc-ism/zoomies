@@ -208,7 +208,7 @@ export default {
 					element.innerText = (demo.ratioImage > 1 ? (demo.ratioImage < thresholdHigh) : (demo.ratioImage > thresholdLow)) ? 'square' : 'rectangle';
 				};
 				
-				demo.hooks.ratio.add(update);
+				demo.hooks.ratio.add(update, true);
 				
 				update();
 			}},
@@ -262,7 +262,7 @@ export default {
 											resolve();
 											
 											return true;
-										}, true);
+										}, true, false);
 									}),
 									exitPromise,
 								]);

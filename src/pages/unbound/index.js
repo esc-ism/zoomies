@@ -94,7 +94,7 @@ export default {
 		},
 		[
 			'There do exist niche use cases for unbound panning.',
-			'They\'re often inappropriate for images with no max size,',
+			'It\'s preferable for images with no max size,',
 			'like a world map that wraps around, or a canvas that grows to accommodate new input.',
 			'In most cases, however, bounds are useful.',
 		],

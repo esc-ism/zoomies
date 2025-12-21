@@ -59,8 +59,12 @@ class ActionHook {
 		}
 	}
 	
-	add(listener, isGlobal = false) {
+	add(listener, isGlobal = false, doTrigger = true) {
 		this.listeners[isGlobal ? 'global' : 'local'].push(listener);
+		
+		if (doTrigger) {
+			listener();
+		}
 	}
 	
 	emit() {
@@ -457,7 +461,7 @@ export default new class {
 				
 				this.target.hide();
 			}
-		}, true);
+		}, true, false);
 	}
 	
 	setSystem({System, text}) {
