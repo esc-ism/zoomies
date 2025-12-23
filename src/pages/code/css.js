@@ -1,8 +1,11 @@
 import {addRule} from '@/shared/css';
 
 import {
-	CLASS_NAMES, CLASS_MAXIMISED, CLASS_TOOLTIP,
+	CLASS_NAMES, CLASS_MAXIMISED, CLASS_TOOLTIP_WRAPPER, CLASS_TOOLTIP_BODY,
 	CLASS_TOOLTIP_BOTTOM, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT,
+	CLASS_TOOLTIP_VALUE,
+	CLASS_TOOLTIP_BACKGROUND,
+	CLASS_TOOLTIP_CONTAINER,
 } from './consts';
 
 const addPseudoRule = (selector, content, {display = 'inline', ...styles} = {}) => addRule(selector, {display, ...styles, content: `"${content}"`});
@@ -67,6 +70,12 @@ for (const name of [/* 'asin', 'acos', */'atan']) {
 	});
 }
 
+addPseudoRule(`.${CLASS_NAMES.log2}::before`, 'log');
+addPseudoRule(`.${CLASS_NAMES.log2}::after`, '2', {
+	'vertical-align': 'sub',
+	'font-size': 'smaller',
+});
+
 addPseudoRule(`.${CLASS_NAMES.root}::before`, '√');
 
 addKeywordPseudoRule(`.${CLASS_NAMES.if}::before`, 'if ');
@@ -77,7 +86,7 @@ addPseudoRule(`.${CLASS_NAMES.indent}::after`, '  ');
 addRule(`.${CLASS_NAMES['=']} > :last-child::after`, {display: 'block'});
 
 // dynamic ops
-addRule([`.${CLASS_NAMES.bool}`, `.${CLASS_NAMES.number}`, `.${CLASS_TOOLTIP}`], {color: '#9cbaff'});
+addRule([`.${CLASS_NAMES.bool}`, `.${CLASS_NAMES.number}`, `.${CLASS_TOOLTIP_VALUE}`], {color: '#9cbaff'});
 
 addRule(`.${CLASS_NAMES.evocation}`, {color: '#cac17d'});
 
@@ -112,22 +121,34 @@ addRule(`.${CLASS_MAXIMISED} > div`, {
 
 const arrowSize = '0.5ch';
 
-addRule(`.${CLASS_TOOLTIP}`, {
-	'font-family': 'consolas, monospace',
-	'font-size': '0.85em',
-	padding: '3px 1ch',
-	'border-radius': '1ch',
-	'text-wrap-mode': 'nowrap',
+addRule(`.${CLASS_TOOLTIP_WRAPPER}`, {
 	position: 'absolute',
 	'z-index': '3',
-	'background-color': '#343a45',
-	outline: '1px solid var(--border-color)',
-	'box-shadow': 'white 0px 0px 1px',
-	'text-shadow': '0 0 4px #202020',
 	'pointer-events': 'none',
+	'text-wrap-style': 'balance',
 });
 
-addRule(`.${CLASS_TOOLTIP}::before`, {
+addRule(`.${CLASS_TOOLTIP_CONTAINER}`, {
+	position: 'relative',
+	padding: '3px 1ch',
+});
+
+addRule(`.${CLASS_TOOLTIP_BACKGROUND}`, {
+	position: 'absolute',
+	'background-color': '#343a45',
+	'border-radius': '1ch',
+	'box-shadow': 'white 0px 0px 1px',
+	outline: '1px solid var(--border-color)',
+});
+
+addRule(`.${CLASS_TOOLTIP_BODY}`, {
+	'font-family': 'consolas, monospace',
+	'font-size': '0.85em',
+	'text-shadow': '0 0 4px #202020',
+	'text-align': 'center',
+});
+
+addRule(`.${CLASS_TOOLTIP_WRAPPER}::before`, {
 	content: '""',
 	position: 'absolute',
 	display: 'block',
@@ -138,9 +159,33 @@ addRule(`.${CLASS_TOOLTIP}::before`, {
 	'border-style': 'solid',
 });
 
+addRule(`.${CLASS_TOOLTIP_BOTTOM} .${CLASS_TOOLTIP_BACKGROUND}`, {top: '0'});
+addRule(`.${CLASS_TOOLTIP_TOP} .${CLASS_TOOLTIP_BACKGROUND}`, {bottom: '0'});
+
+addRule(`.${CLASS_TOOLTIP_BOTTOM} .${CLASS_TOOLTIP_BODY}`, {'vertical-align': 'top'});
+addRule(`.${CLASS_TOOLTIP_TOP} .${CLASS_TOOLTIP_BODY}`, {'vertical-align': 'bottom'});
+
+addRule(`.${CLASS_TOOLTIP_LEFT} .${CLASS_TOOLTIP_BACKGROUND}`, {right: '0'});
+addRule(`.${CLASS_TOOLTIP_RIGHT} .${CLASS_TOOLTIP_BACKGROUND}`, {left: '0'});
+
+addRule([`.${CLASS_TOOLTIP_LEFT} .${CLASS_TOOLTIP_BACKGROUND}`, `.${CLASS_TOOLTIP_RIGHT} .${CLASS_TOOLTIP_BACKGROUND}`], {
+	top: '50%',
+	translate: '0 -50%',
+});
+addRule([`.${CLASS_TOOLTIP_BOTTOM} .${CLASS_TOOLTIP_BACKGROUND}`, `.${CLASS_TOOLTIP_TOP} .${CLASS_TOOLTIP_BACKGROUND}`], {
+	left: '50%',
+	translate: '-50%',
+});
+
+addRule([`.${CLASS_TOOLTIP_BOTTOM} .${CLASS_TOOLTIP_CONTAINER}`, `.${CLASS_TOOLTIP_TOP} .${CLASS_TOOLTIP_CONTAINER}`], {
+	'text-align': 'center',
+});
+
 addRule([`.${CLASS_TOOLTIP_LEFT}`, `.${CLASS_TOOLTIP_RIGHT}`], {
 	transform: 'translateY(-50%)',
 });
+addRule(`.${CLASS_TOOLTIP_LEFT}`, {translate: '-100%'});
+
 addRule([`.${CLASS_TOOLTIP_LEFT}::before`, `.${CLASS_TOOLTIP_RIGHT}::before`], {
 	top: '50%',
 	transform: 'translateY(-50%)',
@@ -151,17 +196,19 @@ addRule([`.${CLASS_TOOLTIP_BOTTOM}::before`, `.${CLASS_TOOLTIP_TOP}::before`], {
 });
 
 addRule(`.${CLASS_TOOLTIP_LEFT}`, {
-	translate: `calc(-100% - (${arrowSize})) 0`,
+	'border-right': `calc(${arrowSize}) solid transparent`,
+	'text-align': 'right',
 });
-addRule(`.${CLASS_TOOLTIP}.${CLASS_TOOLTIP_LEFT}::before`, {
+addRule(`.${CLASS_TOOLTIP_WRAPPER}.${CLASS_TOOLTIP_LEFT}::before`, {
 	left: '100%',
 	'border-left-color': 'var(--border-color)',
 });
 
 addRule(`.${CLASS_TOOLTIP_RIGHT}`, {
-	translate: `calc(${arrowSize}) 0`,
+	'border-left': `calc(${arrowSize}) solid transparent`,
+	'text-align': 'left',
 });
-addRule(`.${CLASS_TOOLTIP}.${CLASS_TOOLTIP_RIGHT}::before`, {
+addRule(`.${CLASS_TOOLTIP_WRAPPER}.${CLASS_TOOLTIP_RIGHT}::before`, {
 	right: '100%',
 	'border-right-color': 'var(--border-color)',
 });
@@ -169,7 +216,7 @@ addRule(`.${CLASS_TOOLTIP}.${CLASS_TOOLTIP_RIGHT}::before`, {
 addRule(`.${CLASS_TOOLTIP_BOTTOM}`, {
 	translate: `-50% calc(${arrowSize})`,
 });
-addRule(`.${CLASS_TOOLTIP}.${CLASS_TOOLTIP_BOTTOM}::before`, {
+addRule(`.${CLASS_TOOLTIP_WRAPPER}.${CLASS_TOOLTIP_BOTTOM}::before`, {
 	bottom: '100%',
 	'border-bottom-color': 'var(--border-color)',
 });
@@ -178,7 +225,7 @@ addRule(`.${CLASS_TOOLTIP_TOP}`, {
 	translate: `-50% calc((${arrowSize}) * -1)`,
 	transform: 'translateY(-100%)',
 });
-addRule(`.${CLASS_TOOLTIP}.${CLASS_TOOLTIP_TOP}::before`, {
+addRule(`.${CLASS_TOOLTIP_WRAPPER}.${CLASS_TOOLTIP_TOP}::before`, {
 	top: '100%',
 	'border-top-color': 'var(--border-color)',
 });

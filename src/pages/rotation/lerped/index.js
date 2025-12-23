@@ -1,9 +1,9 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
-import {CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP} from '../../consts';
+import {CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {register as registerFunctions, cleanup} from '../../code';
-import {getText, getCode, getInstruction, getMath, getInputDependent, getLink, getConnectedPunctuation} from '../../shared';
+import {getText, getCode, getInstruction, getMath, getInputDependent, getLink} from '../../shared';
 import {xmlns} from '../../shared/math';
 import {getPageButton, IDS} from '../../shared/page';
 import {getButton, clearButton} from '../../shared/button';
@@ -22,11 +22,21 @@ const functions = [
 	...SHARED_FUNCTIONS,
 	{op: 'func', id: 'getRailsProgressed', type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [,2, 1,, 5, 4], args: [
 		'from0', 'to0', 'from1', 'to1', 'isHighX', 't',
+	], description: [
+		'The first rail\'s start zoom at 0° rotation',
+		'The second rail\'s start zoom at 0° rotation',
+		'The first rail\'s start zoom at 90° rotation',
+		'The second rail\'s start zoom at 90° rotation',
+		'True if the first rail follows the y-axis',
+		'0 for the 0° rotation state, 1 for the 90° rotation state, or something in-between',
 	], and: [
-		{op: '=', id: 'z0t', type: 'zoom', and: {op: '+', and: ['from0', {op: '*', and: [{op: '-', and: ['to0', 'from0']}, 't']}]}},
-		{op: '=', id: 'z1t', type: 'zoom', and: {op: '+', and: ['from1', {op: '*', and: [{op: '-', and: ['to1', 'from1']}, 't']}]}},
+		{op: '=', id: 'z0t', description: 'The first rail\'s start zoom', type: 'zoom', and: {op: '+', and: ['from0', {op: '*', and: [{op: '-', and: ['to0', 'from0']}, 't']}]}},
+		{op: '=', id: 'z1t', description: 'The second rail\'s start zoom', type: 'zoom', and: {op: '+', and: ['from1', {op: '*', and: [{op: '-', and: ['to1', 'from1']}, 't']}]}},
 		'',
-		{op: '=', id: ['x0', 'y0'], type: ['x', 'y'], pair: ['y0', 'x0'], and: {op: '?', and: ['isHighX', {op: 'array', and: [0, 0.5]}, {op: 'array', and: [0.5, 0]}]}},
+		{op: '=', id: ['x0', 'y0'], description: [
+			'The x-coordinate of the first rail\'s horizon',
+			'The y-coordinate of the first rail\'s horizon',
+		], type: ['x', 'y'], pair: ['y0', 'x0'], and: {op: '?', and: ['isHighX', {op: 'array', and: [0, 0.5]}, {op: 'array', and: [0.5, 0]}]}},
 		'',
 		{op: 'return', and: {op: 'array', multiline: [3], and: [
 			'z0t', 'x0', 'y0',
@@ -34,23 +44,29 @@ const functions = [
 		]}},
 	]},
 	{op: 'func', id: 'getRails', type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [,2, 1,, 5, 4], and: [
-		{op: '=', id: 'isEvenQuadrant', and: {
+		{op: '=', id: 'isEvenQuadrant', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
 			op: '!=', and: [{op: '%', and: [{op: 'floor', and: {op: '/', and: ['rotation', '½π']}}, 2]}, 0],
 		}},
 		'',
-		{op: '=', id: 'zX', type: 'zoom', and: {op: '/', and: ['viewportWidth', 'imageWidth']}},
-		{op: '=', id: 'zY', type: 'zoom', and: {op: '/', and: ['viewportHeight', 'imageHeight']}},
-		{op: '=', id: 'isHighX', and: {op: '>', and: ['zX', 'zY']}},
-		{op: '=', id: ['z0', 'z1'], type: ['zoom', 'zoom'], and: {op: '?', and: ['isHighX', {op: 'array', and: ['zY', 'zX']}, {op: 'array', and: ['zX', 'zY']}]}},
+		{op: '=', id: 'zX', description: 'The zoom at which the image\'s left and right sides touch the viewport\'s edge at 0° rotation', type: 'zoom', and: {op: '/', and: ['viewportWidth', 'imageWidth']}},
+		{op: '=', id: 'zY', description: 'The zoom at which the image\'s top and bottom sides touch the viewport\'s edge at 0° rotation', type: 'zoom', and: {op: '/', and: ['viewportHeight', 'imageHeight']}},
+		{op: '=', id: 'isHighX', description: 'True if the first rail follows the y-axis at 0° rotation', and: {op: '>', and: ['zX', 'zY']}},
+		{op: '=', id: ['z0', 'z1'], description: [
+			'The first rail\'s start zoom at 0° rotation',
+			'The second rail\'s start zoom at 0° rotation',
+		], type: ['zoom', 'zoom'], and: {op: '?', and: ['isHighX', {op: 'array', and: ['zY', 'zX']}, {op: 'array', and: ['zX', 'zY']}]}},
 		'',
-		{op: '=', id: 'zXFlipped', type: 'zoom', and: {op: '/', and: ['viewportHeight', 'imageWidth']}},
-		{op: '=', id: 'zYFlipped', type: 'zoom', and: {op: '/', and: ['viewportWidth', 'imageHeight']}},
-		{op: '=', id: 'isHighXFlipped', and: {op: '>', and: ['zXFlipped', 'zYFlipped']}},
-		{op: '=', id: ['z0Flipped', 'z1Flipped'], type: ['zoom', 'zoom'], and: {op: '?', and: ['isHighXFlipped', {op: 'array', and: ['zYFlipped', 'zXFlipped']}, {op: 'array', and: ['zXFlipped', 'zYFlipped']}]}},
+		{op: '=', id: 'zXFlipped', description: 'The zoom at which the image\'s left and right sides touch the viewport\'s edge at 90° rotation', type: 'zoom', and: {op: '/', and: ['viewportHeight', 'imageWidth']}},
+		{op: '=', id: 'zYFlipped', description: 'The zoom at which the image\'s top and bottom sides touch the viewport\'s edge at 90° rotation', type: 'zoom', and: {op: '/', and: ['viewportWidth', 'imageHeight']}},
+		{op: '=', id: 'isHighXFlipped', description: 'True if the first rail follows the y-axis at 90° rotation', and: {op: '>', and: ['zXFlipped', 'zYFlipped']}},
+		{op: '=', id: ['z0Flipped', 'z1Flipped'], description: [
+			'The first rail\'s start zoom at 90° rotation',
+			'The second rail\'s start zoom at 90° rotation',
+		], type: ['zoom', 'zoom'], and: {op: '?', and: ['isHighXFlipped', {op: 'array', and: ['zYFlipped', 'zXFlipped']}, {op: 'array', and: ['zXFlipped', 'zYFlipped']}]}},
 		'',
 		{op: 'if', and: [
 			{op: '==', and: ['isHighX', 'isHighXFlipped']},
-			{op: '=', id: 't', and: {op: '/', and: [{op: '%', and: [{op: '+', and: ['rotation', '2π']}, '½π']}, '½π']}},
+			{op: '=', id: 't', description: 'The rotation\'s progress from the 90° multiple below it to the one above it', and: {op: '/', and: [{op: '%', and: [{op: '+', and: ['rotation', '2π']}, '½π']}, '½π']}},
 			'',
 			{op: 'return', and: {op: 'call', id: 'getRailsProgressed', multiline: [5], and: [
 				'z0', 'z0Flipped', 'z1', 'z1Flipped',
@@ -59,13 +75,13 @@ const functions = [
 		]},
 		'',
 		{op: '=', id: 'θ', and: {op: 'call', id: 'getθ', and: ['isEvenQuadrant']}},
-		{op: '=', id: 'progress', and: {op: '/', and: ['θ', '½π']}},
+		{op: '=', id: 'progress', description: 'The rotation\'s progress towards being perfectly sideways', and: {op: '/', and: ['θ', '½π']}},
 		'',
-		{op: '=', id: 'scale', and: {op: '/', and: ['z1', 'z0']}},
-		{op: '=', id: 'scaleFlipped', and: {op: '/', and: ['z1Flipped', 'z0Flipped']}},
-		{op: '=', id: 'threshold', and: {op: '/', and: ['scale', {op: '+', and: ['scale', 'scaleFlipped']}]}},
-		'',
-		{op: '=', id: 'zAvg0', type: 'zoom', and: {op: '/', and: [{op: '+', and: ['z0', 'z0Flipped']}, 2]}},
+		{op: '=', id: 'threshold', description: ['The fraction of rotation at which rails should be single lines from origin to corners'], and: {op: '/', and: [
+			{op: 'log2', and: {op: '/', and: ['z1', 'z0']}},
+			{op: 'log2', and: {op: '/', and: ['z1Flipped', 'z0Flipped']}},
+		]}},
+		{op: '=', id: 'zAvg0', description: ['Rail start zooms when they\'re single lines'], type: 'zoom', and: {op: '+', and: [{op: '*', and: ['threshold', {op: '-', and: ['z0Flipped', 'z0']}]}, 'z0']}},
 		'',
 		{op: 'return', and: {op: '?', multiline: true, and: [
 			{op: '<=', and: ['progress', 'threshold']},
@@ -149,14 +165,57 @@ export default {
 			'By precalculating rail data for zooms and snap-pans, those operations can be handled more efficiently.',
 		],
 		[
-			'The transition between 0° and 90° bounds is done via the ',
+			'Now that we\'re working with rails more directly, it\'s useful to define some properties.',
+			'Internally, rails are defined as a "start zoom", a "start point", and a "horizon".',
+			'This is useful for bound calculation, since, past a rail\'s start zoom, doubling zoom will halve the distance between bound and horizon.',
+		],
+		[
+			'Bounds ',
+			getButton('start progressing', [
+				(zoom) => [{zoom, position: 0}, TWEEN_OPTIONS_SETUP],
+				(zoom) => [{zoom: zoom * 1.1}, TWEEN_OPTIONS_YOYO],
+			], {
+				getParam: () => {
+					const {zoomPoints} = demo.system;
+					
+					return zoomPoints[zoomPoints[0].z < zoomPoints[1].z ? 0 : 1].z;
+				},
+			}),
+			' along a rail at its "start zoom" from its "start point".',
+			'You can observe these two properties from rails in the playground, but horizons aren\'t always apparent.',
+		],
+		[
+			'The rails in this system are made up of two segments —',
+			'one starts at the origin and the other ends at a corner.',
+			'Even when rails appear to be ',
+			getButton('single lines', [[{ratio: 1, rotation: DEGREES[90]}, TWEEN_OPTIONS_SETUP]]),
+			' from origin to corner, there exist tiny rails connecting them to the origin.',
+			'For rails that end at corners, their "horizons" are these corners.',
+			'All other rails are different;',
+			'although they appear to end at their intersection with another rail in the playground, they are defined internally as ending at some more distant point.',
+			'In this system, these points are image edge midpoints, like ',
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+				{tag: 'mo', xmlns, content: '('},
+				{tag: 'mn', xmlns, content: '0.5'},
+				{tag: 'mo', xmlns, content: ','},
+				{tag: 'mn', xmlns, content: '0'},
+				{tag: 'mo', xmlns, content: ')'},
+			]},
+			' and ',
+			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
+				{tag: 'mo', xmlns, content: '('},
+				{tag: 'mn', xmlns, content: '0'},
+				{tag: 'mo', xmlns, content: ','},
+				{tag: 'mn', xmlns, content: '0.5'},
+				{tag: 'mo', xmlns, content: ')'},
+			]},
+			'.',
+		],
+		[
+			'Now that we\'re done with definitions, let\'s transition into the transitioning!',
+			'Rails are calculated for the 0° and 90° rotation states, then made to fit other rotations via the ',
 			getLink('linear interpolation', 'https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support'),
-			' formula, where ',
-			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: {tag: 'mi', xmlns, content: 't'}},
-			' determines progress from ',
-			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: {tag: 'mi', xmlns, content: 'start'}},
-			' to ',
-			getConnectedPunctuation({tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: {tag: 'mi', xmlns, content: 'end'}}, '.'),
+			' formula.',
 			getMath({
 				content: {tag: 'mtable', xmlns, content: [
 					{tag: 'mtr', xmlns, content: [
@@ -181,14 +240,8 @@ export default {
 		[
 			'In the code snippet below, linear interpolation is used in ',
 			{tag: 'i', content: 'getRailsProgressed'},
-			' to find the minimum and maximum zooms for which bounds are 1-dimensional.',
-			'Note that angles are measured in ', getLink('radians', 'https://en.wikipedia.org/wiki/Radian'), '.',
-			'The ', {tag: 'i', content: 'rotation'}, ' variable holds the angle between the image\'s positive y-axis and an un-rotated positive x-axis, which is ',
-			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
-				{tag: 'mn', xmlns, content: '½'},
-				{tag: 'mi', xmlns, content: 'π'},
-			]},
-			' at zero rotation.',
+			' to transition between different rail states.',
+			'Note that angle values in code are measured in ', getLink('radians', 'https://en.wikipedia.org/wiki/Radian'), '.',
 		],
 		getInstruction([
 			'This code snippet includes custom functions. ',
@@ -198,9 +251,19 @@ export default {
 			' the ', {tag: 'i', content: 'function'}, ' text to re-fold.',
 		]),
 		getCode(code, [
-			{op: '=', id: ['z0', 'x0', 'y0', 'z1', 'x1', 'y1'], and: {op: 'call', id: 'getRails'}},
+			{op: '=', id: ['z0', 'x0', 'y0', 'z1', 'x1', 'y1'], description: [
+				'The first rail\'s start zoom',
+				'The x-coordinate of the first rail\'s horizon',
+				'The y-coordinate of the first rail\'s horizon',
+				'The second rail\'s start zoom',
+				'The x-coordinate of the second rail\'s start point',
+				'The y-coordinate of the second rail\'s start point',
+			], and: {op: 'call', id: 'getRails'}},
 			'',
-			{op: '=', id: ['boundX', 'boundY'], and: {
+			{op: '=', id: ['boundX', 'boundY'], description: [
+				'Horizontal panning space as a fraction of image width',
+				'Vertical panning space as a fraction of image height',
+			], and: {
 				op: 'call', id: 'getBound',
 			}},
 		]),
@@ -246,15 +309,18 @@ export default {
 			'Like before, a zoom is found for each axis, and the solution is whichever\'s larger.',
 		],
 		getCode(code, [
-			{op: '=', id: ['zX', 'xX', 'zY', 'yY'], type: ['zoom', 'x', 'zoom', 'y'], and: {op: '?', multiline: true, and: [
+			{op: '=', id: ['zX', 'zY'], description: [
+				'The zoom at which bounds start progressing along the y-axis',
+				'The zoom at which bounds start progressing along the x-axis',
+			], type: ['zoom', 'zoom'], and: {op: '?', and: [
 				{op: '==', and: ['y0', 0]},
-				{op: 'array', and: ['z0', 0, 'z1', 'y1']},
-				{op: 'array', and: ['z1', 'x1', 'z0', 0]},
+				{op: 'array', and: ['z0', 'z1']},
+				{op: 'array', and: ['z1', 'z0']},
 			]}},
 			'',
-			{op: '=', id: 'snapZoom', type: 'zoom', and: {op: 'max', multiline: true, and: [
-				{op: '*', and: [{op: '/', and: [{op: '-', and: [0.5, 'xX']}, {op: '-', and: [0.5, {op: 'abs', and: 'x'}]}]}, 'zX']},
-				{op: '*', and: [{op: '/', and: [{op: '-', and: [0.5, 'yY']}, {op: '-', and: [0.5, {op: 'abs', and: 'y'}]}]}, 'zY']},
+			{op: '=', id: 'snapZoom', description: 'The minimum zoom at which (x, y) is in-bounds', type: 'zoom', and: {op: 'max', multiline: true, and: [
+				{op: '*', and: [{op: '/', and: [0.5, {op: '-', and: [0.5, {op: 'abs', and: 'x'}]}]}, 'zX']},
+				{op: '*', and: [{op: '/', and: [0.5, {op: '-', and: [0.5, {op: 'abs', and: 'y'}]}]}, 'zY']},
 			]}},
 		]),
 		{

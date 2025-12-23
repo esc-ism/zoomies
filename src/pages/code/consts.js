@@ -3,32 +3,32 @@ import {getIdGetter} from '@/shared/css';
 export const ANGLE_RADIUS = 10;
 
 export const BUILT_INS = {
-	imageWidth: ({sizesImage: {width: value}}) => ({value, type: 'x', isPercent: false, doCenter: true}),
-	imageHeight: ({sizesImage: {height: value}}) => ({value, type: 'y', isPercent: false, doCenter: true}),
+	imageWidth: ({sizesImage: {width: value}}) => ({value, description: 'The image\'s horizontal diameter', type: 'x', isPercent: false, doCenter: true}),
+	imageHeight: ({sizesImage: {height: value}}) => ({value, description: 'The image\'s vertical diameter', type: 'y', isPercent: false, doCenter: true}),
 	
-	viewportWidth: ({sizesViewport: {width: value}}) => ({value, type: 'xvp', isPercent: false, doCenter: true}),
-	viewportHeight: ({sizesViewport: {height: value}}) => ({value, type: 'yvp', isPercent: false, doCenter: true}),
+	viewportWidth: ({sizesViewport: {width: value}}) => ({value, description: 'The viewport\'s horizontal diameter', type: 'xvp', isPercent: false, doCenter: true}),
+	viewportHeight: ({sizesViewport: {height: value}}) => ({value, description: 'The viewport\'s vertical diameter', type: 'yvp', isPercent: false, doCenter: true}),
 	
-	'½imageWidth': ({sizesImage: {halfWidth: value}}) => ({value, type: 'x', isPercent: false}),
-	'½imageHeight': ({sizesImage: {halfHeight: value}}) => ({value, type: 'y', isPercent: false}),
+	'½imageWidth': ({sizesImage: {halfWidth: value}}) => ({value, description: 'The image\'s horizontal radius', type: 'x', isPercent: false}),
+	'½imageHeight': ({sizesImage: {halfHeight: value}}) => ({value, description: 'The image\'s vertical radius', type: 'y', isPercent: false}),
 	
-	'½viewportWidth': ({sizesViewport: {halfWidth: value}}) => ({value, type: 'xvp', isPercent: false}),
-	'½viewportHeight': ({sizesViewport: {halfHeight: value}}) => ({value, type: 'yvp', isPercent: false}),
+	'½viewportWidth': ({sizesViewport: {halfWidth: value}}) => ({value, description: 'The viewport\'s horizontal radius', type: 'xvp', isPercent: false}),
+	'½viewportHeight': ({sizesViewport: {halfHeight: value}}) => ({value, description: 'The viewport\'s vertical radius', type: 'yvp', isPercent: false}),
 	
-	'2π': () => ({value: Math.PI * 2, type: 'angle', fight: true}),
-	π: () => ({value: Math.PI, type: 'angle', fight: true}),
-	'½π': () => ({value: Math.PI / 2, type: 'angle', fight: true}),
-	'¼π': () => ({value: Math.PI / 4, type: 'angle', fight: true}),
-	'⅛π': () => ({value: Math.PI / 8, type: 'angle', fight: true}),
+	'2π': () => ({value: Math.PI * 2, description: '360°', type: 'angle', fight: true}),
+	π: () => ({value: Math.PI, description: '180°', type: 'angle', fight: true}),
+	'½π': () => ({value: Math.PI / 2, description: '90°', type: 'angle', fight: true}),
+	'¼π': () => ({value: Math.PI / 4, description: '45°', type: 'angle', fight: true}),
+	'⅛π': () => ({value: Math.PI / 8, description: '22.5°', type: 'angle', fight: true}),
 	
-	x: ({position: {x}}) => ({value: x, type: 'x'}),
-	y: ({position: {y}}) => ({value: y, type: 'y'}),
+	x: ({position: {x}}) => ({value: x, description: 'The x position of the viewport\'s center as a fraction of image width', type: 'x'}),
+	y: ({position: {y}}) => ({value: y, description: 'The y position of the viewport\'s center as a fraction of image height', type: 'y'}),
 	
-	rotation: ({rotation: value}) => ({value, type: 'angle', fight: true}),
-	zoom: ({zoom: value}) => ({value, type: 'zoom'}),
+	rotation: ({rotation: value}) => ({value, description: 'The angle between the image\'s positive y-axis and its un-rotated positive x-axis', type: 'angle', fight: true}),
+	zoom: ({zoom: value}) => ({value, description: 'The image\'s scale', type: 'zoom'}),
 	
-	'∞': () => ({value: Infinity}),
-	ε: () => ({value: Number.EPSILON}),
+	'∞': () => ({value: Infinity, description: 'Infinity'}),
+	ε: () => ({value: Number.EPSILON, description: 'The smallest number that JavaScript can handle'}),
 };
 
 const getId = getIdGetter('codegen');
@@ -65,6 +65,7 @@ export const CLASS_NAMES = {
 	atan: getId('atan'),
 	root: getId('root'),
 	pow: getId('pow'),
+	log2: getId('log2'),
 	call: getId('call'),
 	evocation: getId('evocation'),
 	args: getId('args'),
@@ -88,9 +89,16 @@ export const CLASS_NAMES = {
 	wrapper: getId('wrapper'),
 };
 
-export const CLASS_TOOLTIP = getId('tooltip');
+export const CLASS_TOOLTIP_WRAPPER = getId('tooltip', 'wrapper');
+export const CLASS_TOOLTIP_CONTAINER = getId('tooltip', 'container');
+export const CLASS_TOOLTIP_BODY = getId('tooltip', 'body');
+export const CLASS_TOOLTIP_BACKGROUND = getId('tooltip', 'background');
+
+export const CLASS_TOOLTIP_VALUE = getId('tooltip', 'value');
 
 export const CLASS_TOOLTIP_BOTTOM = getId('tooltip', 'bottom');
 export const CLASS_TOOLTIP_TOP = getId('tooltip', 'top');
 export const CLASS_TOOLTIP_LEFT = getId('tooltip', 'left');
 export const CLASS_TOOLTIP_RIGHT = getId('tooltip', 'right');
+
+export const ALLOWANCE_TOOLTIP_SIDE = 12;

@@ -11,7 +11,6 @@ addRule(`.${CLASS_DIALOGUE_CONTAINER}`, {
 });
 
 addRule(`.${CLASS_DIALOGUE}`, {
-	position: 'relative',
 	color: 'black',
 	'text-shadow': '0 0 1px #ffff00',
 });
@@ -19,7 +18,6 @@ addRule(`.${CLASS_DIALOGUE}`, {
 const background = '#ccc';
 
 addRule(`.${CLASS_DIALOGUE_BACKGROUND}`, {
-	padding: 'inherit',
 	position: 'absolute',
 	right: '0',
 	top: '0',

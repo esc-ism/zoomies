@@ -1,5 +1,3 @@
-import {gsap} from 'gsap';
-
 import demo from '@/demo';
 import elements from '@/demo/elements';
 import {Line} from '@/demo/lines/lines';
@@ -7,7 +5,13 @@ import {SVG_NAMESPACE, DEGREES} from '@/shared';
 
 import flash from '../shared/flash';
 
-import {ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED, CLASS_TOOLTIP, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_BOTTOM, CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT} from './consts';
+import {
+	ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED,
+	CLASS_TOOLTIP_WRAPPER, CLASS_TOOLTIP_BODY, CLASS_TOOLTIP_VALUE, ALLOWANCE_TOOLTIP_SIDE,
+	CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_BOTTOM, CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT,
+	CLASS_TOOLTIP_BACKGROUND,
+	CLASS_TOOLTIP_CONTAINER,
+} from './consts';
 import getButtons from './buttons';
 
 import './css';
@@ -15,6 +19,23 @@ import './css';
 let globalScope;
 let functions;
 const visuals = [];
+
+// awful hack because styling inline elements is weird
+export const addSpanBackground = (classList, element, container = element.parentElement) => {
+	const background = document.createElement('div');
+	
+	background.style.padding = 'inherit';
+	element.style.position = 'relative';
+	
+	background.classList.add(...classList);
+	
+	container.insertBefore(background, element);
+	
+	return () => {
+		background.style.width = `${element.offsetWidth}px`;
+		background.style.height = `${element.offsetHeight}px`;
+	};
+};
 
 export const cleanup = () => {
 	for (const visual of visuals) {
@@ -116,6 +137,10 @@ export const register = (statements = []) => {
 					const arg = getElement(CLASS_NAMES.id);
 					
 					scope[argId] = {value: args.values[i], ...args.shapeData[i], element: args.unbroken[i]};
+					
+					if (statement.description?.[i]) {
+						scope[argId].description = statement.description[i];
+					}
 					
 					makeHoverable(arg, argId, scope, meta, true);
 					
@@ -390,73 +415,108 @@ const getTitle = (value, type) => {
 
 const [setTitle, removeTitle] = (() => {
 	let activeElement;
+	let isValue;
 	
-	const tooltip = document.createElement('div');
+	const wrapper = document.createElement('div');
 	
-	tooltip.classList.add(CLASS_TOOLTIP);
+	wrapper.classList.add(CLASS_TOOLTIP_WRAPPER);
+	
+	const container = document.createElement('div');
+	
+	container.classList.add(CLASS_TOOLTIP_CONTAINER);
+	
+	const body = document.createElement('span');
+	
+	body.classList.add(CLASS_TOOLTIP_BODY);
+	
+	container.appendChild(body);
+	wrapper.appendChild(container);
+	const updateBackground = addSpanBackground([CLASS_TOOLTIP_BACKGROUND], body, container);
+	
+	const background = body.previousElementSibling;
 	
 	return [
-		(element, title) => {
+		(element, value, description) => {
+			// prevent dblclick selection
+			element.addEventListener('mousedown', (event) => {
+				event.preventDefault();
+			});
+			
 			element.addEventListener('click', (event) => {
 				event.stopPropagation();
 				
-				// toggle off
-				if (element.isSameNode(activeElement)) {
-					removeTitle();
-					
-					return;
-				}
+				isValue = !element.isSameNode(activeElement) || !isValue;
+				
+				wrapper.classList[isValue ? 'add' : 'remove'](CLASS_TOOLTIP_VALUE);
 				
 				activeElement = element;
 				
 				const {offsetParent} = element;
 				const scrollerLocal = offsetParent.firstChild;
 				const scrollerGlobal = offsetParent.offsetParent;
+				const page = offsetParent.parentElement;
 				
-				tooltip.style.removeProperty('display');
+				body.innerText = isValue ? value : description;
+				
+				container.style.removeProperty('right');
+				
+				page.insertAdjacentElement('afterbegin', wrapper);
 				
 				const left = element.offsetLeft - scrollerLocal.scrollLeft + offsetParent.offsetLeft + element.offsetWidth / 2;
 				
-				if (left <= offsetParent.offsetLeft) {
-					tooltip.style.left = `${element.offsetLeft - scrollerLocal.scrollLeft + offsetParent.offsetLeft + element.offsetWidth}px`;
-					tooltip.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop + element.offsetHeight / 2}px`;
+				if (left <= offsetParent.offsetLeft + ALLOWANCE_TOOLTIP_SIDE) {
+					const offset = element.offsetLeft - scrollerLocal.scrollLeft + element.offsetWidth + offsetParent.offsetLeft;
 					
-					tooltip.classList.add(CLASS_TOOLTIP_RIGHT);
-					tooltip.classList.remove(CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_BOTTOM);
-				} else if (left >= offsetParent.offsetLeft + offsetParent.clientWidth) {
-					tooltip.style.left = `${element.offsetLeft - scrollerLocal.scrollLeft + offsetParent.offsetLeft}px`;
-					tooltip.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop + element.offsetHeight / 2}px`;
+					wrapper.style.left = `${offset}px`;
+					wrapper.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop + element.offsetHeight / 2}px`;
 					
-					tooltip.classList.add(CLASS_TOOLTIP_LEFT);
-					tooltip.classList.remove(CLASS_TOOLTIP_RIGHT, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_BOTTOM);
+					wrapper.classList.add(CLASS_TOOLTIP_RIGHT);
+					wrapper.classList.remove(CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_BOTTOM);
+					
+					wrapper.style.width = `${page.clientWidth - offset - wrapper.clientLeft + page.offsetLeft - 1}px`;
+					
+					updateBackground();
+				} else if (left >= offsetParent.offsetLeft + scrollerLocal.clientWidth - ALLOWANCE_TOOLTIP_SIDE) {
+					const offset = element.offsetLeft - scrollerLocal.scrollLeft + offsetParent.offsetLeft;
+					
+					wrapper.style.left = `${offset}px`;
+					wrapper.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop + element.offsetHeight / 2}px`;
+					
+					wrapper.classList.add(CLASS_TOOLTIP_LEFT);
+					wrapper.classList.remove(CLASS_TOOLTIP_RIGHT, CLASS_TOOLTIP_TOP, CLASS_TOOLTIP_BOTTOM);
+					
+					wrapper.style.width = `${offset - page.offsetLeft - (wrapper.offsetWidth - wrapper.clientWidth) - 1}px`;
+					
+					updateBackground();
 				} else {
-					tooltip.style.left = `${left}px`;
+					wrapper.style.left = `${left}px`;
 					
-					const isTop = scrollerGlobal ?
-							(element.offsetHeight / 2 + element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop - scrollerGlobal.scrollTop >= scrollerGlobal.clientHeight / 2) :
-							(element.offsetHeight / 2 + element.offsetTop - scrollerLocal.scrollTop >= offsetParent.clientHeight / 2);
+					const isTop = element.offsetHeight / 2 + element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop - scrollerGlobal.scrollTop >= scrollerGlobal.clientHeight / 2;
 					
 					if (isTop) {
-						tooltip.classList.add(CLASS_TOOLTIP_TOP);
-						tooltip.classList.remove(CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT, CLASS_TOOLTIP_BOTTOM);
+						wrapper.classList.add(CLASS_TOOLTIP_TOP);
+						wrapper.classList.remove(CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT, CLASS_TOOLTIP_BOTTOM);
 						
-						tooltip.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop}px`;
+						wrapper.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop}px`;
 					} else {
-						tooltip.classList.add(CLASS_TOOLTIP_BOTTOM);
-						tooltip.classList.remove(CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT, CLASS_TOOLTIP_TOP);
+						wrapper.classList.add(CLASS_TOOLTIP_BOTTOM);
+						wrapper.classList.remove(CLASS_TOOLTIP_LEFT, CLASS_TOOLTIP_RIGHT, CLASS_TOOLTIP_TOP);
 						
-						tooltip.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop + element.offsetHeight}px`;
+						wrapper.style.top = `${element.offsetTop - scrollerLocal.scrollTop + offsetParent.offsetTop + element.offsetHeight}px`;
+					}
+					
+					wrapper.style.width = `${scrollerLocal.clientWidth}px`;
+					
+					updateBackground();
+					
+					const textLeft = wrapper.offsetLeft - scrollerGlobal.scrollLeft - background.offsetWidth / 2;
+					
+					if (textLeft < 1) {
+						container.style.right = `${textLeft - 1}px`;
+					} else if (textLeft + background.offsetWidth > scrollerGlobal.clientWidth - 1) {
+						container.style.right = `${textLeft + background.offsetWidth - scrollerGlobal.clientWidth + 1}px`;
 					}
 				}
-				
-				if (!scrollerGlobal) {
-					tooltip.style.position = 'fixed';
-				}
-				
-				tooltip.innerText = title;
-				
-				// todo place once
-				element.offsetParent.parentElement.insertAdjacentElement('afterbegin', tooltip);
 				
 				window.addEventListener('scroll', () => {
 					removeTitle();
@@ -464,7 +524,7 @@ const [setTitle, removeTitle] = (() => {
 			});
 		},
 		() => {
-			tooltip.style.display = 'none';
+			wrapper.remove();
 			
 			activeElement = undefined;
 		},
@@ -486,7 +546,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 	}
 	
 	if (id && 'value' in scope[id]) {
-		setTitle(element, getTitle(scope[id].value, scope[id].type));
+		setTitle(element, getTitle(scope[id].value, scope[id].type), scope[id].description);
 	}
 	
 	const callbacks = {
@@ -500,10 +560,12 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 		},
 	};
 	
-	element.addEventListener('pointerenter', () => {
+	element.addEventListener('pointerenter', ({pointerType}) => {
 		if (unhover && !unhover(element)) {
 			return;
 		}
+		
+		const isMouse = pointerType === 'mouse';
 		
 		const ids = [id];
 		
@@ -546,14 +608,23 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 			
 			hovered.length = 0;
 			
-			demo.hooks.any.remove(callbacks.hook, false, false);
+			demo.hooks.any.remove(callbacks.hook);
 			element.removeEventListener('mouseleave', callbacks.leave);
+			
+			if (!isMouse) {
+				window.removeEventListener('scroll', callbacks.leave, true);
+			}
 			
 			return true;
 		};
 		
 		demo.hooks.any.add(callbacks.hook, false, false);
+		// I want mobile users to get a sustained visualisation on tap, so pointerleave doesn't work
 		element.addEventListener('mouseleave', callbacks.leave, {once: true});
+		
+		if (!isMouse) {
+			window.addEventListener('scroll', callbacks.leave, {once: true, capture: true});
+		}
 		
 		if (doShowVisuals) {
 			visuals.push(visualise(scope, ...ids));
@@ -808,6 +879,7 @@ const interpretters = {
 		
 		return {value: Math.pow(value, power), elements: [wrapper, element]};
 	},
+	log2: getFunction(Math.log2),
 	call: (statement, scope, meta, indent) => {
 		const id = getElement(CLASS_NAMES.id, CLASS_NAMES.evocation);
 		const args = getElement(CLASS_NAMES.args);

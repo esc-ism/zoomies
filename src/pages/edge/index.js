@@ -114,8 +114,8 @@ export default {
 			[
 				'Greyed-out code is unexecuted for the current inputs.',
 				getInputDependent((isMouse) => isMouse ?
-					'Click a variable in executed code to see its value. Mouse over a green variable to see its value visualised in the playground.' :
-					'Tap a variable in executed code to see its value. If the variable is green, its value will be visualised in the playground.'),
+					'Click a variable in executed code to see its value, or double click for a description. Mouse over a green variable to see its value visualised in the playground.' :
+					'Tap a variable in executed code to see its value, or double tap for a description. If the variable is green, its value will be visualised in the playground.'),
 			],
 			[
 				'Code snippets run when you turn a page, and don\'t keep up with state changes.',
@@ -123,7 +123,7 @@ export default {
 			],
 		),
 		getCode(code, [
-			{op: '=', id: 'boundX', type: 'x', and: {
+			{op: '=', id: 'boundX', description: 'Horizontal panning space as a fraction of image width', type: 'x', and: {
 				op: '?', multiline: true, and: [
 					{op: '>=', and: [
 						{op: '/', and: ['viewportWidth', 'zoom']},
@@ -134,7 +134,7 @@ export default {
 				],
 			}},
 			'',
-			{op: '=', id: 'boundY', type: 'y', and: {
+			{op: '=', id: 'boundY', description: 'Vertical panning space as a fraction of image height', type: 'y', and: {
 				op: '?', multiline: true, and: [
 					{op: '>=', and: [
 						{op: '/', and: ['viewportHeight', 'zoom']},
@@ -346,14 +346,14 @@ export default {
 			'This is the final "snap zoom".',
 		],
 		getCode(code, [
-			{op: '=', id: 'zoomX', type: 'zoom', and: {
+			{op: '=', id: 'zoomX', description: 'The lowest zoom at which x is in-bounds', type: 'zoom', and: {
 				op: '/', and: ['½viewportWidth', 'imageWidth', {op: '-', and: [0.5, {op: 'abs', and: 'x'}]}],
 			}},
-			{op: '=', id: 'zoomY', type: 'zoom', and: {
+			{op: '=', id: 'zoomY', description: 'The lowest zoom at which y is in-bounds', type: 'zoom', and: {
 				op: '/', and: ['½viewportHeight', 'imageHeight', {op: '-', and: [0.5, {op: 'abs', and: 'y'}]}],
 			}},
 			'',
-			{op: '=', id: 'snapZoom', type: 'zoom', and: {
+			{op: '=', id: 'snapZoom', description: 'The lowest zoom at which (x, y) is in-bounds', type: 'zoom', and: {
 				op: 'max', and: ['zoomX', 'zoomY'],
 			}},
 		]),

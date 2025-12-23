@@ -35,6 +35,7 @@ export const permissiveTweens = {
 
 const functions = [
 	...SHARED_FUNCTIONS,
+	// todo remove args wherever possible
 	{op: 'func', id: 'getBound', args: ['cornerX', 'cornerY', 'cornerZoom'], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '<=', and: [
@@ -44,7 +45,7 @@ const functions = [
 			{op: 'return', and: {op: 'array', and: [0, 0]}},
 		]},
 		'',
-		{op: '=', id: 'progress', and: {
+		{op: '=', id: 'progress', description: 'The fraction of zoom increase', and: {
 			op: '/', and: [
 				'zoom',
 				'cornerZoom',
@@ -74,7 +75,7 @@ const functions = [
 			{op: 'return', and: {op: 'array', and: [0, 0]}},
 		]},
 		'',
-		{op: '=', id: 'proportion', and: {
+		{op: '=', id: 'proportion', description: 'The fraction of rail to snip', and: {
 			op: '-', and: [
 				1,
 				{op: '/', and: [
@@ -120,7 +121,7 @@ const functions = [
 		{op: 'return', and: {op: 'array', and: [0.5, -0.5, -0.5, -0.5]}},
 	]},
 	{op: 'func', id: 'getStartZooms', type: ['zoom', 'zoom'], and: [
-		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], type: ['zoom', 'zoom', 'zoom', 'zoom'], and: {
+		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], and: {
 			op: 'call', id: 'getAllStartZooms',
 		}},
 		'',
@@ -192,18 +193,6 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'A rail\'s "start zoom" is the zoom at which bounds ',
-			getButton('start progressing', [
-				(zoom) => [{zoom, position: 0}, TWEEN_OPTIONS_SETUP],
-				(zoom) => [{zoom: zoom * 1.1}, TWEEN_OPTIONS_YOYO],
-			], {
-				getParam: () => {
-					const {zoomPoints} = demo.system;
-					
-					return zoomPoints[zoomPoints[0].z < zoomPoints[1].z ? 0 : 1].z;
-				},
-			}),
-			' along it.',
 			'To assign start zooms, we need to find the maximum zoom at which image corners are visible from the origin.',
 			'Adjacent rails can differ, but opposite rails always share a start zoom.',
 			'Knowing this, only the top-left and top-right corners need be considered.',
@@ -933,10 +922,10 @@ export default {
 				op: 'call', id: 'getBound', and: [-0.5, 0.5, 'topLeftZoom'],
 			}},
 			'',
-			{op: '=', id: 'bottomRightX', ref: 'topLeftX', pair: 'bottomRightY', and: {
+			{op: '=', id: 'bottomRightX', description: 'The bottom right bound vertex\'s x-coordinate', ref: 'topLeftX', pair: 'bottomRightY', and: {
 				op: '-', and: 'topLeftX',
 			}},
-			{op: '=', id: 'bottomRightY', ref: 'topLeftY', pair: 'bottomRightX', and: {
+			{op: '=', id: 'bottomRightY', description: 'The bottom right bound vertex\'s y-coordinate', ref: 'topLeftY', pair: 'bottomRightX', and: {
 				op: '-', and: 'topLeftY',
 			}},
 			'',
@@ -944,10 +933,11 @@ export default {
 				op: 'call', id: 'getBound', and: [0.5, 0.5, 'topRightZoom'],
 			}},
 			'',
-			{op: '=', id: 'bottomLeftX', ref: 'topRightX', pair: 'bottomLeftY', and: {
+			// todo does ref overwrite description?
+			{op: '=', id: 'bottomLeftX', description: 'The bottom left bound vertex\'s x-coordinate', ref: 'topRightX', pair: 'bottomLeftY', and: {
 				op: '-', and: 'topRightX',
 			}},
-			{op: '=', id: 'bottomLeftY', ref: 'topRightY', pair: 'bottomLeftX', and: {
+			{op: '=', id: 'bottomLeftY', description: 'The bottom left bound vertex\'s y-coordinate', ref: 'topRightY', pair: 'bottomLeftX', and: {
 				op: '-', and: 'topRightY',
 			}},
 		]),

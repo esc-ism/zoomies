@@ -41,9 +41,8 @@ export const getZoomPoints = ({rotation, sizesViewport, sizesImage}) => {
 	const quadrantAngle = getQuadrantAngle(rotation, isEvenQuadrant);
 	const progress = quadrantAngle / DEGREES[90];
 	
-	const avg0 = (norm0 + inv0) / 2;
-	const scale = norm1 / norm0;
-	const threshold = scale / (inv1 / inv0 + scale);
+	const threshold = Math.log2(norm1 / norm0) / Math.log2(inv1 / inv0);
+	const avg0 = threshold * (inv0 - norm0) + norm0;
 	
 	return progress <= threshold ?
 			getFinalZoomPoints(isNormX, norm0, avg0, norm1, avg0, progress / threshold) :
@@ -54,8 +53,8 @@ export const getConstrainedZoom = ({x, y}, lowAxis, zoomPoints) => {
 	const [xZoomPoint, yZoomPoint] = lowAxis === 'y' ? [zoomPoints[1], zoomPoints[0]] : zoomPoints;
 	
 	return Math.max(
-		(0.5 - xZoomPoint.x) / (0.5 - Math.abs(x)) * xZoomPoint.z,
-		(0.5 - yZoomPoint.y) / (0.5 - Math.abs(y)) * yZoomPoint.z,
+		0.5 / (0.5 - Math.abs(x)) * xZoomPoint.z,
+		0.5 / (0.5 - Math.abs(y)) * yZoomPoint.z,
 	);
 };
 

@@ -102,7 +102,7 @@ export const getButton = (text, tweens, {getParam = () => undefined, isRandom = 
 			
 			const param = getParam();
 			
-			demo.setTween(...resetTweens, ...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
+			demo.setTween(...tweens.map((tween) => typeof tween === 'function' ? tween(param) : tween));
 			
 			demo.tweenEnd.then(() => {
 				element.removeEventListener('blur', releaseButton);

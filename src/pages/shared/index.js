@@ -1,7 +1,7 @@
 import {inputListener} from '@/consts';
 import {SUB_PIXEL_BS} from '@/shared';
 
-import generateCode from '../code';
+import generateCode, {addSpanBackground} from '../code';
 import {
 	CLASS_CODE, CLASS_WRAPPER, CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
 	CLASS_MATH_TITLE, CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_BODY,
@@ -76,19 +76,8 @@ export const getDialogue = (...content) => ({
 	tag: 'div',
 	classList: [CLASS_DIALOGUE_CONTAINER],
 	content: {tag: 'span', classList: [CLASS_DIALOGUE], content},
-	// awful hack because styling inline elements is weird
 	callback: (container) => {
-		const element = container.firstChild;
-		const background = document.createElement('div');
-		
-		background.classList.add(CLASS_DIALOGUE_BACKGROUND);
-		
-		new ResizeObserver(() => {
-			background.style.width = `${element.offsetWidth}px`;
-			background.style.height = `${element.offsetHeight}px`;
-		}).observe(container);
-		
-		container.insertBefore(background, element);
+		new ResizeObserver(addSpanBackground([CLASS_DIALOGUE_BACKGROUND], container.firstChild, container)).observe(container);
 	},
 });
 
@@ -139,7 +128,6 @@ export const getText = (...children) => {
 	wrapper.style.scrollSnapStop = 'always';
 	
 	container.style.padding = '0 1em';
-	container.style.boxSizing = 'border-box';
 	
 	wrapper.classList.add(CLASS_WRAPPER);
 	

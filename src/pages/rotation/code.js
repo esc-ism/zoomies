@@ -1,15 +1,15 @@
 export const LERP = [
 	{op: 'func', id: 'getProgressed', args: ['fromX', 'fromY', 'toX', 'toY', 'lowZoom', 'highZoom'], pair: [1, 0], and: [
-		{op: '=', id: 't', and: {op: '-', and: [1, {op: '/', and: ['lowZoom', 'highZoom']}]}},
+		{op: '=', id: 't', description: 'The amount of progress as a fraction', and: {op: '-', and: [1, {op: '/', and: ['lowZoom', 'highZoom']}]}},
 		'',
 		{op: 'return', and: {op: 'array', and: [
 			{op: '+', and: ['fromX', {op: '*', and: ['t', {op: '-', and: ['toX', 'fromX']}]}]},
 			{op: '+', and: ['fromY', {op: '*', and: ['t', {op: '-', and: ['toY', 'fromY']}]}]},
 		]}},
 	]},
-	{op: 'func', id: 'getθ', args: ['isEvenQuadrant'], type: 'angle', isBase: true, and: [
-		{op: '=', id: 'angle', type: 'angle', isBase: true, and: {
-			op: '%', and: [{op: '+', and: ['rotation', {op: '*', and: ['π', 2]}]}, '½π'],
+	{op: 'func', id: 'getθ', description: '0 when the image is perfectly right-side-up or upside-down, and 1 when the image is perfectly sideways', args: ['isEvenQuadrant'], type: 'angle', isBase: true, and: [
+		{op: '=', id: 'angle', description: 'The rotation\'s difference from the 90° multiple below it', type: 'angle', isBase: true, and: {
+			op: '%', and: [{op: '+', and: ['rotation', '2π']}, '½π'],
 		}},
 		'',
 		{op: 'if', and: [
@@ -23,7 +23,7 @@ export const LERP = [
 
 const SINGLE = [
 	{op: 'func', id: 'getT', args: ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'isInverse'], and: [
-		{op: '=', id: 'a', and: {
+		{op: '=', id: 'a', description: 'A variable in the quadratic formula', and: {
 			op: '-', and: [
 				{op: '+', and: [
 					{op: '*', and: ['g', 'j']},
@@ -37,7 +37,7 @@ const SINGLE = [
 				{op: '*', and: ['i', 'd']},
 			],
 		}},
-		{op: '=', id: 'b', and: {
+		{op: '=', id: 'b', description: 'A variable in the quadratic formula', and: {
 			op: '-', and: [
 				{op: '+', and: [
 					{op: '*', and: ['g', 'h']},
@@ -57,7 +57,7 @@ const SINGLE = [
 				{op: '*', and: ['d', 'y']},
 			],
 		}},
-		{op: '=', id: 'c', and: {
+		{op: '=', id: 'c', description: 'A variable in the quadratic formula', and: {
 			op: '-', and: [
 				{op: '+', and: [
 					{op: '*', and: ['h', 'e']},
@@ -104,20 +104,20 @@ const SINGLE = [
 		}},
 	]},
 	{op: 'func', id: 'getAllStartZooms', type: ['zoom', 'zoom', 'zoom', 'zoom'], and: [
-		{op: '=', id: 'offset', type: 'angle', isBase: true, and: {
+		{op: '=', id: 'offset', description: 'The angle between the image\'s positive y-axis and its upper corners', type: 'angle', isBase: true, and: {
 			op: 'atan', and: {
 				op: '/', and: ['imageWidth', 'imageHeight'],
 			},
 		}},
 		'',
-		{op: '=', id: 'topLeftAngle', type: 'angle', fight: true, and: {
+		{op: '=', id: 'topLeftAngle', description: 'The angle between the image\'s un-rotated positive x-axis and its top-left corner', type: 'angle', fight: true, and: {
 			op: '+', and: ['rotation', 'offset'],
 		}},
-		{op: '=', id: 'topRightAngle', type: 'angle', fight: true, and: {
+		{op: '=', id: 'topRightAngle', description: 'The angle between the image\'s un-rotated positive x-axis and its top-right corner', type: 'angle', fight: true, and: {
 			op: '-', and: ['rotation', 'offset'],
 		}},
 		'',
-		{op: '=', id: 'distance', type: 'position', angle: 'topRightAngle', isPercent: false, and: {
+		{op: '=', id: 'distance', description: 'The distance between the image\'s origin and its corners', type: 'position', angle: 'topRightAngle', isPercent: false, and: {
 			op: 'root', and: {
 				op: '+', and: [
 					{op: 'pow', and: '½imageWidth'},
@@ -206,17 +206,17 @@ export const MULTI_LINE = [
 		]}},
 	]},
 	{op: 'func', id: 'getViewportPoints', args: ['zoomSide', 'zoomBase'], type: ['xvp', 'yvp', 'xvp', 'yvp'], pair: [1, 0, 3, 2], and: [
-		{op: '=', id: 'rightX', isPercent: false, type: 'xvp', and: {
+		{op: '=', id: 'rightX', description: 'The viewport\'s horizontal radius at zoomSide', isPercent: false, type: 'xvp', and: {
 			op: '/', and: ['½viewportWidth', 'zoomSide'],
 		}},
-		{op: '=', id: 'topY', isPercent: false, type: 'yvp', and: {
+		{op: '=', id: 'topY', description: 'The viewport\'s vertical radius at zoomBase', isPercent: false, type: 'yvp', and: {
 			op: '/', and: ['½viewportHeight', 'zoomBase'],
 		}},
 		'',
-		{op: '=', id: 'rightTheta', type: 'angle', and: {
+		{op: '=', id: 'rightTheta', description: 'The angle between the image\'s positive x-axis and its un-rotated positive x-axis', type: 'angle', and: {
 			op: '-', and: ['½π', 'rotation'],
 		}},
-		{op: '=', id: 'topTheta', type: 'angle', and: {
+		{op: '=', id: 'topTheta', description: 'The angle between the image\'s positive x-axis and its un-rotated positive y-axis', type: 'angle', and: {
 			op: '+', and: ['rightTheta', '½π'],
 		}},
 		'',

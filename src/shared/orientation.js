@@ -19,7 +19,7 @@ export const addVerticalRule = (...rule) => {
 	verticalRules.push(getRuleString(...rule));
 };
 
-export const list = window.matchMedia('(max-aspect-ratio: 1/1)');
+export const list = window.matchMedia('(orientation: portrait)');
 
 export const isVertical = () => list.matches;
 
