@@ -77,11 +77,10 @@ const functions = [
 		{op: '=', id: 'θ', and: {op: 'call', id: 'getθ', and: ['isEvenQuadrant']}},
 		{op: '=', id: 'progress', description: 'The rotation\'s progress towards being perfectly sideways', and: {op: '/', and: ['θ', '½π']}},
 		'',
-		{op: '=', id: 'threshold', description: ['The fraction of rotation at which rails should be single lines from origin to corners'], and: {op: '/', and: [
-			{op: 'log2', and: {op: '/', and: ['z1', 'z0']}},
-			{op: 'log2', and: {op: '/', and: ['z1Flipped', 'z0Flipped']}},
-		]}},
-		{op: '=', id: 'zAvg0', description: ['Rail start zooms when they\'re single lines'], type: 'zoom', and: {op: '+', and: [{op: '*', and: ['threshold', {op: '-', and: ['z0Flipped', 'z0']}]}, 'z0']}},
+		{op: '=', id: 'scale', description: 'A measurement of how far the second rail\'s start point is from (0, 0) at 0° rotation', and: {op: 'log2', and: {op: '/', and: ['z1', 'z0']}}},
+		{op: '=', id: 'scaleFlipped', description: 'A measurement of how far the second rail\'s start point is from (0, 0) at 90° rotation', and: {op: 'log2', and: {op: '/', and: ['z1Flipped', 'z0Flipped']}}},
+		{op: '=', id: 'threshold', description: 'The fraction of rotation at which the second rail\'s start point should be (0, 0)', and: {op: '/', and: ['scale', {op: '+', and: ['scale', 'scaleFlipped']}]}},
+		{op: '=', id: 'zAvg0', description: 'The second rail\'s start zoom at threshold rotation', type: 'zoom', and: {op: '+', and: [{op: '*', and: ['threshold', {op: '-', and: ['z0Flipped', 'z0']}]}, 'z0']}},
 		'',
 		{op: 'return', and: {op: '?', multiline: true, and: [
 			{op: '<=', and: ['progress', 'threshold']},

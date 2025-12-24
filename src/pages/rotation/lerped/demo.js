@@ -41,7 +41,9 @@ export const getZoomPoints = ({rotation, sizesViewport, sizesImage}) => {
 	const quadrantAngle = getQuadrantAngle(rotation, isEvenQuadrant);
 	const progress = quadrantAngle / DEGREES[90];
 	
-	const threshold = Math.log2(norm1 / norm0) / Math.log2(inv1 / inv0);
+	const scale = Math.log2(norm1 / norm0);
+	const scaleInv = Math.log2(inv1 / inv0);
+	const threshold = scale / (scale + scaleInv);
 	const avg0 = threshold * (inv0 - norm0) + norm0;
 	
 	return progress <= threshold ?
