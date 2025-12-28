@@ -24,34 +24,37 @@ const functions = [
 	{op: 'func', id: 'getGenericIntersection', multiline: 2, args: [
 		'from0X', 'from0Y', 'to0X', 'to0Y',
 		'from1X', 'from1Y', 'to1X', 'to1Y',
+	], description: [
+		'The x-coordinate of the first line\'s first point',
+		'The y-coordinate of the first line\'s first point',
+		'The x-coordinate of the first line\'s second point',
+		'The y-coordinate of the first line\'s second point',
+		'The x-coordinate of the second line\'s first point',
+		'The y-coordinate of the second line\'s first point',
+		'The x-coordinate of the second line\'s second point',
+		'The y-coordinate of the second line\'s second point',
 	], type: ['x', 'y'], pair: [1, 0], and: [
-		{op: '=', id: 'a0', and: {
+		{op: '=', id: 'a0', description: 'An intermediate value', and: {
 			op: '-', and: ['from0Y', 'to0Y'],
 		}},
-		{op: '=', id: 'b0', and: {
+		{op: '=', id: 'b0', description: 'An intermediate value', and: {
 			op: '-', and: ['to0X', 'from0X'],
 		}},
-		{op: '=', id: 'c0', and: {
-			op: '-', and: [
-				{op: '*', and: ['from0Y', 'to0X']},
-				{op: '*', and: ['from0X', 'to0Y']},
-			],
+		{op: '=', id: 'c0', description: 'An intermediate value', and: {
+			op: '-', and: [{op: '*', and: ['from0Y', 'to0X']}, {op: '*', and: ['from0X', 'to0Y']}],
 		}},
 		'',
-		{op: '=', id: 'a1', and: {
+		{op: '=', id: 'a1', description: 'An intermediate value', and: {
 			op: '-', and: ['from1Y', 'to1Y'],
 		}},
-		{op: '=', id: 'b1', and: {
+		{op: '=', id: 'b1', description: 'An intermediate value', and: {
 			op: '-', and: ['to1X', 'from1X'],
 		}},
-		{op: '=', id: 'c1', and: {
-			op: '-', and: [
-				{op: '*', and: ['from1Y', 'to1X']},
-				{op: '*', and: ['from1X', 'to1Y']},
-			],
+		{op: '=', id: 'c1', description: 'An intermediate value', and: {
+			op: '-', and: [{op: '*', and: ['from1Y', 'to1X']}, {op: '*', and: ['from1X', 'to1Y']}],
 		}},
 		'',
-		{op: '=', id: 'd', and: {
+		{op: '=', id: 'd', description: 'An intermediate value', and: {
 			op: '-', and: [
 				{op: '*', and: ['a0', 'b1']},
 				{op: '*', and: ['b0', 'a1']},
@@ -64,73 +67,61 @@ const functions = [
 		]},
 		'',
 		{op: 'return', and: {op: 'array', and: [
-			{op: '/', and: [
-				{op: '-', and: [
-					{op: '*', and: ['c0', 'b1']},
-					{op: '*', and: ['b0', 'c1']},
-				]},
-				'd',
-			]},
-			{op: '/', and: [
-				{op: '-', and: [
-					{op: '*', and: ['a0', 'c1']},
-					{op: '*', and: ['c0', 'a1']},
-				]},
-				'd',
-			]},
+			{op: '/', and: [{op: '-', and: [{op: '*', and: ['c0', 'b1']}, {op: '*', and: ['b0', 'c1']}]}, 'd']},
+			{op: '/', and: [{op: '-', and: [{op: '*', and: ['a0', 'c1']}, {op: '*', and: ['c0', 'a1']}]}, 'd']},
 			false,
 		]}},
 	]},
 	{op: 'func', id: 'getIntersection', args: [
 		'zoom0', 'from0X', 'from0Y', 'to0X', 'to0Y',
 		'from1X', 'from1Y', 'to1X', 'to1Y',
+	], description: [
+		'The zoom at the lock rail\'s first point',
+		'The x-coordinate of the lock rail\'s first point',
+		'The y-coordinate of the lock rail\'s first point',
+		'The x-coordinate of the lock rail\'s horizon',
+		'The y-coordinate of the lock rail\'s horizon',
+		'The x-coordinate of the other rail\'s start point',
+		'The y-coordinate of the other rail\'s start point',
+		'The x-coordinate of the other rail\'s horizon',
+		'The y-coordinate of the other rail\'s horizon',
 	], multiline: 2, type: ['zoom', 'x', 'y'], pair: [,2, 1], and: [
-		{op: '=', id: ['intersectX', 'intersectY'], and: {
+		{op: '=', id: ['intersectX', 'intersectY'], description: [
+			'The x-coordinate at the intersection',
+			'The y-coordinate at the intersection',
+		], and: {
 			op: 'call', id: 'getGenericIntersection', and: ['from0X', 'from0Y', 'to0X', 'to0Y', 'from1X', 'from1Y', 'to1X', 'to1Y'],
 		}},
 		'',
-		{op: '=', id: 'isXAxis', and: {
+		{op: '=', id: 'isXAxis', description: 'True if the intersection is farther from the origin horizontally than vertically', and: {
 			op: '>', and: [{op: 'abs', and: 'to0X'}, {op: 'abs', and: 'to0Y'}],
 		}},
 		'',
-		{op: '=', id: 'progress', and: {
+		{op: '=', id: 'progress', description: 'A measurement of how much closer the intersection is to the lock rail\'s horizon than its first point', and: {
 			op: '?', multiline: true, and: [
 				'isXAxis',
-				{op: '/', and: [
-					{op: '-', and: ['intersectX', 'from0X']},
-					{op: '-', and: ['to0X', 'from0X']},
-				]},
-				{op: '/', and: [
-					{op: '-', and: ['intersectY', 'from0Y']},
-					{op: '-', and: ['to0Y', 'from0Y']},
-				]},
+				{op: '/', and: [{op: '-', and: ['intersectX', 'from0X']}, {op: '-', and: ['to0X', 'from0X']}]},
+				{op: '/', and: [{op: '-', and: ['intersectY', 'from0Y']}, {op: '-', and: ['to0Y', 'from0Y']}]},
 			],
 		}},
 		'',
-		{op: 'return', and: {op: 'array', and: [
-			{op: '/', and: [
-				'zoom0',
-				{op: '-', and: [1, 'progress']},
-			]},
-			'intersectX',
-			'intersectY',
-		]}},
+		{op: 'return', and: {op: 'array', and: [{op: '/', and: ['zoom0', {op: '-', and: [1, 'progress']}]}, 'intersectX', 'intersectY']}},
 	]},
-	{op: 'func', id: 'getProgressedMiddle', args: ['x', 'y', 'zoom0', 'zoom1'], type: ['x', 'y'], pair: [1, 0], and: [
-		{op: '=', id: 'mult', and: {
-			op: '/', and: ['zoom0', 'zoom1'],
-		}},
-		'',
-		{op: 'return', and: {op: 'array', and: [
-			{op: '*', and: ['x', 'mult']},
-			{op: '*', and: ['y', 'mult']},
-		]}},
-	]},
-	{op: 'func', id: 'getSecond', args: ['firstZoom', 'firstEndX', 'firstEndY', 'secondZoom', 'offsetX', 'offsetY'], multiline: 2, type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
-		{op: '=', id: ['secondX', 'secondY'], type: ['x', 'y'], and: {
+	{op: 'func', id: 'getSecond', args: ['firstZoom', 'firstEndX', 'firstEndY', 'secondZoom', 'offsetX', 'offsetY'], description: [
+		'The origin rail\'s start zoom',
+		'The x-coordinate of the origin rail\'s horizon',
+		'The y-coordinate of the origin rail\'s horizon',
+		'The connecting rail\'s start zoom',
+		'The x-coordinate of the viewport midpoint that isn\'t the origin rail\'s horizon',
+		'The y-coordinate of the viewport midpoint that isn\'t the origin rail\'s horizon',
+	], multiline: 2, type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
+		{op: '=', id: ['secondX', 'secondY'], description: [
+			'The x-coordinate of the connecting rail\'s start point',
+			'The y-coordinate of the onnecting rail\'s start point',
+		], type: ['x', 'y'], and: {
 			op: 'call', id: 'getProgressed', and: [0, 0, 'firstEndX', 'firstEndY', 'firstZoom', 'secondZoom'],
 		}},
-		{op: '=', id: 'mult', and: {
+		{op: '=', id: 'mult', description: 'The scale increase from the origin rail\'s start zoom to the connecting rail\'s', and: {
 			op: '/', and: ['firstZoom', 'secondZoom'],
 		}},
 		'',
@@ -140,19 +131,28 @@ const functions = [
 			{op: '+', and: [{op: '*', and: ['firstEndY', 'mult']}, 'offsetY', 'secondY']},
 		]}},
 	]},
-	{op: 'func', id: 'getAxisIntersects', args: ['isEvenQuadrant', 'θ'], type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [2, 1, 5, 4], and: [
-		{op: '=', id: ['αSide', 'αBase'], and: {
-			op: 'call', id: 'getα', and: ['θ'],
+	{op: 'func', id: 'getAxisIntersects', type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [2, 1, 5, 4], and: [
+		{op: '=', id: ['αSide', 'αBase'], description: [
+			'The angle between the side lock rail and the un-rotated x-axis',
+			'The angle between the base lock rail and the un-rotated y-axis',
+		], and: {
+			op: 'call', id: 'getα',
 		}},
 		'',
 		{op: 'if', and: [
 			{op: '>=', and: ['θ', '¼π']},
-			{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideY'], and: {op: 'call', id: 'getYIntersect', and: [
+			{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideY'], description: [
+				'The viewport-side lock rail\'s zoom at its intersection with the y-axis',
+				'The viewport-side lock rail\'s y-coordinate at its intersection with the y-axis',
+			], and: {op: 'call', id: 'getYIntersect', and: [
 				'½viewportWidth',
 				{op: '+', and: ['θ', 'αSide']},
 				'αSide',
 			]}},
-			{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseY'], and: {op: 'call', id: 'getYIntersect', and: [
+			{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseY'], description: [
+				'The viewport-base lock rail\'s zoom at its intersection with the y-axis',
+				'The viewport-base lock rail\'s y-coordinate at its intersection with the y-axis',
+			], and: {op: 'call', id: 'getYIntersect', and: [
 				'½viewportHeight',
 				{op: '-', and: ['½π', 'θ', 'αBase']},
 				'αBase',
@@ -164,14 +164,20 @@ const functions = [
 			]}},
 		]},
 		'',
-		{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideX'], and: {
+		{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideX'], description: [
+			'The viewport-side lock rail\'s zoom at its intersection with the x-axis',
+			'The viewport-side lock rail\'s x-coordinate at its intersection with the x-axis',
+		], and: {
 			op: 'call', id: 'getXIntersect', and: [
 				'½viewportWidth',
 				{op: '-', and: ['½π', 'θ', 'αSide']},
 				'αSide',
 			],
 		}},
-		{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseX'], and: {
+		{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseX'], description: [
+			'The viewport-base lock rail\'s zoom at its intersection with the x-axis',
+			'The viewport-base lock rail\'s x-coordinate at its intersection with the x-axis',
+		], and: {
 			op: 'call', id: 'getXIntersect', and: [
 				'½viewportHeight',
 				{op: '+', and: ['θ', 'αBase']},
@@ -193,10 +199,6 @@ const functions = [
 		]}},
 	]},
 	{op: 'func', id: 'getDoFlip', and: [
-		{op: '=', id: 'isXAxis', and: {
-			op: '>', and: [{op: 'abs', and: 'firstEndX'}, {op: 'abs', and: 'firstEndY'}],
-		}},
-		'',
 		{op: '=', id: ['farX', 'farY', 'isParallel'], and: {
 			op: 'call', id: 'getGenericIntersection', and: [0, 0, 'firstEndX', 'firstEndY', 'thirdX', 'thirdY', 'thirdEndX', 0.5],
 		}},
@@ -209,13 +211,17 @@ const functions = [
 			]}},
 		]},
 		'',
-		{op: '=', id: 'mThird', and: {
+		{op: '=', id: 'isXAxis', description: 'True if the origin rail\'s horizon is farther from the origin horizontally than vertically', and: {
+			op: '>', and: [{op: 'abs', and: 'firstEndX'}, {op: 'abs', and: 'firstEndY'}],
+		}},
+		'',
+		{op: '=', id: 'mThird', description: 'The lock rail\'s gradient', and: {
 			op: '/', and: [
 				{op: '-', and: [0.5, 'thirdY']},
 				{op: '-', and: ['thirdEndX', 'thirdX']},
 			],
 		}},
-		{op: '=', id: 'mFirst', and: {
+		{op: '=', id: 'mFirst', description: 'The origin rail\'s gradient', and: {
 			op: '/', and: ['firstEndY', 'firstEndX'],
 		}},
 		'',
@@ -225,14 +231,8 @@ const functions = [
 				{op: '<', and: ['mThird', 'mFirst']},
 				{op: '?', multiline: true, and: [
 					'isXAxis',
-					{op: '==', and: [
-						{op: '>', and: ['secondX', 0]},
-						{op: '<', and: ['farX', 'secondX']},
-					]},
-					{op: '==', and: [
-						{op: '>', and: ['secondY', 0]},
-						{op: '<', and: ['farY', 'secondY']},
-					]},
+					{op: '==', and: [{op: '>', and: ['secondX', 0]}, {op: '<', and: ['farX', 'secondX']}]},
+					{op: '==', and: [{op: '>', and: ['secondY', 0]}, {op: '<', and: ['farY', 'secondY']}]},
 				]},
 			],
 		}},
@@ -240,69 +240,96 @@ const functions = [
 	{op: 'func', id: 'getShared', type: [
 		'zoom', 'zoom',
 		// first
-		'xvp', 'yvp', 'xvp', 'yvp', 'xvp', 'yvp', 'xvp', 'yvp',
+		'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 		// second
 		'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
-	], multilineResult: [2, 4, 4, 8, 8], pair: [,,3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24], args: [
-		'isEvenQuadrant', 'zoomSide', 'zoomBase', 'rightXRaw', 'rightYRaw', 'topXRaw', 'topYRaw',
-		'axisIntersectXSide', 'axisIntersectYSide', 'axisIntersectXBase', 'axisIntersectYBase',
-		'cornerXSide', 'cornerXBase',
-	], multiline: [7, 4, 2], and: [
-		{op: '=', id: 'isHorizontalFirst', and: {
+	], multilineResult: [2, 4, 4, 8, 8], pair: [,,3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24], multiline: [7, 4, 2], and: [
+		{op: '=', id: 'isHorizontalFirst', description: 'True if the image first starts disappearing off the top/bottom of the viewport', and: {
 			op: '<=', and: ['zoomSide', 'zoomBase'],
 		}},
-		{op: '=', id: 'isVerticalFlip', and: {
+		{op: '=', id: 'isVerticalFlip', description: 'True if the image is rotated between 90° and 270°', and: {
 			op: '&&', and: [
 				{op: '<', and: ['rotation', 0]},
 				{op: '>', and: ['rotation', {op: '-', and: 'π'}]},
 			],
 		}},
 		'',
-		{op: '=', id: ['rightX', 'rightY'], and: {
+		{op: '=', id: ['sideX', 'sideY'], ref: ['rightX', 'rightY'], pair: ['sideY', 'sideX'], description: [
+			'The midpoint x-coordinate of the left/right viewport edge that is closer to the upper image corners',
+			'The midpoint y-coordinate of the left/right viewport edge that is closer to the upper image corners',
+		], and: {
 			op: '?', multiline: true, and: [
 				{op: '!=', and: ['isVerticalFlip', 'isEvenQuadrant']},
-				{op: 'array', and: [{op: '-', and: 'rightXRaw'}, {op: '-', and: 'rightYRaw'}]},
-				{op: 'array', and: ['rightXRaw', 'rightYRaw']},
+				{op: 'array', and: [{op: '-', and: 'rightX'}, {op: '-', and: 'rightY'}]},
+				{op: 'array', and: ['rightX', 'rightY']},
 			],
 		}},
-		{op: '=', id: ['topX', 'topY'], and: {
+		{op: '=', id: ['baseX', 'baseY'], ref: ['topX', 'topY'], pair: ['baseY', 'baseX'], description: [
+			'The midpoint x-coordinate of the top/bottom viewport edge that is closer to the upper image corners',
+			'The midpoint y-coordinate of the top/bottom viewport edge that is closer to the upper image corners',
+		], and: {
 			op: '?', multiline: true, and: [
 				'isVerticalFlip',
-				{op: 'array', and: [{op: '-', and: 'topXRaw'}, {op: '-', and: 'topYRaw'}]},
-				{op: 'array', and: ['topXRaw', 'topYRaw']},
+				{op: 'array', and: [{op: '-', and: 'topX'}, {op: '-', and: 'topY'}]},
+				{op: 'array', and: ['topX', 'topY']},
 			],
 		}},
 		'',
 		{op: '=', id: [
 			'firstZoom', 'secondZoom', 'firstEndX', 'firstEndY',
 			'offsetX', 'offsetY', 'thirdX', 'thirdY', 'thirdEndX',
-		], multiline: [6, 3], and: {
+		], description: [
+			'The origin rail\'s start zoom',
+			'The connecting rail\'s start zoom',
+			'The x-coordinate of the origin rail\'s horizon',
+			'The y-coordinate of the origin rail\'s horizon',
+			'The x-coordinate of the viewport midpoint that isn\'t the origin rail\'s horizon',
+			'The y-coordinate of the viewport midpoint that isn\'t the origin rail\'s horizon',
+			'An axis intersection x-coordinate of the lock rail with the higher start zoom',
+			'An axis intersection y-coordinate of the lock rail with the higher start zoom',
+			'The horizon x-coordinate of the lock rail with the higher start zoom',
+		], type: ['zoom', 'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x'], pair: [,,'firstEndY', 'firstEndX', 'offsetY', 'offsetX', 'thirdY', 'thirdX'], multiline: [6, 3], and: {
 			op: '?', multiline: true, and: [
 				'isHorizontalFirst',
 				{op: 'array', multiline: [6, 3], and: [
-					'zoomSide', 'zoomBase', 'rightX', 'rightY',
-					'topX', 'topY', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide',
+					'zoomSide', 'zoomBase', 'sideX', 'sideY',
+					'baseX', 'baseY', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide',
 				]},
 				{op: 'array', multiline: [6, 3], and: [
-					'zoomBase', 'zoomSide', 'topX', 'topY',
-					'rightX', 'rightY', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase',
+					'zoomBase', 'zoomSide', 'baseX', 'baseY',
+					'sideX', 'sideY', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase',
 				]},
 			],
 		}},
 		'',
-		{op: '=', id: ['secondX', 'secondY', 'secondEndX', 'secondEndY'], and: {
+		{op: '=', id: ['secondX', 'secondY', 'secondEndX', 'secondEndY'], description: [
+			'The x-coordinate of the connecting rail\'s start point',
+			'The y-coordinate of the connecting rail\'s start point',
+			'The x-coordinate of the connecting rail\'s horizon',
+			'The y-coordinate of the connecting rail\'s horizon',
+		], type: ['x', 'y', 'x', 'y'], pair: ['secondY', 'secondX', 'secondEndY', 'secondEndX'], and: {
 			op: 'call', id: 'getSecond', and: ['firstZoom', 'firstEndX', 'firstEndY', 'secondZoom', 'offsetX', 'offsetY'],
 		}},
 		'',
-		{op: '=', id: ['firstEndXFlipped', 'firstEndYFlipped', 'offsetXFlipped', 'offsetYFlipped'], and: {
+		{op: '=', id: ['firstEndXFlipped', 'firstEndYFlipped', 'offsetXFlipped', 'offsetYFlipped'], description: [
+			'The x-coordinate of the origin rail\'s horizon, with negative sideX',
+			'The y-coordinate of the origin rail\'s horizon, with negative sideY',
+			'The x-coordinate of the viewport midpoint that isn\'t the origin rail\'s horizon, with negative sideX',
+			'The y-coordinate of the viewport midpoint that isn\'t the origin rail\'s horizon, with negative sideY',
+		], ref: ['firstEndX', 'firstEndY', 'offsetX', 'offsetY'], pair: ['firstEndYFlipped', 'firstEndXFlipped', 'offsetYFlipped', 'offsetXFlipped'], and: {
 			op: '?', multiline: true, and: [
 				'isHorizontalFirst',
-				{op: 'array', and: [{op: '-', and: 'rightX'}, {op: '-', and: 'rightY'}, 'topX', 'topY']},
-				{op: 'array', and: ['topX', 'topY', {op: '-', and: 'rightX'}, {op: '-', and: 'rightY'}]},
+				{op: 'array', and: [{op: '-', and: 'sideX'}, {op: '-', and: 'sideY'}, 'baseX', 'baseY']},
+				{op: 'array', and: ['baseX', 'baseY', {op: '-', and: 'sideX'}, {op: '-', and: 'sideY'}]},
 			],
 		}},
 		'',
-		{op: '=', id: ['secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped'], and: {
+		{op: '=', id: ['secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped'], description: [
+			'The x-coordinate of the connecting rail\'s start point, with negative sideX',
+			'The y-coordinate of the connecting rail\'s start point, with negative sideY',
+			'The x-coordinate of the connecting rail\'s horizon, with negative sideX',
+			'The y-coordinate of the connecting rail\'s horizon, with negative sideY',
+		], ref: ['secondX', 'secondY', 'secondEndX', 'secondEndY'], pair: ['secondYFlipped', 'secondXFlipped', 'secondEndYFlipped', 'secondEndXFlipped'], and: {
 			op: 'call', id: 'getSecond', and: ['firstZoom', 'firstEndXFlipped', 'firstEndYFlipped', 'secondZoom', 'offsetXFlipped', 'offsetYFlipped'],
 		}},
 		'',
@@ -339,20 +366,43 @@ const functions = [
 		'firstZoom', 'firstEndX', 'firstEndY', 'firstEndXFlipped', 'firstEndYFlipped',
 		'secondZoom', 'secondX', 'secondY', 'secondEndX', 'secondEndY',
 		'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
+	], description: [
+		'The lock rail\'s start zoom',
+		'The x-coordinate of the lock rail\'s start point',
+		'The y-coordinate of the lock rail\'s start point',
+		'The x-coordinate of the lock rail\'s horizon',
+		'The origin rail\'s start zoom',
+		'The x-coordinate of the origin rail\'s horizon',
+		'The y-coordinate of the origin rail\'s horizon',
+		'The x-coordinate of the origin rail\'s horizon, with viewport left and right reversed',
+		'The y-coordinate of the origin rail\'s horizon, with viewport left and right reversed',
+		'The lock rail\'s start zoom',
+		'The x-coordinate of the connecting rail\'s start point',
+		'The y-coordinate of the connecting rail\'s start point',
+		'The x-coordinate of the connecting rail\'s horizon',
+		'The y-coordinate of the connecting rail\'s horizon',
+		'The x-coordinate of the connecting rail\'s start point, with viewport left and right reversed',
+		'The y-coordinate of the connecting rail\'s start point, with viewport left and right reversed',
+		'The x-coordinate of the connecting rail\'s horizon, with viewport left and right reversed',
+		'The y-coordinate of the connecting rail\'s horizon, with viewport left and right reversed',
 	], multiline: [4, 5, 5, 4], type: [
 		'zoom', 'x', 'y', 'xvp', 'yvp',,,
 		'x', 'y', 'x', 'y',
-	], multilineResult: [4, 5, 5, 4], pair: [,2, 1, 4, 3,,,8, 7, 10, 9], and: [
+	], multilineResult: [5, 6], pair: [,2, 1, 4, 3,,,8, 7, 10, 9], and: [
 		{op: 'if', and: [
 			{op: '>=', and: ['thirdZoom', 'secondZoom']},
-			{op: 'return', and: {op: 'array', and: [
+			{op: 'return', and: {op: 'array', multiline: [5, 6], and: [
 				'thirdZoom', 'thirdX', 'thirdY', 'firstEndX', 'firstEndY',
 				true, false, 'secondX', 'secondY', 'secondEndX', 'secondEndY',
 			]}},
 		]},
 		'',
-		{op: '=', id: ['thirdZoomFlipped', 'thirdXFlipped', 'thirdYFlipped'], and: {
-			op: 'call', id: 'getIntersection', and: [
+		{op: '=', id: ['thirdZoomFlipped', 'thirdXFlipped', 'thirdYFlipped'], description: [
+			'The lock rail\'s start zoom',
+			'The x-coordinate of the lock rail\'s start point, with viewport left and right reversed',
+			'The y-coordinate of the lock rail\'s start point, with viewport left and right reversed',
+		], and: {
+			op: 'call', id: 'getIntersection', multiline: [5, 4], and: [
 				'thirdZoom', 'thirdX', 'thirdY', 'cornerX', 0.5,
 				'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
 			],
@@ -360,7 +410,7 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			{op: '>=', and: ['thirdZoomFlipped', 'secondZoom']},
-			{op: 'return', and: {op: 'array', and: [
+			{op: 'return', and: {op: 'array', multiline: [5, 6], and: [
 				'thirdZoomFlipped', 'thirdXFlipped', 'thirdYFlipped', 'firstEndXFlipped', 'firstEndYFlipped',
 				true, true, 'secondXFlipped', 'secondYFlipped', 'secondEndXFlipped', 'secondEndYFlipped',
 			]}},
@@ -368,7 +418,7 @@ const functions = [
 		'',
 		{op: 'return', and: {op: 'array', and: [
 			'secondZoom', {op: '...', and: {
-				op: 'call', id: 'getGenericIntersection', and: [
+				op: 'call', id: 'getGenericIntersection', multiline: 2, and: [
 					0, 0, 'firstEndX', 'firstEndY', 'thirdX', 'thirdY', 'cornerX', 0.5,
 				],
 			}}, 'firstEndX', 'firstEndY',
@@ -381,23 +431,31 @@ const functions = [
 		'x', 'y', 'x', 'y',,
 		'x', 'y', 'x', 'y',
 	], multilineResult: [3, 3, 5, 2, 5, 5], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,14, 13, 16, 15,,19, 18, 21, 20], args: ['isEvenQuadrant'], and: [
-		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
+		{op: '=', id: ['zoomSide', 'zoomBase'], description: [
+			'The lowest zoom at which an image corner touches the left or right edge of the viewport',
+			'The lowest zoom at which an image corner touches the top or bottom edge of the viewport',
+		], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
 		'',
-		{op: '=', id: ['rightX', 'rightY', 'topX', 'topY'], and: {
+		{op: '=', id: ['rightX', 'rightY', 'topX', 'topY'], description: [
+			'The x-coordinate at the midpoint of the viewport\'s right edge',
+			'The y-coordinate at the midpoint of the viewport\'s right edge',
+			'The x-coordinate at the midpoint of the viewport\'s top edge',
+			'The y-coordinate at the midpoint of the viewport\'s top edge',
+		], and: {
 			op: 'call', id: 'getViewportPoints', and: ['zoomSide', 'zoomBase'],
 		}},
 		'',
-		{op: '=', id: 'θ', and: {
-			op: 'call', id: 'getθ', and: ['isEvenQuadrant'],
-		}},
+		{op: '=', id: 'θ', description: '0 when the image is perfectly right-side-up or upside-down, and 1 when the image is perfectly sideways', and: {op: 'call', id: 'getθ'}},
 		'',
 		{op: '=', multiline: 3, id: [
 			'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide',
 			'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase',
+		], description: [
+			// todo
 		], and: {
-			op: 'call', id: 'getAxisIntersects', and: ['isEvenQuadrant', 'θ'],
+			op: 'call', id: 'getAxisIntersects',
 		}},
 		'',
 		{op: '=', id: ['cornerXSide', 'cornerXBase'], type: ['x', 'x'], and: {
@@ -431,11 +489,7 @@ const functions = [
 			'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
 			'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
 		], and: {
-			op: 'call', id: 'getShared', and: [
-				'isEvenQuadrant', 'zoomSide', 'zoomBase', 'rightX', 'rightY', 'topX', 'topY',
-				'axisIntersectXSide', 'axisIntersectYSide', 'axisIntersectXBase', 'axisIntersectYBase',
-				'cornerXSide', 'cornerXBase',
-			],
+			op: 'call', id: 'getShared',
 		}},
 		'',
 		{op: '=', id: ['thirdZoomSide', 'thirdXSide', 'thirdYSide'], and: {
@@ -498,7 +552,7 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			{op: '<=', and: ['thirdZoomBase', 'thirdZoomSide']},
-			{op: '=', multiline: [5, 6], id: [
+			{op: '=', id: [
 				'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstEndXFixed', 'firstEndYFixed',
 				'hasSecondFixed', 'secondIsFlipped', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
 			], and: {
@@ -550,16 +604,8 @@ const functions = [
 		'x', 'y', 'x', 'y',,
 		'x', 'y', 'x', 'y',
 	], multilineResult: [3, 3, 5, 2, 5, 5], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,,15, 14, 17, 18,,20, 19, 22, 21], and: [
-		{op: '=', id: 'isEvenQuadrant', and: {
-			op: '!=', and: [
-				{op: '%', and: [
-					{op: 'floor', and: {
-						op: '/', and: ['rotation', '½π'],
-					}},
-					2,
-				]},
-				0,
-			],
+		{op: '=', id: 'isEvenQuadrant', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
+			op: '!=', and: [{op: '%', and: [{op: 'floor', and: {op: '/', and: ['rotation', '½π']}}, 2]}, 0],
 		}},
 		'',
 		{op: '=', id: [
@@ -1174,7 +1220,10 @@ export default {
 				op: 'call', id: 'getRails',
 			}},
 			'',
-			{op: '=', id: ['topLeftX', 'topLeftY'], and: {
+			{op: '=', id: ['topLeftX', 'topLeftY'], description: [
+				'The bound\'s x-coordinate for the top-left rail',
+				'The bound\'s y-coordinate for the top-left rail',
+			], and: {
 				op: 'call', id: 'getBound', and: [
 					'thirdZoom0', 'thirdX0', 'thirdY0', -0.5,
 					'firstZoom', 'firstEndX0', 'firstEndY0',
@@ -1182,14 +1231,17 @@ export default {
 				],
 			}},
 			'',
-			{op: '=', id: 'bottomRightX', ref: 'topLeftX', pair: 'bottomRightY', and: {
+			{op: '=', id: 'bottomRightX', description: 'The bound\'s x-coordinate on the bottom-right rail', ref: 'topLeftX', pair: 'bottomRightY', and: {
 				op: '-', and: 'topLeftX',
 			}},
-			{op: '=', id: 'bottomRightY', ref: 'topLeftY', pair: 'bottomRightX', and: {
+			{op: '=', id: 'bottomRightY', description: 'The bound\'s y-coordinate on the bottom-right rail', ref: 'topLeftY', pair: 'bottomRightX', and: {
 				op: '-', and: 'topLeftY',
 			}},
 			'',
-			{op: '=', id: ['topRightX', 'topRightY'], and: {
+			{op: '=', id: ['topRightX', 'topRightY'], description: [
+				'The bound\'s x-coordinate on the top-right rail',
+				'The bound\'s y-coordinate on the top-right rail',
+			], and: {
 				op: 'call', id: 'getBound', and: [
 					'thirdZoom1', 'thirdX1', 'thirdY1', 0.5,
 					'firstZoom', 'firstEndX1', 'firstEndY1',
@@ -1197,10 +1249,10 @@ export default {
 				],
 			}},
 			'',
-			{op: '=', id: 'bottomLeftX', ref: 'topRightX', pair: 'bottomLeftY', and: {
+			{op: '=', id: 'bottomLeftX', description: 'The bound\'s x-coordinate on the bottom-left rail', ref: 'topRightX', pair: 'bottomLeftY', and: {
 				op: '-', and: 'topRightX',
 			}},
-			{op: '=', id: 'bottomLeftY', ref: 'topRightY', pair: 'bottomLeftX', and: {
+			{op: '=', id: 'bottomLeftY', description: 'The bound\'s y-coordinate on the bottom-left rail', ref: 'topRightY', pair: 'bottomLeftX', and: {
 				op: '-', and: 'topRightY',
 			}},
 		]),
@@ -1281,12 +1333,12 @@ export default {
 			'Overall, the code\'s mostly unchanged from ', getPageButton(IDS.DOUBLE), '.',
 		],
 		getCode(code, [
-			{op: '=', id: 'snapZoom', type: 'zoom', and: {
+			{op: '=', id: 'snapZoom', description: 'The minimum zoom at which (x, y) is in-bounds', type: 'zoom', and: {
 				op: 'max', multiline: true, and: [
-					{op: 'call', id: 'getZoom', and: [false, false, false]},
-					{op: 'call', id: 'getZoom', and: [false, true, true]},
-					{op: 'call', id: 'getZoom', and: [true, false, true]},
-					{op: 'call', id: 'getZoom', and: [true, true, false]},
+					{op: 'call', id: 'getZoom', and: [false, false]},
+					{op: 'call', id: 'getZoom', and: [false, true]},
+					{op: 'call', id: 'getZoom', and: [true, false]},
+					{op: 'call', id: 'getZoom', and: [true, true]},
 				],
 			}},
 		]),

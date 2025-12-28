@@ -123,7 +123,7 @@ export default {
 			],
 		),
 		getCode(code, [
-			{op: '=', id: 'boundX', description: 'Horizontal panning space as a fraction of image width', type: 'x', and: {
+			{op: '=', id: 'boundX', description: 'The x-position of the right-side bound', type: 'x', and: {
 				op: '?', multiline: true, and: [
 					{op: '>=', and: [
 						{op: '/', and: ['viewportWidth', 'zoom']},
@@ -134,7 +134,7 @@ export default {
 				],
 			}},
 			'',
-			{op: '=', id: 'boundY', description: 'Vertical panning space as a fraction of image height', type: 'y', and: {
+			{op: '=', id: 'boundY', description: 'The y-position of the top-side bound', type: 'y', and: {
 				op: '?', multiline: true, and: [
 					{op: '>=', and: [
 						{op: '/', and: ['viewportHeight', 'zoom']},

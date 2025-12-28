@@ -36,104 +36,73 @@ export const permissiveTweens = {
 const functions = [
 	...SHARED_FUNCTIONS,
 	// todo remove args wherever possible
-	{op: 'func', id: 'getBound', args: ['cornerX', 'cornerY', 'cornerZoom'], type: ['x', 'y'], pair: [1, 0], and: [
+	{op: 'func', id: 'getBound', args: ['cornerX', 'cornerY', 'cornerZoom'], description: [
+		'The horizon\'s x-coordinate',
+		'The horizon\'s y-coordinate',
+		'The start zoom',
+	], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
-			{op: '<=', and: [
-				'zoom',
-				'cornerZoom',
-			]},
+			{op: '<=', and: ['zoom', 'cornerZoom']},
 			{op: 'return', and: {op: 'array', and: [0, 0]}},
 		]},
 		'',
-		{op: '=', id: 'progress', description: 'The fraction of zoom increase', and: {
-			op: '/', and: [
-				'zoom',
-				'cornerZoom',
-			],
+		{op: '=', id: 'progress', description: 'The scale increase from the rail\'s start zoom', and: {
+			op: '/', and: ['zoom', 'cornerZoom'],
 		}},
 		'',
 		{op: 'return', and: {op: 'array', multiline: true, and: [
-			{op: '-', and: [
-				'cornerX',
-				{op: '/', and: [
-					'cornerX',
-					'progress',
-				]},
-			]},
-			{op: '-', and: [
-				'cornerY',
-				{op: '/', and: [
-					'cornerY',
-					'progress',
-				]},
-			]},
+			{op: '-', and: ['cornerX', {op: '/', and: ['cornerX', 'progress']}]},
+			{op: '-', and: ['cornerY', {op: '/', and: ['cornerY', 'progress']}]},
 		]}},
 	]},
-	{op: 'func', id: 'getSnippedStart', args: ['cornerX', 'cornerY', 'cornerZoom', 'otherZoom'], type: ['x', 'y'], pair: [1, 0], and: [
+	{op: 'func', id: 'getSnippedStart', args: ['cornerX', 'cornerY', 'cornerZoom', 'otherZoom'], description: [
+		'The horizon\'s x-coordinate',
+		'The horizon\'s y-coordinate',
+		'The start zoom',
+		'The zoom at which to snip',
+	], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '>=', and: ['cornerZoom', 'otherZoom']},
 			{op: 'return', and: {op: 'array', and: [0, 0]}},
 		]},
 		'',
 		{op: '=', id: 'proportion', description: 'The fraction of rail to snip', and: {
-			op: '-', and: [
-				1,
-				{op: '/', and: [
-					'cornerZoom',
-					'otherZoom',
-				]},
-			],
+			op: '-', and: [1, {op: '/', and: ['cornerZoom', 'otherZoom']}],
 		}},
 		'',
 		{op: 'return', and: {op: 'array', multiline: true, and: [
-			{op: '*', and: [
-				'proportion',
-				'cornerX',
-			]},
-			{op: '*', and: [
-				'proportion',
-				'cornerY',
-			]},
+			{op: '*', and: ['proportion', 'cornerX']},
+			{op: '*', and: ['proportion', 'cornerY']},
 		]}},
 	]},
 	{op: 'func', id: 'getCorners', type: ['x', 'y', 'x', 'y'], pair: [1, 0, 3, 2], and: [
 		{op: 'if', and: [
-			{op: '<=', and: [
-				{op: '-', and: 'x'},
-				'y',
-			]},
+			{op: '<=', and: [{op: '-', and: 'x'}, 'y']},
 			{op: 'if', and: [
-				{op: '<=', and: [
-					'x',
-					'y',
-				]},
+				{op: '<=', and: ['x', 'y']},
 				{op: 'return', and: {op: 'array', and: [-0.5, 0.5, 0.5, 0.5]}},
 			]},
 			{op: 'return', and: {op: 'array', and: [0.5, -0.5, 0.5, 0.5]}},
 		]},
 		{op: 'if', and: [
-			{op: '<=', and: [
-				'x',
-				'y',
-			]},
+			{op: '<=', and: ['x', 'y']},
 			{op: 'return', and: {op: 'array', and: [-0.5, 0.5, -0.5, -0.5]}},
 		]},
 		{op: 'return', and: {op: 'array', and: [0.5, -0.5, -0.5, -0.5]}},
 	]},
 	{op: 'func', id: 'getStartZooms', type: ['zoom', 'zoom'], and: [
-		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], and: {
+		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], description: [
+			'The zoom at which the image\'s top left corner touches the viewport\'s left or right edge',
+			'The zoom at which the image\'s top left corner touches the viewport\'s top or bottom edge',
+			'The zoom at which the image\'s top right corner touches the viewport\'s left or right edge',
+			'The zoom at which the image\'s top right corner touches the viewport\'s top or bottom edge',
+		], and: {
 			op: 'call', id: 'getAllStartZooms',
 		}},
 		'',
 		{op: 'return', and: {op: 'array', multiline: true, and: [
-			{op: 'min', and: [
-				'topLeftX',
-				'topLeftY',
-			]},
-			{op: 'min', and: [
-				'topRightX',
-				'topRightY',
-			]},
+			{op: 'min', and: ['topLeftX', 'topLeftY']},
+			{op: 'min', and: ['topRightX', 'topRightY']},
 		]}},
 	]},
 ];
@@ -909,7 +878,10 @@ export default {
 			'The full start zoom calculation is given in the code snippet below.',
 		],
 		getCode(code, [
-			{op: '=', id: ['topLeftZoom', 'topRightZoom'], and: {
+			{op: '=', id: ['topLeftZoom', 'topRightZoom'], description: [
+				'The zoom at which the image\'s top left corner touches a viewports edge',
+				'The zoom at which the image\'s top right corner touches a viewport edge',
+			], and: {
 				op: 'call', id: 'getStartZooms',
 			}},
 		]),
@@ -918,26 +890,32 @@ export default {
 			'The calculation is demonstrated below.',
 		],
 		getCode(code, [
-			{op: '=', id: ['topLeftX', 'topLeftY'], and: {
+			{op: '=', id: ['topLeftX', 'topLeftY'], description: [
+				'The bound\'s x-coordinate for the top-left rail',
+				'The bound\'s y-coordinate for the top-left rail',
+			], and: {
 				op: 'call', id: 'getBound', and: [-0.5, 0.5, 'topLeftZoom'],
 			}},
 			'',
-			{op: '=', id: 'bottomRightX', description: 'The bottom right bound vertex\'s x-coordinate', ref: 'topLeftX', pair: 'bottomRightY', and: {
+			{op: '=', id: 'bottomRightX', description: 'The bound\'s x-coordinate on the bottom-right rail', ref: 'topLeftX', pair: 'bottomRightY', and: {
 				op: '-', and: 'topLeftX',
 			}},
-			{op: '=', id: 'bottomRightY', description: 'The bottom right bound vertex\'s y-coordinate', ref: 'topLeftY', pair: 'bottomRightX', and: {
+			{op: '=', id: 'bottomRightY', description: 'The bound\'s y-coordinate on the bottom-right rail', ref: 'topLeftY', pair: 'bottomRightX', and: {
 				op: '-', and: 'topLeftY',
 			}},
 			'',
-			{op: '=', id: ['topRightX', 'topRightY'], and: {
+			{op: '=', id: ['topRightX', 'topRightY'], description: [
+				'The bound\'s x-coordinate on the top-right rail',
+				'The bound\'s y-coordinate on the top-right rail',
+			], and: {
 				op: 'call', id: 'getBound', and: [0.5, 0.5, 'topRightZoom'],
 			}},
 			'',
 			// todo does ref overwrite description?
-			{op: '=', id: 'bottomLeftX', description: 'The bottom left bound vertex\'s x-coordinate', ref: 'topRightX', pair: 'bottomLeftY', and: {
+			{op: '=', id: 'bottomLeftX', description: 'The bound\'s x-coordinate on the bottom-left rail', ref: 'topRightX', pair: 'bottomLeftY', and: {
 				op: '-', and: 'topRightX',
 			}},
-			{op: '=', id: 'bottomLeftY', description: 'The bottom left bound vertex\'s y-coordinate', ref: 'topRightY', pair: 'bottomLeftX', and: {
+			{op: '=', id: 'bottomLeftY', description: 'The bound\'s y-coordinate on the bottom-left rail', ref: 'topRightY', pair: 'bottomLeftX', and: {
 				op: '-', and: 'topRightY',
 			}},
 		]),
@@ -1012,7 +990,12 @@ export default {
 			'Specifically, we need to know which image corners enclose the region, alongside the origin.',
 		],
 		getCode(code, [
-			{op: '=', id: ['toX0', 'toY0', 'toX1', 'toY1'], and: {
+			{op: '=', id: ['toX0', 'toY0', 'toX1', 'toY1'], description: [
+				'The x-position of one of the snap point region\'s corners',
+				'The y-position of one of the snap point region\'s corners',
+				'The x-position of one of the snap point region\'s corners',
+				'The y-position of one of the snap point region\'s corners',
+			], and: {
 				op: 'call', id: 'getCorners',
 			}},
 		]),
@@ -1026,21 +1009,17 @@ export default {
 			' start zoom.',
 		],
 		getCode(code, [
-			{op: '=', id: ['fromX0', 'fromY0'], and: {
-				op: 'call', id: 'getSnippedStart', and: [
-					'toX0',
-					'toY0',
-					'topLeftZoom',
-					'topRightZoom',
-				],
+			{op: '=', id: ['fromX0', 'fromY0'], description: [
+				'The start point\'s x-coordinate for a snipped rail bordering the snap point region',
+				'The start point\'s y-coordinate for a snipped rail bordering the snap point region',
+			], and: {
+				op: 'call', id: 'getSnippedStart', and: ['toX0', 'toY0', 'topLeftZoom', 'topRightZoom'],
 			}},
-			{op: '=', id: ['fromX1', 'fromY1'], and: {
-				op: 'call', id: 'getSnippedStart', and: [
-					'toX1',
-					'toY1',
-					'topRightZoom',
-					'topLeftZoom',
-				],
+			{op: '=', id: ['fromX1', 'fromY1'], description: [
+				'The start point\'s x-coordinate for a snipped rail bordering the snap point region',
+				'The start point\'s y-coordinate for a snipped rail bordering the snap point region',
+			], and: {
+				op: 'call', id: 'getSnippedStart', and: ['toX1', 'toY1', 'topRightZoom', 'topLeftZoom'],
 			}},
 		]),
 		[
@@ -1685,7 +1664,7 @@ export default {
 			'From here, it\'s a simple calculation using the un-snipped rail\'s start zoom to find our final snap zoom.',
 		],
 		getCode(code, [
-			{op: '=', id: 't', and: {
+			{op: '=', id: 't', description: 'The fraction of length at which a line through both rails will pass through the snap point', and: {
 				op: 'call', id: 'getT', multiline: [4, 4, 1], and: [
 					'fromX0', 'fromY0', 'toX0', 'toY0',
 					'fromX1', 'fromY1', 'toX1', 'toY1',
@@ -1696,10 +1675,7 @@ export default {
 			{op: '=', id: 'snapZoom', type: 'zoom', and: {
 				op: '/', and: [
 					{op: 'max', and: ['topLeftZoom', 'topRightZoom']},
-					{op: '-', and: [
-						1,
-						't',
-					]},
+					{op: '-', and: [1, 't']},
 				],
 			}},
 		]),

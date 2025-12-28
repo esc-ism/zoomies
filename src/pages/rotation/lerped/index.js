@@ -74,13 +74,13 @@ const functions = [
 			]}},
 		]},
 		'',
-		{op: '=', id: 'θ', and: {op: 'call', id: 'getθ', and: ['isEvenQuadrant']}},
+		{op: '=', id: 'θ', description: '0 when the image is perfectly right-side-up or upside-down, and 1 when the image is perfectly sideways', and: {op: 'call', id: 'getθ'}},
 		{op: '=', id: 'progress', description: 'The rotation\'s progress towards being perfectly sideways', and: {op: '/', and: ['θ', '½π']}},
 		'',
 		{op: '=', id: 'scale', description: 'A measurement of how far the second rail\'s start point is from (0, 0) at 0° rotation', and: {op: 'log2', and: {op: '/', and: ['z1', 'z0']}}},
 		{op: '=', id: 'scaleFlipped', description: 'A measurement of how far the second rail\'s start point is from (0, 0) at 90° rotation', and: {op: 'log2', and: {op: '/', and: ['z1Flipped', 'z0Flipped']}}},
-		{op: '=', id: 'threshold', description: 'The fraction of rotation at which the second rail\'s start point should be (0, 0)', and: {op: '/', and: ['scale', {op: '+', and: ['scale', 'scaleFlipped']}]}},
-		{op: '=', id: 'zAvg0', description: 'The second rail\'s start zoom at threshold rotation', type: 'zoom', and: {op: '+', and: [{op: '*', and: ['threshold', {op: '-', and: ['z0Flipped', 'z0']}]}, 'z0']}},
+		{op: '=', id: 'threshold', description: 'The "progress" value at which the second rail\'s start point should be (0, 0)', and: {op: '/', and: ['scale', {op: '+', and: ['scale', 'scaleFlipped']}]}},
+		{op: '=', id: 'zAvg0', description: 'The second rail\'s start zoom when its start point is (0, 0)', type: 'zoom', and: {op: '+', and: [{op: '*', and: ['threshold', {op: '-', and: ['z0Flipped', 'z0']}]}, 'z0']}},
 		'',
 		{op: 'return', and: {op: '?', multiline: true, and: [
 			{op: '<=', and: ['progress', 'threshold']},
@@ -97,7 +97,7 @@ const functions = [
 	{op: 'func', id: 'getBound', type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '>', and: ['zoom', 'z1']},
-			{op: '=', id: 'progress', and: {op: '/', and: ['zoom', 'z1']}},
+			{op: '=', id: 'progress', description: 'The scale increase from the second rail\'s start zoom', and: {op: '/', and: ['zoom', 'z1']}},
 			'',
 			{op: 'return', and: {op: 'array', multiline: true, and: [
 				{op: '-', and: [0.5, {op: '/', and: [{op: '-', and: [0.5, 'x1']}, 'progress']}]},
@@ -260,8 +260,8 @@ export default {
 			], and: {op: 'call', id: 'getRails'}},
 			'',
 			{op: '=', id: ['boundX', 'boundY'], description: [
-				'Horizontal panning space as a fraction of image width',
-				'Vertical panning space as a fraction of image height',
+				'The x-position of the right-side bound',
+				'The y-position of the top-side bound',
 			], and: {
 				op: 'call', id: 'getBound',
 			}},

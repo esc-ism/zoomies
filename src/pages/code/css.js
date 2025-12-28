@@ -126,6 +126,7 @@ addRule(`.${CLASS_TOOLTIP_WRAPPER}`, {
 	'z-index': '3',
 	'pointer-events': 'none',
 	'text-wrap-style': 'balance',
+	'max-width': '20em',
 });
 
 addRule(`.${CLASS_TOOLTIP_CONTAINER}`, {

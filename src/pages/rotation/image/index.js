@@ -35,45 +35,55 @@ const getCornerProgressTweens = (rotation) => [
 
 const functions = [
 	...SHARED_FUNCTIONS,
-	{op: 'func', id: 'getIntersectSide', args: ['cornerAngle', 'α', 'θ', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
-		{op: '=', id: 'lockAngle', type: 'angle', and: {
+	{op: 'func', id: 'getIntersectSide', args: ['α'], description: 'The angle between the side lock rail and the un-rotated x-axis', type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
+		{op: '=', id: 'lockAngle', description: 'The angle between the side lock rail and the x-axis', type: 'angle', and: {
 			op: '+', and: ['α', 'θ'],
 		}},
 		'',
 		{op: 'if', and: [
 			{op: '<', and: ['lockAngle', 'cornerAngle']},
-			{op: '=', id: ['intersectZoom', 'intersectY'], and: {
+			{op: '=', id: ['intersectZoom', 'intersectY'], description: [
+				'The lock rail\'s zoom at its intersection with the y-axis',
+				'The lock rail\'s y-coordinate at its intersection with the y-axis',
+			], and: {
 				op: 'call', id: 'getYIntersect', and: ['½viewportWidth', 'lockAngle', 'α'],
 			}},
 			'',
 			{op: 'return', and: {op: 'array', and: ['intersectZoom', 0, 'intersectY']}},
 		]},
 		'',
-		{op: '=', id: ['intersectZoom', 'intersectX'], and: {
+		{op: '=', id: ['intersectZoom', 'intersectX'], description: [
+			'The lock rail\'s zoom at its intersection with the x-axis',
+			'The lock rail\'s x-coordinate at its intersection with the x-axis',
+		], and: {
 			op: 'call', id: 'getXIntersect', and: ['½viewportWidth', {op: '-', and: ['½π', 'θ', 'α']}, 'α'],
 		}},
 		'',
 		{op: 'return', and: {op: 'array', and: [
-			'intersectZoom',
-			{op: '?', and: ['isEvenQuadrant', {op: '-', and: 'intersectX'}, 'intersectX']},
-			0,
+			'intersectZoom', {op: '?', and: ['isEvenQuadrant', {op: '-', and: 'intersectX'}, 'intersectX']}, 0,
 		]}},
 	]},
-	{op: 'func', id: 'getIntersectBase', args: ['cornerAngle', 'α', 'θ', 'isEvenQuadrant'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
-		{op: '=', id: 'lockAngle', type: 'angle', and: {
+	{op: 'func', id: 'getIntersectBase', args: ['α'], description: 'The angle between the base lock rail and the un-rotated y-axis', type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
+		{op: '=', id: 'lockAngle', description: 'The angle between the base lock rail and the x-axis', type: 'angle', isBase: true, and: {
 			op: '-', and: ['½π', 'θ', 'α'],
 		}},
 		'',
 		{op: 'if', and: [
 			{op: '<', and: ['lockAngle', 'cornerAngle']},
-			{op: '=', id: ['intersectZoom', 'intersectY'], and: {
+			{op: '=', id: ['intersectZoom', 'intersectY'], description: [
+				'The lock rail\'s zoom at its intersection with the y-axis',
+				'The lock rail\'s y-coordinate at its intersection with the y-axis',
+			], and: {
 				op: 'call', id: 'getYIntersect', and: ['½viewportHeight', 'lockAngle', 'α'],
 			}},
 			'',
 			{op: 'return', and: {op: 'array', and: ['intersectZoom', 0, 'intersectY']}},
 		]},
 		'',
-		{op: '=', id: ['intersectZoom', 'intersectX'], and: {
+		{op: '=', id: ['intersectZoom', 'intersectX'], description: [
+			'The lock rail\'s zoom at its intersection with the x-axis',
+			'The lock rail\'s x-coordinate at its intersection with the x-axis',
+		], and: {
 			op: 'call', id: 'getXIntersect', and: ['½viewportHeight', {op: '+', and: ['α', 'θ']}, 'α'],
 		}},
 		'',
@@ -84,82 +94,67 @@ const functions = [
 		]}},
 	]},
 	// todo rename all the "first, second, third" stuff to "origin, connector, lock"
-	{op: 'func', id: 'getFirstEnd', args: ['firstZoom', 'secondZoom', 'secondX', 'secondY'], type: ['x', 'y'], pair: [1, 0], and: [
+	{op: 'func', id: 'getFirstEnd', args: ['firstZoom', 'secondZoom', 'secondX', 'secondY'], description: [
+		'The origin rail\'s start zoom',
+		'The lock rail\'s zoom at the axis intersect closest to its horizon',
+		'The lock rail\'s x-coordinate at the axis intersect closest to its horizon',
+		'The lock rail\'s y-coordinate at the axis intersect closest to its horizon',
+	], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '==', and: ['secondY', 0]},
 			{op: 'return', and: {op: 'array', and: [
-				{op: '/', and: [
-					'secondX',
-					{op: '-', and: [1, {op: '/', and: ['firstZoom', 'secondZoom']}]},
-				]},
+				{op: '/', and: ['secondX', {op: '-', and: [1, {op: '/', and: ['firstZoom', 'secondZoom']}]}]},
 				0,
 			]}},
 		]},
 		'',
 		{op: 'return', and: {op: 'array', and: [
 			0,
-			{op: '/', and: [
-				'secondY',
-				{op: '-', and: [1, {op: '/', and: ['firstZoom', 'secondZoom']}]},
-			]},
+			{op: '/', and: ['secondY', {op: '-', and: [1, {op: '/', and: ['firstZoom', 'secondZoom']}]}]},
 		]}},
 	]},
 	{op: 'func', id: 'getRails', type: ['zoom', 'x', 'y', 'zoom', 'xvp', 'yvp', 'zoom', 'x', 'y', 'zoom', 'xvp', 'yvp'], pair: [,2, 1,,5, 4,,8, 7,,11, 10], multilineResult: 2, and: [
-		{op: '=', id: ['zoomSide', 'zoomBase'], and: {
+		{op: '=', id: ['zoomSide', 'zoomBase'], description: [
+			'The lowest zoom at which an image corner touches the left or right edge of the viewport',
+			'The lowest zoom at which an image corner touches the top or bottom edge of the viewport',
+		], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
 		'',
-		{op: '=', id: 'isEvenQuadrant', and: {
-			op: '!=', and: [
-				{op: '%', and: [
-					{op: 'floor', and: {
-						op: '/', and: ['rotation', '½π'],
-					}},
-					2,
-				]},
-				0,
-			],
+		{op: '=', id: 'isEvenQuadrant', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
+			op: '!=', and: [{op: '%', and: [{op: 'floor', and: {op: '/', and: ['rotation', '½π']}}, 2]}, 0],
 		}},
-		{op: '=', id: 'θ', and: {
-			op: 'call', id: 'getθ', and: ['isEvenQuadrant'],
+		{op: '=', id: 'θ', description: '0 when the image is perfectly right-side-up or upside-down, and 1 when the image is perfectly sideways', and: {op: 'call', id: 'getθ'}},
+		'',
+		{op: '=', id: ['αSide', 'αBase'], description: [
+			'The angle between the side lock rail and the un-rotated x-axis',
+			'The angle between the base lock rail and the un-rotated y-axis',
+		], and: {op: 'call', id: 'getα'}},
+		'',
+		{op: '=', id: 'cornerAngle', description: 'The angle between the image\'s positive y-axis and its top corners', type: 'angle', and: {
+			op: 'atan', and: {op: '/', and: ['imageHeight', 'imageWidth']},
 		}},
 		'',
-		{op: '=', id: ['αSide', 'αBase'], and: {
-			op: 'call', id: 'getα', and: ['θ'],
+		{op: '=', id: ['intersectSideZoom', 'intersectSideX', 'intersectSideY'], description: [
+			'The viewport-side lock rail\'s start zoom',
+			'The x-coordinate of the viewport-side lock rail\'s start point',
+			'The y-coordinate of the viewport-side lock rail\'s start point',
+		], and: {
+			op: 'call', id: 'getIntersectSide', and: ['αSide'],
 		}},
-		'',
-		{op: '=', id: 'cornerAngle', type: 'angle', and: {
-			op: 'atan', and: {
-				op: '/', and: ['imageHeight', 'imageWidth'],
-			},
-		}},
-		'',
-		{op: '=', id: ['intersectSideZoom', 'intersectSideX', 'intersectSideY'], and: {
-			op: 'call', id: 'getIntersectSide', and: [
-				'cornerAngle',
-				'αSide',
-				'θ',
-				'isEvenQuadrant',
-			],
-		}},
-		{op: '=', id: ['intersectBaseZoom', 'intersectBaseX', 'intersectBaseY'], and: {
-			op: 'call', id: 'getIntersectBase', and: [
-				'cornerAngle',
-				'αBase',
-				'θ',
-				'isEvenQuadrant',
-			],
+		{op: '=', id: ['intersectBaseZoom', 'intersectBaseX', 'intersectBaseY'], description: [
+			'The viewport-base lock rail\'s start zoom',
+			'The x-coordinate of the viewport-base lock rail\'s start point',
+			'The y-coordinate of the viewport-base lock rail\'s start point',
+		], and: {
+			op: 'call', id: 'getIntersectBase', and: ['αBase'],
 		}},
 		'',
 		{op: '=', id: ['endXSide', 'endYSide'], and: {
-			op: 'call', id: 'getFirstEnd', and: [
-				'zoomSide', 'intersectSideZoom', 'intersectSideX', 'intersectSideY',
-			],
+			op: 'call', id: 'getFirstEnd', and: ['zoomSide', 'intersectSideZoom', 'intersectSideX', 'intersectSideY'],
 		}},
 		{op: '=', id: ['endXBase', 'endYBase'], and: {
-			op: 'call', id: 'getFirstEnd', and: [
-				'zoomBase', 'intersectBaseZoom', 'intersectBaseX', 'intersectBaseY',
-			],
+			op: 'call', id: 'getFirstEnd', and: ['zoomBase', 'intersectBaseZoom', 'intersectBaseX', 'intersectBaseY'],
 		}},
 		'',
 		{op: 'if', and: [
@@ -175,15 +170,20 @@ const functions = [
 			'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'endXSide', 'endYSide',
 		]}},
 	]},
-	{op: 'func', id: 'isBelow', args: ['secondX', 'secondY', 'cornerX', 'cornerY'], and: [
-		{op: '=', id: 'm', and: {
+	{op: 'func', id: 'isBelow', args: ['secondX', 'secondY', 'cornerX', 'cornerY'], description: [
+		'The x-coordinate of the lock rail\'s start point',
+		'The y-coordinate of the lock rail\'s start point',
+		'The x-coordinate of the lock rail\'s horizon',
+		'The y-coordinate of the lock rail\'s horizon',
+	], and: [
+		{op: '=', id: 'm', description: 'The lock rail\'s gradient', and: {
 			op: '/', and: [
 				{op: '-', and: ['cornerY', 'secondY']},
 				{op: '-', and: ['cornerX', 'secondX']},
 			],
 		}},
 		'',
-		{op: '=', id: 'c', and: {
+		{op: '=', id: 'c', description: 'The lock rail\'s y-coordinate at its intersection with the y-axis', and: {
 			op: '-', and: ['secondY', {op: '*', and: ['m', 'secondX']}],
 		}},
 		'',
@@ -591,9 +591,10 @@ export default {
 								{tag: 'mtd', xmlns, content: [
 									{tag: 'mrow', xmlns, content: [
 										{tag: 'mo', xmlns, content: '|'},
+										{tag: 'mn', xmlns, content: '1'},
+										{tag: 'mo', xmlns, content: '-'},
 										{tag: 'mfrac', xmlns, content: [
 											{tag: 'mrow', xmlns, content: [
-												{tag: 'mo', xmlns, content: '-'},
 												{tag: 'mi', xmlns, content: 'θ'},
 											]},
 											{tag: 'mrow', xmlns, content: [
@@ -601,8 +602,6 @@ export default {
 												{tag: 'mo', xmlns, content: '°'},
 											]},
 										]},
-										{tag: 'mo', xmlns, content: '+'},
-										{tag: 'mn', xmlns, content: '1'},
 										{tag: 'mo', xmlns, content: '|'},
 									]},
 									{tag: 'mo', xmlns, content: '='},
@@ -1038,29 +1037,48 @@ export default {
 			{op: '=', id: [
 				'originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0',
 				'originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1',
+			], description: [
+				'The top-left origin rail\'s start zoom',
+				'The x-coordinate of the top-left lock rail\'s start point',
+				'The y-coordinate of the top-left lock rail\'s start point',
+				'The top-left lock rail\'s start zoom',
+				'The x-coordinate of the top-left origin rail\'s horizon',
+				'The y-coordinate of the top-left origin rail\'s horizon',
+				'The top-right origin rail\'s start zoom',
+				'The x-coordinate of the top-right lock rail\'s start point',
+				'The y-coordinate of the top-right lock rail\'s start point',
+				'The top-right lock rail\'s start zoom',
+				'The x-coordinate of the top-right origin rail\'s horizon',
+				'The y-coordinate of the top-right origin rail\'s horizon',
 			], and: {
 				op: 'call', id: 'getRails',
 			}},
 			'',
-			{op: '=', id: ['topLeftX', 'topLeftY'], and: {
+			{op: '=', id: ['topLeftX', 'topLeftY'], description: [
+				'The bound\'s x-coordinate for the top-left rail',
+				'The bound\'s y-coordinate for the top-left rail',
+			], and: {
 				op: 'call', id: 'getBound', and: ['originZoom0', 'x0', 'y0', 'zoom0', 'endX0', 'endY0', true],
 			}},
 			'',
-			{op: '=', id: 'bottomRightX', ref: 'topLeftX', pair: 'bottomRightY', and: {
+			{op: '=', id: 'bottomRightX', description: 'The bound\'s x-coordinate on the bottom-right rail', ref: 'topLeftX', pair: 'bottomRightY', and: {
 				op: '-', and: 'topLeftX',
 			}},
-			{op: '=', id: 'bottomRightY', ref: 'topLeftY', pair: 'bottomRightX', and: {
+			{op: '=', id: 'bottomRightY', description: 'The bound\'s y-coordinate on the bottom-right rail', ref: 'topLeftY', pair: 'bottomRightX', and: {
 				op: '-', and: 'topLeftY',
 			}},
 			'',
-			{op: '=', id: ['topRightX', 'topRightY'], and: {
+			{op: '=', id: ['topRightX', 'topRightY'], description: [
+				'The bound\'s x-coordinate on the top-right rail',
+				'The bound\'s y-coordinate on the top-right rail',
+			], and: {
 				op: 'call', id: 'getBound', and: ['originZoom1', 'x1', 'y1', 'zoom1', 'endX1', 'endY1', false],
 			}},
 			'',
-			{op: '=', id: 'bottomLeftX', ref: 'topRightX', pair: 'bottomLeftY', and: {
+			{op: '=', id: 'bottomLeftX', description: 'The bound\'s x-coordinate on the bottom-left rail', ref: 'topRightX', pair: 'bottomLeftY', and: {
 				op: '-', and: 'topRightX',
 			}},
-			{op: '=', id: 'bottomLeftY', ref: 'topRightY', pair: 'bottomLeftX', and: {
+			{op: '=', id: 'bottomLeftY', description: 'The bound\'s y-coordinate on the bottom-left rail', ref: 'topRightY', pair: 'bottomLeftX', and: {
 				op: '-', and: 'topRightY',
 			}},
 		]),
@@ -1126,16 +1144,13 @@ export default {
 			'Here, with the additional segment pairs, the maximum number of checks required is tripled.',
 		],
 		getCode(code, [
-			{op: '=', id: 'match0', and: {op: '||', and: [
+			{op: '=', id: 'match0', description: 'True if all origin rails follow the same axis', and: {op: '||', and: [
 				{op: '==', and: ['endX0', 'endX1']},
 				{op: '==', and: ['endY0', 'endY1']},
 			]}},
-			{op: '=', id: ['flip0', 'flip1'], and: {
-				op: 'call', id: 'getQuadrant',
-			}},
 			'',
-			{op: '=', id: 'snapZoom', and: {
-				op: 'call', id: 'getZoom', and: ['flip0', 'flip1', {op: '!=', and: ['flip0', 'flip1']}],
+			{op: '=', id: 'snapZoom', description: 'The minimum zoom at which (x, y) is in-bounds', and: {
+				op: 'call', id: 'getZoom', and: [{op: '...', and: {op: 'call', id: 'getQuadrant'}}],
 			}},
 		]),
 		{

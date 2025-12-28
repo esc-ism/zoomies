@@ -132,11 +132,17 @@ export const register = (statements = []) => {
 			const body = document.createElement('div');
 			
 			if ('args' in statement) {
+				let spreads = 0;
+				
 				const elements = statement.args.map((argId, i) => {
 					const wrapper = getElement(CLASS_NAMES.csv);
 					const arg = getElement(CLASS_NAMES.id);
 					
-					scope[argId] = {value: args.values[i], ...args.shapeData[i], element: args.unbroken[i]};
+					scope[argId] = {value: args.values[i], ...args.shapeData[i], element: args.unbroken[i - spreads]};
+					
+					if (args.spreads[i]) {
+						spreads++;
+					}
 					
 					if (statement.description?.[i]) {
 						scope[argId].description = statement.description[i];
@@ -170,7 +176,7 @@ export const register = (statements = []) => {
 			
 			if (active) {
 				result.value = meta.return;
-				result.shapeData = getOtherProps(statement, 'op', 'id', 'args', 'and', 'multiline', 'multilineResult');
+				result.shapeData = getOtherProps(statement, 'op', 'id', 'args', 'and', 'multiline', 'multilineResult', 'description');
 				
 				delete meta.return;
 				meta.active = true;
@@ -264,6 +270,7 @@ const getCsvs = (statement, scope, meta, indent, property = 'and') => {
 	const elements = [];
 	const values = [];
 	const shapeData = [];
+	const spreads = [];
 	
 	const subIndent = indent + !!statement.multiline;
 	
@@ -276,14 +283,18 @@ const getCsvs = (statement, scope, meta, indent, property = 'and') => {
 		
 		shapeData.push(subShapeData);
 		
+		// todo this seems buggy
 		if (meta.spread) {
 			if (meta.active) {
 				values.push(...value);
+				spreads.push(...values.map(() => true));
+				spreads[spreads.length - 1] = false;
 			}
 			
 			delete meta.spread;
 		} else {
 			values.push(value);
+			spreads.push(false);
 		}
 	}
 	
@@ -291,7 +302,7 @@ const getCsvs = (statement, scope, meta, indent, property = 'and') => {
 	
 	makeMultiline(elements, indent, statement, property);
 	
-	return {values, elements, unbroken, shapeData};
+	return {values, elements, unbroken, shapeData, spreads};
 };
 
 const getLine = ({value: length, doCenter = false, isPercent = true}, rotation, isX) => {
@@ -453,10 +464,29 @@ const [setTitle, removeTitle] = (() => {
 				
 				const {offsetParent} = element;
 				const scrollerLocal = offsetParent.firstChild;
-				const scrollerGlobal = offsetParent.offsetParent;
+				// null when fullscreened
+				const scrollerGlobal = offsetParent.offsetParent ?? {
+					scrollLeft: 0,
+					scrollTop: 0,
+					clientWidth: scrollerLocal.clientWidth,
+					clientHeight: scrollerLocal.clientHeight,
+				};
 				const page = offsetParent.parentElement;
 				
+				if (offsetParent.offsetParent) {
+					wrapper.style.removeProperty('position');
+				} else {
+					wrapper.style.position = 'fixed';
+				}
+				
 				body.innerText = isValue ? value : description;
+				
+				if (!isValue && !description) {
+					body.innerText = 'description missing — they\'re a work in progress';
+					body.style.color = '#f99';
+				} else {
+					body.style.removeProperty('color');
+				}
 				
 				container.style.removeProperty('right');
 				
@@ -721,6 +751,15 @@ const interpretters = {
 		idWrapper.append(...csvs.elements);
 		
 		return {elements: [idWrapper, getElement(CLASS_NAMES['=']), ...operand]};
+	},
+	pseudo: (statement, scope, meta, indent) => {
+		const {value, elements, ...call} = interpret(statement.and, scope, meta, indent);
+		
+		const shapeData = {...(call.shapeData ?? {})};
+		
+		Object.assign(shapeData, getOtherProps(statement, 'op', 'id', 'and', 'multiline'));
+		
+		return {elements, value, ...shapeData};
 	},
 	'+': getCombiner((a, b) => a + b, ['==', '!=', '%', '*', '/']),
 	'-': (() => {

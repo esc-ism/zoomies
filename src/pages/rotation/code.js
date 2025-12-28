@@ -7,7 +7,7 @@ export const LERP = [
 			{op: '+', and: ['fromY', {op: '*', and: ['t', {op: '-', and: ['toY', 'fromY']}]}]},
 		]}},
 	]},
-	{op: 'func', id: 'getθ', description: '0 when the image is perfectly right-side-up or upside-down, and 1 when the image is perfectly sideways', args: ['isEvenQuadrant'], type: 'angle', isBase: true, and: [
+	{op: 'func', id: 'getθ', type: 'angle', isBase: true, and: [
 		{op: '=', id: 'angle', description: 'The rotation\'s difference from the 90° multiple below it', type: 'angle', isBase: true, and: {
 			op: '%', and: [{op: '+', and: ['rotation', '2π']}, '½π'],
 		}},
@@ -74,15 +74,7 @@ const SINGLE = [
 			'isInverse',
 			{op: 'return', and: {
 				op: '/', and: [
-					{op: '-', and: [
-						{op: '-', and: 'b'},
-						{op: 'root', and: {
-							op: '-', and: [
-								{op: 'pow', and: 'b'},
-								{op: '*', and: [4, 'a', 'c']},
-							],
-						}},
-					]},
+					{op: '-', and: [{op: '-', and: 'b'}, {op: 'root', and: {op: '-', and: [{op: 'pow', and: 'b'}, {op: '*', and: [4, 'a', 'c']}]}}]},
 					{op: '*', and: [2, 'a']},
 				],
 			}},
@@ -90,24 +82,14 @@ const SINGLE = [
 		'',
 		{op: 'return', and: {
 			op: '/', and: [
-				{op: '+', and: [
-					{op: '-', and: 'b'},
-					{op: 'root', and: {
-						op: '-', and: [
-							{op: 'pow', and: 'b'},
-							{op: '*', and: [4, 'a', 'c']},
-						],
-					}},
-				]},
+				{op: '+', and: [{op: '-', and: 'b'}, {op: 'root', and: {op: '-', and: [{op: 'pow', and: 'b'}, {op: '*', and: [4, 'a', 'c']}]}}]},
 				{op: '*', and: [2, 'a']},
 			],
 		}},
 	]},
 	{op: 'func', id: 'getAllStartZooms', type: ['zoom', 'zoom', 'zoom', 'zoom'], and: [
 		{op: '=', id: 'offset', description: 'The angle between the image\'s positive y-axis and its upper corners', type: 'angle', isBase: true, and: {
-			op: 'atan', and: {
-				op: '/', and: ['imageWidth', 'imageHeight'],
-			},
+			op: 'atan', and: {op: '/', and: ['imageWidth', 'imageHeight']},
 		}},
 		'',
 		{op: '=', id: 'topLeftAngle', description: 'The angle between the image\'s un-rotated positive x-axis and its top-left corner', type: 'angle', fight: true, and: {
@@ -118,51 +100,14 @@ const SINGLE = [
 		}},
 		'',
 		{op: '=', id: 'distance', description: 'The distance between the image\'s origin and its corners', type: 'position', angle: 'topRightAngle', isPercent: false, and: {
-			op: 'root', and: {
-				op: '+', and: [
-					{op: 'pow', and: '½imageWidth'},
-					{op: 'pow', and: '½imageHeight'},
-				],
-			},
+			op: 'root', and: {op: '+', and: [{op: 'pow', and: '½imageWidth'}, {op: 'pow', and: '½imageHeight'}]},
 		}},
 		'',
 		{op: 'return', and: {op: 'array', multiline: true, and: [
-			{op: '/', and: [
-				'½viewportWidth',
-				{op: 'abs', and: {
-					op: '*', and: [
-						'distance',
-						{op: 'cos', and: 'topLeftAngle'},
-					],
-				}},
-			]},
-			{op: '/', and: [
-				'½viewportHeight',
-				{op: 'abs', and: {
-					op: '*', and: [
-						'distance',
-						{op: 'sin', and: 'topLeftAngle'},
-					],
-				}},
-			]},
-			{op: '/', and: [
-				'½viewportWidth',
-				{op: 'abs', and: {
-					op: '*', and: [
-						'distance',
-						{op: 'cos', and: 'topRightAngle'},
-					],
-				}},
-			]},
-			{op: '/', and: [
-				'½viewportHeight',
-				{op: 'abs', and: {
-					op: '*', and: [
-						'distance',
-						{op: 'sin', and: 'topRightAngle'},
-					],
-				}},
-			]},
+			{op: '/', and: ['½viewportWidth', {op: 'abs', and: {op: '*', and: ['distance', {op: 'cos', and: 'topLeftAngle'}]}}]},
+			{op: '/', and: ['½viewportHeight', {op: 'abs', and: {op: '*', and: ['distance', {op: 'sin', and: 'topLeftAngle'}]}}]},
+			{op: '/', and: ['½viewportWidth', {op: 'abs', and: {op: '*', and: ['distance', {op: 'cos', and: 'topRightAngle'}]}}]},
+			{op: '/', and: ['½viewportHeight', {op: 'abs', and: {op: '*', and: ['distance', {op: 'sin', and: 'topRightAngle'}]}}]},
 		]}},
 	]},
 ];
@@ -180,23 +125,20 @@ export const MULTI_LINE = [
 			}},
 			'',
 			{op: 'if', and: [
-				{op: '&&', and: [
-					{op: '>=', and: ['t', 0]},
-					{op: '<=', and: ['t', 'maxT']},
-				]},
-				{op: 'return', and: {
-					op: '/', and: [
-						'startZoom',
-						{op: '-', and: [1, 't']},
-					],
-				}},
+				{op: '&&', and: [{op: '>=', and: ['t', 0]}, {op: '<=', and: ['t', 'maxT']}]},
+				{op: 'return', and: {op: '/', and: ['startZoom', {op: '-', and: [1, 't']}]}},
 			]},
 		]},
 		'',
 		{op: 'return', and: false},
 	]},
 	{op: 'func', id: 'getStartZooms', type: ['zoom', 'zoom'], and: [
-		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], and: {
+		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], description: [
+			'The zoom at which the image\'s top left corner touches the viewport\'s left or right edge',
+			'The zoom at which the image\'s top left corner touches the viewport\'s top or bottom edge',
+			'The zoom at which the image\'s top right corner touches the viewport\'s left or right edge',
+			'The zoom at which the image\'s top right corner touches the viewport\'s top or bottom edge',
+		], and: {
 			op: 'call', id: 'getAllStartZooms',
 		}},
 		'',
@@ -205,7 +147,7 @@ export const MULTI_LINE = [
 			{op: 'min', and: ['topLeftY', 'topRightY']},
 		]}},
 	]},
-	{op: 'func', id: 'getViewportPoints', args: ['zoomSide', 'zoomBase'], type: ['xvp', 'yvp', 'xvp', 'yvp'], pair: [1, 0, 3, 2], and: [
+	{op: 'func', id: 'getViewportPoints', type: ['xvp', 'yvp', 'xvp', 'yvp'], pair: [1, 0, 3, 2], and: [
 		{op: '=', id: 'rightX', description: 'The viewport\'s horizontal radius at zoomSide', isPercent: false, type: 'xvp', and: {
 			op: '/', and: ['½viewportWidth', 'zoomSide'],
 		}},
@@ -221,99 +163,46 @@ export const MULTI_LINE = [
 		}},
 		'',
 		{op: 'return', and: {op: 'array', multiline: true, and: [
+			{op: '/', and: [{op: '*', and: ['rightX', {op: 'cos', and: 'rightTheta'}]}, 'imageWidth']},
+			{op: '/', and: [{op: '*', and: ['rightX', {op: 'sin', and: 'rightTheta'}]}, 'imageHeight']},
+			{op: '/', and: [{op: '*', and: ['topY', {op: 'cos', and: 'topTheta'}]}, 'imageWidth']},
+			{op: '/', and: [{op: '*', and: ['topY', {op: 'sin', and: 'topTheta'}]}, 'imageHeight']},
+		]}},
+	]},
+	{op: 'func', id: 'getα', type: ['angle', 'angle'], fight: [true, true], isBase: [false, true], and: [
+		{op: '=', id: 'progress', description: 'How far the lock point should be from its viewport edge\'s midpoint as a fraction', and: {
+			op: '-', and: [1, {op: '/', and: ['θ', '¼π']}],
+		}},
+		'',
+		{op: 'return', and: {op: 'array', multiline: true, and: [
+			{op: 'atan', and: {op: '*', and: ['progress', {op: '/', and: ['viewportHeight', 'viewportWidth']}]}},
+			{op: 'atan', and: {op: '*', and: ['progress', {op: '/', and: ['viewportWidth', 'viewportHeight']}]}},
+		]}},
+	]},
+	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'α'], description: [
+		'The size of the relevant viewport edge',
+	], type: ['zoom', 'y'], and: [
+		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '/', and: [
-				{op: '*', and: [
-					'rightX',
-					{op: 'cos', and: 'rightTheta'},
-				]},
-				'imageWidth',
+				'viewportSize',
+				{op: '*', and: [{op: 'cos', and: 'α'}, {op: 'abs', and: {op: '/', and: ['½imageWidth', {op: 'cos', and: 'cornerAngle'}]}}]},
 			]},
 			{op: '/', and: [
-				{op: '*', and: [
-					'rightX',
-					{op: 'sin', and: 'rightTheta'},
-				]},
-				'imageHeight',
-			]},
-			{op: '/', and: [
-				{op: '*', and: [
-					'topY',
-					{op: 'cos', and: 'topTheta'},
-				]},
-				'imageWidth',
-			]},
-			{op: '/', and: [
-				{op: '*', and: [
-					'topY',
-					{op: 'sin', and: 'topTheta'},
-				]},
+				{op: '-', and: ['½imageHeight', {op: '*', and: ['½imageWidth', {op: 'tan', and: 'cornerAngle'}]}]},
 				'imageHeight',
 			]},
 		]}},
 	]},
-	{op: 'func', id: 'getα', args: ['θ'], type: ['angle', 'angle'], fight: [true, true], isBase: [false, true], and: [
-		{op: '=', id: 'progress', and: {
-			op: '+', and: [
-				{op: '/', and: [{op: '-', and: 'θ'}, '¼π']},
-				1,
-			],
-		}},
-		'',
-		{op: '=', id: 'αSide', type: 'angle', and: {
-			op: 'atan', and: {
-				op: '*', and: [
-					'progress',
-					{op: '/', and: ['viewportHeight', 'viewportWidth']},
-				],
-			},
-		}},
-		{op: '=', id: 'αBase', type: 'angle', isBase: true, and: {
-			op: 'atan', and: {
-				op: '*', and: [
-					'progress',
-					{op: '/', and: ['viewportWidth', 'viewportHeight']},
-				],
-			},
-		}},
-		'',
-		{op: 'return', and: {op: 'array', and: ['αSide', 'αBase']}},
-	]},
-	{op: 'func', id: 'getYIntersect', args: ['viewportSize', 'cornerAngle', 'α'], type: ['zoom', 'y'], and: [
+	{op: 'func', id: 'getXIntersect', args: ['viewportSize', 'cornerAngle', 'α'], description: [
+		'The size of the relevant viewport edge',
+	], type: ['zoom', 'x'], and: [
 		{op: 'return', and: {op: 'array', multiline: true, and: [
 			{op: '/', and: [
 				'viewportSize',
-				{op: '*', and: [
-					{op: 'cos', and: 'α'},
-					{op: 'abs', and: {
-						op: '/', and: ['½imageWidth', {op: 'cos', and: 'cornerAngle'}],
-					}},
-				]},
+				{op: '*', and: [{op: 'cos', and: 'α'}, {op: 'abs', and: {op: '/', and: ['½imageHeight', {op: 'cos', and: 'cornerAngle'}]}}]},
 			]},
 			{op: '/', and: [
-				{op: '-', and: [
-					'½imageHeight',
-					{op: '*', and: ['½imageWidth', {op: 'tan', and: 'cornerAngle'}]},
-				]},
-				'imageHeight',
-			]},
-		]}},
-	]},
-	{op: 'func', id: 'getXIntersect', args: ['viewportSize', 'cornerAngle', 'α'], type: ['zoom', 'x'], and: [
-		{op: 'return', and: {op: 'array', multiline: true, and: [
-			{op: '/', and: [
-				'viewportSize',
-				{op: '*', and: [
-					{op: 'cos', and: 'α'},
-					{op: 'abs', and: {
-						op: '/', and: ['½imageHeight', {op: 'cos', and: 'cornerAngle'}],
-					}},
-				]},
-			]},
-			{op: '/', and: [
-				{op: '-', and: [
-					'½imageWidth',
-					{op: '*', and: ['½imageHeight', {op: 'tan', and: 'cornerAngle'}]},
-				]},
+				{op: '-', and: ['½imageWidth', {op: '*', and: ['½imageHeight', {op: 'tan', and: 'cornerAngle'}]}]},
 				'imageWidth',
 			]},
 		]}},
@@ -322,30 +211,32 @@ export const MULTI_LINE = [
 
 export const DOUBLE_LINE = [
 	...MULTI_LINE,
-	{op: 'func', id: 'getBound', args: ['originZoom', 'midX', 'midY', 'midZoom', 'endX', 'endY', 'isLeft'], type: ['x', 'y'], pair: [1, 0], and: [
+	{op: 'func', id: 'getBound', args: ['originZoom', 'midX', 'midY', 'midZoom', 'endX', 'endY', 'isLeft'], description: [
+		'The origin rail\'s start zoom',
+		'The x-coordinate of the lock rail\'s start point',
+		'The y-coordinate of the lock rail\'s start point',
+		'The lock rail\'s start zoom',
+		'The x-coordinate of the origin rail\'s horizon',
+		'The y-coordinate of the origin rail\'s horizon',
+		'True if the lock rail\'s horizon is the image\'s top-left corner',
+	], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '>', and: ['zoom', 'midZoom']},
-			{op: '=', id: 'progress', and: {
+			{op: '=', id: 'progress', description: 'The scale increase from the lock rail\'s start zoom', and: {
 				op: '/', and: ['zoom', 'midZoom'],
 			}},
-			{op: '=', id: 'cornerX', type: 'x', and: {
+			{op: '=', id: 'cornerX', description: 'The x-coordinate of the lock rail\'s horizon', type: 'x', and: {
 				op: '?', and: ['isLeft', -0.5, 0.5],
 			}},
 			'',
 			{op: 'return', and: {op: 'array', multiline: true, and: [
 				{op: '-', and: [
 					'cornerX',
-					{op: '/', and: [
-						{op: '-', and: ['cornerX', 'midX']},
-						'progress',
-					]},
+					{op: '/', and: [{op: '-', and: ['cornerX', 'midX']}, 'progress']},
 				]},
 				{op: '-', and: [
 					0.5,
-					{op: '/', and: [
-						{op: '-', and: [0.5, 'midY']},
-						'progress',
-					]},
+					{op: '/', and: [{op: '-', and: [0.5, 'midY']}, 'progress']},
 				]},
 			]}},
 		]},
@@ -357,7 +248,14 @@ export const DOUBLE_LINE = [
 		'',
 		{op: 'return', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'endX', 'endY', 'originZoom', 'zoom']}},
 	]},
-	{op: 'func', id: 'getDirected', args: ['endX', 'endY', 'midX', 'midY', 'flip', 'cX'], type: ['x', 'y', 'x', 'y', 'x', 'y'], pair: [1, 0, 3, 2, 5, 4], and: [
+	{op: 'func', id: 'getDirected', args: ['endX', 'endY', 'midX', 'midY', 'flip', 'cX'], description: [
+		'The x-coordinate of the origin rail\'s horizon',
+		'The y-coordinate of the origin rail\'s horizon',
+		'The x-coordinate of the lock rail\'s start point',
+		'The y-coordinate of the lock rail\'s start point',
+		'True if exactly one rail is flipped',
+		'The x-coordinate of the lock rail\'s horizon',
+	], type: ['x', 'y', 'x', 'y', 'x', 'y'], pair: [1, 0, 3, 2, 5, 4], and: [
 		{op: 'return', and: {
 			op: '?', multiline: true, and: [
 				'flip',
@@ -374,7 +272,10 @@ export const DOUBLE_LINE = [
 			],
 		}},
 	]},
-	{op: 'func', id: 'getPairings', args: ['flip0', 'flip1'], type: [
+	{op: 'func', id: 'getPairings', args: ['flip0', 'flip1'], description: [
+		'True if the rails to the top-left image corner should be flipped',
+		'True if the rails to the top-right image corner should be flipped',
+	], type: [
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',,
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
@@ -383,16 +284,49 @@ export const DOUBLE_LINE = [
 		11, 10, 13, 12, 15, 14, 17, 16,,
 		20, 19, 22, 21, 24, 23, 26, 25,
 	], multilineResult: [9, 9, 10], and: [
-		{op: '=', id: ['dEndX0', 'dEndY0', 'dMidX0', 'dMidY0', 'dCX0', 'dCY0'], and: {
+		{op: '=', id: ['dEndX0', 'dEndY0', 'dMidX0', 'dMidY0', 'dCX0', 'dCY0'], description: [
+			'The x-coordinate of the first origin rail\'s horizon',
+			'The y-coordinate of the first origin rail\'s horizon',
+			'The x-coordinate of the first lock rail\'s start point',
+			'The y-coordinate of the first lock rail\'s start point',
+			'The x-coordinate of the first lock rail\'s horizon',
+			'The y-coordinate of the first lock rail\'s horizon',
+		], and: {
 			op: 'call', id: 'getDirected', and: ['endX0', 'endY0', 'x0', 'y0', 'flip0', -0.5],
 		}},
-		{op: '=', id: ['dEndX1', 'dEndY1', 'dMidX1', 'dMidY1', 'dCX1', 'dCY1'], and: {
+		{op: '=', id: ['dEndX1', 'dEndY1', 'dMidX1', 'dMidY1', 'dCX1', 'dCY1'], description: [
+			'The x-coordinate of the second origin rail\'s horizon',
+			'The y-coordinate of the second origin rail\'s horizon',
+			'The x-coordinate of the second lock rail\'s start point',
+			'The y-coordinate of the second lock rail\'s start point',
+			'The x-coordinate of the second lock rail\'s horizon',
+			'The y-coordinate of the second lock rail\'s horizon',
+		], and: {
 			op: 'call', id: 'getDirected', and: ['endX1', 'endY1', 'x1', 'y1', 'flip1', 0.5],
 		}},
 		'',
 		{op: '=', multiline: 2, id: [
 			'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
 			'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
+		], description: [
+			'The start zoom of the pre-snip lock rails',
+			'The x-coordinate of the first pre-snip lock rail\'s start point',
+			'The y-coordinate of the first pre-snip lock rail\'s start point',
+			'The x-coordinate of the first pre-snip lock rail\'s horizon',
+			'The y-coordinate of the first pre-snip lock rail\'s horizon',
+			'The x-coordinate of the second pre-snip lock rail\'s start point',
+			'The y-coordinate of the second pre-snip lock rail\'s start point',
+			'The x-coordinate of the second pre-snip lock rail\'s horizon',
+			'The y-coordinate of the second pre-snip lock rail\'s horizon',
+			'The start zoom of the post-snip lock rails',
+			'The x-coordinate of the first post-snip lock rail\'s start point',
+			'The y-coordinate of the first post-snip lock rail\'s start point',
+			'The x-coordinate of the first post-snip lock rail\'s horizon',
+			'The y-coordinate of the first post-snip lock rail\'s horizon',
+			'The x-coordinate of the second post-snip lock rail\'s start point',
+			'The y-coordinate of the second post-snip lock rail\'s start point',
+			'The x-coordinate of the second post-snip lock rail\'s horizon',
+			'The y-coordinate of the second post-snip lock rail\'s horizon',
 		], and: {op: '?', multiline: true, and: [
 			{op: '>=', and: ['zoom0', 'zoom1']},
 			{op: 'array', multiline: 2, and: [
@@ -452,32 +386,63 @@ export const DOUBLE_LINE = [
 			]}},
 		]}},
 	]},
-	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], type: 'zoom', and: [
+	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1'], type: 'zoom', and: [
+		{op: '=', id: 'isInverse', description: 'True for the left and right regions', and: {op: '!=', and: ['flip0', 'flip1']}},
 		{op: '=', id: [
 			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C',
 			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B',
 			'hasA', 'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A',
+		], description: [
+			'The start zoom of the post-snip lock rails',
+			'The x-coordinate of the first post-snip lock rail\'s start point',
+			'The y-coordinate of the first post-snip lock rail\'s start point',
+			'The x-coordinate of the first post-snip lock rail\'s horizon',
+			'The y-coordinate of the first post-snip lock rail\'s horizon',
+			'The x-coordinate of the second post-snip lock rail\'s start point',
+			'The y-coordinate of the second post-snip lock rail\'s start point',
+			'The x-coordinate of the second post-snip lock rail\'s horizon',
+			'The y-coordinate of the second post-snip lock rail\'s horizon',
+			'The start zoom of the pre-snip lock rails',
+			'The x-coordinate of the first pre-snip lock rail\'s start point',
+			'The y-coordinate of the first pre-snip lock rail\'s start point',
+			'The x-coordinate of the first pre-snip lock rail\'s horizon',
+			'The y-coordinate of the first pre-snip lock rail\'s horizon',
+			'The x-coordinate of the second pre-snip lock rail\'s start point',
+			'The y-coordinate of the second pre-snip lock rail\'s start point',
+			'The x-coordinate of the second pre-snip lock rail\'s horizon',
+			'The y-coordinate of the second pre-snip lock rail\'s horizon',
+			'True if the post-snip origin rails should be checked',
+			'The start zoom of the post-snip origin rails',
+			'The x-coordinate of the first post-snip origin rail\'s start point',
+			'The y-coordinate of the first post-snip origin rail\'s start point',
+			'The x-coordinate of the first post-snip origin rail\'s horizon',
+			'The y-coordinate of the first post-snip origin rail\'s horizon',
+			'The x-coordinate of the second post-snip origin rail\'s start point',
+			'The y-coordinate of the second post-snip origin rail\'s start point',
+			'The x-coordinate of the second post-snip origin rail\'s horizon',
+			'The y-coordinate of the second post-snip origin rail\'s horizon',
 		], and: {
 			op: 'call', id: 'getPairings', and: ['flip0', 'flip1'],
 		}},
 		'',
-		{op: '=', id: 'snapC', and: {op: 'call', id: 'getIntersectZoom', and: [
-			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C', 'isInverse', 1,
-		]}},
+		{op: '=', id: 'snapC', description: 'The snap zoom if the snap point is between the pair of post-snip lock rails — otherwise NaN', and: {
+			op: 'call', id: 'getIntersectZoom', and: [
+				'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C', 'isInverse', 1,
+			],
+		}},
 		'',
 		{op: 'if', and: [
 			'snapC',
 			{op: 'return', and: 'snapC'},
 		]},
 		'',
-		{op: '=', id: 'snapB', and: {op: 'call', id: 'getIntersectZoom', and: [
-			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', 'isInverse', {
-				op: '-', and: [
-					1,
-					{op: '/', and: ['zoomB', 'zoomC']},
-				],
-			},
-		]}},
+		{op: '=', id: 'snapB', description: 'The snap zoom if the snap point is between the pair of pre-snip lock rails — otherwise NaN', and: {
+			op: 'call', id: 'getIntersectZoom', and: [
+				'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', 'isInverse', {
+					op: '-', and: [1, {op: '/', and: ['zoomB', 'zoomC']}],
+				},
+			],
+		}},
 		'',
 		{op: 'if', and: [
 			{op: '||', and: [{op: '!', and: 'hasA'}, 'snapB']},
