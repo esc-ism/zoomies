@@ -276,7 +276,7 @@ export const DOUBLE_LINE = [
 			{op: 'return', and: {op: 'array', and: [0, 0]}},
 		]},
 		'',
-		{op: 'return', and: {op: 'call', id: 'getProgressed', and: [0, 0, 'endX', 'endY', 'originZoom', 'zoom']}},
+		{op: 'return', and: {op: 'call', id: 'getProgressed', and: [{op: 'pseudo', type: 'x', and: 0}, {op: 'pseudo', type: 'y', and: 0}, 'endX', 'endY', 'originZoom', 'zoom']}},
 	]},
 	{op: 'func', id: 'getDirected', args: ['endX', 'endY', 'midX', 'midY', 'flip', 'cX'], description: [
 		'The x-coordinate of the origin rail\'s horizon',
@@ -319,7 +319,7 @@ export const DOUBLE_LINE = [
 			'The x-coordinate of the first lock rail\'s horizon',
 			'The y-coordinate of the first lock rail\'s horizon',
 		], and: {
-			op: 'call', id: 'getDirected', and: ['endX0', 'endY0', 'x0', 'y0', 'flip0', -0.5],
+			op: 'call', id: 'getDirected', and: ['endX0', 'endY0', 'x0', 'y0', 'flip0', {op: 'pseudo', type: 'x', and: -0.5}],
 		}},
 		{op: '=', id: ['dEndX1', 'dEndY1', 'dMidX1', 'dMidY1', 'dCX1', 'dCY1'], description: [
 			'The x-coordinate of the second origin rail\'s horizon',
@@ -329,7 +329,7 @@ export const DOUBLE_LINE = [
 			'The x-coordinate of the second lock rail\'s horizon',
 			'The y-coordinate of the second lock rail\'s horizon',
 		], and: {
-			op: 'call', id: 'getDirected', and: ['endX1', 'endY1', 'x1', 'y1', 'flip1', 0.5],
+			op: 'call', id: 'getDirected', and: ['endX1', 'endY1', 'x1', 'y1', 'flip1', {op: 'pseudo', type: 'x', and: 0.5}],
 		}},
 		'',
 		{op: '=', multiline: 2, id: [

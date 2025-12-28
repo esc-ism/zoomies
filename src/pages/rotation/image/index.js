@@ -214,14 +214,14 @@ const functions = [
 			{op: 'if', and: [
 				{op: '>', and: ['y', 0]},
 				{op: 'return', and: {op: 'array', and: [
-					{op: 'call', id: 'isBelow', and: ['x1', 'y1', 0.5, 0.5]},
+					{op: 'call', id: 'isBelow', and: ['x1', 'y1', {op: 'pseudo', type: 'x', and: 0.5}, {op: 'pseudo', type: 'y', and: 0.5}]},
 					false,
 				]}},
 			]},
 			'',
 			{op: 'return', and: {op: 'array', and: [
 				true,
-				{op: 'call', id: 'isBelow', and: [{op: '-', and: 'x0'}, {op: '-', and: 'y0'}, 0.5, -0.5]},
+				{op: 'call', id: 'isBelow', and: [{op: '-', and: 'x0'}, {op: '-', and: 'y0'}, {op: 'pseudo', type: 'x', and: 0.5}, {op: 'pseudo', type: 'y', and: -0.5}]},
 			]}},
 		]},
 		'',
@@ -229,12 +229,12 @@ const functions = [
 			{op: '>', and: ['y', 0]},
 			{op: 'return', and: {op: 'array', and: [
 				false,
-				{op: 'call', id: 'isBelow', and: ['x0', 'y0', -0.5, 0.5]},
+				{op: 'call', id: 'isBelow', and: ['x0', 'y0', {op: 'pseudo', type: 'x', and: -0.5}, {op: 'pseudo', type: 'y', and: 0.5}]},
 			]}},
 		]},
 		'',
 		{op: 'return', and: {op: 'array', and: [
-			{op: 'call', id: 'isBelow', and: [{op: '-', and: 'x1'}, {op: '-', and: 'y1'}, -0.5, -0.5]},
+			{op: 'call', id: 'isBelow', and: [{op: '-', and: 'x1'}, {op: '-', and: 'y1'}, {op: 'pseudo', type: 'x', and: -0.5}, {op: 'pseudo', type: 'y', and: -0.5}]},
 			true,
 		]}},
 	]},

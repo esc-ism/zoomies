@@ -111,7 +111,7 @@ const functions = [
 		]},
 		'',
 		{op: 'return', and: {
-			op: 'call', id: 'getProgressed', and: [0, 0, 'x0', 'y0', 'z0', 'zoom'],
+			op: 'call', id: 'getProgressed', and: [{op: 'pseudo', type: 'x', and: 0}, {op: 'pseudo', type: 'y', and: 0}, 'x0', 'y0', 'z0', 'zoom'],
 		}},
 	]},
 ];

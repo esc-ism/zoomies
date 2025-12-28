@@ -564,12 +564,12 @@ const functions = [
 				{op: 'return', and: {op: 'array', multiline: [1, 1, 5], and: [
 					'secondZoom', {op: '...', and: {
 						op: 'call', id: 'getGenericIntersection', and: [
-							0, 0, 'firstEndXSide', 'firstEndYSide', 'axisXSide', 'axisYSide', 'cornerXSide', 0.5,
+							{op: 'pseudo', type: 'x', and: 0}, {op: 'pseudo', type: 'y', and: 0}, 'firstEndXSide', 'firstEndYSide', 'axisXSide', 'axisYSide', 'cornerXSide', 0.5,
 						],
 					}},
 					'secondZoom', {op: '...', and: {
 						op: 'call', id: 'getGenericIntersection', and: [
-							0, 0, 'firstEndXBase', 'firstEndYBase', 'axisXBase', 'axisYBase', 'cornerXBase', 0.5,
+							{op: 'pseudo', type: 'x', and: 0}, {op: 'pseudo', type: 'y', and: 0}, 'firstEndXBase', 'firstEndYBase', 'axisXBase', 'axisYBase', 'cornerXBase', 0.5,
 						],
 					}},
 					'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXBase', 'firstEndYBase',
@@ -579,13 +579,13 @@ const functions = [
 			{op: 'return', and: {op: 'array', multiline: [1, 1, 5, 2, 5, 5], and: [
 				{op: '...', and: {
 					op: 'call', id: 'getIntersection', multiline: 5, and: [
-						'axisZoomSide', 'axisXSide', 'axisYSide', 'cornerXSide', 0.5,
+						'axisZoomSide', 'axisXSide', 'axisYSide', 'cornerXSide', {op: 'pseudo', type: 'y', and: 0.5},
 						'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
 					],
 				}},
 				{op: '...', and: {
 					op: 'call', id: 'getIntersection', multiline: 5, and: [
-						'axisZoomBase', 'axisXBase', 'axisYBase', 'cornerXBase', 0.5,
+						'axisZoomBase', 'axisXBase', 'axisYBase', 'cornerXBase', {op: 'pseudo', type: 'y', and: 0.5},
 						'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
 					],
 				}},
@@ -768,7 +768,7 @@ const functions = [
 					{op: '<=', and: ['zoom', 'secondZoom']},
 				]},
 				{op: 'return', and: {
-					op: 'call', id: 'getProgressed', and: [0, 0, 'firstEndX', 'firstEndY', 'firstZoom', 'zoom'],
+					op: 'call', id: 'getProgressed', and: [{op: 'pseudo', type: 'x', and: 0}, {op: 'pseudo', type: 'y', and: 0}, 'firstEndX', 'firstEndY', 'firstZoom', 'zoom'],
 				}},
 			]},
 			'',
@@ -831,7 +831,7 @@ const functions = [
 			'The start point y-coordinate of the rail connected to the lock rail',
 			'The horizon x-coordinate of the rail connected to the lock rail',
 			'The horizon y-coordinate of the rail connected to the lock rail',
-		], and: {
+		], pair: [,'fromY0', 'fromX0', 'toY0', 'toX0'], type: ['zoom', 'x', 'y', 'x', 'y'], and: {
 			op: '?', multiline: true, and: [
 				'hasSecond',
 				{op: 'array', and: ['secondZoom', 'secondX', 'secondY', 'secondEndX', 'secondEndY']},
@@ -844,11 +844,11 @@ const functions = [
 				'flip',
 				{op: 'array', multiline: [5], and: [
 					'zoom0', {op: '-', and: 'fromX0'}, {op: '-', and: 'fromY0'}, {op: '-', and: 'toX0'}, {op: '-', and: 'toY0'},
-					{op: '-', and: 'thirdX'}, {op: '-', and: 'thirdY'}, {op: '-', and: 'thirdEndX'}, -0.5,
+					{op: '-', and: 'thirdX'}, {op: '-', and: 'thirdY'}, {op: '-', and: 'thirdEndX'}, {op: 'pseudo', type: 'y', and: -0.5},
 				]},
 				{op: 'array', multiline: [5], and: [
 					'zoom0', 'fromX0', 'fromY0', 'toX0', 'toY0',
-					'thirdX', 'thirdY', 'thirdEndX', 0.5,
+					'thirdX', 'thirdY', 'thirdEndX', {op: 'pseudo', type: 'y', and: 0.5},
 				]},
 			],
 		}},
@@ -877,7 +877,7 @@ const functions = [
 			'The horizon\'s y-coordinate for a second rail bordering the snap point region',
 		], and: {
 			op: 'call', id: 'getDirected', and: [
-				'flip0', 'thirdZoom0', 'thirdX0', 'thirdY0', -0.5,
+				'flip0', 'thirdZoom0', 'thirdX0', 'thirdY0', {op: 'pseudo', type: 'x', and: -0.5},
 				'firstZoom', 'firstEndX0', 'firstEndY0',
 				'secondZoom', 'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
 			],
@@ -897,7 +897,7 @@ const functions = [
 			'The horizon\'s y-coordinate for a second rail bordering the snap point region',
 		], and: {
 			op: 'call', id: 'getDirected', and: [
-				'flip1', 'thirdZoom1', 'thirdX1', 'thirdY1', 0.5,
+				'flip1', 'thirdZoom1', 'thirdX1', 'thirdY1', {op: 'pseudo', type: 'x', and: 0.5},
 				'firstZoom', 'firstEndX1', 'firstEndY1',
 				'secondZoom', 'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
 			],
