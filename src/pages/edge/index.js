@@ -123,7 +123,7 @@ export default {
 			],
 		),
 		getCode(code, [
-			{op: '=', id: 'boundX', description: 'The x-position of the right-side bound', type: 'x', and: {
+			{op: '=', id: 'boundX', description: 'The x-coordinate of the right-side bound', type: 'x', and: {
 				op: '?', multiline: true, and: [
 					{op: '>=', and: [
 						{op: '/', and: ['viewportWidth', 'zoom']},
@@ -134,7 +134,7 @@ export default {
 				],
 			}},
 			'',
-			{op: '=', id: 'boundY', description: 'The y-position of the top-side bound', type: 'y', and: {
+			{op: '=', id: 'boundY', description: 'The y-coordinate of the top-side bound', type: 'y', and: {
 				op: '?', multiline: true, and: [
 					{op: '>=', and: [
 						{op: '/', and: ['viewportHeight', 'zoom']},

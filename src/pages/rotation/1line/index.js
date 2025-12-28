@@ -10,7 +10,7 @@ import {getPageButton, IDS} from '../../shared/page';
 import {getSnapOptions, singleCornerGetter} from '../../shared/tween';
 import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound, TWEEN_OPTIONS_SETUP, TWEEN_OPTIONS_YOYO} from '../../consts';
 
-import SHARED_FUNCTIONS from '../code';
+import {SINGLE_LINE as SHARED_FUNCTIONS} from '../code';
 import * as mock from '../mock';
 
 import System, {getZoomPoints} from './demo';
@@ -92,10 +92,10 @@ const functions = [
 	]},
 	{op: 'func', id: 'getStartZooms', type: ['zoom', 'zoom'], and: [
 		{op: '=', id: ['topLeftX', 'topLeftY', 'topRightX', 'topRightY'], description: [
-			'The zoom at which the image\'s top left corner touches the viewport\'s left or right edge',
-			'The zoom at which the image\'s top left corner touches the viewport\'s top or bottom edge',
-			'The zoom at which the image\'s top right corner touches the viewport\'s left or right edge',
-			'The zoom at which the image\'s top right corner touches the viewport\'s top or bottom edge',
+			'The zoom at which the image\'s top-left corner touches the viewport\'s left or right edge',
+			'The zoom at which the image\'s top-left corner touches the viewport\'s top or bottom edge',
+			'The zoom at which the image\'s top-right corner touches the viewport\'s left or right edge',
+			'The zoom at which the image\'s top-right corner touches the viewport\'s top or bottom edge',
 		], and: {
 			op: 'call', id: 'getAllStartZooms',
 		}},
@@ -879,8 +879,8 @@ export default {
 		],
 		getCode(code, [
 			{op: '=', id: ['topLeftZoom', 'topRightZoom'], description: [
-				'The zoom at which the image\'s top left corner touches a viewports edge',
-				'The zoom at which the image\'s top right corner touches a viewport edge',
+				'The zoom at which the image\'s top-left corner touches a viewports edge',
+				'The zoom at which the image\'s top-right corner touches a viewport edge',
 			], and: {
 				op: 'call', id: 'getStartZooms',
 			}},
@@ -894,7 +894,7 @@ export default {
 				'The bound\'s x-coordinate for the top-left rail',
 				'The bound\'s y-coordinate for the top-left rail',
 			], and: {
-				op: 'call', id: 'getBound', and: [-0.5, 0.5, 'topLeftZoom'],
+				op: 'call', id: 'getBound', and: [{op: 'pseudo', and: -0.5, type: 'x'}, {op: 'pseudo', and: 0.5, type: 'y'}, 'topLeftZoom'],
 			}},
 			'',
 			{op: '=', id: 'bottomRightX', description: 'The bound\'s x-coordinate on the bottom-right rail', ref: 'topLeftX', pair: 'bottomRightY', and: {
@@ -908,7 +908,7 @@ export default {
 				'The bound\'s x-coordinate on the top-right rail',
 				'The bound\'s y-coordinate on the top-right rail',
 			], and: {
-				op: 'call', id: 'getBound', and: [0.5, 0.5, 'topRightZoom'],
+				op: 'call', id: 'getBound', and: [{op: 'pseudo', and: 0.5, type: 'x'}, {op: 'pseudo', and: 0.5, type: 'y'}, 'topRightZoom'],
 			}},
 			'',
 			// todo does ref overwrite description?
@@ -991,10 +991,10 @@ export default {
 		],
 		getCode(code, [
 			{op: '=', id: ['toX0', 'toY0', 'toX1', 'toY1'], description: [
-				'The x-position of one of the snap point region\'s corners',
-				'The y-position of one of the snap point region\'s corners',
-				'The x-position of one of the snap point region\'s corners',
-				'The y-position of one of the snap point region\'s corners',
+				'The x-coordinate of one of the snap point region\'s corners',
+				'The y-coordinate of one of the snap point region\'s corners',
+				'The x-coordinate of one of the snap point region\'s corners',
+				'The y-coordinate of one of the snap point region\'s corners',
 			], and: {
 				op: 'call', id: 'getCorners',
 			}},
@@ -1672,7 +1672,7 @@ export default {
 				],
 			}},
 			'',
-			{op: '=', id: 'snapZoom', type: 'zoom', and: {
+			{op: '=', id: 'snapZoom', description: 'The lowest zoom at which (x, y) is in-bounds', type: 'zoom', and: {
 				op: '/', and: [
 					{op: 'max', and: ['topLeftZoom', 'topRightZoom']},
 					{op: '-', and: [1, 't']},

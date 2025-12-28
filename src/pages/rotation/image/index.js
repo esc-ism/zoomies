@@ -35,7 +35,7 @@ const getCornerProgressTweens = (rotation) => [
 
 const functions = [
 	...SHARED_FUNCTIONS,
-	{op: 'func', id: 'getIntersectSide', args: ['α'], description: 'The angle between the side lock rail and the un-rotated x-axis', type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
+	{op: 'func', id: 'getIntersectSide', args: ['α'], description: ['The angle between the side lock rail and the un-rotated x-axis'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
 		{op: '=', id: 'lockAngle', description: 'The angle between the side lock rail and the x-axis', type: 'angle', and: {
 			op: '+', and: ['α', 'θ'],
 		}},
@@ -56,14 +56,18 @@ const functions = [
 			'The lock rail\'s zoom at its intersection with the x-axis',
 			'The lock rail\'s x-coordinate at its intersection with the x-axis',
 		], and: {
-			op: 'call', id: 'getXIntersect', and: ['½viewportWidth', {op: '-', and: ['½π', 'θ', 'α']}, 'α'],
+			op: 'call', id: 'getXIntersect', and: [
+				'½viewportWidth',
+				{op: 'pseudo', type: 'angle', isBase: true, and: {op: '-', and: ['½π', 'θ', 'α']}},
+				'α',
+			],
 		}},
 		'',
 		{op: 'return', and: {op: 'array', and: [
 			'intersectZoom', {op: '?', and: ['isEvenQuadrant', {op: '-', and: 'intersectX'}, 'intersectX']}, 0,
 		]}},
 	]},
-	{op: 'func', id: 'getIntersectBase', args: ['α'], description: 'The angle between the base lock rail and the un-rotated y-axis', type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
+	{op: 'func', id: 'getIntersectBase', args: ['α'], description: ['The angle between the base lock rail and the un-rotated y-axis'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
 		{op: '=', id: 'lockAngle', description: 'The angle between the base lock rail and the x-axis', type: 'angle', isBase: true, and: {
 			op: '-', and: ['½π', 'θ', 'α'],
 		}},
@@ -84,7 +88,11 @@ const functions = [
 			'The lock rail\'s zoom at its intersection with the x-axis',
 			'The lock rail\'s x-coordinate at its intersection with the x-axis',
 		], and: {
-			op: 'call', id: 'getXIntersect', and: ['½viewportHeight', {op: '+', and: ['α', 'θ']}, 'α'],
+			op: 'call', id: 'getXIntersect', and: [
+				'½viewportHeight',
+				{op: 'pseudo', type: 'angle', isBase: true, and: {op: '+', and: ['α', 'θ']}},
+				'α',
+			],
 		}},
 		'',
 		{op: 'return', and: {op: 'array', and: [
@@ -96,9 +104,9 @@ const functions = [
 	// todo rename all the "first, second, third" stuff to "origin, connector, lock"
 	{op: 'func', id: 'getFirstEnd', args: ['firstZoom', 'secondZoom', 'secondX', 'secondY'], description: [
 		'The origin rail\'s start zoom',
-		'The lock rail\'s zoom at the axis intersect closest to its horizon',
-		'The lock rail\'s x-coordinate at the axis intersect closest to its horizon',
-		'The lock rail\'s y-coordinate at the axis intersect closest to its horizon',
+		'The lock rail\'s zoom at the axis intersection closest to its horizon',
+		'The lock rail\'s x-coordinate at the axis intersection closest to its horizon',
+		'The lock rail\'s y-coordinate at the axis intersection closest to its horizon',
 	], type: ['x', 'y'], pair: [1, 0], and: [
 		{op: 'if', and: [
 			{op: '==', and: ['secondY', 0]},
@@ -150,10 +158,16 @@ const functions = [
 			op: 'call', id: 'getIntersectBase', and: ['αBase'],
 		}},
 		'',
-		{op: '=', id: ['endXSide', 'endYSide'], and: {
+		{op: '=', id: ['endXSide', 'endYSide'], description: [
+			'The x-coordinate of the viewport-side origin rail\'s horizon',
+			'The y-coordinate of the viewport-side origin rail\'s horizon',
+		], and: {
 			op: 'call', id: 'getFirstEnd', and: ['zoomSide', 'intersectSideZoom', 'intersectSideX', 'intersectSideY'],
 		}},
-		{op: '=', id: ['endXBase', 'endYBase'], and: {
+		{op: '=', id: ['endXBase', 'endYBase'], description: [
+			'The x-coordinate of the viewport-base origin rail\'s horizon',
+			'The y-coordinate of the viewport-base origin rail\'s horizon',
+		], and: {
 			op: 'call', id: 'getFirstEnd', and: ['zoomBase', 'intersectBaseZoom', 'intersectBaseX', 'intersectBaseY'],
 		}},
 		'',

@@ -131,7 +131,7 @@ const functions = [
 			{op: '+', and: [{op: '*', and: ['firstEndY', 'mult']}, 'offsetY', 'secondY']},
 		]}},
 	]},
-	{op: 'func', id: 'getAxisIntersects', type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [2, 1, 5, 4], and: [
+	{op: 'func', id: 'getAxisIntersects', type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [,2, 1,, 5, 4], multilineResult: 2, and: [
 		{op: '=', id: ['αSide', 'αBase'], description: [
 			'The angle between the side lock rail and the un-rotated x-axis',
 			'The angle between the base lock rail and the un-rotated y-axis',
@@ -141,46 +141,46 @@ const functions = [
 		'',
 		{op: 'if', and: [
 			{op: '>=', and: ['θ', '¼π']},
-			{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideY'], description: [
+			{op: '=', id: ['axisZoomSide', 'axisYSide'], description: [
 				'The viewport-side lock rail\'s zoom at its intersection with the y-axis',
 				'The viewport-side lock rail\'s y-coordinate at its intersection with the y-axis',
 			], and: {op: 'call', id: 'getYIntersect', and: [
 				'½viewportWidth',
-				{op: '+', and: ['θ', 'αSide']},
+				{op: 'pseudo', type: 'angle', and: {op: '+', and: ['θ', 'αSide']}},
 				'αSide',
 			]}},
-			{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseY'], description: [
+			{op: '=', id: ['axisZoomBase', 'axisYBase'], description: [
 				'The viewport-base lock rail\'s zoom at its intersection with the y-axis',
 				'The viewport-base lock rail\'s y-coordinate at its intersection with the y-axis',
 			], and: {op: 'call', id: 'getYIntersect', and: [
 				'½viewportHeight',
-				{op: '-', and: ['½π', 'θ', 'αBase']},
+				{op: 'pseudo', type: 'angle', and: {op: '-', and: ['½π', 'θ', 'αBase']}},
 				'αBase',
 			]}},
 			'',
 			{op: 'return', and: {op: 'array', multiline: 2, and: [
-				'axisIntersectSideZoom', 0, 'axisIntersectSideY',
-				'axisIntersectBaseZoom', 0, 'axisIntersectBaseY',
+				'axisZoomSide', 0, 'axisYSide',
+				'axisZoomBase', 0, 'axisYBase',
 			]}},
 		]},
 		'',
-		{op: '=', id: ['axisIntersectSideZoom', 'axisIntersectSideX'], description: [
+		{op: '=', id: ['axisZoomSide', 'axisXSide'], description: [
 			'The viewport-side lock rail\'s zoom at its intersection with the x-axis',
 			'The viewport-side lock rail\'s x-coordinate at its intersection with the x-axis',
 		], and: {
 			op: 'call', id: 'getXIntersect', and: [
 				'½viewportWidth',
-				{op: '-', and: ['½π', 'θ', 'αSide']},
+				{op: 'pseudo', type: 'angle', isBase: true, and: {op: '-', and: ['½π', 'θ', 'αSide']}},
 				'αSide',
 			],
 		}},
-		{op: '=', id: ['axisIntersectBaseZoom', 'axisIntersectBaseX'], description: [
+		{op: '=', id: ['axisZoomBase', 'axisXBase'], description: [
 			'The viewport-base lock rail\'s zoom at its intersection with the x-axis',
 			'The viewport-base lock rail\'s x-coordinate at its intersection with the x-axis',
 		], and: {
 			op: 'call', id: 'getXIntersect', and: [
 				'½viewportHeight',
-				{op: '+', and: ['θ', 'αBase']},
+				{op: 'pseudo', type: 'angle', isBase: true, and: {op: '+', and: ['θ', 'αBase']}},
 				'αBase',
 			],
 		}},
@@ -188,18 +188,22 @@ const functions = [
 		{op: 'if', and: [
 			'isEvenQuadrant',
 			{op: 'return', and: {op: 'array', multiline: 2, and: [
-				'axisIntersectSideZoom', {op: '-', and: 'axisIntersectSideX'}, 0,
-				'axisIntersectBaseZoom', 'axisIntersectBaseX', 0,
+				'axisZoomSide', {op: '-', and: 'axisXSide'}, 0,
+				'axisZoomBase', 'axisXBase', 0,
 			]}},
 		]},
 		'',
 		{op: 'return', and: {op: 'array', multiline: 2, and: [
-			'axisIntersectSideZoom', 'axisIntersectSideX', 0,
-			'axisIntersectBaseZoom', {op: '-', and: 'axisIntersectBaseX'}, 0,
+			'axisZoomSide', 'axisXSide', 0,
+			'axisZoomBase', {op: '-', and: 'axisXBase'}, 0,
 		]}},
 	]},
 	{op: 'func', id: 'getDoFlip', and: [
-		{op: '=', id: ['farX', 'farY', 'isParallel'], and: {
+		{op: '=', id: ['farX', 'farY', 'isParallel'], description: [
+			'The x-coordinate of the lock rail\'s intersection with its origin rail',
+			'The y-coordinate of the lock rail\'s intersection with its origin rail',
+			'True if the lock rail has the same gradient as its origin rail',
+		], and: {
 			op: 'call', id: 'getGenericIntersection', and: [0, 0, 'firstEndX', 'firstEndY', 'thirdX', 'thirdY', 'thirdEndX', 0.5],
 		}},
 		'',
@@ -288,16 +292,16 @@ const functions = [
 			'An axis intersection x-coordinate of the lock rail with the higher start zoom',
 			'An axis intersection y-coordinate of the lock rail with the higher start zoom',
 			'The horizon x-coordinate of the lock rail with the higher start zoom',
-		], type: ['zoom', 'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x'], pair: [,,'firstEndY', 'firstEndX', 'offsetY', 'offsetX', 'thirdY', 'thirdX'], multiline: [6, 3], and: {
+		], type: ['zoom', 'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x'], pair: [,,'firstEndY', 'firstEndX', 'offsetY', 'offsetX', 'thirdY', 'thirdX'], multiline: [4, 5], and: {
 			op: '?', multiline: true, and: [
 				'isHorizontalFirst',
-				{op: 'array', multiline: [6, 3], and: [
+				{op: 'array', multiline: [4, 5], and: [
 					'zoomSide', 'zoomBase', 'sideX', 'sideY',
-					'baseX', 'baseY', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide',
+					'baseX', 'baseY', 'axisXSide', 'axisYSide', 'cornerXSide',
 				]},
-				{op: 'array', multiline: [6, 3], and: [
+				{op: 'array', multiline: [4, 5], and: [
 					'zoomBase', 'zoomSide', 'baseX', 'baseY',
-					'sideX', 'sideY', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase',
+					'sideX', 'sideY', 'axisXBase', 'axisYBase', 'cornerXBase',
 				]},
 			],
 		}},
@@ -374,17 +378,17 @@ const functions = [
 		'The origin rail\'s start zoom',
 		'The x-coordinate of the origin rail\'s horizon',
 		'The y-coordinate of the origin rail\'s horizon',
-		'The x-coordinate of the origin rail\'s horizon, with viewport left and right reversed',
-		'The y-coordinate of the origin rail\'s horizon, with viewport left and right reversed',
-		'The lock rail\'s start zoom',
+		'The x-coordinate of the origin rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+		'The y-coordinate of the origin rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+		'The connecting rail\'s start zoom',
 		'The x-coordinate of the connecting rail\'s start point',
 		'The y-coordinate of the connecting rail\'s start point',
 		'The x-coordinate of the connecting rail\'s horizon',
 		'The y-coordinate of the connecting rail\'s horizon',
-		'The x-coordinate of the connecting rail\'s start point, with viewport left and right reversed',
-		'The y-coordinate of the connecting rail\'s start point, with viewport left and right reversed',
-		'The x-coordinate of the connecting rail\'s horizon, with viewport left and right reversed',
-		'The y-coordinate of the connecting rail\'s horizon, with viewport left and right reversed',
+		'The x-coordinate of the connecting rail\'s start point, with horizontal lines pointed away from the image\'s upper corners',
+		'The y-coordinate of the connecting rail\'s start point, with horizontal lines pointed away from the image\'s upper corners',
+		'The x-coordinate of the connecting rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+		'The y-coordinate of the connecting rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
 	], multiline: [4, 5, 5, 4], type: [
 		'zoom', 'x', 'y', 'xvp', 'yvp',,,
 		'x', 'y', 'x', 'y',
@@ -399,8 +403,8 @@ const functions = [
 		'',
 		{op: '=', id: ['thirdZoomFlipped', 'thirdXFlipped', 'thirdYFlipped'], description: [
 			'The lock rail\'s start zoom',
-			'The x-coordinate of the lock rail\'s start point, with viewport left and right reversed',
-			'The y-coordinate of the lock rail\'s start point, with viewport left and right reversed',
+			'The x-coordinate of the lock rail\'s start point, with horizontal lines pointed away from the image\'s upper corners',
+			'The y-coordinate of the lock rail\'s start point, with horizontal lines pointed away from the image\'s upper corners',
 		], and: {
 			op: 'call', id: 'getIntersection', multiline: [5, 4], and: [
 				'thirdZoom', 'thirdX', 'thirdY', 'cornerX', 0.5,
@@ -437,7 +441,6 @@ const functions = [
 		], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
-		'',
 		{op: '=', id: ['rightX', 'rightY', 'topX', 'topY'], description: [
 			'The x-coordinate at the midpoint of the viewport\'s right edge',
 			'The y-coordinate at the midpoint of the viewport\'s right edge',
@@ -449,31 +452,39 @@ const functions = [
 		'',
 		{op: '=', id: 'θ', description: '0 when the image is perfectly right-side-up or upside-down, and 1 when the image is perfectly sideways', and: {op: 'call', id: 'getθ'}},
 		'',
-		{op: '=', multiline: 3, id: [
-			'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide',
-			'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase',
+		{op: '=', id: [
+			'axisZoomSide', 'axisXSide', 'axisYSide',
+			'axisZoomBase', 'axisXBase', 'axisYBase',
 		], description: [
-			// todo
+			'The viewport-side lock rail\'s zoom at the an axis intersection',
+			'The viewport-side lock rail\'s x-coordinate at an axis intersection',
+			'The viewport-side lock rail\'s y-coordinate at an axis intersection',
+			'The viewport-base lock rail\'s zoom at an axis intersection',
+			'The viewport-base lock rail\'s x-coordinate at an axis intersection',
+			'The viewport-base lock rail\'s y-coordinate at an axis intersection',
 		], and: {
 			op: 'call', id: 'getAxisIntersects',
 		}},
 		'',
-		{op: '=', id: ['cornerXSide', 'cornerXBase'], type: ['x', 'x'], and: {
-			op: '?', and: ['isEvenQuadrant', {op: 'array', and: [-0.5, 0.5]}, {op: 'array', and: [0.5, -0.5]}],
-		}},
-		'',
 		{op: 'if', and: [
 			{op: '&&', and: [
-				{op: '<', and: [{op: 'abs', and: 'axisIntersectXSide'}, 'ε']},
-				{op: '<', and: [{op: 'abs', and: 'axisIntersectYSide'}, 'ε']},
-				{op: '<', and: [{op: 'abs', and: 'axisIntersectXBase'}, 'ε']},
-				{op: '<', and: [{op: 'abs', and: 'axisIntersectYBase'}, 'ε']},
+				{op: '<', and: [{op: 'abs', and: 'axisXSide'}, 'ε']},
+				{op: '<', and: [{op: 'abs', and: 'axisYSide'}, 'ε']},
+				{op: '<', and: [{op: 'abs', and: 'axisXBase'}, 'ε']},
+				{op: '<', and: [{op: 'abs', and: 'axisYBase'}, 'ε']},
 			]},
 			{op: 'return', and: {op: 'array', and: [
-				'axisIntersectZoomSide', 0, 0, 'axisIntersectZoomBase', 0, 0,
+				'axisZoomSide', 0, 0, 'axisZoomBase', 0, 0,
 				'∞', 0, 0, 0, 0,
 			]}},
 		]},
+		'',
+		{op: '=', id: ['cornerXSide', 'cornerXBase'], description: [
+			'The x-coordinate of the viewport-side lock rail\'s horizon',
+			'The x-coordinate of the viewport-base lock rail\'s horizon',
+		], type: ['x', 'x'], and: {
+			op: '?', and: ['isEvenQuadrant', {op: 'array', and: [-0.5, 0.5]}, {op: 'array', and: [0.5, -0.5]}],
+		}},
 		'',
 		{op: '=', id: [
 			'firstZoom', 'secondZoom',
@@ -488,19 +499,54 @@ const functions = [
 			'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
 			'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
 			'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
+		], description: [
+			'The start zoom for both origin rails',
+			'The start zoom for both connecting rails',
+			'The x-coordinate of the viewport-side origin rail\'s horizon, with horizontal lines pointed towards the image\'s upper corners',
+			'The y-coordinate of the viewport-side origin rail\'s horizon, with horizontal lines pointed towards the image\'s upper corners',
+			'The x-coordinate of the viewport-base origin rail\'s horizon, with horizontal lines pointed towards the image\'s upper corners',
+			'The y-coordinate of the viewport-base origin rail\'s horizon, with horizontal lines pointed towards the image\'s upper corners',
+			'The x-coordinate of the viewport-side origin rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+			'The y-coordinate of the viewport-side origin rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+			'The x-coordinate of the viewport-base origin rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+			'The y-coordinate of the viewport-base origin rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+			'The x-coordinate of the viewport-side connecting rail\'s start point, with horizontal lines pointed towards the image\'s upper corners',
+			'The y-coordinate of the viewport-side connecting rail\'s start point, with horizontal lines pointed towards the image\'s upper corners',
+			'The x-coordinate of the viewport-side connecting rail\'s horizon, with horizontal lines pointed towards the image\'s upper corners',
+			'The y-coordinate of the viewport-side connecting rail\'s horizon, with horizontal lines pointed towards the image\'s upper corners',
+			'The x-coordinate of the viewport-base connecting rail\'s start point, with horizontal lines pointed towards the image\'s upper corners',
+			'The y-coordinate of the viewport-base connecting rail\'s start point, with horizontal lines pointed towards the image\'s upper corners',
+			'The x-coordinate of the viewport-base connecting rail\'s horizon, with horizontal lines pointed towards the image\'s upper corners',
+			'The y-coordinate of the viewport-base connecting rail\'s horizon, with horizontal lines pointed towards the image\'s upper corners',
+			'The x-coordinate of the viewport-side connecting rail\'s start point, with horizontal lines pointed away from the image\'s upper corners',
+			'The y-coordinate of the viewport-side connecting rail\'s start point, with horizontal lines pointed away from the image\'s upper corners',
+			'The x-coordinate of the viewport-side connecting rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+			'The y-coordinate of the viewport-side connecting rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+			'The x-coordinate of the viewport-base connecting rail\'s start point, with horizontal lines pointed away from the image\'s upper corners',
+			'The y-coordinate of the viewport-base connecting rail\'s start point, with horizontal lines pointed away from the image\'s upper corners',
+			'The x-coordinate of the viewport-base connecting rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
+			'The y-coordinate of the viewport-base connecting rail\'s horizon, with horizontal lines pointed away from the image\'s upper corners',
 		], and: {
 			op: 'call', id: 'getShared',
 		}},
 		'',
-		{op: '=', id: ['thirdZoomSide', 'thirdXSide', 'thirdYSide'], and: {
+		{op: '=', id: ['thirdZoomSide', 'thirdXSide', 'thirdYSide'], description: [
+			'The viewport-side lock rail\'s zoom at its intersection with its connecting rail',
+			'The x-coordinate of the viewport-side lock rail at its intersection with its connecting rail',
+			'The y-coordinate of the viewport-side lock rail at its intersection with its connecting rail',
+		], and: {
 			op: 'call', id: 'getIntersection', and: [
-				'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+				'axisZoomSide', 'axisXSide', 'axisYSide', 'cornerXSide', 0.5,
 				'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
 			],
 		}},
-		{op: '=', id: ['thirdZoomBase', 'thirdXBase', 'thirdYBase'], and: {
+		{op: '=', id: ['thirdZoomBase', 'thirdXBase', 'thirdYBase'], description: [
+			'The viewport-base lock rail\'s zoom at its intersection with its connecting rail',
+			'The x-coordinate of the viewport-base lock rail at its intersection with its connecting rail',
+			'The y-coordinate of the viewport-base lock rail at its intersection with its connecting rail',
+		], and: {
 			op: 'call', id: 'getIntersection', and: [
-				'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
+				'axisZoomBase', 'axisXBase', 'axisYBase', 'cornerXBase', 0.5,
 				'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
 			],
 		}},
@@ -518,12 +564,12 @@ const functions = [
 				{op: 'return', and: {op: 'array', multiline: [1, 1, 5], and: [
 					'secondZoom', {op: '...', and: {
 						op: 'call', id: 'getGenericIntersection', and: [
-							0, 0, 'firstEndXSide', 'firstEndYSide', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+							0, 0, 'firstEndXSide', 'firstEndYSide', 'axisXSide', 'axisYSide', 'cornerXSide', 0.5,
 						],
 					}},
 					'secondZoom', {op: '...', and: {
 						op: 'call', id: 'getGenericIntersection', and: [
-							0, 0, 'firstEndXBase', 'firstEndYBase', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
+							0, 0, 'firstEndXBase', 'firstEndYBase', 'axisXBase', 'axisYBase', 'cornerXBase', 0.5,
 						],
 					}},
 					'firstZoom', 'firstEndXSide', 'firstEndYSide', 'firstEndXBase', 'firstEndYBase',
@@ -533,13 +579,13 @@ const functions = [
 			{op: 'return', and: {op: 'array', multiline: [1, 1, 5, 2, 5, 5], and: [
 				{op: '...', and: {
 					op: 'call', id: 'getIntersection', multiline: 5, and: [
-						'axisIntersectZoomSide', 'axisIntersectXSide', 'axisIntersectYSide', 'cornerXSide', 0.5,
+						'axisZoomSide', 'axisXSide', 'axisYSide', 'cornerXSide', 0.5,
 						'secondXSideFlipped', 'secondYSideFlipped', 'secondEndXSideFlipped', 'secondEndYSideFlipped',
 					],
 				}},
 				{op: '...', and: {
 					op: 'call', id: 'getIntersection', multiline: 5, and: [
-						'axisIntersectZoomBase', 'axisIntersectXBase', 'axisIntersectYBase', 'cornerXBase', 0.5,
+						'axisZoomBase', 'axisXBase', 'axisYBase', 'cornerXBase', 0.5,
 						'secondXBaseFlipped', 'secondYBaseFlipped', 'secondEndXBaseFlipped', 'secondEndYBaseFlipped',
 					],
 				}},
@@ -555,6 +601,18 @@ const functions = [
 			{op: '=', id: [
 				'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstEndXFixed', 'firstEndYFixed',
 				'hasSecondFixed', 'secondIsFlipped', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
+			], description: [
+				'The viewport-base lock rail\'s start zoom',
+				'The x-coordinate of the viewport-base lock rail\'s start point',
+				'The y-coordinate of the viewport-base lock rail\'s start point',
+				'The x-coordinate of the viewport-base origin rail\'s horizon',
+				'The y-coordinate of the viewport-base origin rail\'s horizon',
+				'True if the viewport-base lock rail starts from its connecting rail',
+				'True if the viewport-side and viewport-base connecting rails have different gradients',
+				'The x-coordinate of the viewport-base connecting rail\'s start point',
+				'The y-coordinate of the viewport-base connecting rail\'s start point',
+				'The x-coordinate of the viewport-base connecting rail\'s horizon',
+				'The y-coordinate of the viewport-base connecting rail\'s horizon',
 			], and: {
 				op: 'call', id: 'getFixed', and: [
 					'thirdZoomBase', 'thirdXBase', 'thirdYBase', 'cornerXBase',
@@ -578,6 +636,18 @@ const functions = [
 		{op: '=', id: [
 			'thirdZoomFixed', 'thirdXFixed', 'thirdYFixed', 'firstEndXFixed', 'firstEndYFixed',
 			'hasSecondFixed', 'secondIsFlipped', 'secondXFixed', 'secondYFixed', 'secondEndXFixed', 'secondEndYFixed',
+		], description: [
+			'The viewport-side lock rail\'s start zoom',
+			'The x-coordinate of the viewport-side lock rail\'s start point',
+			'The y-coordinate of the viewport-side lock rail\'s start point',
+			'The x-coordinate of the viewport-side origin rail\'s horizon',
+			'The y-coordinate of the viewport-side origin rail\'s horizon',
+			'True if the viewport-side lock rail starts from its connecting rail',
+			'True if the viewport-side and viewport-base connecting rails have different gradients',
+			'The x-coordinate of the viewport-side connecting rail\'s start point',
+			'The y-coordinate of the viewport-side connecting rail\'s start point',
+			'The x-coordinate of the viewport-side connecting rail\'s horizon',
+			'The y-coordinate of the viewport-side connecting rail\'s horizon',
 		], and: {
 			op: 'call', id: 'getFixed', and: [
 				'thirdZoomSide', 'thirdXSide', 'thirdYSide', 'cornerXSide',
@@ -614,6 +684,34 @@ const functions = [
 			'secondZoom', 'secondIsFlipped',
 			'hasSecondSide', 'secondXSide', 'secondYSide', 'secondEndXSide', 'secondEndYSide',
 			'hasSecondBase', 'secondXBase', 'secondYBase', 'secondEndXBase', 'secondEndYBase',
+		], description: [
+			'The viewport-side lock rail\'s start zoom',
+			'The x-coordinate of the viewport-side lock rail\'s start point',
+			'The y-coordinate of the viewport-side lock rail\'s start point',
+			'The viewport-base lock rail\'s start zoom',
+			'The x-coordinate of the viewport-base lock rail\'s start point',
+			'The y-coordinate of the viewport-base lock rail\'s start point',
+			
+			'The start zoom for both origin rails',
+			'The x-coordinate of the viewport-side origin rail\'s horizon',
+			'The y-coordinate of the viewport-side origin rail\'s horizon',
+			'The x-coordinate of the viewport-base origin rail\'s horizon',
+			'The y-coordinate of the viewport-base origin rail\'s horizon',
+			
+			'The start zoom for both connecting rails',
+			'True if the viewport-side and viewport-base connecting rails have different gradients',
+			
+			'True if the viewport-side lock rail starts from its connecting rail',
+			'The x-coordinate of the viewport-side connecting rail\'s start point',
+			'The y-coordinate of the viewport-side connecting rail\'s start point',
+			'The x-coordinate of the viewport-side connecting rail\'s horizon',
+			'The y-coordinate of the viewport-side connecting rail\'s horizon',
+			
+			'True if the viewport-base lock rail starts from its connecting rail',
+			'The x-coordinate of the viewport-base connecting rail\'s start point',
+			'The y-coordinate of the viewport-base connecting rail\'s start point',
+			'The x-coordinate of the viewport-base connecting rail\'s horizon',
+			'The y-coordinate of the viewport-base connecting rail\'s horizon',
 		], and: {op: 'call', id: 'getAll', and: ['isEvenQuadrant']}},
 		'',
 		{op: 'if', and: [
@@ -640,6 +738,22 @@ const functions = [
 		'thirdZoom', 'thirdX', 'thirdY', 'thirdEndX',
 		'firstZoom', 'firstEndX', 'firstEndY',
 		'secondZoom', 'hasSecond', 'secondX', 'secondY', 'secondEndX', 'secondEndY',
+	], description: [
+		'The lock rail\'s start zoom',
+		'The x-coordinate of the lock rail\'s start point',
+		'The y-coordinate of the lock rail\'s start point',
+		'The x-coordinate of the lock rail\'s horizon',
+		
+		'The origin rail\'s start zoom',
+		'The x-coordinate of the origin rail\'s horizon',
+		'The y-coordinate of the origin rail\'s horizon',
+		
+		'The connecting rail\'s start zoom',
+		'True if the lock rail starts from its connecting rail',
+		'The x-coordinate of the connecting rail\'s start point',
+		'The y-coordinate of the connecting rail\'s start point',
+		'The x-coordinate of the connecting rail\'s horizon',
+		'The y-coordinate of the connecting rail\'s horizon',
 	], and: [
 		{op: 'if', and: [
 			{op: '<=', and: ['zoom', 'firstZoom']},
@@ -663,7 +777,7 @@ const functions = [
 			}},
 		]},
 		'',
-		{op: '=', id: 'progress', and: {
+		{op: '=', id: 'progress', description: 'The scale increase from the lock rail\'s start zoom', and: {
 			op: '/', and: ['zoom', 'thirdZoom'],
 		}},
 		'',
@@ -686,14 +800,38 @@ const functions = [
 	]},
 	{op: 'func', id: 'getDirected', type: [
 		'zoom', 'x', 'y', 'x', 'y',
-		'zoom', 'x', 'y', 'x', 'y',
-	], pair: [,2, 1, 4, 3,,7, 6, 9, 8], args: [
+		'x', 'y', 'x', 'y',
+	], pair: [,2, 1, 4, 3, 6, 5, 8, 7], args: [
 		'flip',
-		'thirdZoom', 'thirdX', 'thirdY', 'thirdEndX',
+		'thirdX', 'thirdY', 'thirdEndX',
 		'firstZoom', 'firstEndX', 'firstEndY',
 		'secondZoom', 'hasSecond', 'secondX', 'secondY', 'secondEndX', 'secondEndY',
-	], multiline: [1, 4, 3, 6], and: [
-		{op: '=', id: ['zoom0', 'fromX0', 'fromY0', 'toX0', 'toY0'], and: {
+	], description: [
+		'True if the rail should be mirrored',
+		
+		'The lock rail\'s start zoom',
+		'The x-coordinate of the lock rail\'s start point',
+		'The y-coordinate of the lock rail\'s start point',
+		'The x-coordinate of the lock rail\'s horizon',
+		
+		'The origin rail\'s start zoom',
+		'The x-coordinate of the origin rail\'s horizon',
+		'The y-coordinate of the origin rail\'s horizon',
+		
+		'The connecting rail\'s start zoom',
+		'True if the lock rail starts from its connecting rail',
+		'The x-coordinate of the connecting rail\'s start point',
+		'The y-coordinate of the connecting rail\'s start point',
+		'The x-coordinate of the connecting rail\'s horizon',
+		'The y-coordinate of the connecting rail\'s horizon',
+	], multiline: [4, 3, 6], and: [
+		{op: '=', id: ['zoom0', 'fromX0', 'fromY0', 'toX0', 'toY0'], description: [
+			'The start zoom of the rail connected to the lock rail',
+			'The start point x-coordinate of the rail connected to the lock rail',
+			'The start point y-coordinate of the rail connected to the lock rail',
+			'The horizon x-coordinate of the rail connected to the lock rail',
+			'The horizon y-coordinate of the rail connected to the lock rail',
+		], and: {
 			op: '?', multiline: true, and: [
 				'hasSecond',
 				{op: 'array', and: ['secondZoom', 'secondX', 'secondY', 'secondEndX', 'secondEndY']},
@@ -704,18 +842,18 @@ const functions = [
 		{op: 'return', and: {
 			op: '?', multiline: true, and: [
 				'flip',
-				{op: 'array', multiline: 5, and: [
+				{op: 'array', multiline: [5], and: [
 					'zoom0', {op: '-', and: 'fromX0'}, {op: '-', and: 'fromY0'}, {op: '-', and: 'toX0'}, {op: '-', and: 'toY0'},
-					'thirdZoom', {op: '-', and: 'thirdX'}, {op: '-', and: 'thirdY'}, {op: '-', and: 'thirdEndX'}, -0.5,
+					{op: '-', and: 'thirdX'}, {op: '-', and: 'thirdY'}, {op: '-', and: 'thirdEndX'}, -0.5,
 				]},
-				{op: 'array', multiline: 5, and: [
+				{op: 'array', multiline: [5], and: [
 					'zoom0', 'fromX0', 'fromY0', 'toX0', 'toY0',
-					'thirdZoom', 'thirdX', 'thirdY', 'thirdEndX', 0.5,
+					'thirdX', 'thirdY', 'thirdEndX', 0.5,
 				]},
 			],
 		}},
 	]},
-	{op: 'func', id: 'getPairings', args: ['flip0', 'flip1'], type: [
+	{op: 'func', id: 'getPairings', type: [
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',,
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
@@ -724,24 +862,42 @@ const functions = [
 		11, 10, 13, 12, 15, 14, 17, 16,,,
 		21, 20, 23, 22, 25, 24, 27, 26,
 	], multilineResult: [9, 9, 10], and: [
-		{op: '=', multiline: 2, id: [
+		{op: '=', multiline: [5], id: [
 			'zoomLow0', 'fromXLow0', 'fromYLow0', 'toXLow0', 'toYLow0',
-			'zoomHigh0', 'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0',
+			'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0',
+		], description: [
+			'The start zoom of a first rail bordering the snap point region',
+			'The start point\'s x-coordinate for a first rail bordering the snap point region',
+			'The start point\'s y-coordinate for a first rail bordering the snap point region',
+			'The horizon\'s x-coordinate for a first rail bordering the snap point region',
+			'The horizon\'s y-coordinate for a first rail bordering the snap point region',
+			'The start point\'s x-coordinate for a second rail bordering the snap point region',
+			'The start point\'s y-coordinate for a second rail bordering the snap point region',
+			'The horizon\'s x-coordinate for a second rail bordering the snap point region',
+			'The horizon\'s y-coordinate for a second rail bordering the snap point region',
 		], and: {
 			op: 'call', id: 'getDirected', and: [
-				'flip0',
-				'thirdZoom0', 'thirdX0', 'thirdY0', -0.5,
+				'flip0', 'thirdZoom0', 'thirdX0', 'thirdY0', -0.5,
 				'firstZoom', 'firstEndX0', 'firstEndY0',
 				'secondZoom', 'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
 			],
 		}},
-		{op: '=', multiline: 2, id: [
+		{op: '=', multiline: [5], id: [
 			'zoomLow1', 'fromXLow1', 'fromYLow1', 'toXLow1', 'toYLow1',
-			'zoomHigh1', 'fromXHigh1', 'fromYHigh1', 'toXHigh1', 'toYHigh1',
+			'fromXHigh1', 'fromYHigh1', 'toXHigh1', 'toYHigh1',
+		], description: [
+			'The start zoom of a first rail bordering the snap point region',
+			'The start point\'s x-coordinate for a first rail bordering the snap point region',
+			'The start point\'s y-coordinate for a first rail bordering the snap point region',
+			'The horizon\'s x-coordinate for a first rail bordering the snap point region',
+			'The horizon\'s y-coordinate for a first rail bordering the snap point region',
+			'The start point\'s x-coordinate for a second rail bordering the snap point region',
+			'The start point\'s y-coordinate for a second rail bordering the snap point region',
+			'The horizon\'s x-coordinate for a second rail bordering the snap point region',
+			'The horizon\'s y-coordinate for a second rail bordering the snap point region',
 		], and: {
 			op: 'call', id: 'getDirected', and: [
-				'flip1',
-				'thirdZoom1', 'thirdX1', 'thirdY1', 0.5,
+				'flip1', 'thirdZoom1', 'thirdX1', 'thirdY1', 0.5,
 				'firstZoom', 'firstEndX1', 'firstEndY1',
 				'secondZoom', 'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
 			],
@@ -750,6 +906,25 @@ const functions = [
 		{op: '=', multiline: 2, id: [
 			'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
 			'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
+		], description: [
+			'The start zoom of the post-snip lock rails',
+			'The x-coordinate of the first post-snip lock rail\'s start point',
+			'The y-coordinate of the first post-snip lock rail\'s start point',
+			'The x-coordinate of the first post-snip lock rail\'s horizon',
+			'The y-coordinate of the first post-snip lock rail\'s horizon',
+			'The x-coordinate of the second post-snip lock rail\'s start point',
+			'The y-coordinate of the second post-snip lock rail\'s start point',
+			'The x-coordinate of the second post-snip lock rail\'s horizon',
+			'The y-coordinate of the second post-snip lock rail\'s horizon',
+			'The start zoom of the pre-snip lock rails',
+			'The x-coordinate of the first pre-snip lock rail\'s start point',
+			'The y-coordinate of the first pre-snip lock rail\'s start point',
+			'The x-coordinate of the first pre-snip lock rail\'s horizon',
+			'The y-coordinate of the first pre-snip lock rail\'s horizon',
+			'The x-coordinate of the second pre-snip lock rail\'s start point',
+			'The y-coordinate of the second pre-snip lock rail\'s start point',
+			'The x-coordinate of the second pre-snip lock rail\'s horizon',
+			'The y-coordinate of the second pre-snip lock rail\'s horizon',
 		], and: {
 			op: '?', multiline: true, and: [
 				{op: '>=', and: ['thirdZoom0', 'thirdZoom1']},
@@ -757,7 +932,7 @@ const functions = [
 					'thirdZoom0',
 					'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0',
 					{op: '...', and: {op: 'call', id: 'getProgressed', and: [
-						'fromXHigh1', 'fromYHigh1', 'toXHigh1', 'toYHigh1', 'zoomHigh1', 'thirdZoom0',
+						'fromXHigh1', 'fromYHigh1', 'toXHigh1', 'toYHigh1', 'thirdZoom1', 'thirdZoom0',
 					]}},
 					'toXHigh1', 'toYHigh1',
 					'thirdZoom1',
@@ -770,7 +945,7 @@ const functions = [
 				{op: 'array', multiline: [1, 3, 4, 1, 4, 3], and: [
 					'thirdZoom1',
 					{op: '...', and: {op: 'call', id: 'getProgressed', and: [
-						'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0', 'zoomHigh0', 'thirdZoom1',
+						'fromXHigh0', 'fromYHigh0', 'toXHigh0', 'toYHigh0', 'thirdZoom0', 'thirdZoom1',
 					]}},
 					'toXHigh0', 'toYHigh0',
 					'fromXHigh1', 'fromYHigh1', 'toXHigh1', 'toYHigh1',
@@ -804,32 +979,66 @@ const functions = [
 			'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
 		]}},
 	]},
-	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], type: 'zoom', and: [
+	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], description: [
+		'True if the top-left rail should be mirrored',
+		'True if the top-right rail should be mirrored',
+		'True for the left and right regions',
+	], type: 'zoom', and: [
 		{op: '=', id: [
 			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C',
 			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B',
 			'hasA', 'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A',
+		], description: [
+			'The start zoom of the post-snip lock rails',
+			'The x-coordinate of the first post-snip lock rail\'s start point',
+			'The y-coordinate of the first post-snip lock rail\'s start point',
+			'The x-coordinate of the first post-snip lock rail\'s horizon',
+			'The y-coordinate of the first post-snip lock rail\'s horizon',
+			'The x-coordinate of the second post-snip lock rail\'s start point',
+			'The y-coordinate of the second post-snip lock rail\'s start point',
+			'The x-coordinate of the second post-snip lock rail\'s horizon',
+			'The y-coordinate of the second post-snip lock rail\'s horizon',
+			'The start zoom of the pre-snip lock rails',
+			'The x-coordinate of the first pre-snip lock rail\'s start point',
+			'The y-coordinate of the first pre-snip lock rail\'s start point',
+			'The x-coordinate of the first pre-snip lock rail\'s horizon',
+			'The y-coordinate of the first pre-snip lock rail\'s horizon',
+			'The x-coordinate of the second pre-snip lock rail\'s start point',
+			'The y-coordinate of the second pre-snip lock rail\'s start point',
+			'The x-coordinate of the second pre-snip lock rail\'s horizon',
+			'The y-coordinate of the second pre-snip lock rail\'s horizon',
+			'True if the post-snip origin rails should be checked',
+			'The start zoom of the post-snip origin rails',
+			'The x-coordinate of the first post-snip origin rail\'s start point',
+			'The y-coordinate of the first post-snip origin rail\'s start point',
+			'The x-coordinate of the first post-snip origin rail\'s horizon',
+			'The y-coordinate of the first post-snip origin rail\'s horizon',
+			'The x-coordinate of the second post-snip origin rail\'s start point',
+			'The y-coordinate of the second post-snip origin rail\'s start point',
+			'The x-coordinate of the second post-snip origin rail\'s horizon',
+			'The y-coordinate of the second post-snip origin rail\'s horizon',
 		], and: {
-			op: 'call', id: 'getPairings', and: ['flip0', 'flip1'],
+			op: 'call', id: 'getPairings',
 		}},
 		'',
-		{op: '=', id: 'snapC', and: {op: 'call', id: 'getIntersectZoom', and: [
-			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C', 'isInverse', 1,
-		]}},
+		{op: '=', id: 'snapC', description: 'The snap zoom if the snap point is between the pair of post-snip lock rails — otherwise NaN', and: {
+			op: 'call', id: 'getIntersectZoom', and: [
+				'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C', 1,
+			],
+		}},
 		'',
 		{op: 'if', and: [
 			'snapC',
 			{op: 'return', and: 'snapC'},
 		]},
 		'',
-		{op: '=', id: 'snapB', and: {op: 'call', id: 'getIntersectZoom', and: [
-			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', 'isInverse', {
-				op: '-', and: [
-					1,
-					{op: '/', and: ['zoomB', 'zoomC']},
-				],
-			},
-		]}},
+		{op: '=', id: 'snapB', description: 'The snap zoom if the snap point is between the pair of pre-snip lock rails — otherwise NaN', and: {
+			op: 'call', id: 'getIntersectZoom', and: [
+				'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B', {
+					op: '-', and: [1, {op: '/', and: ['zoomB', 'zoomC']}],
+				},
+			],
+		}},
 		'',
 		{op: 'if', and: [
 			{op: '||', and: [{op: '!', and: 'hasA'}, 'snapB']},
@@ -838,11 +1047,8 @@ const functions = [
 		'',
 		{op: 'return', and: {
 			op: 'call', id: 'getIntersectZoom', and: [
-				'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A', 'isInverse', {
-					op: '-', and: [
-						1,
-						{op: '/', and: ['zoomA', 'zoomB']},
-					],
+				'zoomA', 'fromX0A', 'fromY0A', 'toX0A', 'toY0A', 'fromX1A', 'fromY1A', 'toX1A', 'toY1A', {
+					op: '-', and: [1, {op: '/', and: ['zoomA', 'zoomB']}],
 				},
 			],
 		}},
@@ -1216,6 +1422,34 @@ export default {
 				'secondZoom', 'secondIsFlipped',
 				'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
 				'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
+			], description: [
+				'The top-left lock rail\'s start zoom',
+				'The x-coordinate of the top-left lock rail\'s start point',
+				'The y-coordinate of the top-left lock rail\'s start point',
+				'The top-right lock rail\'s start zoom',
+				'The x-coordinate of the top-right lock rail\'s start point',
+				'The y-coordinate of the top-right lock rail\'s start point',
+				
+				'The start zoom for both origin rails',
+				'The x-coordinate of the top-left origin rail\'s horizon',
+				'The y-coordinate of the top-left origin rail\'s horizon',
+				'The x-coordinate of the top-right origin rail\'s horizon',
+				'The y-coordinate of the top-right origin rail\'s horizon',
+				
+				'The start zoom for both connecting rails',
+				'True if the viewport-side and viewport-base connecting rails have different gradients',
+				
+				'True if the top-left lock rail starts from its connecting rail',
+				'The x-coordinate of the top-left connecting rail\'s start point',
+				'The y-coordinate of the top-left connecting rail\'s start point',
+				'The x-coordinate of the top-left connecting rail\'s horizon',
+				'The y-coordinate of the top-left connecting rail\'s horizon',
+				
+				'True if the top-right lock rail starts from its connecting rail',
+				'The x-coordinate of the top-right connecting rail\'s start point',
+				'The y-coordinate of the top-right connecting rail\'s start point',
+				'The x-coordinate of the top-right connecting rail\'s horizon',
+				'The y-coordinate of the top-right connecting rail\'s horizon',
 			], and: {
 				op: 'call', id: 'getRails',
 			}},

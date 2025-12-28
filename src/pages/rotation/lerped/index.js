@@ -260,8 +260,8 @@ export default {
 			], and: {op: 'call', id: 'getRails'}},
 			'',
 			{op: '=', id: ['boundX', 'boundY'], description: [
-				'The x-position of the right-side bound',
-				'The y-position of the top-side bound',
+				'The x-coordinate of the right-side bound',
+				'The y-coordinate of the top-side bound',
 			], and: {
 				op: 'call', id: 'getBound',
 			}},
@@ -309,8 +309,8 @@ export default {
 		],
 		getCode(code, [
 			{op: '=', id: ['zX', 'zY'], description: [
-				'The zoom at which bounds start progressing along the y-axis',
 				'The zoom at which bounds start progressing along the x-axis',
+				'The zoom at which bounds start progressing along the y-axis',
 			], type: ['zoom', 'zoom'], and: {op: '?', and: [
 				{op: '==', and: ['y0', 0]},
 				{op: 'array', and: ['z0', 'z1']},

@@ -116,7 +116,6 @@ const functions = [
 		], and: {
 			op: 'call', id: 'getStartZooms',
 		}},
-		'',
 		{op: '=', id: ['rightX', 'rightY', 'topX', 'topY'], description: [
 			'The x-coordinate at the midpoint of the viewport\'s right edge',
 			'The y-coordinate at the midpoint of the viewport\'s right edge',
