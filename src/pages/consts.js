@@ -34,10 +34,10 @@ export const TWEEN_OPTIONS_YOYO = {duration: 0.5, repeat: 3, yoyo: true};
 
 export const TWEEN_OPTIONS_SETUP = {duration: 0.3, ease: 'power1.out'};
 
-export const getTweenOptionsBound = (pointIndex = 1) => ({
+export const getTweenOptionsBound = (pointIndex = 1, bound = 'bound1') => ({
 	isPositionUpdate: true,
 	onUpdate({parent}) {
-		const {x, y} = demo.system.bound1 || demo.system.zoomPoints[pointIndex];
+		const {x, y} = demo.system[bound] || demo.system.zoomPoints[pointIndex];
 		
 		if (parent === demo.tween) {
 			const {target} = parent.data;

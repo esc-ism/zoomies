@@ -1,5 +1,9 @@
 import demo from '@/demo';
 
+import {CLASS_DIAGRAM} from './consts';
+
+import './css';
+
 let target;
 
 const cancelEvent = (event) => {
@@ -8,6 +12,8 @@ const cancelEvent = (event) => {
 };
 
 const diagramContainer = document.createElement('div');
+
+diagramContainer.classList.add(CLASS_DIAGRAM);
 
 diagramContainer.style.position = 'absolute';
 diagramContainer.style.zIndex = '10';
@@ -19,6 +25,7 @@ diagramContainer.style.pointerEvents = 'all';
 diagramContainer.style.cursor = 'pointer';
 diagramContainer.style.backgroundColor = 'black';
 diagramContainer.style.backgroundColor = 'black';
+diagramContainer.style.boxSizing = 'border-box';
 
 diagramContainer.addEventListener('wheel', cancelEvent);
 diagramContainer.addEventListener('pointerdown', cancelEvent);

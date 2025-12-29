@@ -1,9 +1,9 @@
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
-import {CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {CLASS_MATH_LOOSE, getTweenOptionsBound, TWEEN_OPTIONS_SETUP, TWEEN_OPTIONS_YOYO} from '../../consts';
 import {register as registerFunctions, cleanup} from '../../code';
-import {getText, getCode, getInstruction, getMath, getInputDependent, getLink} from '../../shared';
+import {getText, getCode, getInstruction, getMath, getInputDependent, getLink, getDialogue, getConnectedPunctuation} from '../../shared';
 import {xmlns} from '../../shared/math';
 import {getPageButton, IDS} from '../../shared/page';
 import {getButton, clearButton} from '../../shared/button';
@@ -116,6 +116,10 @@ const functions = [
 	]},
 ];
 
+const getHorizonArgs = () => demo.ratioViewport <= 1 ?
+		{ratio: 0.5, zoom: 2, x: 0.25, y: 0} :
+		{ratio: 2, zoom: 2, x: 0, y: 0.25};
+
 export default {
 	System,
 	start() {
@@ -158,17 +162,20 @@ export default {
 		[
 			'Now that rotation is a factor in calculations, it\'s useful to split the process of finding bounds into two steps:',
 			{tag: 'ol', content: [
-				{tag: 'li', content: 'When rotation or aspect ratios change, calculate rail data (endpoints and start zooms).'},
+				{tag: 'li', content: 'When rotation or aspect ratios change, calculate rail data.'},
 				{tag: 'li', content: 'When either the first step runs or zoom is changed, use rail data to set bounds.'},
 			]},
 			'By precalculating rail data for zooms and snap-pans, those operations can be handled more efficiently.',
 		],
+		getDialogue('what does "rail data" mean?'),
 		[
-			'Now that we\'re working with rails more directly, it\'s useful to define some properties.',
 			'Internally, rails are defined as a "start zoom", a "start point", and a "horizon".',
-			'This is useful for bound calculation, since, past a rail\'s start zoom, doubling zoom will halve the distance between bound and horizon.',
+			'Let\'s define those properties.',
 		],
 		[
+			'Bounds calculations take a rail and, for a given zoom, output the bound\'s position on the rail.',
+			'Rails begin at their "start point", which is the bound calculation ouput at the rail\'s "start zoom".',
+			'Start points are either intersections with other rails, or the origin.',
 			'Bounds ',
 			getButton('start progressing', [
 				(zoom) => [{zoom, position: 0}, TWEEN_OPTIONS_SETUP],
@@ -180,19 +187,31 @@ export default {
 					return zoomPoints[zoomPoints[0].z < zoomPoints[1].z ? 0 : 1].z;
 				},
 			}),
-			' along a rail at its "start zoom" from its "start point".',
-			'You can observe these two properties from rails in the playground, but horizons aren\'t always apparent.',
+			' along a rail when zoom climbs above its start zoom.',
 		],
 		[
-			'The rails in this system are made up of two segments —',
-			'one starts at the origin and the other ends at a corner.',
-			'Even when rails appear to be ',
-			getButton('single lines', [[{ratio: 1, rotation: DEGREES[90]}, TWEEN_OPTIONS_SETUP]]),
-			' from origin to corner, there exist tiny rails connecting them to the origin.',
-			'For rails that end at corners, their "horizons" are these corners.',
+			'As zoom rises, bounds tend towards rail "horizons".',
+			'Specifically, past a rail\'s start zoom, doubling zoom will halve the distance between bound and horizon.',
+			'For rails that end at image corners, their horizons are these corners.',
 			'All other rails are different;',
-			'although they appear to end at their intersection with another rail in the playground, they are defined internally as ending at some more distant point.',
-			'In this system, these points are image edge midpoints, like ',
+			'although their playground depictions end at their ',
+			getButton('intersection', [
+				({ratio}) => [{ratio, zoom: 1, rotation: DEGREES[90], position: 0}, TWEEN_OPTIONS_SETUP],
+				({zoom}) => [{zoom}],
+				({x, y}) => [{x, y}, {ease: 'bounce.out'}],
+			], {
+				getParam: getHorizonArgs,
+			}),
+			' with another rail, they are defined internally as ending at some more distant point.',
+			'In this system, these unseen horizons are image edge ',
+			getConnectedPunctuation(getButton('midpoints', [
+				({ratio}) => [{ratio, zoom: 1, rotation: DEGREES[90], position: 0}, TWEEN_OPTIONS_SETUP],
+				({zoom}) => [{zoom}, getTweenOptionsBound(0, 'bound')],
+				({x, y}) => [{x: x * 2, y: y * 2}],
+			], {
+				getParam: getHorizonArgs,
+			}), ','),
+			' like ',
 			{tag: 'math', xmlns, classList: [CLASS_MATH_LOOSE], content: [
 				{tag: 'mo', xmlns, content: '('},
 				{tag: 'mn', xmlns, content: '0.5'},
@@ -212,7 +231,8 @@ export default {
 		],
 		[
 			'Now that we\'re done with definitions, let\'s transition into the transitioning!',
-			'Rails are calculated for the 0° and 90° rotation states, then made to fit other rotations via the ',
+			'Rails are calculated for the 0° and 90° rotation states, then transitioned between for other rotations.',
+			'Transitional states are found via the ',
 			getLink('linear interpolation', 'https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support'),
 			' formula.',
 			getMath({
@@ -237,9 +257,11 @@ export default {
 			}),
 		],
 		[
-			'In the code snippet below, linear interpolation is used in ',
+			'In the code snippet below, this rotation-based rail interpolation is performed by ',
 			{tag: 'i', content: 'getRailsProgressed'},
-			' to transition between different rail states.',
+			', which is called within ',
+			{tag: 'i', content: 'getRails'},
+			'.',
 			'Note that angle values in code are measured in ', getLink('radians', 'https://en.wikipedia.org/wiki/Radian'), '.',
 		],
 		getInstruction([
@@ -347,7 +369,7 @@ export default {
 				
 				return {...data, position, startZoom: 1, zoom: getConstrainedZoom({x: 0.25, y: 0.25}, lowAxis, zoomPoints)};
 			}}),
-			' towards a visible corner, the system will fail to provide a high enough zoom.',
+			' towards a visible corner, the system won\'t provide a high enough zoom.',
 		],
 		[
 			'This isn\'t an insignificant issue;',

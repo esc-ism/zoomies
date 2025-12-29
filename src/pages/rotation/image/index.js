@@ -371,9 +371,9 @@ export default {
 		[
 			'Like origin rail start zooms, which are found via the same maths as in ', getPageButton(IDS.SINGLE), ', lock rails are found through trigonometry.',
 			'There are four kinds of lock rail;',
-			'they can start from either axis and end at either a side or base corner.',
+			'start points can lie on either axis and horizons can be either side or base corners.',
 			'Each of the four variations has slightly different formulae, but they all present similar problems with similar solutions.',
-			'Given below are derivations of start zoom and start position formulae for the x-axis, base corner variant.',
+			'Given below are derivations of start zoom and start point formulae for the x-axis, base corner variant.',
 		],
 		getDiagrammedMath(
 			zoomImage,
@@ -383,7 +383,7 @@ export default {
 					{tag: 'mtable', xmlns, classList: [CLASS_MATH_ASSERTION], content: [
 						{tag: 'mtr', xmlns, content: [
 							{tag: 'mtd', xmlns, content: [
-								{tag: 'div', content: 'let the rails meet at'},
+								{tag: 'div', content: 'let the lock rail\'s start point be'},
 							]},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'mo', xmlns, content: '('},
@@ -1044,8 +1044,8 @@ export default {
 			},
 		),
 		[
-			'That math is used by ', {tag: 'i', content: 'getRails'}, ' below, which returns rail endpoints and start zooms.',
-			'If you want to know how the other lock rail variants are handled, see ', {tag: 'i', content: 'getIntersectSide'}, ' and ', {tag: 'i', content: 'getIntersectBase'}, '.',
+			'That math is used in ', {tag: 'i', content: 'getRails'}, ' below.',
+			'Specifically, ', {tag: 'i', content: 'getIntersectSide'}, ' and ', {tag: 'i', content: 'getIntersectBase'}, ' hold the formulae for every lock rail variant.',
 		],
 		getCode(code, [
 			{op: '=', id: [
@@ -1150,7 +1150,7 @@ export default {
 		],
 		[
 			'The final product may have either two or three segments, as seen below.',
-			'Segments are coloured to show pairings.',
+			'Segments colours signify pairings.',
 		],
 		getDoubleImage(snapImageDuo, snapImageTrio),
 		[

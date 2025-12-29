@@ -1102,12 +1102,12 @@ export default {
 				({zoomPoints}) => [{position: zoomPoints[4], zoom: zoomPoints[4].z}],
 			], {getParam: () => getDirectVars()}), '.'),
 			' When this fails, enter the "connecting rail"!',
-			'Connecting rails are pointed directly towards ',
+			'Connecting rail horizons are ',
 			getConnectedPunctuation(getButton('viewport corners', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{position: zoomPoints[4].end}],
 			], {getParam: () => getDirectVars()}), ','),
-			' each keeping a ',
+			' which enables them to keep a ',
 			getButton('pair', [
 				({rotation, ratio, zoomPoints, third}) => [{rotation, ratio, zoom: zoomPoints[1].z, position: third}, TWEEN_OPTIONS_SETUP],
 				({third}) => [{zoom: third.z}, {duration: 3, ease: 'none'}],
@@ -1126,16 +1126,16 @@ export default {
 		},
 		[
 			'Like a movie paying off its setups in the final act, this final system relies entirely on the concepts introduced earlier.',
-			'One pair of image corners is no longer ',
-			getButton('viewable', [
+			'One pair of image corners ',
+			getButton('touches', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}, TWEEN_OPTIONS_SETUP],
-				({zoomPoints}) => [{zoom: zoomPoints[3].z * 1.05}, TWEEN_OPTIONS_YOYO],
+				({zoomPoints}) => [{zoom: zoomPoints[3].z / 1.05}, TWEEN_OPTIONS_YOYO],
 			], {getParam: () => getDirectVars()}),
-			'  from the origin at the origin rail\'s start zoom.',
-			'The others are no longer ',
-			getButton('viewable', [
+			'  the edge of the viewport at the origin rail\'s start zoom.',
+			'The others ',
+			getButton('touch', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}, TWEEN_OPTIONS_SETUP],
-				({zoomPoints}) => [{zoom: zoomPoints[4].z * 1.05}, {
+				({zoomPoints}) => [{zoom: zoomPoints[4].z / 1.05}, {
 					...TWEEN_OPTIONS_YOYO,
 					onUpdate() {
 						demo.position.x = zoomPoints[4].x;
@@ -1145,24 +1145,23 @@ export default {
 					},
 				}],
 			], {getParam: () => getDirectVars()}),
-			' from any point along the origin rail at the connecting rail\'s start zoom.',
-			'We can find the connecting rail\'s start position by interpolating along its origin rail.',
-			'The only new wrinkle introduced is the question of its end point.',
+			' at the connecting rail\'s start zoom.',
+			'We can find the connecting rail\'s start point by interpolating along its origin rail.',
+			'Only in its horizon is a new wrinkle introduced.',
 		],
 		[
-			'I\'ve stated that connecting rails are pointed at ',
+			'I\'ve stated that connecting rail horizons are ',
 			getConnectedPunctuation(getButton('viewport corners', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{position: zoomPoints[4].end}],
 			], {getParam: () => getDirectVars()}), ','),
 			' but how can we find these corners\' coordinates?',
-			'You might notice that this is reminiscent of ', getPageButton(IDS.DOUBLE), '\'s viewport midpoint problem.',
+			'You might notice that this is reminiscent of ', getPageButton(IDS.DOUBLE), '\'s origin rail horizon problem.',
 			'Conveniently, we can re-use those maths and locate corners by summing midpoint coordinates.',
 		],
 		[
-			'Before, we calculated top and right-side midpoints at different zoom levels (used here as origin and connecting rail start zooms).',
-			'It\'s simpler to interpolate down the pre-calculated midpoint at origin rail start zoom than it is to do more trigonometry.',
-			'So that\'s what you see below!',
+			'As before, top and right-side midpoints are calculated at origin and connecting rail start zooms.',
+			'Then, origin rail horizons are used to find connecting rail horizons, interpolating to scale up viewport size with increased start zooms.',
 		],
 		getDiagrammedMath(
 			pointsImage,
@@ -1411,8 +1410,8 @@ export default {
 			},
 		),
 		[
-			'You\'ll see that math in the ', {tag: 'i', content: 'getSecond'}, ' function.',
-			'The other main additions are conditions to identify which of the two possible corners connecting rails should point towards.',
+			'You\'ll see that math in the ', {tag: 'i', content: 'getSecond'}, ' function, deep within ', {tag: 'i', content: 'getRails'}, '.',
+			'The other main additions are conditions to identify which of the two possible connecting rail horizons should be used.',
 			'I\'ve also had to include special case checks for when corner rails and connecting rails have identical gradients, or when they\'re similar enough that rounding errors keep my code from finding accurate intersections.',
 		],
 		getCode(code, [

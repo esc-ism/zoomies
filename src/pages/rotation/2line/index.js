@@ -281,8 +281,17 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Origin rail start zooms are unchanged, but now travel directly towards viewport edge midpoints.',
-			'This requires us to find the coordinates of these midpoints.',
+			'Origin rail start zooms are unchanged, but their horizons are now viewport edge ',
+			getConnectedPunctuation(getButton('midpoints', [
+				({zoom}) => [{zoom, position: 0}, TWEEN_OPTIONS_SETUP],
+				({position}) => [{position}],
+			], {getParam: () => {
+				const {zoomPoints} = demo.system;
+				const index = zoomPoints[0].z < zoomPoints[2].z ? 0 : 2;
+				
+				return {zoom: zoomPoints[index].z, position: zoomPoints[index].end};
+			}}), '.'),
+			'Finding the coordinates of these midpoints requires some trigonometry.',
 			'A solution is given below, using the base image corners and the viewport\'s top edge as an example.',
 		],
 		getDiagrammedMath(
@@ -600,7 +609,7 @@ export default {
 		],
 		'If there\'s more than one possible snap zoom, the higher value is used.',
 		getCode(code, [
-			{op: '=', id: 'snapZoom', description: 'The minimum zoom at which (x, y) is in-bounds', type: 'zoom', and: {
+			{op: '=', id: 'snapZoom', description: 'The minimum post-inversion zoom at which (x, y) is in-bounds', type: 'zoom', and: {
 				op: 'max', multiline: true, and: [
 					{op: 'call', id: 'getZoom', and: [false, false]},
 					{op: 'call', id: 'getZoom', and: [false, true]},

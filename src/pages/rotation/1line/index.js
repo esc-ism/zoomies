@@ -150,7 +150,7 @@ export default {
 			getButton('state', [
 				() => [{ratio: demo.ratioViewport, rotation: DEGREES[45], zoom: 1, position: 0}],
 			]),
-			' that caused issues with non-square viewports, you\'ll see that it\'s now handled perfectly.',
+			' that caused issues with non-square viewports, you\'ll see that it\'s now handled perfectly!',
 		],
 		[
 			'For a zoomful system built to handle rotation in its bounding, this one takes the most rudimentary approach possible.',
@@ -1686,18 +1686,14 @@ export default {
 		},
 		[
 			'As mentioned in ', getPageButton(IDS.EDGE), ', my approach to snap-panning underestimates how far the user wants to zoom in.',
-			'The worst outcome is being too zoomed out.',
+			'The worst snap pan outcomes accentuate this underestimation by being too zoomed out.',
 		],
 		[
 			'The good news is that this makes the overly restrictive bounds harmless — if anything, they\'re beneficial!',
 			'Permissive bounds, on the other hand, are unacceptable, because they cause unexpectedly ',
-			getButton('zoomed-out', getSnapOptions(), {getParam: () => ({
-				position: {y: 0.25, x: 0},
-				zoom: 2,
-				startZoom: 1,
-				rotation: DEGREES[90],
-				ratio: 0.25,
-			})}),
+			getButton('zoomed out', getSnapOptions(), {
+				getParam: () => ({position: {y: 0.25, x: 0}, zoom: 2, startZoom: 1, rotation: DEGREES[90], ratio: 0.25}),
+			}),
 			' snap-pans.',
 		],
 		{
