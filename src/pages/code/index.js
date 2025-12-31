@@ -3,7 +3,7 @@ import elements from '@/demo/elements';
 import {Line} from '@/demo/lines/lines';
 import {SVG_NAMESPACE, DEGREES} from '@/shared';
 
-import flash from '../shared/flash';
+import getFlash from '../shared/flash';
 
 import {
 	ANGLE_RADIUS, BUILT_INS, CLASS_NAMES, CLASS_MAXIMISED,
@@ -480,13 +480,6 @@ const [setTitle, removeTitle] = (() => {
 				}
 				
 				body.innerText = isValue ? value : description;
-				
-				if (!isValue && !description) {
-					body.innerText = 'description missing — they\'re a work in progress';
-					body.style.color = '#f99';
-				} else {
-					body.style.removeProperty('color');
-				}
 				
 				container.style.removeProperty('right');
 				
@@ -1008,10 +1001,12 @@ const generateButtons = (parent, statements) => {
 	
 	refreshParams.push({parent, statements});
 	
+	const flash = getFlash(parent.parentElement.parentElement);
+	
 	buttons.refresh.addEventListener('click', () => {
 		reset();
 		
-		flash(parent.parentElement.parentElement);
+		flash();
 		
 		for (const args of refreshParams) {
 			for (let i = args.parent.children.length - 1; i >= 0; --i) {

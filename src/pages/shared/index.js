@@ -3,7 +3,7 @@ import {SUB_PIXEL_BS} from '@/shared';
 
 import generateCode, {addSpanBackground} from '../code';
 import {
-	CLASS_CODE, CLASS_WRAPPER, CLASS_INSTRUCTION, CLASS_FLASH_CONTAINER,
+	CLASS_WRAPPER, CLASS_INSTRUCTION, CLASS_CODE,
 	CLASS_MATH_TITLE, CLASS_MATH_WRAPPER, CLASS_MATH_CONTAINER, CLASS_MATH_BODY,
 } from '../consts';
 
@@ -104,7 +104,7 @@ export const getCode = (callbacks, statements) => {
 				},
 			},
 		},
-		classList: [CLASS_CODE, CLASS_FLASH_CONTAINER],
+		classList: [CLASS_CODE],
 	};
 };
 

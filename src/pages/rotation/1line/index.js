@@ -35,7 +35,6 @@ export const permissiveTweens = {
 
 const functions = [
 	...SHARED_FUNCTIONS,
-	// todo remove args wherever possible
 	{op: 'func', id: 'getBound', args: ['cornerX', 'cornerY', 'cornerZoom'], description: [
 		'The horizon\'s x-coordinate',
 		'The horizon\'s y-coordinate',
@@ -162,7 +161,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'To assign start zooms, we need to find the maximum zoom at which image corners are visible from the origin.',
+			'Each rail\'s start zoom is the highest zoom at which its image corner is visible from the origin.',
 			'Adjacent rails can differ, but opposite rails always share a start zoom.',
 			'Knowing this, only the top-left and top-right corners need be considered.',
 		],
@@ -190,7 +189,7 @@ export default {
 				' to the left is one of three threshold indicators.',
 				'Scroll it off the top of the screen to see the diagram.',
 			],
-			{callback: (element) => {
+			{callback: (element) => demo.init().then(() => {
 				const {viewport} = demo.elements;
 				
 				demo.hooks.resizeViewport.add(() => {
@@ -202,7 +201,7 @@ export default {
 						element.innerText = '';
 					}
 				}, true);
-			}},
+			})},
 			[
 				getInputDependent((isMouse) => isMouse ? 'Click' : 'Tap'),
 				' diagrams to center their maths.',
@@ -911,7 +910,6 @@ export default {
 				op: 'call', id: 'getBound', and: [{op: 'pseudo', and: 0.5, type: 'x'}, {op: 'pseudo', and: 0.5, type: 'y'}, 'topRightZoom'],
 			}},
 			'',
-			// todo does ref overwrite description?
 			{op: '=', id: 'bottomLeftX', description: 'The bound\'s x-coordinate on the bottom-left rail', ref: 'topRightX', pair: 'bottomLeftY', and: {
 				op: '-', and: 'topRightX',
 			}},

@@ -3,10 +3,9 @@ import {inputListener} from '@/consts';
 import {DEGREES, getAngleDiff} from '@/shared';
 import {CLASS_HIDE_HORIZONTAL, CLASS_HIDE_VERTICAL} from '@/shared/orientation';
 
-import {CLASS_FLASH_CONTAINER} from '../consts';
 import {getText, getInstruction, getDialogue, getInputDependent} from '../shared';
 import {clearButton} from '../shared/button';
-import flash from '../shared/flash';
+import getFlash from '../shared/flash';
 import {IDS} from '../shared/page';
 
 import getRestartButton from './restart';
@@ -191,7 +190,7 @@ export default {
 			'It will walk you through the problems and demonstrate solutions, building from basics to the limits of my amateur capabilities.',
 		],
 		getDialogue(
-			'sounds good. what\'s the thing ',
+			'sure. what\'s the thing ',
 			{tag: 'span', classList: [CLASS_HIDE_HORIZONTAL], content: 'at the top'},
 			{tag: 'span', classList: [CLASS_HIDE_VERTICAL], content: 'to the left'},
 			'?',
@@ -237,9 +236,9 @@ export default {
 					}
 				};
 				
-				inputListener.add(update);
+				const flash = getFlash(container);
 				
-				container.classList.add(CLASS_FLASH_CONTAINER);
+				inputListener.add(update);
 				
 				button.style.display = 'none';
 				
@@ -282,7 +281,7 @@ export default {
 								}
 							} while (!validator());
 							
-							flash(container);
+							flash();
 						}
 						
 						instruction = undefined;
@@ -300,7 +299,7 @@ export default {
 						]);
 						
 						if (id === exits) {
-							flash(container);
+							flash();
 						}
 						
 						container.style.removeProperty('cursor');

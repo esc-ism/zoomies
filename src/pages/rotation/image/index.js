@@ -345,7 +345,6 @@ export default {
 		],
 		[
 			'Similarly to ', getPageButton(IDS.EDGER), ', ',
-			// todo there are likely lots of buttons that should be doing manual position setting
 			getButton('origin rails', [
 				({rotation, ratio, zoomPoints}) => [{position: 0, ratio, rotation, zoom: zoomPoints[2].z}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z}, {...getTweenOptionsBound(2), duration: 3}],

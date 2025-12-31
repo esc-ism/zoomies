@@ -1,7 +1,5 @@
 import demo from '@/demo';
-import {getId, getIdGetter} from '@/shared/css';
-
-export const CLASS_FLASH_CONTAINER = getId('flash', 'container');
+import {getIdGetter} from '@/shared/css';
 
 export const getTextId = getIdGetter('text');
 

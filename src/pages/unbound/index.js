@@ -102,15 +102,11 @@ export default {
 			'Utility doesn\'t ', {tag: 'i', content: 'really'}, ' matter to me, though.',
 			'More important is that unbound panning is ', {tag: 'strong', content: 'boring'}, ' and bound panning is ', {tag: 'strong', content: 'interesting'}, '!',
 		],
-		getDialogue(
-			'why make me read about something you ',
-			{tag: 'strong', content: 'agree'},
-			' is boring?',
-		),
+		getDialogue('you agree this is boring? why write about it?'),
 		[
 			'No story\'s ending is as impactful without context.',
 			'These early pages set up the complex bounding coming later, and document the journey I took to get there.',
-			'Hopefully, by the end, you\'ll find this stuff as interesting as I do!',
+			'We\'ll get to the good stuff soon, and, when we do, hopefully you\'ll find it as interesting as I do!',
 		],
 	),
 };

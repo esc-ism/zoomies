@@ -194,7 +194,7 @@ export default {
 			' a perfect corner view.',
 		],
 		[
-			'I call these ', {tag: 'i', content: 'possible'}, ' advantages because they aren\'t necessarily desireable.',
+			'I call these "possible" advantages because they aren\'t necessarily desireable.',
 			'In general, the more freedom given to users, the better their experience;',
 			'being restricted is frustrating.',
 		],
@@ -414,6 +414,7 @@ export default {
 			'This system, made to handle un-rotated images, fulfills its role perfectly.',
 			'Every design problem had a single, unambiguous solution, leaving no scope for innovation.',
 			'So, in the name of progress, we\'ll only be looking at systems built for rotation from now on.',
+			'This one happens to handle rotation with limited success under niche conditions, but we want something that ', {tag: 'strong', content: 'excels'}, ' under ', {tag: 'strong', content: 'all'}, ' conditions.',
 		],
 		[
 			'All upcoming systems will be based on this one, each trying to generalise its behaviour.',

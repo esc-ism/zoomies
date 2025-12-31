@@ -630,7 +630,7 @@ export default {
 			'.',
 			'The only clue to their existence is some slight behavioural inconsistency around the rotation values at window limits.',
 		],
-		getDialogue('how aren\'t the bad rails causing issues?'),
+		getDialogue('bad rails don\'t wreck things? how?'),
 		[
 			'Well, using the maximum snap zoom possible means that the permissive, pre-inversion rail segments are skipped.',
 			'Within inversion windows, snap-panning to ',
