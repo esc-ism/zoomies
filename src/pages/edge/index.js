@@ -49,7 +49,8 @@ export default {
 			'When possible, it keeps the viewport wholly within the image.',
 			'Panning is prevented along axes where the viewport is ',
 			getButton('larger', [
-				[{rotation: DEGREES[90], zoom: 0.8}],
+				[{rotation: DEGREES[90], position: 0, zoom: 1}, TWEEN_OPTIONS_SETUP],
+				[{zoom: 0.8}],
 			]),
 			' than the image.',
 		],
@@ -64,7 +65,7 @@ export default {
 			'Whereas bounds in ', getPageButton(IDS.CENTER), ' were fixed, from now on they will ',
 			getButton('grow and shrink', [
 				[{zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
-				[{zoom: 1.25}, TWEEN_OPTIONS_YOYO],
+				[{zoom: 1.2}, TWEEN_OPTIONS_YOYO],
 			]),
 			' alongside zoom.',
 			'Bounds may be a point at the image\'s origin, a ',

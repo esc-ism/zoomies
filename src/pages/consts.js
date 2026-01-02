@@ -50,3 +50,5 @@ export const getTweenOptionsBound = (pointIndex = 1, bound = 'bound1') => ({
 		}
 	},
 });
+
+export const FONT_SIZE_EMOJI = '1.8em';

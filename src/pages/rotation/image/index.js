@@ -2,7 +2,10 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
 import {cleanup, register as registerFunctions} from '../../code';
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, getTweenOptionsBound, TWEEN_OPTIONS_SETUP} from '../../consts';
+import {
+	CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE,
+	FONT_SIZE_EMOJI, TWEEN_OPTIONS_SETUP, getTweenOptionsBound,
+} from '../../consts';
 import {getText, getCode, getDiagrammedMath, getInstruction, getConnectedPunctuation} from '../../shared';
 import {getPageButton, IDS} from '../../shared/page';
 import {getButton, clearButton} from '../../shared/button';
@@ -300,8 +303,8 @@ export default {
 				() => [{position: demo.system.bound1 || {x: 0, y: 0}}, TWEEN_OPTIONS_SETUP],
 				({ratio, rotation, zoom}) => [{ratio, rotation, zoom}, getTweenOptionsBound(3)],
 			], {getParam: () => getRestrictiveVars()}),
-			' that was too restrictive is way better!',
-			' ', getPageButton(IDS.CENTER), ' gives users much more viewfinding flexibility, but this seems good enough to avoid frustrating users.',
+			' that was too restrictive is way better! ',
+			getPageButton(IDS.CENTER), ' would provide much more viewfinding flexibility, but this system at least mitigates frustration.',
 			'The overly permissive ',
 			getButton('state', [[permissiveTweens, TWEEN_OPTIONS_SETUP]]),
 			' is also fixed, accurately replicating the behaviour of ', getPageButton(IDS.EDGE), '.',
@@ -340,7 +343,7 @@ export default {
 			]), '.'),
 		],
 		[
-			'Now that we\'re messing with rail gradients, we need another rail segment to connect back to the origin.',
+			'Now that we\'re messing with gradients, rails need an additional segment to connect them back to the origin.',
 			'I\'ll call rail segments that determine lock points "lock rails" and the other segments "origin rails".',
 		],
 		[
@@ -370,9 +373,9 @@ export default {
 		[
 			'Like origin rail start zooms, which are found via the same maths as in ', getPageButton(IDS.SINGLE), ', lock rails are found through trigonometry.',
 			'There are four kinds of lock rail;',
-			'start points can lie on either axis and horizons can be either side or base corners.',
+			'start points can lie on either axis, and lock points can lie on either the viewport\'s side or base.',
 			'Each of the four variations has slightly different formulae, but they all present similar problems with similar solutions.',
-			'Given below are derivations of start zoom and start point formulae for the x-axis, base corner variant.',
+			'Given below are derivations of start zoom and start point formulae for the x-axis, base lock point variant.',
 		],
 		getDiagrammedMath(
 			zoomImage,
@@ -1193,9 +1196,7 @@ export default {
 			'It complements ', getPageButton(IDS.CENTER), ' well.',
 			'The two systems synergise perfectly, covering each other\'s weakness to create a superior product.',
 		],
-		{
-			tag: 'div', style: {textAlign: 'center', fontSize: '1.8em'}, content: '🥳',
-		},
+		{tag: 'div', style: {textAlign: 'center', fontSize: FONT_SIZE_EMOJI}, content: '🥳'},
 		[
 			'By combining systems, we\'ve finally conquered rotation!',
 			'This is a win, but perhaps more second act climax than final, supreme victory.',

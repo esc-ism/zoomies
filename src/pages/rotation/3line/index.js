@@ -1,7 +1,12 @@
+import gsap from 'gsap';
+
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
-import {CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP, TWEEN_OPTIONS_YOYO} from '../../consts';
+import {
+	CLASS_MATH_ASSERTION, CLASS_MATH_EQUATION, CLASS_MATH_LOOSE,
+	FONT_SIZE_EMOJI, TWEEN_OPTIONS_SETUP, TWEEN_OPTIONS_YOYO,
+} from '../../consts';
 import {cleanup, register as registerFunctions} from '../../code';
 import {getText, getCode, getMath, getDiagrammedMath, getConnectedPunctuation} from '../../shared';
 import {getButton, clearButton} from '../../shared/button';
@@ -877,11 +882,12 @@ const functions = [
 			'The horizon\'s y-coordinate for a second rail bordering the snap point region',
 		], and: {
 			op: 'call', id: 'getDirected', and: [
-				'flip0', 'thirdZoom0', 'thirdX0', 'thirdY0', {op: 'pseudo', type: 'x', and: -0.5},
+				'flip0', 'thirdX0', 'thirdY0', {op: 'pseudo', type: 'x', and: -0.5},
 				'firstZoom', 'firstEndX0', 'firstEndY0',
 				'secondZoom', 'hasSecond0', 'secondX0', 'secondY0', 'secondEndX0', 'secondEndY0',
 			],
 		}},
+		'',
 		{op: '=', multiline: [5], id: [
 			'zoomLow1', 'fromXLow1', 'fromYLow1', 'toXLow1', 'toYLow1',
 			'fromXHigh1', 'fromYHigh1', 'toXHigh1', 'toYHigh1',
@@ -897,7 +903,7 @@ const functions = [
 			'The horizon\'s y-coordinate for a second rail bordering the snap point region',
 		], and: {
 			op: 'call', id: 'getDirected', and: [
-				'flip1', 'thirdZoom1', 'thirdX1', 'thirdY1', {op: 'pseudo', type: 'x', and: 0.5},
+				'flip1', 'thirdX1', 'thirdY1', {op: 'pseudo', type: 'x', and: 0.5},
 				'firstZoom', 'firstEndX1', 'firstEndY1',
 				'secondZoom', 'hasSecond1', 'secondX1', 'secondY1', 'secondEndX1', 'secondEndY1',
 			],
@@ -925,6 +931,12 @@ const functions = [
 			'The y-coordinate of the second pre-snip lock rail\'s start point',
 			'The x-coordinate of the second pre-snip lock rail\'s horizon',
 			'The y-coordinate of the second pre-snip lock rail\'s horizon',
+		], type: [
+			'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
+			'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
+		], pair: [
+			, 'y0C', 'x0C', 'yEnd0C', 'xEnd0C', 'y1C', 'x1C', 'yEnd1C', 'xEnd1C',,
+			'y0B', 'x0B', 'yEnd0B', 'xEnd0B', 'y1B', 'x1B', 'yEnd1B', 'xEnd1B',
 		], and: {
 			op: '?', multiline: true, and: [
 				{op: '>=', and: ['thirdZoom0', 'thirdZoom1']},
@@ -974,16 +986,17 @@ const functions = [
 			]}},
 		]},
 		'',
-		{op: 'return', and: {op: 'array', multiline: 9, and: [
+		{op: 'return', and: {op: 'array', multiline: 2, and: [
 			'zoomC', 'x0C', 'y0C', 'xEnd0C', 'yEnd0C', 'x1C', 'y1C', 'xEnd1C', 'yEnd1C',
 			'zoomB', 'x0B', 'y0B', 'xEnd0B', 'yEnd0B', 'x1B', 'y1B', 'xEnd1B', 'yEnd1B',
 		]}},
 	]},
-	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1', 'isInverse'], description: [
+	{op: 'func', id: 'getZoom', args: ['flip0', 'flip1'], description: [
 		'True if the top-left rail should be mirrored',
 		'True if the top-right rail should be mirrored',
 		'True for the left and right regions',
 	], type: 'zoom', and: [
+		{op: '=', id: 'isInverse', description: 'True for the left and right regions', and: {op: '!=', and: ['flip0', 'flip1']}},
 		{op: '=', id: [
 			'zoomC', 'fromX0C', 'fromY0C', 'toX0C', 'toY0C', 'fromX1C', 'fromY1C', 'toX1C', 'toY1C',
 			'zoomB', 'fromX0B', 'fromY0B', 'toX0B', 'toY0B', 'fromX1B', 'fromY1B', 'toX1B', 'toY1B',
@@ -1102,7 +1115,7 @@ export default {
 				({zoomPoints}) => [{position: zoomPoints[4], zoom: zoomPoints[4].z}],
 			], {getParam: () => getDirectVars()}), '.'),
 			' When this fails, enter the "connecting rail"!',
-			'Connecting rail horizons are ',
+			'Connecting rails\' horizons are ',
 			getConnectedPunctuation(getButton('viewport corners', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{position: zoomPoints[4].end}],
@@ -1125,15 +1138,15 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Like a movie paying off its setups in the final act, this final system relies entirely on the concepts introduced earlier.',
-			'One pair of image corners ',
-			getButton('touches', [
+			'Like a movie paying off its setups in the final act, this final system relies entirely on pre-established maths.',
+			'Before, two candidate start zooms were calculated for the origin rail.',
+			'Here, the ',
+			getButton('origin', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[3].z, position: 0}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{zoom: zoomPoints[3].z / 1.05}, TWEEN_OPTIONS_YOYO],
 			], {getParam: () => getDirectVars()}),
-			'  the edge of the viewport at the origin rail\'s start zoom.',
-			'The others ',
-			getButton('touch', [
+			' rail\'s start zoom is the lower of the two, and the ',
+			getButton('connecting', [
 				({rotation, ratio, zoomPoints}) => [{rotation, ratio, zoom: zoomPoints[4].z, position: zoomPoints[4]}, TWEEN_OPTIONS_SETUP],
 				({zoomPoints}) => [{zoom: zoomPoints[4].z / 1.05}, {
 					...TWEEN_OPTIONS_YOYO,
@@ -1145,8 +1158,8 @@ export default {
 					},
 				}],
 			], {getParam: () => getDirectVars()}),
-			' at the connecting rail\'s start zoom.',
-			'We can find the connecting rail\'s start point by interpolating along its origin rail.',
+			' rail\'s start zoom is the higher.',
+			'The connecting rail\'s start point is found by interpolating along its origin rail.',
 			'Only in its horizon is a new wrinkle introduced.',
 		],
 		[
@@ -1502,7 +1515,7 @@ export default {
 				() => [{rotation: demo.rotation - DEGREES[360]}, {cutRotation: false, ease: 'none', duration: 8}],
 				[{ratioImage: 0.5}, {position: '<', duration: 2}],
 				[{ratioImage: 1.5}, {duration: 2}],
-				[{ratioImage: 0.75}, {duration: 2}],
+				[{ratioImage: 0.6666666666666}, {duration: 2}],
 				[{ratioImage: 2}, {duration: 2}],
 			]), ','),
 			' providing a more consistent and reliable experience.',
@@ -1557,7 +1570,7 @@ export default {
 		],
 		getDoubleImage(snapImageDuo, snapImageTrio),
 		[
-			'It\'s definitely possible to pinpoint the snap position\'s region here, but it\'d be tricky.',
+			'It\'s definitely possible to pinpoint the snap point\'s region here, but it\'d be tricky.',
 			'I\'ve elected to just check every region again.',
 			'Taking an inferior approach is a little irksome, but this method is simple and avoids introducing sneaky bugs.',
 			'If you cared about efficiency, this would be the way to improve it.',
@@ -1593,23 +1606,100 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'This is a system that succeeds on both fronts.',
-			'It does all that\'s required to be considered a success, despite my creeping scope.',
-			'It\'s likely that a different approach could produce something wholly superior,',
-			'but my line of reasoning dead-ends here.',
+			'With this system, the goal of devising a rotation-handler that succeeds on both fronts has been achieved.',
+			'Despite the creeping scope, we\'ve accomplished everything we set out to do.',
+			'Perhaps this mountain has higher summits, still undiscovered beyond the fog, but I\'ve puzzled along far enough to be satisfied with my adventure.',
 		],
 		[
 			'And, with that, we\'re done!',
 			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful;',
 			'its bounding is outclassed by ', getPageButton(IDS.CENTER), ' and its snap-panning has no compelling advantage over ', getPageButton(IDS.IMAGE), '.',
-			'Nevertheless, I\'m glad to have seen my vision through, and proud to have pushed my limits so far.',
+			'Still, sometimes a jack of all trades is exactly what\'s needed!',
+			'And, regardless of the outcome, I\'m glad to have seen my vision through, and proud to have pushed my limits so far.',
 		],
 		[
-			'Let\'s end on a less clinical note.',
-			'There\'s a kind of geometric beauty to this system, isn\'t there?',
-			'I find the way that its bounds warp, and the patterns formed by its rails, a little mesmerising.',
+			'Hopefully you\'re proud to have scaled this peak alongside me!',
+			'Take a second to give yourself a pat on the back — you\'ve earned it.',
+		],
+		{tag: 'div', style: {textAlign: 'center', fontSize: FONT_SIZE_EMOJI}, content: [
+			{tag: 'span', content: '✨', style: {scale: '-1 1', display: 'inline-block'}}, '🏆✨',
+		]},
+		[
+			'Anyway, let\'s wrap this up with one, final stroke of sentimentality.',
+			'A key aspect of this work\'s appeal, unmentioned since the ', getPageButton(IDS.SPLASH), ', is its visuals.',
+			'There\'s a kind of geometric beauty to some of these systems, isn\'t there?',
+			'This one in particular, with the way that its bounds warp, and the patterns formed by its rails, can be a little ',
+			getConnectedPunctuation(getButton('mesmerising', [
+				[{zoom: 1, position: 0, ratioImage: 1}, TWEEN_OPTIONS_SETUP],
+				[{rotation: `-=0.1`, zoom: 0.9}, {ease: 'power1.out', duration: 0.5}],
+				[{rotation: `+=${DEGREES[360] * 3 + 0.1}`}, {
+					ease: 'power2.out',
+					cutRotation: false,
+					duration: 6,
+					delay: 0.2,
+					onUpdate: (() => {
+						const low = 0.32;
+						const mid = 0.5;
+						const high = 0.95;
+						const threshLow = 0.07;
+						const threshMid = 0.1;
+						const threshHigh = 0.1;
+						const scaleLow = 0.2;
+						const scaleMid = 0.35;
+						const scaleHigh = 1;
+						
+						return ({ratio}) => {
+							if (ratio <= low - threshLow) {
+								gsap.globalTimeline.timeScale(1);
+								
+								return;
+							}
+							
+							if (ratio <= low) {
+								gsap.globalTimeline.timeScale(1 - ((ratio - (low - threshLow)) / threshLow) * (1 - scaleLow));
+								
+								return;
+							}
+							
+							if (ratio <= mid - threshMid) {
+								gsap.globalTimeline.timeScale(scaleLow);
+								
+								return;
+							}
+							
+							if (ratio <= mid) {
+								gsap.globalTimeline.timeScale(scaleLow + ((ratio - ((mid - threshMid) - threshMid)) / threshMid) * (scaleMid - scaleLow));
+								
+								return;
+							}
+							
+							if (ratio <= high - threshHigh) {
+								gsap.globalTimeline.timeScale(scaleMid);
+								
+								return;
+							}
+							
+							if (ratio <= high) {
+								gsap.globalTimeline.timeScale(scaleMid + ((ratio - (high - threshHigh)) / threshHigh) * (scaleHigh - scaleMid));
+								
+								return;
+							}
+							
+							gsap.globalTimeline.timeScale(scaleHigh);
+						};
+					})(),
+					onInterrupt: () => {
+						gsap.globalTimeline.timeScale(1);
+					},
+				}],
+				[{zoom: 2}, {duration: 1, ease: 'power3.out', position: '<'}],
+				[{zoom: 1.5, ratioImage: 1.4}, {duration: 1.5}],
+				[{zoom: 1}, {duration: 3.5, ease: 'power1.out'}],
+				[{ratioImage: 1.2}, {duration: 1, position: '<'}],
+				[{ratioImage: 1}, {duration: 2}],
+			]), '.'),
 			'Having reached the end of my site, I hope that you\'ve gained an appreciation for that aesthetic charm, and all that went into its design.',
 		],
-		{style: {textAlign: 'center', font: '1.8em EnsuredVinerHandITC', marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
+		{style: {textAlign: 'center', font: `${FONT_SIZE_EMOJI} EnsuredVinerHandITC`, marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
 	),
 };

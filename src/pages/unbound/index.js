@@ -1,4 +1,4 @@
-import {CLASS_MATH_LOOSE} from '../consts';
+import {CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP} from '../consts';
 import {getText, getInstruction, getInputDependent, getMath, getDialogue, getConnectedPunctuation} from '../shared';
 import {getButton} from '../shared/button';
 import {xmlns} from '../shared/math';
@@ -67,7 +67,8 @@ export default {
 		[
 			'A competent user of this system may ',
 			getButton('self-impose', [
-				[{zoom: 1, position: 0.2}],
+				[{zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
+				[{position: 0.2}],
 				[{position: {x: 0.3, y: -0.2}}],
 				[{position: {x: -0.2, y: -0.3}}],
 				[{position: {x: -0.4, y: 0.2}}],
@@ -75,7 +76,8 @@ export default {
 			' bounds to keep their bearings.',
 			'But what if their ',
 			getConnectedPunctuation(getButton('finger slips', [
-				[{position: 2, zoom: 1}],
+				[{zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
+				[{position: 2}],
 			]), '?'),
 		],
 		[

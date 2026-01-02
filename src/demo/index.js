@@ -940,7 +940,7 @@ export default new class {
 						
 						break;
 					case 'rotation':
-						if (cutRotation) {
+						if (cutRotation && typeof value === 'number') {
 							if (value > this.rotation) {
 								record(type, value - this.rotation <= DEGREES[180] ? value : value - DEGREES[360]);
 							} else {
@@ -1000,6 +1000,14 @@ export default new class {
 		return this.tween = timeline
 			.eventCallback('onUpdate', () => {
 				this.progress.set(timeline.totalProgress());
+			})
+			// I guess killing a timeline doesn't trigger child onInterrupt callbacks 🤷‍♂️
+			.eventCallback('onInterrupt', () => {
+				for (const child of timeline.getChildren()) {
+					if (child.isActive()) {
+						child.kill();
+					}
+				}
 			})
 			.play();
 	}
