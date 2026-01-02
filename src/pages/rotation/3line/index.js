@@ -316,7 +316,7 @@ const functions = [
 			'The y-coordinate of the connecting rail\'s start point',
 			'The x-coordinate of the connecting rail\'s horizon',
 			'The y-coordinate of the connecting rail\'s horizon',
-		], type: ['x', 'y', 'x', 'y'], pair: ['secondY', 'secondX', 'secondEndY', 'secondEndX'], and: {
+		], and: {
 			op: 'call', id: 'getSecond', and: ['firstZoom', 'firstEndX', 'firstEndY', 'secondZoom', 'offsetX', 'offsetY'],
 		}},
 		'',

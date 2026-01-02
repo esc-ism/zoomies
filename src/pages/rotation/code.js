@@ -308,8 +308,8 @@ export const DOUBLE_LINE = [
 		'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
 	], pair: [
 		,2, 1, 4, 3, 6, 5, 8, 7,,
-		11, 10, 13, 12, 15, 14, 17, 16,,
-		20, 19, 22, 21, 24, 23, 26, 25,
+		11, 10, 13, 12, 15, 14, 17, 16,,,
+		21, 20, 23, 22, 25, 24, 27, 26,
 	], multilineResult: [9, 9, 10], and: [
 		{op: '=', id: ['dEndX0', 'dEndY0', 'dMidX0', 'dMidY0', 'dCX0', 'dCY0'], description: [
 			'The x-coordinate of the first origin rail\'s horizon',
@@ -354,6 +354,12 @@ export const DOUBLE_LINE = [
 			'The y-coordinate of the second pre-snip lock rail\'s start point',
 			'The x-coordinate of the second pre-snip lock rail\'s horizon',
 			'The y-coordinate of the second pre-snip lock rail\'s horizon',
+		], type: [
+			'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
+			'zoom', 'x', 'y', 'x', 'y', 'x', 'y', 'x', 'y',
+		], pair: [
+			, 'y0C', 'x0C', 'yEnd0C', 'xEnd0C', 'y1C', 'x1C', 'yEnd1C', 'xEnd1C',,
+			'y0B', 'x0B', 'yEnd0B', 'xEnd0B', 'y1B', 'x1B', 'yEnd1B', 'xEnd1B',
 		], and: {op: '?', multiline: true, and: [
 			{op: '>=', and: ['zoom0', 'zoom1']},
 			{op: 'array', multiline: 2, and: [

@@ -73,7 +73,7 @@ const functions = [
 			'The x-coordinate of the origin rail\'s horizon',
 			'The y-coordinate of the origin rail\'s horizon',
 			'True if the origin rail\'s horizon is the midpoint of the viewport\'s right edge',
-		], type: ['x', 'y', 'zoom', 'xvp', 'yvp'], pair: [1, 0,,4, 3], and: {
+		], type: ['x', 'y', 'zoom', 'xvp', 'yvp'], pair: ['intersectY', 'intersectX',, 'endY', 'endX'], and: {
 			op: '?', multiline: true, and: [
 				{op: '!=', and: [
 					{op: '<', and: [{op: 'abs', and: {op: '/', and: [{op: '-', and: [0.5, 'axisY']}, 'cornerX']}}, 1]},
