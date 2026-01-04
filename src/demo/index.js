@@ -271,12 +271,12 @@ export default new class {
 				}
 				
 				if (event.ctrlKey) {
-					this.listeners.resizeImage(event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] / -1000);
+					this.listeners.resizeImage(event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] * -0.0015);
 					
 					return;
 				}
 				
-				this.listeners.zoom(event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] / -1000);
+				this.listeners.zoom(event.deltaY * MULTIPLIERS_SCROLL[event.deltaMode] * -0.0015);
 			});
 			
 			this.addPointerDownListener(
@@ -401,7 +401,7 @@ export default new class {
 											const dFrom = Math.sqrt(Math.pow(touch.client.from.x - center.x, 2) + Math.pow(touch.client.from.y - center.y, 2));
 											const dTo = Math.sqrt(Math.pow(touch.client.to.x - center.x, 2) + Math.pow(touch.client.to.y - center.y, 2));
 											
-											this.listeners.zoom((dTo - dFrom) / Math.max(this.sizesViewport.halfWidth, this.sizesViewport.halfHeight));
+											this.listeners.zoom((dTo - dFrom) / Math.max(this.sizesViewport.halfWidth, this.sizesViewport.halfHeight) * 0.5);
 											
 											return;
 										}
@@ -415,7 +415,7 @@ export default new class {
 											const from = (touch.client.from.y + other.client.to.y) / 2;
 											const to = (touch.client.to.y + other.client.to.y) / 2;
 											
-											this.listeners.resizeImage((to - from) / this.sizesViewport.halfHeight);
+											this.listeners.resizeImage((to - from) / this.sizesViewport.height);
 											
 											return;
 										}
@@ -423,7 +423,7 @@ export default new class {
 										const from = (touch.client.from.x + other.client.to.x) / 2;
 										const to = (touch.client.to.x + other.client.to.x) / 2;
 										
-										this.rotation += (from - to) / this.sizesViewport.width * DEGREES[360];
+										this.rotation += (from - to) / this.sizesViewport.width * DEGREES[270];
 										
 										this.listeners.rotate();
 									};

@@ -1572,7 +1572,7 @@ export default {
 		[
 			'It\'s definitely possible to pinpoint the snap point\'s region here, but it\'d be tricky.',
 			'I\'ve elected to just check every region again.',
-			'Taking an inferior approach is a little irksome, but this method is simple and avoids introducing sneaky bugs.',
+			'Taking a suboptimal approach is a little irksome, but this method is simple and avoids introducing sneaky bugs.',
 			'If you cared about efficiency, this would be the way to improve it.',
 		],
 		[
@@ -1607,11 +1607,11 @@ export default {
 		},
 		[
 			'With this system, the goal of devising a rotation-handler that succeeds on both fronts has been achieved.',
-			'Despite the creeping scope, we\'ve accomplished everything we set out to do.',
+			'Despite the creeping scope, we\'ve accomplished all that we set out to do.',
 			'Perhaps this mountain has higher summits, still undiscovered beyond the fog, but I\'ve puzzled along far enough to be satisfied with my adventure.',
 		],
 		[
-			'And, with that, we\'re done!',
+			'So, with that, we\'re done!',
 			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful;',
 			'its bounding is outclassed by ', getPageButton(IDS.CENTER), ' and its snap-panning has no compelling advantage over ', getPageButton(IDS.IMAGE), '.',
 			'Still, sometimes a jack of all trades is exactly what\'s needed!',
@@ -1624,9 +1624,9 @@ export default {
 		{tag: 'div', style: {textAlign: 'center', fontSize: FONT_SIZE_EMOJI}, content: [
 			{tag: 'span', content: '✨', style: {scale: '-1 1', display: 'inline-block'}}, '🏆✨',
 		]},
+		'Now that I\'ve finally finished penning logic, I\'ll shed the facade of stoicism and reveal my inner hedonism.',
 		[
-			'Anyway, let\'s wrap this up with one, final stroke of sentimentality.',
-			'A key aspect of this work\'s appeal, unmentioned since the ', getPageButton(IDS.SPLASH), ', is its visuals.',
+			'To me, the core of this work\'s appeal, unmentioned since the ', getPageButton(IDS.SPLASH), ', is aesthetic.',
 			'There\'s a kind of geometric beauty to some of these systems, isn\'t there?',
 			'This one in particular, with the way that its bounds warp, and the patterns formed by its rails, can be a little ',
 			getConnectedPunctuation(getButton('mesmerising', [
@@ -1697,9 +1697,10 @@ export default {
 				[{zoom: 1}, {duration: 3.5, ease: 'power1.out'}],
 				[{ratioImage: 1.2}, {duration: 1, position: '<'}],
 				[{ratioImage: 1}, {duration: 2}],
-			]), '.'),
-			'Having reached the end of my site, I hope that you\'ve gained an appreciation for that aesthetic charm, and all that went into its design.',
+			]), '...'),
+			' like a hypnotic dance.',
 		],
+		'Having reached the end of my site, I hope that you\'ve gained an appreciation for that visual charm, and all that went into its design.',
 		{style: {textAlign: 'center', font: `${FONT_SIZE_EMOJI} EnsuredVinerHandITC`, marginTop: 'calc(var(--text-height) - var(--scrollbar-width))'}, content: 'Thanks for reading ✌'},
 	),
 };

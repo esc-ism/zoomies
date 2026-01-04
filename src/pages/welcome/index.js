@@ -62,8 +62,8 @@ const instructions = [
 		key: 'pan',
 		validator: new Validator(
 			() => ({...demo.position}),
-			({x, y}) => Math.abs(demo.position.x - x) / demo.ratioImage + Math.abs(demo.position.y - y) / demo.ratioImageInverse,
-			0.1,
+			({x, y}) => Math.pow((demo.position.x - x) / demo.ratioImage * demo.zoom, 2) + Math.pow((demo.position.y - y) / demo.ratioImageInverse * demo.zoom, 2),
+			0.00023,
 		),
 	},
 	{
@@ -78,7 +78,7 @@ const instructions = [
 		validator: new Validator(
 			() => demo.zoom,
 			(zoom) => (demo.zoom > zoom ? (demo.zoom / zoom) : (zoom / demo.zoom)) - 1,
-			0.1,
+			0.07,
 		),
 	},
 	{
@@ -88,7 +88,7 @@ const instructions = [
 		validator: new Validator(
 			() => demo.rotation,
 			(rotation) => Math.abs(getAngleDiff(demo.rotation, rotation)),
-			DEGREES[45] / 9,
+			DEGREES[45] * 0.4,
 		),
 	},
 	{
@@ -98,7 +98,7 @@ const instructions = [
 		validator: new Validator(
 			() => demo.ratioImage,
 			(ratioImage) => (demo.ratioImage > ratioImage ? (demo.ratioImage / ratioImage) : (ratioImage / demo.ratioImage)) - 1,
-			0.1,
+			0.07,
 		),
 	},
 	{
@@ -118,7 +118,7 @@ const instructions = [
 			return new Validator(
 				() => [resizerHorizontal.offsetLeft, resizerVertical.offsetTop],
 				([x, y]) => Math.abs(resizerHorizontal.offsetLeft - x) / window.innerWidth + Math.abs(resizerVertical.offsetTop - y) / window.innerHeight,
-				0.02,
+				0.035,
 			);
 		})(),
 	},

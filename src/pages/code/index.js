@@ -18,6 +18,7 @@ import './css';
 
 let globalScope;
 let functions;
+let maxedElement;
 const visuals = [];
 
 // awful hack because styling inline elements is weird
@@ -37,12 +38,18 @@ export const addSpanBackground = (classList, element, container = element.parent
 	};
 };
 
-export const cleanup = () => {
+export const cleanup = (doMinimise = true) => {
 	for (const visual of visuals) {
 		visual();
 	}
 	
 	visuals.length = 0;
+	
+	if (doMinimise && maxedElement) {
+		maxedElement.classList.remove(CLASS_MAXIMISED);
+		
+		maxedElement = undefined;
+	}
 };
 
 const visualClasses = {
@@ -626,7 +633,7 @@ const makeHoverable = (element, id, scope, meta, isVar) => {
 			}
 			
 			if (doShowVisuals) {
-				cleanup();
+				cleanup(false);
 			}
 			
 			hovered.length = 0;
@@ -1020,17 +1027,19 @@ const generateButtons = (parent, statements) => {
 	});
 	
 	buttons.max.addEventListener('click', () => {
-		buttons.max.replaceWith(buttons.min);
+		maxedElement = parent.parentElement.parentElement;
 		
-		parent.parentElement.parentElement.classList.add(CLASS_MAXIMISED);
+		buttons.max.replaceWith(buttons.min);
+		maxedElement.classList.add(CLASS_MAXIMISED);
 		
 		removeTitle();
 	});
 	
 	buttons.min.addEventListener('click', () => {
 		buttons.min.replaceWith(buttons.max);
+		maxedElement.classList.remove(CLASS_MAXIMISED);
 		
-		parent.parentElement.parentElement.classList.remove(CLASS_MAXIMISED);
+		maxedElement = undefined;
 		
 		removeTitle();
 	});

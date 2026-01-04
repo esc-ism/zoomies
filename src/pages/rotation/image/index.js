@@ -200,7 +200,7 @@ const functions = [
 			],
 		}},
 		'',
-		{op: '=', id: 'c', description: 'The lock rail\'s y-coordinate at its intersection with the y-axis', and: {
+		{op: '=', id: 'c', description: 'The lock rail\'s y-coordinate at its intersection with the y-axis', type: 'y', and: {
 			op: '-', and: ['secondY', {op: '*', and: ['m', 'secondX']}],
 		}},
 		'',
@@ -224,7 +224,10 @@ const functions = [
 			'',
 			{op: 'return', and: {op: 'array', and: [
 				true,
-				{op: 'call', id: 'isBelow', and: [{op: '-', and: 'x0'}, {op: '-', and: 'y0'}, {op: 'pseudo', type: 'x', and: 0.5}, {op: 'pseudo', type: 'y', and: -0.5}]},
+				{op: 'call', id: 'isBelow', and: [
+					{op: 'pseudo', type: 'x', and: {op: '-', and: 'x0'}}, {op: 'pseudo', type: 'y', and: {op: '-', and: 'y0'}},
+					{op: 'pseudo', type: 'x', and: 0.5}, {op: 'pseudo', type: 'y', and: -0.5},
+				]},
 			]}},
 		]},
 		'',
@@ -237,7 +240,10 @@ const functions = [
 		]},
 		'',
 		{op: 'return', and: {op: 'array', and: [
-			{op: 'call', id: 'isBelow', and: [{op: '-', and: 'x1'}, {op: '-', and: 'y1'}, {op: 'pseudo', type: 'x', and: -0.5}, {op: 'pseudo', type: 'y', and: -0.5}]},
+			{op: 'call', id: 'isBelow', and: [
+				{op: 'pseudo', type: 'x', and: {op: '-', and: 'x1'}}, {op: 'pseudo', type: 'y', and: {op: '-', and: 'y1'}},
+				{op: 'pseudo', type: 'x', and: -0.5}, {op: 'pseudo', type: 'y', and: -0.5},
+			]},
 			true,
 		]}},
 	]},
@@ -371,7 +377,7 @@ export default {
 			'Corners will alternate between base and side every 90°.',
 		],
 		[
-			'Like origin rail start zooms, which are found via the same maths as in ', getPageButton(IDS.SINGLE), ', lock rails are found through trigonometry.',
+			'Like origin rail start zooms, which are calculated via the same maths as in ', getPageButton(IDS.SINGLE), ', lock rails are found through trigonometry.',
 			'There are four kinds of lock rail;',
 			'start points can lie on either axis, and lock points can lie on either the viewport\'s side or base.',
 			'Each of the four variations has slightly different formulae, but they all present similar problems with similar solutions.',

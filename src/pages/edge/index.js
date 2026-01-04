@@ -2,7 +2,7 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
-import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP} from '../consts';
+import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP, getTweenOptionsBound} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
 import {getText, getCode, getInstruction, getMath, getInputDependent, getLink, getDialogue, getConnectedPunctuation} from '../shared';
@@ -204,9 +204,8 @@ export default {
 			'Though, of course, it ',
 			getButton('fails', [
 				[{zoom: 1, position: 0, rotation: DEGREES[90], ratio: 1}, TWEEN_OPTIONS_SETUP],
-				(position) => [position],
-				[{zoom: 2}, {position: '<30%'}],
-				[{rotation: DEGREES[90] - 0.2}, {duration: 0.5, delay: 0.3}],
+				[{zoom: 2}, getTweenOptionsBound(1, 'bound')],
+				() => [{rotation: demo.ratioViewport < 1 ? (DEGREES[90] + Math.atan(demo.ratioViewport)) : Math.atan(demo.ratioViewport)}, {duration: 0.5, delay: 0.3}],
 				({x, y}) => [{position: {x: x - 0.05, y: y - 0.05}}, {duration: 0.2, delay: 0.6}],
 				(position) => [position, {ease: 'bounce.out', duration: 0.4, delay: 0.1}],
 			], {getParam: getSnapPosition}),
@@ -415,7 +414,7 @@ export default {
 			'This system, made to handle un-rotated images, fulfills its role perfectly.',
 			'Every design problem had a single, unambiguous solution, leaving no scope for innovation.',
 			'So, in the name of progress, we\'ll only be looking at systems built for rotation from now on.',
-			'This one happens to handle rotation with limited success under niche conditions, but we want something that ', {tag: 'strong', content: 'excels'}, ' under ', {tag: 'strong', content: 'all'}, ' conditions.',
+			'The goal is effective, consistent behaviour under all conditions, instead of the limited rotation-handling effectiveness under niche conditions achieved here.',
 		],
 		[
 			'All upcoming systems will be based on this one, each trying to generalise its behaviour.',

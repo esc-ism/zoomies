@@ -66,7 +66,7 @@ const functions = [
 			op: '?', and: ['isLeftCorner', -0.5, 0.5],
 		}},
 		'',
-		{op: '=', multiline: true, id: ['intersectX', 'intersectY', 'intersectZoom', 'endX', 'endY', 'isRight'], description: [
+		{op: '=', multiline: 2, id: ['intersectX', 'intersectY', 'intersectZoom', 'endX', 'endY', 'isRight'], description: [
 			'The x-coordinate of the lock rail\'s start point',
 			'The y-coordinate of the lock rail\'s start point',
 			'The lock rail\'s start zoom',
@@ -139,7 +139,7 @@ const functions = [
 			'The viewport-side lock rail\'s zoom at its intersection with the y-axis',
 			'The viewport-side lock rail\'s y-coordinate at its intersection with the y-axis',
 		], and: {
-			op: 'call', id: 'getYIntersect', multiline: true, and: [
+			op: 'call', id: 'getYIntersect', and: [
 				'½viewportWidth',
 				{op: 'pseudo', type: 'angle', and: {op: '+', and: ['θ', 'αSide']}},
 				'αSide',
@@ -149,14 +149,14 @@ const functions = [
 			'The viewport-base lock rail\'s zoom at its intersection with the y-axis',
 			'The viewport-base lock rail\'s y-coordinate at its intersection with the y-axis',
 		], and: {
-			op: 'call', id: 'getYIntersect', multiline: true, and: [
+			op: 'call', id: 'getYIntersect', and: [
 				'½viewportHeight',
 				{op: 'pseudo', type: 'angle', isBase: true, and: {op: '-', and: ['½π', 'θ', 'αBase']}},
 				'αBase',
 			],
 		}},
 		'',
-		{op: '=', multiline: true, id: ['intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY', 'intersectSideIsRight'], description: [
+		{op: '=', multiline: 2, id: ['intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY', 'intersectSideIsRight'], description: [
 			'The x-coordinate of the viewport-side lock rail\'s start point',
 			'The y-coordinate of the viewport-side lock rail\'s start point',
 			'The viewport-side lock rail\'s start zoom',
@@ -166,7 +166,7 @@ const functions = [
 		], and: {
 			op: 'call', id: 'getCloseIntersection', and: ['rightX', 'rightY', 'topX', 'topY', 'axisIntersectSideY', 'axisIntersectSideZoom', 'isEvenQuadrant'],
 		}},
-		{op: '=', multiline: true, id: ['intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY', 'intersectBaseIsTop'], description: [
+		{op: '=', multiline: 2, id: ['intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY', 'intersectBaseIsTop'], description: [
 			'The x-coordinate of the viewport-base lock rail\'s start point',
 			'The y-coordinate of the viewport-base lock rail\'s start point',
 			'The viewport-base lock rail\'s start zoom',
