@@ -44,7 +44,7 @@ const functions = [
 		]}},
 	]},
 	{op: 'func', id: 'getRails', type: ['zoom', 'x', 'y', 'zoom', 'x', 'y'], pair: [,2, 1,, 5, 4], and: [
-		{op: '=', id: 'isEvenQuadrant', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
+		{op: '=', id: 'is▚', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
 			op: '!=', and: [{op: '%', and: [{op: 'floor', and: {op: '/', and: ['rotation', '½π']}}, 2]}, 0],
 		}},
 		'',
@@ -56,21 +56,21 @@ const functions = [
 			'The second rail\'s start zoom at 0° rotation',
 		], type: ['zoom', 'zoom'], and: {op: '?', and: ['isHighX', {op: 'array', and: ['zY', 'zX']}, {op: 'array', and: ['zX', 'zY']}]}},
 		'',
-		{op: '=', id: 'zX🗘', description: 'The zoom at which the image\'s left and right sides touch the viewport\'s edge at 90° rotation', type: 'zoom', and: {op: '/', and: ['viewportHeight', 'imageWidth']}},
-		{op: '=', id: 'zY🗘', description: 'The zoom at which the image\'s top and bottom sides touch the viewport\'s edge at 90° rotation', type: 'zoom', and: {op: '/', and: ['viewportWidth', 'imageHeight']}},
-		{op: '=', id: 'isHighX🗘', description: 'True if the first rail follows the y-axis at 90° rotation', and: {op: '>', and: ['zX🗘', 'zY🗘']}},
-		{op: '=', id: ['z0🗘', 'z1🗘'], description: [
+		{op: '=', id: 'zX↷', description: 'The zoom at which the image\'s left and right sides touch the viewport\'s edge at 90° rotation', type: 'zoom', and: {op: '/', and: ['viewportHeight', 'imageWidth']}},
+		{op: '=', id: 'zY↷', description: 'The zoom at which the image\'s top and bottom sides touch the viewport\'s edge at 90° rotation', type: 'zoom', and: {op: '/', and: ['viewportWidth', 'imageHeight']}},
+		{op: '=', id: 'isHighX↷', description: 'True if the first rail follows the y-axis at 90° rotation', and: {op: '>', and: ['zX↷', 'zY↷']}},
+		{op: '=', id: ['z0↷', 'z1↷'], description: [
 			'The first rail\'s start zoom at 90° rotation',
 			'The second rail\'s start zoom at 90° rotation',
-		], type: ['zoom', 'zoom'], and: {op: '?', and: ['isHighX🗘', {op: 'array', and: ['zY🗘', 'zX🗘']}, {op: 'array', and: ['zX🗘', 'zY🗘']}]}},
+		], type: ['zoom', 'zoom'], and: {op: '?', and: ['isHighX↷', {op: 'array', and: ['zY↷', 'zX↷']}, {op: 'array', and: ['zX↷', 'zY↷']}]}},
 		'',
 		{op: 'if', and: [
-			{op: '==', and: ['isHighX', 'isHighX🗘']},
+			{op: '==', and: ['isHighX', 'isHighX↷']},
 			{op: '=', id: 't', description: 'The rotation\'s progress from the 90° multiple below it to the one above it', and: {op: '/', and: [{op: '%', and: [{op: '+', and: ['rotation', '2π']}, '½π']}, '½π']}},
 			'',
 			{op: 'return', and: {op: 'call', id: 'getRailsProgressed', multiline: [5], and: [
-				'z0', 'z0🗘', 'z1', 'z1🗘',
-				'isHighX', {op: '?', and: ['isEvenQuadrant', 't', {op: '-', and: [1, 't']}]},
+				'z0', 'z0↷', 'z1', 'z1↷',
+				'isHighX', {op: '?', and: ['is▚', 't', {op: '-', and: [1, 't']}]},
 			]}},
 		]},
 		'',
@@ -78,9 +78,9 @@ const functions = [
 		{op: '=', id: 'progress', description: 'The rotation\'s progress towards being perfectly sideways', and: {op: '/', and: ['θ', '½π']}},
 		'',
 		{op: '=', id: 'scale', description: 'A measurement of how far the second rail\'s start point is from (0, 0) at 0° rotation', and: {op: 'log2', and: {op: '/', and: ['z1', 'z0']}}},
-		{op: '=', id: 'scale🗘', description: 'A measurement of how far the second rail\'s start point is from (0, 0) at 90° rotation', and: {op: 'log2', and: {op: '/', and: ['z1🗘', 'z0🗘']}}},
-		{op: '=', id: 'threshold', description: 'The "progress" value at which the second rail\'s start point should be (0, 0)', and: {op: '/', and: ['scale', {op: '+', and: ['scale', 'scale🗘']}]}},
-		{op: '=', id: 'zAvg0', description: 'The second rail\'s start zoom when its start point is (0, 0)', type: 'zoom', and: {op: '+', and: [{op: '*', and: ['threshold', {op: '-', and: ['z0🗘', 'z0']}]}, 'z0']}},
+		{op: '=', id: 'scale↷', description: 'A measurement of how far the second rail\'s start point is from (0, 0) at 90° rotation', and: {op: 'log2', and: {op: '/', and: ['z1↷', 'z0↷']}}},
+		{op: '=', id: 'threshold', description: 'The "progress" value at which the second rail\'s start point should be (0, 0)', and: {op: '/', and: ['scale', {op: '+', and: ['scale', 'scale↷']}]}},
+		{op: '=', id: 'zAvg0', description: 'The second rail\'s start zoom when its start point is (0, 0)', type: 'zoom', and: {op: '+', and: [{op: '*', and: ['threshold', {op: '-', and: ['z0↷', 'z0']}]}, 'z0']}},
 		'',
 		{op: 'return', and: {op: '?', multiline: true, and: [
 			{op: '<=', and: ['progress', 'threshold']},
@@ -89,8 +89,8 @@ const functions = [
 				'isHighX', {op: '/', and: ['progress', 'threshold']},
 			]},
 			{op: 'call', id: 'getRailsProgressed', multiline: [5], and: [
-				'zAvg0', 'z0🗘', 'zAvg0', 'z1🗘',
-				'isHighX🗘', {op: '/', and: [{op: '-', and: ['progress', 'threshold']}, {op: '-', and: [1, 'threshold']}]},
+				'zAvg0', 'z0↷', 'zAvg0', 'z1↷',
+				'isHighX↷', {op: '/', and: [{op: '-', and: ['progress', 'threshold']}, {op: '-', and: [1, 'threshold']}]},
 			]},
 		]}},
 	]},
@@ -350,7 +350,7 @@ export default {
 			style: {textAlign: 'center'},
 		},
 		[
-			'Honestly, I\'m surprised by how little the modification has helped.',
+			'Honestly, it surprises me how little this modification helps.',
 			'Make sure your viewport isn\'t square-shaped if you want to see the issues.',
 		],
 		[

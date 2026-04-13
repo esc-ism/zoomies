@@ -125,7 +125,7 @@ const functions = [
 			op: 'call', id: 'getViewportPoints', and: ['zoomSide', 'zoomBase'],
 		}},
 		'',
-		{op: '=', id: 'isEvenQuadrant', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
+		{op: '=', id: 'is▚', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
 			op: '!=', and: [{op: '%', and: [{op: 'floor', and: {op: '/', and: ['rotation', '½π']}}, 2]}, 0],
 		}},
 		{op: '=', id: 'θ', description: '0 when the image is perfectly right-side-up or upside-down, and 1 when the image is perfectly sideways', and: {op: 'call', id: 'getθ'}},
@@ -164,7 +164,7 @@ const functions = [
 			'The y-coordinate of the viewport-side origin rail\'s horizon',
 			'True if the viewport-side lock point is on the viewport\'s right edge',
 		], and: {
-			op: 'call', id: 'getCloseIntersection', and: ['rightX', 'rightY', 'topX', 'topY', 'axisIntersectSideY', 'axisIntersectSideZoom', 'isEvenQuadrant'],
+			op: 'call', id: 'getCloseIntersection', and: ['rightX', 'rightY', 'topX', 'topY', 'axisIntersectSideY', 'axisIntersectSideZoom', 'is▚'],
 		}},
 		{op: '=', multiline: 2, id: ['intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY', 'intersectBaseIsTop'], description: [
 			'The x-coordinate of the viewport-base lock rail\'s start point',
@@ -174,11 +174,11 @@ const functions = [
 			'The y-coordinate of the viewport-base origin rail\'s horizon',
 			'True if the viewport-base lock point is on the viewport\'s top edge',
 		], and: {
-			op: 'call', id: 'getCloseIntersection', and: ['topX', 'topY', 'rightX', 'rightY', 'axisIntersectBaseY', 'axisIntersectBaseZoom', {op: '!', and: 'isEvenQuadrant'}],
+			op: 'call', id: 'getCloseIntersection', and: ['topX', 'topY', 'rightX', 'rightY', 'axisIntersectBaseY', 'axisIntersectBaseZoom', {op: '!', and: 'is▚'}],
 		}},
 		'',
 		{op: 'if', and: [
-			'isEvenQuadrant',
+			'is▚',
 			{op: 'return', and: {op: 'array', multiline: [6], and: [
 				'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'intersectSideEndX', 'intersectSideEndY',
 				'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'intersectBaseEndX', 'intersectBaseEndY',
@@ -291,7 +291,7 @@ export default {
 				
 				return {zoom: zoomPoints[index].z, position: zoomPoints[index].end};
 			}}), '.'),
-			'Finding the coordinates of these midpoints requires some trigonometry.',
+			' Finding the coordinates of these midpoints requires some trigonometry.',
 			'A solution is given below, using the base image corners and the viewport\'s top edge as an example.',
 		],
 		getDiagrammedMath(
@@ -630,7 +630,7 @@ export default {
 			'.',
 			'The only clue to their existence is some slight behavioural inconsistency around the rotation values at window limits.',
 		],
-		getDialogue('bad rails don\'t wreck things? how?'),
+		getDialogue('bad rails = good snap panning? how?'),
 		[
 			'Well, using the maximum snap zoom possible means that the permissive, pre-inversion rail segments are skipped.',
 			'Within inversion windows, snap-panning to ',
@@ -654,7 +654,7 @@ export default {
 				}},
 			),
 			' gives the exact snap zoom where inversion happens.',
-			'No other snap point can give a lower, pre-inversion zoom.',
+			'No snap point can give a lower, pre-inversion zoom.',
 		],
 		{
 			tag: 'h2',
@@ -671,7 +671,7 @@ export default {
 		],
 		[
 			'On the bright side, its behaviour outside of inversion windows is exactly what I\'m looking for.',
-			'The system shows that this approach to origin rails has promise, but it needs an innovation.',
+			'This approach to origin rails has promise, but it needs an innovation.',
 			'Let\'s see if we can find one!',
 		],
 	),

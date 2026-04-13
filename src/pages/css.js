@@ -38,10 +38,6 @@ addRule(`.${CLASS_MATH_ASSERTION} mtd:nth-child(2) > :only-child`, {'margin-bott
 
 addRule(`.${CLASS_MATH_BODY} div`, {'text-wrap-style': 'balance'});
 
-addRule([`.${CLASS_MATH_BODY}`, `.${CLASS_CODE} code`], {
-	padding: '0.7em 1em',
-});
-
 addRule(`.${CLASS_CODE} code`, {
 	'font-family': 'consolas, monospace',
 	'font-size': '0.85em',
@@ -50,6 +46,11 @@ addRule(`.${CLASS_CODE} code`, {
 	'padding-right': '3em',
 	display: 'block',
 	width: 'fit-content',
+});
+
+// needs to be AFTER the padding-right declaration above
+addRule([`.${CLASS_MATH_BODY}`, `.${CLASS_CODE} code`], {
+	padding: '0.7em 1em',
 });
 
 addRule(`.${CLASS_CODE} br + br + br`, {display: 'none'});

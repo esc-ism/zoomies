@@ -1,5 +1,3 @@
-import gsap from 'gsap';
-
 import demo from '@/demo';
 import {DEGREES} from '@/shared';
 
@@ -191,7 +189,7 @@ const functions = [
 		}},
 		'',
 		{op: 'if', and: [
-			'isEvenQuadrant',
+			'is▚',
 			{op: 'return', and: {op: 'array', multiline: 2, and: [
 				'axisZoomSide', {op: '-', and: 'axisXSide'}, 0,
 				'axisZoomBase', 'axisXBase', 0,
@@ -268,7 +266,7 @@ const functions = [
 			'The midpoint y-coordinate of the left/right viewport edge that is closer to the upper image corners',
 		], and: {
 			op: '?', multiline: true, and: [
-				{op: '!=', and: ['isVerticalFlip', 'isEvenQuadrant']},
+				{op: '!=', and: ['isVerticalFlip', 'is▚']},
 				{op: 'array', and: [{op: '-', and: 'rightX'}, {op: '-', and: 'rightY'}]},
 				{op: 'array', and: ['rightX', 'rightY']},
 			],
@@ -439,7 +437,7 @@ const functions = [
 		'zoom',,,
 		'x', 'y', 'x', 'y',,
 		'x', 'y', 'x', 'y',
-	], multilineResult: [3, 3, 5, 2, 5, 5], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,14, 13, 16, 15,,19, 18, 21, 20], args: ['isEvenQuadrant'], and: [
+	], multilineResult: [3, 3, 5, 2, 5, 5], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,14, 13, 16, 15,,19, 18, 21, 20], args: ['is▚'], and: [
 		{op: '=', id: ['zoomSide', 'zoomBase'], description: [
 			'The lowest zoom at which an image corner touches the left or right edge of the viewport',
 			'The lowest zoom at which an image corner touches the top or bottom edge of the viewport',
@@ -488,7 +486,7 @@ const functions = [
 			'The x-coordinate of the viewport-side lock rail\'s horizon',
 			'The x-coordinate of the viewport-base lock rail\'s horizon',
 		], type: ['x', 'x'], and: {
-			op: '?', and: ['isEvenQuadrant', {op: 'array', and: [-0.5, 0.5]}, {op: 'array', and: [0.5, -0.5]}],
+			op: '?', and: ['is▚', {op: 'array', and: [-0.5, 0.5]}, {op: 'array', and: [0.5, -0.5]}],
 		}},
 		'',
 		{op: '=', id: [
@@ -679,7 +677,7 @@ const functions = [
 		'x', 'y', 'x', 'y',,
 		'x', 'y', 'x', 'y',
 	], multilineResult: [3, 3, 5, 2, 5, 5], pair: [,2, 1,,5, 4,,8, 7, 10, 9,,,,15, 14, 17, 18,,20, 19, 22, 21], and: [
-		{op: '=', id: 'isEvenQuadrant', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
+		{op: '=', id: 'is▚', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
 			op: '!=', and: [{op: '%', and: [{op: 'floor', and: {op: '/', and: ['rotation', '½π']}}, 2]}, 0],
 		}},
 		'',
@@ -717,10 +715,10 @@ const functions = [
 			'The y-coordinate of the viewport-base connecting rail\'s start point',
 			'The x-coordinate of the viewport-base connecting rail\'s horizon',
 			'The y-coordinate of the viewport-base connecting rail\'s horizon',
-		], and: {op: 'call', id: 'getAll', and: ['isEvenQuadrant']}},
+		], and: {op: 'call', id: 'getAll', and: ['is▚']}},
 		'',
 		{op: 'if', and: [
-			'isEvenQuadrant',
+			'is▚',
 			{op: 'return', and: {op: 'array', multiline: [3, 3, 5, 2, 5, 5], and: [
 				'thirdZoomSide', 'thirdXSide', 'thirdYSide',
 				'thirdZoomBase', 'thirdXBase', 'thirdYBase',
@@ -1423,7 +1421,7 @@ export default {
 			},
 		),
 		[
-			'You\'ll see that math in the ', {tag: 'i', content: 'getSecond'}, ' function, deep within ', {tag: 'i', content: 'getRails'}, '.',
+			'That math is found in the ', {tag: 'i', content: 'getSecond'}, ' function, deep within ', {tag: 'i', content: 'getRails'}, '.',
 			'The other main additions are conditions to identify which of the two possible connecting rail horizons should be used.',
 			'I\'ve also had to include special case checks for when corner rails and connecting rails have identical gradients, or when they\'re similar enough that rounding errors keep my code from finding accurate intersections.',
 		],
@@ -1572,8 +1570,7 @@ export default {
 		[
 			'It\'s definitely possible to pinpoint the snap point\'s region here, but it\'d be tricky.',
 			'I\'ve elected to just check every region again.',
-			'Taking a suboptimal approach is a little irksome, but this method is simple and avoids introducing sneaky bugs.',
-			'If you cared about efficiency, this would be the way to improve it.',
+			'Taking a suboptimal approach is irksome, but this method is simple and avoids introducing sneaky bugs.',
 		],
 		[
 			'Overall, the code\'s mostly unchanged from ', getPageButton(IDS.DOUBLE), '.',
@@ -1607,18 +1604,17 @@ export default {
 		},
 		[
 			'With this system, the goal of devising a rotation-handler that succeeds on both fronts has been achieved.',
-			'Despite the creeping scope, we\'ve accomplished all that we set out to do.',
-			'Perhaps this mountain has higher summits, still undiscovered beyond the fog, but I\'ve puzzled along far enough to be satisfied with my adventure.',
+			'After a puzzle marathon, I\'ve finally caught up to my creeping scope.',
 		],
 		[
 			'So, with that, we\'re done!',
-			'Although this system is the culmination of my efforts, I consider it more conceptually interesting than practically useful;',
+			'Although this system is the culmination of my efforts, it seems more conceptually interesting than practically useful;',
 			'its bounding is outclassed by ', getPageButton(IDS.CENTER), ' and its snap-panning has no compelling advantage over ', getPageButton(IDS.IMAGE), '.',
 			'Still, sometimes a jack of all trades is exactly what\'s needed!',
 			'And, regardless of the outcome, I\'m glad to have seen my vision through, and proud to have pushed my limits so far.',
 		],
 		[
-			'Hopefully you\'re proud to have scaled this peak alongside me!',
+			'Hopefully you\'re proud of your own efforts!',
 			'Take a second to give yourself a pat on the back — you\'ve earned it.',
 		],
 		{tag: 'div', style: {textAlign: 'center', fontSize: FONT_SIZE_EMOJI}, content: [
@@ -1631,72 +1627,24 @@ export default {
 			'This one in particular, with the way that its bounds warp, and the patterns formed by its rails, can be a little ',
 			getConnectedPunctuation(getButton('mesmerising', [
 				[{zoom: 1, position: 0, ratioImage: 1}, TWEEN_OPTIONS_SETUP],
-				[{rotation: `-=0.1`, zoom: 0.9}, {ease: 'power1.out', duration: 0.5}],
-				[{rotation: `+=${DEGREES[360] * 3 + 0.1}`}, {
-					ease: 'power2.out',
+				[{rotation: `+=0.1`, zoom: 0.9}, {ease: 'power1.out', duration: 0.5}],
+				[{rotation: `-=${DEGREES[90] * 11}`}, {
 					cutRotation: false,
-					duration: 6,
+					ease: 'none',
+					duration: 15.5,
 					delay: 0.2,
-					onUpdate: (() => {
-						const low = 0.32;
-						const mid = 0.5;
-						const high = 0.95;
-						const threshLow = 0.07;
-						const threshMid = 0.1;
-						const threshHigh = 0.1;
-						const scaleLow = 0.2;
-						const scaleMid = 0.35;
-						const scaleHigh = 1;
-						
-						return ({ratio}) => {
-							if (ratio <= low - threshLow) {
-								gsap.globalTimeline.timeScale(1);
-								
-								return;
-							}
-							
-							if (ratio <= low) {
-								gsap.globalTimeline.timeScale(1 - ((ratio - (low - threshLow)) / threshLow) * (1 - scaleLow));
-								
-								return;
-							}
-							
-							if (ratio <= mid - threshMid) {
-								gsap.globalTimeline.timeScale(scaleLow);
-								
-								return;
-							}
-							
-							if (ratio <= mid) {
-								gsap.globalTimeline.timeScale(scaleLow + ((ratio - ((mid - threshMid) - threshMid)) / threshMid) * (scaleMid - scaleLow));
-								
-								return;
-							}
-							
-							if (ratio <= high - threshHigh) {
-								gsap.globalTimeline.timeScale(scaleMid);
-								
-								return;
-							}
-							
-							if (ratio <= high) {
-								gsap.globalTimeline.timeScale(scaleMid + ((ratio - (high - threshHigh)) / threshHigh) * (scaleHigh - scaleMid));
-								
-								return;
-							}
-							
-							gsap.globalTimeline.timeScale(scaleHigh);
-						};
-					})(),
-					onInterrupt: () => {
-						gsap.globalTimeline.timeScale(1);
-					},
 				}],
-				[{zoom: 2}, {duration: 1, ease: 'power3.out', position: '<'}],
-				[{zoom: 1.5, ratioImage: 1.4}, {duration: 1.5}],
-				[{zoom: 1}, {duration: 3.5, ease: 'power1.out'}],
-				[{ratioImage: 1.2}, {duration: 1, position: '<'}],
-				[{ratioImage: 1}, {duration: 2}],
+				[{zoom: 2}, {duration: 3, ease: 'power3.out', position: '<'}],
+				[{zoom: 1.5}, {duration: 11}],
+				[{ratioImage: 1.4}, {duration: 8, position: '<-1'}],
+				[{zoom: 1}, {duration: 8, ease: 'power1.out'}],
+				[{ratioImage: 1}, {duration: 10, position: '<'}],
+				[{rotation: `-=${DEGREES[90] + 0.1}`}, {
+					cutRotation: false,
+					ease: 'power3.out',
+					duration: 4.5,
+					position: '>-4.5',
+				}],
 			]), '...'),
 			' like a hypnotic dance.',
 		],

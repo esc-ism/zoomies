@@ -221,11 +221,8 @@ export const getDiagrammedMath = (diagram, ...sections) => {
 	}};
 };
 
-export const getConnectedPunctuation = (main, punctuation) => ({
+export const getConnectedPunctuation = (...content) => ({
 	tag: 'span',
 	style: {textWrapMode: 'nowrap'},
-	content: [
-		main,
-		punctuation,
-	],
+	content,
 });

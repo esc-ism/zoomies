@@ -2,7 +2,10 @@ import demo from '@/demo';
 import {DEGREES} from '@/shared';
 import {xmlns} from '@/pages/shared/math';
 
-import {CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP, getTweenOptionsBound} from '../consts';
+import {
+	CLASS_MATH_EQUATION, TWEEN_OPTIONS_YOYO, CLASS_MATH_LOOSE,
+	TWEEN_OPTIONS_SETUP, getTweenOptionsBound, FONT_SIZE_EMOJI,
+} from '../consts';
 import getRefreshButton from '../code/buttons/refresh';
 import {register as registerFunctions, cleanup} from '../code';
 import {getText, getCode, getInstruction, getMath, getInputDependent, getLink, getDialogue, getConnectedPunctuation} from '../shared';
@@ -209,13 +212,42 @@ export default {
 				({x, y}) => [{position: {x: x - 0.05, y: y - 0.05}}, {duration: 0.2, delay: 0.6}],
 				(position) => [position, {ease: 'bounce.out', duration: 0.4, delay: 0.1}],
 			], {getParam: getSnapPosition}),
-			' when rotation is introduced.',
-			'At least, it fails ', {tag: 'i', content: 'most'}, ' of the time...',
+			' when rotation is introduced...',
 		],
+		{
+			style: {textAlign: 'center', marginTop: '-0.5em'},
+			content: [
+				{
+					tag: 'span',
+					content: '...or does it? ',
+					style: {fontStyle: 'italic'},
+				},
+				{
+					tag: 'span',
+					content: '🤔',
+					style: {fontSize: FONT_SIZE_EMOJI},
+				},
+			],
+		},
 		[
-			'In a system made for images rotated 90°,',
-			' the viewport\'s height would be used to calculate ', {tag: 'i', content: 'boundX'},
-			' and its width would be used for ', {tag: 'i', content: 'boundY'}, '.',
+			'In a system made for images ',
+			getButton('rotated 90°', [
+				() => [{zoom: 1, rotation: DEGREES[90], ratio: 1, position: 0}, TWEEN_OPTIONS_SETUP],
+				[{rotation: 0}],
+			]),
+			',',
+			' the viewport\'s ',
+			getButton('height', [
+				() => [{zoom: 1, rotation: 0, ratio: 0.5, position: 0}, TWEEN_OPTIONS_SETUP],
+				[{zoom: 2}, {yoyo: true, repeat: 1, ...getTweenOptionsBound(0, 'bound')}],
+			]),
+			' would be used to calculate ', {tag: 'i', content: 'boundX'},
+			' and its ',
+			getButton('width', [
+				() => [{zoom: 1, rotation: 0, ratio: 2, position: 0}, TWEEN_OPTIONS_SETUP],
+				[{zoom: 2}, {yoyo: true, repeat: 1, ...getTweenOptionsBound(0, 'bound')}],
+			]),
+			' would be used for ', {tag: 'i', content: 'boundY'}, '.',
 			'That\'s the opposite of what we\'re doing here.',
 			'If width and height are equal, however, both systems yield the same results.',
 			'So, if this system has a square-shaped viewport, it handles 90° rotations perfectly!',

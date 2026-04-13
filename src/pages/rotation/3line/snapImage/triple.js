@@ -14,8 +14,8 @@ const svg = getDiagram(radii, strokeDiameter, topLeft, topRight);
 svg.style.marginLeft = '0.5em';
 
 const POINTS = [
-	[...getSplit([0, radii.y * -0.1], [radii.x * 0.113, radii.y * -0.21], 0.5), topLeft],
-	[[0, radii.y * 0.1], ...getSplit([radii.x * 0.04, radii.y * 0.15], topRight, 0.1)],
+	[...getSplit([0, radii.y * -0.1], [radii.x * 0.213, radii.y * -0.285], 0.5), topLeft],
+	[[0, radii.y * 0.1], ...getSplit([radii.x * 0.165, radii.y * 0.25], topRight, 0.1)],
 ];
 
 for (let i = 0; i < 3; ++i) {

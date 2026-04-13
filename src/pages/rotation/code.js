@@ -20,7 +20,7 @@ export const LERP = [
 		}},
 		'',
 		{op: 'if', and: [
-			'isEvenQuadrant',
+			'is▚',
 			{op: 'return', and: 'angle'},
 		]},
 		'',

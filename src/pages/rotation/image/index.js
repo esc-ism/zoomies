@@ -67,7 +67,7 @@ const functions = [
 		}},
 		'',
 		{op: 'return', and: {op: 'array', and: [
-			'intersectZoom', {op: '?', and: ['isEvenQuadrant', {op: '-', and: 'intersectX'}, 'intersectX']}, 0,
+			'intersectZoom', {op: '?', and: ['is▚', {op: '-', and: 'intersectX'}, 'intersectX']}, 0,
 		]}},
 	]},
 	{op: 'func', id: 'getIntersectBase', args: ['α'], description: ['The angle between the base lock rail and the un-rotated y-axis'], type: ['zoom', 'x', 'y'], pair: [, 2, 1], and: [
@@ -100,7 +100,7 @@ const functions = [
 		'',
 		{op: 'return', and: {op: 'array', and: [
 			'intersectZoom',
-			{op: '?', and: ['isEvenQuadrant', 'intersectX', {op: '-', and: 'intersectX'}]},
+			{op: '?', and: ['is▚', 'intersectX', {op: '-', and: 'intersectX'}]},
 			0,
 		]}},
 	]},
@@ -132,7 +132,7 @@ const functions = [
 			op: 'call', id: 'getStartZooms',
 		}},
 		'',
-		{op: '=', id: 'isEvenQuadrant', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
+		{op: '=', id: 'is▚', description: 'True if the image is rotated between 90° and 180°, or between 270° and 360°', and: {
 			op: '!=', and: [{op: '%', and: [{op: 'floor', and: {op: '/', and: ['rotation', '½π']}}, 2]}, 0],
 		}},
 		{op: '=', id: 'θ', description: '0 when the image is perfectly right-side-up or upside-down, and 1 when the image is perfectly sideways', and: {op: 'call', id: 'getθ'}},
@@ -175,7 +175,7 @@ const functions = [
 		}},
 		'',
 		{op: 'if', and: [
-			'isEvenQuadrant',
+			'is▚',
 			{op: 'return', and: {op: 'array', multiline: 2, and: [
 				'zoomSide', 'intersectSideX', 'intersectSideY', 'intersectSideZoom', 'endXSide', 'endYSide',
 				'zoomBase', 'intersectBaseX', 'intersectBaseY', 'intersectBaseZoom', 'endXBase', 'endYBase',
@@ -568,20 +568,6 @@ export default {
 							{tag: 'mtext', xmlns, content: 'is'},
 							{tag: 'mtd', xmlns, content: [
 								{tag: 'div', content: 'the desired lock rail angle'},
-							]},
-						]},
-						{tag: 'mtr', xmlns, content: [
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mo', xmlns, content: '∠'},
-								{tag: 'mi', xmlns, content: 'B'},
-								{tag: 'mi', xmlns, content: 'A'},
-								{tag: 'mi', xmlns, content: 'C'},
-							]},
-							{tag: 'mtext', xmlns, content: 'is'},
-							{tag: 'mtd', xmlns, content: [
-								{tag: 'mi', xmlns, content: 'θ'},
-								{tag: 'mo', xmlns, content: '+'},
-								{tag: 'mi', xmlns, content: 'α'},
 							]},
 						]},
 					]},

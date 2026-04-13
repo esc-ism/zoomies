@@ -167,17 +167,25 @@ export default {
 		],
 		[
 			'For a given corner, there are two possible start zooms —',
-			'one if the corner disappears off the viewport\'s "',
-			getButton('side', [
-				[{rotation: DEGREES[90], ratio: 0.5, zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
-				[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
-			]),
-			'" (left/right), and another if it disappears off its "',
-			getButton('base', [
-				[{rotation: DEGREES[90], ratio: 2, zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
-				[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
-			]),
-			'" (top/bottom).',
+			'one if the corner disappears off the viewport\'s ',
+			getConnectedPunctuation(
+				'"',
+				getButton('side', [
+					[{rotation: DEGREES[90], ratio: 0.5, zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
+					[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
+				]),
+				'"',
+			),
+			' (left/right), and another if it disappears off its ',
+			getConnectedPunctuation(
+				'"',
+				getButton('base', [
+					[{rotation: DEGREES[90], ratio: 2, zoom: 1, position: 0}, TWEEN_OPTIONS_SETUP],
+					[{zoom: 1.05}, TWEEN_OPTIONS_YOYO],
+				]),
+				'"',
+			),
+			' (top/bottom).',
 			'Finding these requires some trigonometry.',
 			'A solution is given below, using the top-left image corner as an example.',
 		],
@@ -1024,7 +1032,7 @@ export default {
 			'The final step is to find some fraction "', {tag: 'i', content: 't'}, '" of rail length such that a line through both rails at ', {tag: 'i', content: 't'}, ' also passes through the snap point.',
 			'A kindred spirit gives a more detailed description of the problem ',
 			getLink('here', 'https://math.stackexchange.com/questions/2223691/intersect-2-lines-at-the-same-ratio-through-a-point'),
-			', including an excellent diagram that you may find helpful.',
+			', including a diagram that you may find helpful.',
 		],
 		[
 			'We can write out a definition of rail points at ', {tag: 'i', content: 't'}, ' using linear interpolation.',
@@ -1332,7 +1340,7 @@ export default {
 										]},
 										{tag: 'mo', xmlns, content: ')'},
 										{tag: 'mo', xmlns, content: '-'},
-										{tag: 'mi', xmlns, content: 'y'},
+										{tag: 'mi', xmlns, content: 'x'},
 									]},
 								]},
 							]},
@@ -1381,7 +1389,7 @@ export default {
 										]},
 										{tag: 'mo', xmlns, content: ')'},
 										{tag: 'mo', xmlns, content: '-'},
-										{tag: 'mi', xmlns, content: 'y'},
+										{tag: 'mi', xmlns, content: 'x'},
 									]},
 								]},
 							]},
@@ -1705,7 +1713,7 @@ export default {
 		],
 		[
 			'A valid use case would require variable rotation alongside guaranteed 1:1 aspect ratios for both image and viewport —',
-			'any other shared ratio will work fine at default zoom, but will give permissive bounds when rotated 90°.',
+			'any other shared ratio will give permissive bounds when rotated 90°.',
 			'With such specific preconditions, it\'s hard to call this system particularly useful.',
 		],
 		[

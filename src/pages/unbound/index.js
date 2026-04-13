@@ -1,4 +1,4 @@
-import {CLASS_MATH_LOOSE, TWEEN_OPTIONS_SETUP} from '../consts';
+import {CLASS_MATH_LOOSE, FONT_SIZE_EMOJI, TWEEN_OPTIONS_SETUP} from '../consts';
 import {getText, getInstruction, getInputDependent, getMath, getDialogue, getConnectedPunctuation} from '../shared';
 import {getButton} from '../shared/button';
 import {xmlns} from '../shared/math';
@@ -29,7 +29,7 @@ export default {
 				{tag: 'mi', xmlns, content: 'y'},
 				{tag: 'mo', xmlns, content: ')'},
 			]},
-			' is the position of the viewport\'s center, a formal description of the system used by the playground might read:',
+			' is the position of the viewport\'s center, a formal description of the playground\'s pan-limiting system might read:',
 		],
 		getMath({
 			content: {tag: 'mtable', xmlns, content: [
@@ -104,11 +104,13 @@ export default {
 			'Utility doesn\'t ', {tag: 'i', content: 'really'}, ' matter to me, though.',
 			'More important is that unbound panning is ', {tag: 'strong', content: 'boring'}, ' and bound panning is ', {tag: 'strong', content: 'interesting'}, '!',
 		],
-		getDialogue('you agree this is boring? why write about it?'),
+		getDialogue('why write about it if it\'s boring?'),
 		[
-			'No story\'s ending is as impactful without context.',
-			'These early pages set up the complex bounding coming later, and document the journey I took to get there.',
-			'We\'ll get to the good stuff soon, and, when we do, hopefully you\'ll find it as interesting as I do!',
+			'Basically, the ideas coming later require a long preamble.',
+			'Instead of just spewing a wall of definitions and equations, I\'m narrativising their conception,',
+			'presenting systems as iterative refinements to solve increasingly difficult problems.',
+			'By the end, you\'ll have all the tools you need to get your socks ', {tag: 'strong', content: 'blown off'}, '.',
 		],
+		{content: '🧦💨🦵', style: {fontSize: FONT_SIZE_EMOJI, textAlign: 'center'}},
 	),
 };

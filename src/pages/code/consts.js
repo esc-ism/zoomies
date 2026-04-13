@@ -21,8 +21,8 @@ export const BUILT_INS = {
 	'¼π': () => ({value: Math.PI / 4, description: '45°', type: 'angle', fight: true}),
 	'⅛π': () => ({value: Math.PI / 8, description: '22.5°', type: 'angle', fight: true}),
 	
-	x: ({position: {x}}) => ({value: x, description: 'The horizontal translation applied to the viewport, relative to the image, as a fraction of image width', type: 'x'}),
-	y: ({position: {y}}) => ({value: y, description: 'The vertical translation applied to the viewport, relative to the image, as a fraction of image height', type: 'y'}),
+	x: ({position: {x}}) => ({value: x, description: 'The horizontal translation, relative to the image, applied to the viewport as a fraction of image width', type: 'x'}),
+	y: ({position: {y}}) => ({value: y, description: 'The vertical translation, relative to the image, applied to the viewport as a fraction of image height', type: 'y'}),
 	
 	rotation: ({rotation: value}) => ({value, description: 'The angle between the image\'s positive y-axis and its un-rotated positive x-axis', type: 'angle', fight: true}),
 	zoom: ({zoom: value}) => ({value, description: 'The image\'s scale', type: 'zoom'}),
