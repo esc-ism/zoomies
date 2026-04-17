@@ -106,11 +106,10 @@ export default {
 		],
 		getDialogue('why write about it if it\'s boring?'),
 		[
-			'Basically, the ideas coming later require a long preamble.',
-			'Instead of just spewing a wall of definitions and equations, I\'m narrativising their conception,',
+			'The ideas coming later require a long preamble.',
+			'Instead of just spewing a wall of definitions and equations, I\'m choosing to narrativise their conception,',
 			'presenting systems as iterative refinements to solve increasingly difficult problems.',
-			'By the end, you\'ll have all the tools you need to get your socks ', {tag: 'strong', content: 'blown off'}, '.',
+			'As long as you can remember our characters\' names, you\'ll be set up for a real page turner.',
 		],
-		{content: '🧦💨🦵', style: {fontSize: FONT_SIZE_EMOJI, textAlign: 'center'}},
 	),
 };
