@@ -106,10 +106,10 @@ export default {
 		],
 		getDialogue('why write about it if it\'s boring?'),
 		[
-			'The ideas coming later require a long preamble.',
-			'Instead of just spewing a wall of definitions and equations, I\'m choosing to narrativise their conception,',
-			'presenting systems as iterative refinements to solve increasingly difficult problems.',
-			'As long as you can remember our characters\' names, you\'ll be set up for a real page turner.',
+			'The interesting concepts require some setup.',
+			'Instead of dropping you in at the deep end, with only a wall of definitions and equations to keep you afloat, I\'m choosing to ease you in from first principles.',
+			'Though we\'re starting in the kiddie pool, you should progress like a duck to water!',
 		],
+		{content: '🦆💨', style: {fontSize: FONT_SIZE_EMOJI, textAlign: 'center', transform: 'scaleX(-1)'}},
 	),
 };
